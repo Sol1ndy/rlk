@@ -240,15 +240,22 @@ def build(W, ctx):
                  '# not in the air patterns (10 공중 장풍, 11 착지 공격: she would hang in the air)',
                  f'execute if score #pat {OBJ} matches 0..9 run return 1',
                  'return fail'])
-    w('bal_on', ['# @s = body: the pattern goes (like the G3 backfire, no true damage), she drops to a knee.',
+    w('bal_on', ['# @s = body: the pattern goes (like the G3 backfire, no true damage), she drops to a knee - on the floor: a glide',
+                 '# stopped mid-arc (the side-step hop of pattern 3) would leave the NoGravity body up to 0.6 b up (review B-08).',
                  f'execute if score #pat {OBJ} matches 1..11 run {fn("core/cancel_pat")}',
-                 fn('core/stop_move'),
+                 fn('core/stop_move'), fn('core/ground'),
                  sset('#stag', BAL_STAG), api.play('stun')]
       + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('stagger')]
       + [fn('hud/sub')])
     w('bal_tick', ['# @s = body: her own tick runs the stagger countdown (#stag).', fn('tick')])
     w('bal_off', ['# @s = body: the balance clock is over: the stagger ends now if it still runs (recovery, the AI).',
                   f'execute if score #stag {OBJ} matches 1.. run {fn("core/stag_end")}'])
+    w('core/ground', ['# Back on the floor at once if she is above it (@s = body; a cancelled glide / hop): the spot below when it',
+                      '# passes mv/ok, else the arena centre (never into a block, never below the floor).',
+                      f'execute store result score #t {OBJ} run data get entity @s Pos[1] 100',
+                      f'execute if score #t {OBJ} matches ..{CY * 100 + 4} run return 0',
+                      f'execute at @s positioned ~ {CY} ~ if function rlk:mboss/mv/ok run return run tp @s ~ ~ ~',
+                      f'execute positioned as @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] positioned ~ {CY} ~ run tp @s ~ ~ ~'])
     w('core/dash/probe', [
         '# Dash probe (@s = body, rotated as it): a marker rlk_tk_dp walks forward in 0.5 b steps while the next spot passes',
         '# mv/ok (inside the arena safe disc - 0.5 b, feet and head free), at most #t tk steps; #t2 tk = steps taken.',

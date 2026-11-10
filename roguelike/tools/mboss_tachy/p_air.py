@@ -188,10 +188,10 @@ def wing_fx():
 
 
 # ------------------------------------------------------------------------------------------------- hazards
-def hazard(key, hit, pos=None, tell=1, grp=False, extra_tag=None):
+def hazard(key, hit, pos=None, tell=1, grp=False, extra_tag=None, noparry=None):
     """The quiet hazard of api.HITS entry `hit` (s3lib.hazard) striking `tell` ticks later; pos = execute subcommands for
     a hazard away from the body (on the floor: y CY), aim = the body yaw. extra_tag: one more tag on it."""
-    lines = S.hazard(key, hit, grp=grp, tell=tell)
+    lines = S.hazard(key, hit, grp=grp, tell=tell, noparry=noparry)
     if pos:
         call = lines[-2]
         head = f'execute at @s rotated as @s rotated ~ 0 positioned ~ {CY} ~ run '
@@ -699,6 +699,10 @@ def build_l(W):
     lock = m1('rlk_tk_llock')
     dv.at(0, lock_lines(key, 'rlk_tk_llock'), 'tag @s remove rlk_mb_inv', api.play('dive'), face_to('rlk_tk_llock'),
           f'execute positioned as {lock} run function rlk:mboss/mv/glide {{t:{impact}}}', snd('dive'))
+    # combat overhaul (rulings B-01 / B-02): the landing shock (disc 5.5) is her one unparriable strike; its warning glint
+    # when the dive starts, on her chest (she is still high: where her own glints are), `shock` t before the shock
+    assert shock >= L.NP_LEAD_BIG
+    dv.at(0, L.np_warn(at=f'~ ~{S.H(1.4)} ~', pre=AT_BODY))
     if not K.p('thrust_trail', len=10, el=3):
         dv.rng(1, impact, f'execute at @s run {part(WHITE, 0.2, 0.6, 0.2, 0.02, 4)}')
     dv.at(impact - 1, hazard(key, hits[0], pos=f'at {lock}'))
@@ -706,7 +710,7 @@ def build_l(W):
           fx('dust_ring', [part('minecraft:poof', 1.2, 0.05, 1.2, 0.03, 16)], f'at {lock} positioned ~ ~0.1 ~', r=20),
           S.snd('chop'))
     dv.rng(impact + 1, shock - 1, f'execute at @s run {part(SPARK, 0.6, 0.9, 0.6, 0.1, 3)}')
-    dv.at(shock - 1, hazard(key, hits[1], pos=f'at {lock}'))
+    dv.at(shock - 1, hazard(key, hits[1], pos=f'at {lock}', noparry=1))
     dv.at(shock, fx('bolt', [part(SPARK, 1.5, 2.0, 1.5, 0.3, 40)], f'at {lock}'),
           fx('shock_ring', [part(GOLD, 2.8, 0.1, 2.8, 0, 50)], f'at {lock} positioned ~ ~0.1 ~', r=55), snd('shock'))
     dv.at(sl_end, 'kill @e[type=minecraft:marker,tag=rlk_tk_llock]')

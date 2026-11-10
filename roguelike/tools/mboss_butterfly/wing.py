@@ -756,12 +756,16 @@ def b5(g):
               at_b(c) + g.fx('rel_slashes'),
               BODY + f'positioned {c} positioned ^-1.2 ^ ^ run ' + g.fx('rel_flare'))
     tl.at(whirl[0], g.sound('entity.breeze.whirl', 0.6, 1.3))
+    # combat overhaul (rulings B-01 / B-02): 달빛 해제 is her one unparriable hit; the warning glint when the whirl starts,
+    # at the rig's core anchor of that tick (she hangs over R), B5_DET - whirl[0] ticks before the detonation
+    assert B5_DET - whirl[0] >= L.NP_LEAD_BIG
+    tl.at(whirl[0], L.np_warn(at=core('whirl'), pre='rotated as @s rotated ~ 0'))
     tl.at(rt('release', 20), g.snd('release_charge'))
     tl.at(rt('release', 22), g.sound('entity.player.attack.sweep', 0.4, 1.6))
     tl.at(rt('release', 24), g.sound('entity.breeze.whirl', 0.5, 1.4))
     tl.at(rt('release', 28), g.sound('entity.breeze.whirl', 0.5, 1.5))
     tl.at(whirl[-1], g.sound('entity.player.attack.sweep', 0.4, 1.6))
-    dome = hz_q(g, f'execute at {R_} run ', 'disc', B5_R, B5_DET - B5_CUP, DMG['b5'], kb=KB['heavy'])
+    dome = hz_q(g, f'execute at {R_} run ', 'disc', B5_R, B5_DET - B5_CUP, DMG['b5'], kb=KB['heavy'], noparry=1, glint=False)
     tl.at(B5_CUP, f'# the cup: the dome r {L.num(B5_R)} at R, its hazard {B5_DET - B5_CUP} t ahead (quiet: no decal), the charge',
           *dome, at_b(core('cup')) + g.kcard('glow', bb='center', s0=1.0, s1=1.8, life=8, fade=3, col='#D8F2BC'),
           g.sound('block.respawn_anchor.charge', 0.7, 1.2), g.sound('block.beacon.activate', 0.6, 1.6))

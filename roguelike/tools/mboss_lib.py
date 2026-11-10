@@ -51,6 +51,13 @@ SPECIAL_PICKS_MAX = 3
 BAL_HOOKS = ['bal_ok', 'bal_on', 'bal_tick', 'bal_off']
 # hr FN-a: the reward word of a special entry (winWord, shown instead of 처치): a non-empty string of at most this many chars
 WIN_WORD_MAX = 12
+# Combat overhaul (reviews B-02 / B-03): the unparriable-attack warning glint. NP_LEAD = the least ticks between the glint
+# and the strike (the telegraph rule: >= 12 t, >= 20 t for the big hits where the pattern's tell allows): the framework
+# flashes it at a hazard's creation only when the hazard's own wind-up is at least this (F:mboss/hz/np_auto); a module whose
+# hazard is made later calls np_warn() at the pattern's tell tick. Registry field "glint" [up, forward] (blocks from the
+# body anchor, any kind): the chest / head of the visible rig at rest, where F:mboss/d/np_at draws it (glint_of).
+NP_LEAD = 12
+NP_LEAD_BIG = 20
 
 # #elem numbering (combat/apply): 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro 8 void
 ELEM_NAMES = ['물리', '불', '물', '번개', '얼음', '바위', '바람', '풀', '공허']
@@ -190,6 +197,12 @@ def load_registry():
         assert 'poof' not in b or isinstance(b['poof'], bool), f'{b["id"]}: poof must be true or false'
         # combat overhaul lane B: the balance-gauge flag (BAL_HOOKS)
         assert 'bal' not in b or isinstance(b['bal'], bool), f'{b["id"]}: bal must be true or false'
+        # combat overhaul (review B-03): the warning glint point [up, forward] in blocks from the body anchor; never at or
+        # under the floor (up >= 1) and on the body (|forward| <= 8)
+        if 'glint' in b:
+            gl = b['glint']
+            assert (isinstance(gl, list) and len(gl) == 2 and all(isinstance(v, (int, float)) for v in gl)
+                    and 1.0 <= gl[0] <= 12.0 and -8.0 <= gl[1] <= 8.0), f'{b["id"]}: glint must be [up 1..12, forward -8..8]'
         if b.get('shield', not b.get('px', False)):
             assert 'hit' in b, f'{b["id"]}: shield needs hit {{w,h}}'
         assert set(b.get('res', {})) <= RES_KEYS, f'{b["id"]}: res keys'
@@ -246,6 +259,28 @@ def fn_root_of(bid, reg=None):
         if b['id'] == bid:
             return fn_root(b)
     return f'mboss/{bid}'
+
+
+def glint_of(b):
+    """(up, forward) of registry entry b's warning-glint point, blocks from the body anchor (F:mboss/d/np_at): its "glint"
+    field, else 3/4 of the husk height for a husk-sized rig (scale >= 0.5; the husk is 1.95 b x scale) and 2 b up for a
+    proxy boss (the husk is a 0.2 b anchor under a rig that is not husk-shaped: give those a "glint")."""
+    if 'glint' in b:
+        return float(b['glint'][0]), float(b['glint'][1])
+    sc = float(b.get('scale', 1.0))
+    return (round(1.95 * sc * 0.75, 2) if sc >= 0.5 else 2.0), 0.0
+
+
+def np_warn(at=None, pre=''):
+    """The warning glint of an unparriable attack that can be dodged, from the pattern's tell tick (>= NP_LEAD t before the
+    strike, >= NP_LEAD_BIG where the tell allows; never for a no-dodge mechanic or a lingering field). Any executor.
+    at=None: at the running boss's glint point (F:mboss/np_glint). at='^x ^y ^z' / '~ ~y ~': at that point from the
+    execution position (F:mboss/np_glint_here; the module passes the rig point when the visible body is away from the
+    anchor's point; keep it above the floor), pre = execute sub-commands before it (e.g. 'at @s rotated ~ 0')."""
+    if at is None:
+        assert not pre
+        return 'function rlk:mboss/np_glint'
+    return f'execute {pre + " " if pre else ""}positioned {at} run function rlk:mboss/np_glint_here'
 
 
 def enabled_bosses(reg=None):
@@ -404,12 +439,15 @@ def _tenths(v):
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
             sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None,
-            norx=None, safe_g=None, pm=None, pm_lethal=None, bol=None, noparry=None):
+            norx=None, safe_g=None, pm=None, pm_lethal=None, bol=None, noparry=None, glint=True):
     """Lines that set the one-shot options of the next hazard (reset after each create).
     grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group.
     nododge=1: no dodge and no i-frames help (#hzNoDodge). noparry=1 / 0 (combat overhaul C, #hzNoParry): unparriable /
-    parryable regardless of the default rule (framework hz/np_def: no-dodge, per-mille, re-arm, ring, full, mask, a disc of
-    r >= 4.5 b, a sector / line reaching >= 8 b are unparriable and flash the warning glint). rearm=N: a hit disarms it for N ticks only (#hzRearm;
+    parryable regardless of the default rule (framework hz/np_def: only no-dodge, per-mille, re-arming, full-arena and mask
+    hazards are unparriable; a module names its few big hits with noparry=1 - every hazard of one strike the same). An
+    unparriable hazard that can be dodged flashes the warning glint at its creation when its wind-up is >= NP_LEAD
+    (hz/np_auto); glint=False (with noparry=1; #hzNoParry 2): the module calls np_warn() itself at the tell tick, the
+    framework draws none for this hazard. rearm=N: a hit disarms it for N ticks only (#hzRearm;
     with a volley group the whole group re-arms together: at most one hit per N ticks).
     Chapter mode (AZ-CM): norx=1: no player-side element reaction from its hit (#hzNR); safe_g=G: the safe group of a
     mask hazard (#hzSafeG, 0 = its own id; 'cur' = the group of the last hz/safe_new, #mbSafeG, cm.md 13.6).
@@ -436,6 +474,9 @@ def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, b
         assert 1 <= int(bol) <= 100
     if noparry is not None:
         assert int(noparry) in (0, 1)
+    assert glint or (noparry is not None and int(noparry) == 1), 'glint=False goes with noparry=1'
+    if not glint:
+        noparry = 2
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
              ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet),
              ('#hzNoDodge', nododge), ('#hzRearm', rearm), ('#hzNR', norx), ('#hzSafeG', safe_g),

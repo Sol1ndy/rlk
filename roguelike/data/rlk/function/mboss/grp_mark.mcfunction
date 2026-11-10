@@ -1,4 +1,4 @@
-# #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
+# #g mb = a volley group that was just answered (grp_hit: a landed hit, a perfect parry or a perfect dodge): its hazards and props stop testing for hits (the strike
 # visuals and the flights go on). #mbGrpL remembers it, so a member made later (hz/init, pj/launch) starts harmless:
 # one hit per group even when a member is created after the hit (e.g. a burst made at a prop's life end).
 # #mbGrpL2 is the same for one-shot hits only: a #hzRearm hazard (a lingering field ticking every 10 t) that lands next

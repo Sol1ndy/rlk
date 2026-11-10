@@ -250,11 +250,20 @@ def run_boss(bid, cfg):
         for _ in range(3):
             W(s)
         okp = s.call('rlk:mboss/d/bal_ok', bctx(b))
+        # (fix lane FB, review B-09: a body that is not in play - untargetable, rlk_mb_inv - takes no pips at all)
+        out = 'rlk_mb_inv' in b.tags
+        bal0 = sc(s, b, 'bal')
         s.call('rlk:bal/hit', bctx(b), {'n': 12})
         W(s)
-        ck(f'{bid} 6a a protected state (test {cfg["prot"]}): bal_ok refuses, the gauge at 0 waits (pending)',
-           not okp and 'rlk_bal_pend' in b.tags and sc(s, b, 'grgT') == 0 and sc(s, b, 'bal') == 0,
-           (okp, b.tags & {'rlk_bal_pend'}, sc(s, b, 'grgT'), sc(s, b, 'bal')))
+        if out:
+            ck(f'{bid} 6a a protected state (test {cfg["prot"]}) with the body untargetable: bal_ok refuses and the pips are refused '
+               '(bal/boss/may): the gauge stays, nothing pending',
+               not okp and 'rlk_bal_pend' not in b.tags and sc(s, b, 'grgT') == 0 and sc(s, b, 'bal') == bal0,
+               (okp, b.tags & {'rlk_bal_pend'}, sc(s, b, 'grgT'), sc(s, b, 'bal'), bal0))
+        else:
+            ck(f'{bid} 6a a protected state (test {cfg["prot"]}): bal_ok refuses, the gauge at 0 waits (pending)',
+               not okp and 'rlk_bal_pend' in b.tags and sc(s, b, 'grgT') == 0 and sc(s, b, 'bal') == 0,
+               (okp, b.tags & {'rlk_bal_pend'}, sc(s, b, 'grgT'), sc(s, b, 'bal')))
         if 'refill' in cfg:
             if cfg['refill'] == 'strike':
                 azsim.strike(s, b, 1)
