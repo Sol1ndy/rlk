@@ -12,3 +12,5 @@ function rlk:mboss/fieldgen/hud/groggy_on
 function rlk:mboss/fieldgen/groggy/rig
 function rlk:mboss/fieldgen/seq_f/groggy/begin
 function rlk:mboss/fieldgen/hud/refresh
+# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

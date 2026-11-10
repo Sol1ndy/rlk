@@ -97,7 +97,8 @@ def t_gen():
        len([i for i in ids if i]) == 8 and font['providers'][-1] == {'type': 'reference', 'id': 'minecraft:default'}
        and all(i == i.lower() for i in ids), ids)
     sp = [p for p in font['providers'] if p['type'] == 'space'][0]['advances']
-    ck(R, 'G3 the boss row is exactly 200 px (12 x (5 + 1 + 2) + pad)', 12 * 8 + sp[chr(0xED21)] == 200 and sp[chr(0xED20)] == 2, sp)
+    ck(R, 'G3 the boss row adds no width: back 200, 12 x (5 + 1 + 2), pad to 200', 12 * 8 + sp[chr(0xED21)] == 200
+       and sp[chr(0xED20)] == 2 and sp[chr(0xED22)] == -200, sp)
     shutil.rmtree(HERE / 'tmp', ignore_errors=True)
 
 
@@ -108,9 +109,9 @@ def t_hooks():
         return anchor in L and line in L and L.index(line) > L.index(anchor)
 
     ck(R, 'H1 mob/setup: bal/init after rlk_mob', has_after('mob/setup', 'tag @s add rlk_mob', 'function rlk:bal/init'))
-    ck(R, 'H2 mob/tick: bal/tick (not bosses) after the stun clock',
+    ck(R, 'H2 mob/tick: bal/tick (every enemy but Raiden, whose own tick runs it) after the stun clock',
        has_after('mob/tick', 'execute if score @s stunT matches 0 run function rlk:mob/unstun',
-                 'execute if score @s balT matches 1.. unless entity @s[tag=boss] run function rlk:bal/tick'))
+                 'execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] run function rlk:bal/tick'))
     L = lines('combat/apply')
     hook = 'execute if score #mobHP tmp matches 1.. if score @s bal matches 1.. unless score #trueDmg tmp matches 1 run function rlk:bal/src/hit'
     ck(R, 'H3 combat/apply: sources after the HP is taken (survivors, no true damage)',
@@ -143,21 +144,17 @@ def t_hooks():
     ck(R, 'H10 cm/sb/tick: the brood cycle stops while groggy', 'execute if score @s grgT matches 1.. run return 0' in lines('cm/sb/tick'))
     hb = lines('mob/hb_cleanup')
     ck(R, 'H11 mob/hb_cleanup kills orphan rows', 'kill @e[tag=rlk_hb_bal,tag=!rlk_hb_ok]' in hb and 'tag @e[tag=rlk_hb_bal] remove rlk_hb_ok' in hb)
-    ft, fb = lines('mboss/fight_tick'), lines('mboss/fight_bal')
-    ck(R, 'H12 mboss/fight_tick: one test, then fight_bal: bal clock, bal_tick instead of the module tick',
-       ft.index('execute if score @s balT matches 1.. run return run function rlk:mboss/fight_bal') < ft.index('function rlk:mboss/d/tick')
-       and fb.index('function rlk:bal/boss/tick')
-       < fb.index('execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick')
-       < fb.index('function rlk:mboss/d/tick'))
-    for rel in ('mboss/bars', 'boss/raiden/bars'):
+    ft, dt = lines('mboss/fight_tick'), [l for l in lines('mboss/d/tick') if l and not l.startswith('#')]
+    ck(R, 'H12 mboss/fight_tick unchanged; d/tick: every flagged line skips a groggy body, the last line runs d/bal_tick',
+       not [l for l in ft if 'bal' in l]
+       and all('unless score @s grgT matches 1.. run return run function' in l for l in dt[:-1])
+       and dt[-1] == 'execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick', dt[-2:])
+    for rel, bar in (('mboss/bars', 'rlk:mboss_state'), ('boss/raiden/bars', 'rlk:narukami_state')):
         L = lines(rel)
-        ck(R, f'H13 {rel}: #buPip before bossui/draw',
-           L.index('execute if score @s balMax matches 1.. run scoreboard players set #buPip bu 1') < L.index('function rlk:bossui/draw'))
-    d = lines('bossui/draw')
-    ck(R, 'H14 bossui/draw: pips after the under bar, option reset at the end',
-       d.index('execute if score #buPip bu matches 1 run function rlk:bossui/pips') > d.index(
-           'execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub')
-       and d[-2] == 'scoreboard players set #buPip bu 0')
+        want = (f'bossbar set {bar} name [{{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}},'
+                '{nbt:"brow",storage:"rlk:bal",interpret:true}]')
+        ck(R, f'H13 {rel}: the boss row is the second component of the bossui line (no command added)', want in L)
+    ck(R, 'H14 bossui/draw untouched (no balance option)', not [l for l in lines('bossui/draw') if 'bal' in l or 'Pip' in l])
     rt = lines('boss/raiden/tick')
     ck(R, 'H15 boss/raiden/tick: the bal clock after the death check (world pause skips the tick)',
        rt.index('execute if score @s balT matches 1.. run function rlk:bal/boss/tick') == rt.index(
@@ -511,6 +508,19 @@ def t_boss():
     for _ in range(100):
         s.run('bal/boss/tick', body)
     ck(R, 'B18 100 t later: bal_off once, full gauge', len(s.stub_calls(r'mboss/d/bal_off$')) == 1 and s.s(body, 'bal') == 12)
+    s.run('bal/hit', body, {'n': 1})
+    t0 = s.s(body, 'balT')
+    s.setsc('#mbPause', 'mb', 1)
+    s.run('bal/tick', body)
+    paused = s.s(body, 'balT')
+    s.setsc('#mbPause', 'mb', 0)
+    s.setsc('#mbSt', 'mb', 2)
+    s.run('bal/tick', body)
+    dying = s.s(body, 'balT')
+    s.setsc('#mbSt', 'mb', 1)
+    s.run('bal/tick', body)
+    ck(R, 'B19 a registry boss through mob/tick (bal/tick): the clock stops while the fight is paused or not in its fight state',
+       (t0, paused, dying, s.s(body, 'balT')) == (300, 300, 300, 299), (t0, paused, dying, s.s(body, 'balT')))
 
 
 # ======================================================================= K cleanup
@@ -553,8 +563,8 @@ def t_cost():
     n0 = s.cmd_count
     s.run('bal/tick', e)
     grog = s.cmd_count - n0
-    ck(R, f'$1 a regen tick <= 6 commands ({regen}), a groggy tick <= 12 ({grog}) — only while pips are missing / groggy',
-       regen <= 6 and grog <= 12, (regen, grog))
+    ck(R, f'$1 a regen tick <= 6 commands ({regen}), a groggy tick <= 14 ({grog}) — only while pips are missing / groggy',
+       regen <= 6 and grog <= 14, (regen, grog))
     L = [l for l in lines('mob/tick') if 'bal' in l and not l.startswith('#')]
     ck(R, '$2 an idle mob pays one score test in mob/tick', len(L) == 1 and L[0].startswith('execute if score @s balT matches 1..'))
 

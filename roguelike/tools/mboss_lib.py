@@ -43,9 +43,11 @@ SPECIAL_PICKS_MAX = 3
 # Balance gauge (균형치, combat overhaul lane B; tools/build_balance.py, rlk:bal/**): registry flag "bal" (any kind, JSON
 # boolean). An enabled entry with bal true gets the 12-pip gauge (rlk:bal/init asks mboss/d/bal_has) and implements these
 # hooks (no macro; @s = the body, at it, fight state): bal_ok = return 1 when the groggy may start now (fail otherwise: a
-# scripted / invulnerable / mechanic state; the framework retries every fight tick), bal_on = stop cleanly and start the
-# groggy look (grgT already set), bal_tick = one groggy tick INSTEAD of the module tick (mboss/fight_tick), bal_off = the
-# groggy is over (gauge full again): resume the AI. Entries without the flag have no gauge and need none of them.
+# scripted / invulnerable / mechanic state; rlk:bal retries every fight tick), bal_on = stop cleanly and start the
+# groggy look (grgT already set), bal_tick = one groggy tick INSTEAD of the module tick (mboss/d/tick: the flagged lines
+# say `unless score @s grgT matches 1..`, the last line runs d/bal_tick), bal_off = the groggy is over (gauge full again):
+# resume the AI. Entries without the flag have no gauge and need none of them. The gauge clock runs in mob/tick (paused
+# with the fight); the boss row is the bossbar name's second component (storage rlk:bal brow).
 BAL_HOOKS = ['bal_ok', 'bal_on', 'bal_tick', 'bal_off']
 # hr FN-a: the reward word of a special entry (winWord, shown instead of 처치): a non-empty string of at most this many chars
 WIN_WORD_MAX = 12

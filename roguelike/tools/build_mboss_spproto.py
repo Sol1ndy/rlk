@@ -60,6 +60,14 @@ w('rig/sink', [f'execute as @e[type=minecraft:block_display,tag={PART}] run data
 
 # ---------------------------------------------------------------------------------------------
 # Patterns (#spT = the pattern clock, #spPat = the running pattern, #spCool = the idle clock)
+# Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the stand-in special boss breaks from any
+# fight state; the pattern and library effects go, the stand-in holds.
+w('bal_ok', ['return 1'])
+w('bal_on', ['function rlk:mboss/lib_clear', 'scoreboard players set #spPat mb 0', 'scoreboard players set #spT mb 0'])
+w('bal_tick', [fn('rig/follow'), 'execute if score #spFlash mb matches 1.. run scoreboard players remove #spFlash mb 1',
+               f'execute if score #spFlash mb matches 0 run {fn("rig/unglow")}',
+               'execute if score #spFlash mb matches 0 run scoreboard players set #spFlash mb -1'])
+w('bal_off', ['scoreboard players set #spCool mb 20'])
 w('choose', '''
 scoreboard players add #spNext mb 1
 execute if score #spNext mb matches 3.. run scoreboard players set #spNext mb 1

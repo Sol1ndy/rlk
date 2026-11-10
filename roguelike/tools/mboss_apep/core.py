@@ -454,6 +454,45 @@ class Core:
                          F('p/cancel'), F('svc/look_p3'), f'function {A.rig_fn("stance/upright")}', g.play('idle_p3'),
                          F('px/restate'), F('arena/props_now'), sc('#apCool', 20), sc('#apHudQ', 1)])
         self.w('bars', ['# Hook bars (@s = body, every tick in intro / fight): the under-bar (hud/bar); phase 2 the Heart bar.', F('hud/bar')])
+        # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the 100 t balance groggy in phases 1 / 3.
+        # The rig has no stagger clip (a new one needs build_mboss_apep_rig.mjs + the resource pack): the slot and the
+        # library effects are cut (the phase, transition queue and floor stay); phase 1 shows its idle and holds it,
+        # phase 3 stands upright and bows into crouch_p3 (held), then rises with stand_p3 at the end. Never in phase 2
+        # (parked), a transition / reserved floor step, the T1 sink (20), the Q2 aftermath (32), a failure (40), the
+        # cutscene (60) or the stance service (61), a cine or while invulnerable.
+        crl = A.clip_len('crouch_p3')
+        self.w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                          'execute unless score #apPh mb matches 1 unless score #apPh mb matches 3 run return fail',
+                          'execute if score #apTr mb matches 1.. run return fail',
+                          'execute if score #mbFloorHit mb matches 1 run return fail',
+                          'execute if score #mbCine mb matches 1 run return fail',
+                          'execute if entity @s[tag=rlk_mb_inv] run return fail',
+                          'execute if score #apPid mb matches 0..7 run return 1',
+                          'execute if score #apPid mb matches 10 run return 1',
+                          'execute if score #apPid mb matches 31 run return 1',
+                          'execute if score #apPid mb matches 33..36 run return 1',
+                          'return fail'])
+        self.w('bal_on', ['# @s = body: the slot and the library effects cut, the groggy pose of the phase.',
+                          F('svc/lib_clear'), F('p/cancel'), sc('#apChP', 0), sc('#apYawC', 0),
+                          f'execute if score #apPh mb matches 1 run {g.play("idle_p1")}',
+                          f'execute if score #apPh mb matches 1 run {F("rig/tick")}',
+                          f'execute if score #apPh mb matches 3 run function {A.rig_fn("stance/upright")}',
+                          f'execute if score #apPh mb matches 3 run {g.play("crouch_p3")}',
+                          F('px/restate'), sc('#apHudQ', 1)])
+        self.w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the flash, the HUD; the phase-3 bow plays',
+                            '# out, then the pose holds; stand_p3 in the last ticks.',
+                            'scoreboard players add #apFc mb 1',
+                            f'execute if score #apFlash mb matches 0.. run {F("u/flash")}', sc('#apFlash', -1),
+                            F('hud/tick'),
+                            f'execute if score #apPh mb matches 3 if score @s grgT matches {A.clip_len("stand_p3")} run {g.play("stand_p3")}',
+                            f'execute if score #apPh mb matches 3 if score @s grgT matches {100 - crl}.. run {F("rig/tick")}',
+                            f'execute if score #apPh mb matches 3 if score @s grgT matches ..{A.clip_len("stand_p3")} run {F("rig/tick")}',
+                            f'execute if score #apPh mb matches 3 if score @s grgT matches {100 - crl}.. run {F("pxs/tick")}',
+                            f'execute if score #apPh mb matches 3 if score @s grgT matches ..{A.clip_len("stand_p3")} run {F("pxs/tick")}'])
+        self.w('bal_off', ['# @s = body: the balance groggy is over: the idle of the phase, the proxies, the usual decisions.',
+                           f'execute if score #apPh mb matches 1 run {g.play("idle_p1")}',
+                           f'execute if score #apPh mb matches 3 run {g.play("idle_p3")}',
+                           F('px/restate'), sc('#apCool', 20), sc('#apHudQ', 1)])
         vis = ['# Hook hz_vis (@s = hazard marker, #hzEv 0 create / 1 strike / 2 end): routed by mbHzV / 10 = the pattern id.']
         routes = [f'execute if score #apV mb matches {p.id} run return run {F(f"p/{p.key}/vis")}' for p in self.with_hook('vis')]
         if g.has('org/vis'):

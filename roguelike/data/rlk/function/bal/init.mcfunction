@@ -17,7 +17,7 @@ execute if entity @s[tag=rlk_cm_ci] run return 0
 execute if entity @s[tag=rlk_lobby] run return 0
 execute if entity @s[tag=rlk_pet] run return 0
 # bosses: a registry boss only when its module implements the balance hooks (registry "bal", mboss/d/bal_has)
-execute if entity @s[tag=rlk_mb_body] unless function rlk:mboss/d/bal_has run return 0
+execute if entity @s[tag=rlk_mb_body] unless function rlk:mboss/d/bal_has run return run data remove storage rlk:bal brow
 execute if entity @s[tag=rlk_mb_body] run scoreboard players set @s balC 3
 execute if entity @s[tag=rlk_raiden] run scoreboard players set @s balC 3
 execute if score @s balC matches 0 if entity @s[tag=rlk_c2e] run scoreboard players set @s balC 2

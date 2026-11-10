@@ -16,8 +16,8 @@ scoreboard players set #buSub bu 0
 scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
 function rlk:mboss/d/bars
-# balance gauge: the 12 pips under the HP bar (storage rlk:bal brow, kept by rlk:bal/ui/draw)
-execute if score @s balMax matches 1.. run scoreboard players set #buPip bu 1
 function rlk:bossui/draw
-bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
+# + the balance gauge row (tools/build_balance.py: storage rlk:bal brow, written when it changes; it moves back the bar
+# width itself, so the line keeps its width; no brow = nothing)
+bossbar set rlk:mboss_state name [{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""},{nbt:"brow",storage:"rlk:bal",interpret:true}]
 bossbar set rlk:mboss_sub name {nbt:"sub[]",storage:"rlk:mboss",interpret:true,separator:""}

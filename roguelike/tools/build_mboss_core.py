@@ -1165,17 +1165,6 @@ scoreboard players set #mbSt mb 1
 scoreboard players set #mbT mb 0
 ''')
 w('fight_tick', '''
-# balance gauge (tools/build_balance.py): balT >= 1 while pips are missing, groggy or pending -> fight_bal (one test
-# per tick otherwise; a paused fight runs neither, so the gauge clocks stop too)
-execute if score @s balT matches 1.. run return run function rlk:mboss/fight_bal
-function rlk:mboss/d/tick
-execute if score #mbSt mb matches 1 unless score #mbNoLeash mb matches 1 run function rlk:mboss/mv/leash
-''')
-w('fight_bal', '''
-# fight_tick of a boss whose gauge is not idle: regen / groggy clock / pending groggy, then the module's bal_tick
-# INSTEAD of its tick while groggy (mboss_lib.BAL_HOOKS), else the usual tick and leash.
-function rlk:bal/boss/tick
-execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick
 function rlk:mboss/d/tick
 execute if score #mbSt mb matches 1 unless score #mbNoLeash mb matches 1 run function rlk:mboss/mv/leash
 ''')
@@ -1494,10 +1483,10 @@ scoreboard players set #buSub bu 0
 scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
 function rlk:mboss/d/bars
-# balance gauge: the 12 pips under the HP bar (storage rlk:bal brow, kept by rlk:bal/ui/draw)
-execute if score @s balMax matches 1.. run scoreboard players set #buPip bu 1
 function rlk:bossui/draw
-bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
+# + the balance gauge row (tools/build_balance.py: storage rlk:bal brow, written when it changes; it moves back the bar
+# width itself, so the line keeps its width; no brow = nothing)
+bossbar set rlk:mboss_state name [{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""},{nbt:"brow",storage:"rlk:bal",interpret:true}]
 bossbar set rlk:mboss_sub name {nbt:"sub[]",storage:"rlk:mboss",interpret:true,separator:""}
 ''')
 w('bars_cm', '''
@@ -1617,8 +1606,13 @@ for hook in L.HOOKS:
         out.write('mboss/d/' + hook, '\n'.join(lines))
         continue
     lines = [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of the running boss (#mbId mb = registry n).']
+    if hook == 'tick':
+        lines.append('# balance gauge (registry "bal", mboss_lib.BAL_HOOKS): a groggy body (@s grgT >= 1) runs its bal_tick instead (last '
+                     'line: no extra command otherwise)')
     for b in BOSSES:
-        if args:
+        if hook == 'tick' and b.get('bal'):
+            lines.append(f'execute if score #mbId mb matches {b["n"]} unless score @s grgT matches 1.. run return run function rlk:{L.fn_root(b)}/tick')
+        elif args:
             argtxt = '{' + ','.join(f'{a}:$({a})' for a in args) + '}'
             lines.append(f'$execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook} {argtxt}')
         elif hook == 'incoming' and b.get('kind', 'mid') in ('chapter', 'special'):
@@ -1628,6 +1622,8 @@ for hook in L.HOOKS:
             lines.append(f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}')
     if args:
         lines.append('$scoreboard players set #mbReqT mb $(' + args[0] + ')')
+    if hook == 'tick':
+        lines.append('execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick')
     out.write('mboss/d/' + hook, '\n'.join(lines))
 
 # Balance gauge hooks (mboss_lib.BAL_HOOKS): dispatchers over the enabled entries with the registry flag "bal" only;

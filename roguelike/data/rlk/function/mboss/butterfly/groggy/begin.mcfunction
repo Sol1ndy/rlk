@@ -14,3 +14,5 @@ function rlk:mboss/butterfly/rig/play/groggy_h
 execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0
 function rlk:mboss/butterfly/seq_h/groggy/begin
 function rlk:mboss/butterfly/hud/refresh
+# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

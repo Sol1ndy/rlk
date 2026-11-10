@@ -207,6 +207,7 @@ class Core:
         self.forms()
         self.transform()
         self.groggy()
+        self.balance()
         self.cocoon()
         self.dew()
         self.burn()
@@ -835,7 +836,9 @@ class Core:
             g.play('groggy_h'),
             'execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0',
             F('seq_h/groggy/begin'),                   # [seq_h: human author] S3 visuals and sounds
-            F('hud/refresh')])
+            F('hud/refresh'),
+            '# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)',
+            'function rlk:bal/refill'])
         self.w('groggy/tick', [
             'scoreboard players add #bfT mb 1',
             f'# still debuffed after 달빛 해제: new 달빛 이슬 during the groggy (as many as the cure meter still needs: 1 or 2)',
@@ -858,6 +861,50 @@ class Core:
             sc_set('#bfHumN', 0), sc_set('#bfHumLim', HUM_NEXT_N), sc_set('#bfHumT', 0), sc_set('#bfHumTL', 0),
             f'execute if score #mbLock mb matches 0 run scoreboard players set #bfReq mb {FIRST_AFTER_GROGGY}',
             sc_set('#bfCool', 4),
+            F('ai/enter')])
+
+    # -----------------------------------------------------------------------------------------
+    def balance(self):
+        """Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the 100 t balance groggy — from
+        idle / the burst-run close-in / a normal pattern (human 1-4, butterfly 11-13; never 달빛 축복 14, 달빛 해제 15, the
+        transformation 20, her own groggy / recover, the look prep). Cut like test/cut; from butterfly form she drops
+        to human form at once (as her own groggy does, the human stretch counts from here) and stands in groggy_h.
+        The module tick does not run (no form clocks, no AI); the dew / cure / heal-event / Burning lines do."""
+        F, R, g = self.F, self.R, self.g
+        ids = sorted(p.id for p in self.normal if p.id not in (14, 15, 20))
+        self.w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                          f'execute if score #bfSt mb matches {ST["idle"]} run return 1',
+                          f'execute if score #bfSt mb matches {ST["close"]} if score #bfPat mb matches 0 run return 1']
+               + [f'execute if score #bfSt mb matches {ST["pattern"]} if score #bfPat mb matches {i} run return 1' for i in ids]
+               + [f'execute if score #bfSt mb matches {ST["close"]} if score #bfPat mb matches {i} run return 1' for i in ids]
+               + ['return fail'])
+        self.w('bal_on', [
+            '# @s = body: cut what runs, human form, stand groggy.',
+            'function rlk:mboss/lib_clear',
+            F('p/cancel'),
+            R('prop/clear'),
+            sc_set('#bfMv', 0), sc_set('#mbNoLeash', 0),
+            f'execute if score #bfForm mb matches 2 run scoreboard players set #bfHumN mb 0',
+            f'execute if score #bfForm mb matches 2 run scoreboard players set #bfHumLim mb {HUM_NEXT_N}',
+            f'execute if score #bfForm mb matches 2 run scoreboard players set #bfHumT mb 0',
+            f'execute if score #bfForm mb matches 2 run scoreboard players set #bfHumTL mb 0',
+            f'execute if score #bfForm mb matches 2 run {F("form/now_h")}',
+            g.play('groggy_h'),
+            'data modify storage rlk:mboss sub set value [{text:"그로기",color:"#FFD23F",bold:true}]'])
+        self.w('bal_tick', [
+            '# @s = body, instead of the hook tick while groggy: clocks, flash, dews / cure / heal events / Burning, the rig.',
+            'scoreboard players add #bfClk mb 1',
+            f'execute if score #bfFlash mb matches 1 run {R("flash")}',
+            sc_set('#bfFlash', 0),
+            f'execute if score #bfDewN mb matches 1.. run {F("dew/all")}',
+            f'execute if score #bpS5T mb matches 1.. at @e[tag=rlk_body,limit=1] run {F("wx/cure/tick")}',
+            f'execute if score #mbHealEv mb matches 1.. run {F("coc/heal_ev")}',
+            f'execute if score #bfBurnQ mb matches 1 run {F("burn/start")}',
+            R('tick')])
+        self.w('bal_off', [
+            '# @s = body: the balance groggy is over: idle (human form), then the usual decisions.',
+            g.play('idle_h'),
+            sc_set('#bfCool', 10),
             F('ai/enter')])
 
     # -----------------------------------------------------------------------------------------

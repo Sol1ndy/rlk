@@ -5,7 +5,8 @@
 (11-03; 그대로 복사했고, 고친 곳은 2절 끝 "11-03 에 고친 곳"(+ 두 스위트 README 의 메모)과 문서의 trailer 줄뿐). 같은 날 문서 검토 뒤
 생성기 주석 · 보스 절이 가리키는 문서와 옛 공정성 모의(스크립트 + 결과 로그)를 더 옮겼다: `mboss/` · `tele/` · `mb2/{spec,balance,review,integ}` ·
 `mb3/fgfix/sim` · `ap/requests` · `az/requests` · `ap/balance` · `tk/review/bal` · `navia/` · `riglib/`(파일 목록은 `roguelike/README.md` 0-7).
-11-05 홍련 I1 에서 그 보스의 스위트 `hr/`(3-4)를 더했다. `tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(6절). 데이터팩 zip 에는 들어가지 않는다(zip 은
+11-05 홍련 I1 에서 그 보스의 스위트 `hr/`(3-4)를 더했다. 11-10 전투 개편 B 에서 균형치 스위트 `bal/tests/`(`test_bal.py` · `test_bal_boss.py`; 데이터팩 밖의 사본에서
+`python3 test_bal.py <roguelike>`, `test_bal_boss.py <roguelike> [보스 …]`; 보스 쪽은 `hr/tests/lib` · `ar/s3/lib` 를 읽기만 함)를 더했다. `tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(6절). 데이터팩 zip 에는 들어가지 않는다(zip 은
 `pack.mcmeta` `README.md` `engravings.md` `items.md` `data` 만). 전체 흐름 · 릴리스 게이트는 `roguelike/README.md` 의 0장을 본다.
 
 - **배치는 옛 스크래치패드 구조 그대로**다: 옛 `<S>/ar/tests/test_kit.py` → `sim/ar/tests/test_kit.py`. 스위트들이

@@ -167,6 +167,15 @@ w('props/now', [f'# The props of the current look (#cpLook: {", ".join(f"{i} {lk
 
 # ---------------------------------------------------------------------------------------------
 # Patterns (the module clock #cpT, every 70 t one of three)
+# Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the stand-in chapter boss breaks from any
+# fight state outside its cutscene and a reserved floor step; the pattern and library effects go, the rig holds.
+w('bal_ok', ['execute if score #mbCine mb matches 1 run return fail', 'execute if score #mbFloorHit mb matches 1 run return fail',
+             'return 1'])
+w('bal_on', ['function rlk:mboss/lib_clear', 'scoreboard players set #cpPat mb 0', 'scoreboard players set #cpT mb 0'])
+w('bal_tick', ['execute if score #cpFlash mb matches 1.. run scoreboard players remove #cpFlash mb 1',
+               f'execute if score #cpFlash mb matches 0 run {fn("rig/unglow")}',
+               'execute if score #cpFlash mb matches 0 run scoreboard players set #cpFlash mb -1'])
+w('bal_off', ['scoreboard players set #cpCool mb 20'])
 w('choose', f'''
 scoreboard players add #cpNext mb 1
 execute if score #cpNext mb matches 4.. run scoreboard players set #cpNext mb 1

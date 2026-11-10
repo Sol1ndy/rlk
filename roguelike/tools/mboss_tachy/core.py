@@ -227,6 +227,28 @@ def build(W, ctx):
     w('core/cancel_pat', ['# Cancel the running pattern (G3 backfire, reload, tests; @s = body): recovery follows.',
                           fn('core/cancel_d'), f'tag @s remove {api.TAGS["core"]}', sset('#pat', 0), sset('#done', 0),
                           fn('core/stop_move'), fn('el/edge'), api.rig('look/chest/off'), fn('ai/rec_start')])
+    # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the balance groggy is her G3 stagger
+    # state (#stag) for BAL_STAG t with the knee-drop clip `stun` and no damage knob of her own (rlk:bal adds its %),
+    # entered like the G3 backfire without its true damage; her tick runs it (bal_tick = the hook tick), rlk:bal ends
+    # it with its clock. Only from idle / a ground pattern (1-9) outside her invulnerable blink windows; never
+    # in a stagger, the element swap, the mantle (G2), the nova, the transition, the replay, the close-in or the intro.
+    BAL_STAG = 100
+    w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                 f'execute unless score #ph {OBJ} matches 1..7 run return fail',
+                 f'execute if score #stag {OBJ} matches 1.. run return fail',
+                 'execute if entity @s[tag=rlk_mb_inv] run return fail',
+                 '# not in the air patterns (10 공중 장풍, 11 착지 공격: she would hang in the air)',
+                 f'execute if score #pat {OBJ} matches 0..9 run return 1',
+                 'return fail'])
+    w('bal_on', ['# @s = body: the pattern goes (like the G3 backfire, no true damage), she drops to a knee.',
+                 f'execute if score #pat {OBJ} matches 1..11 run {fn("core/cancel_pat")}',
+                 fn('core/stop_move'),
+                 sset('#stag', BAL_STAG), api.play('stun')]
+      + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('stagger')]
+      + [fn('hud/sub')])
+    w('bal_tick', ['# @s = body: her own tick runs the stagger countdown (#stag).', fn('tick')])
+    w('bal_off', ['# @s = body: the balance clock is over: the stagger ends now if it still runs (recovery, the AI).',
+                  f'execute if score #stag {OBJ} matches 1.. run {fn("core/stag_end")}'])
     w('core/dash/probe', [
         '# Dash probe (@s = body, rotated as it): a marker rlk_tk_dp walks forward in 0.5 b steps while the next spot passes',
         '# mv/ok (inside the arena safe disc - 0.5 b, feet and head free), at most #t tk steps; #t2 tk = steps taken.',

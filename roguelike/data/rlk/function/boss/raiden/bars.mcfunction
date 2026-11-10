@@ -25,7 +25,6 @@ execute if score @s rdPhase matches 2 run scoreboard players set #buSubCol bu 1
 execute if score @s rdPhase matches 3 run scoreboard players operation #buSub bu = @s rdTime
 execute if score @s rdPhase matches 3 run scoreboard players set #buSubMax bu 300
 execute if score @s rdPhase matches 3 run scoreboard players set #buSubCol bu 9
-# balance gauge: the 12 pips under the HP bar (storage rlk:bal brow)
-execute if score @s balMax matches 1.. run scoreboard players set #buPip bu 1
 function rlk:bossui/draw
-bossbar set rlk:narukami_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
+# + the balance gauge row (tools/build_balance.py: storage rlk:bal brow; it moves back the bar width itself)
+bossbar set rlk:narukami_state name [{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""},{nbt:"brow",storage:"rlk:bal",interpret:true}]

@@ -28,9 +28,6 @@ function rlk:bossui/run_hp {col:"#2A2A2E"}
 execute unless score #buNoNum bu matches 1.. run function rlk:bossui/nums
 # Under bar (shield in its element colour, or a gauge).
 execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub
-# Balance pips (#buPip 1): the BAR-wide row from storage rlk:bal brow, from the bar's left end.
-execute if score #buPip bu matches 1 run function rlk:bossui/pips
 # The options hold for this draw only.
 scoreboard players set #buHpCol bu 0
 scoreboard players set #buNoNum bu 0
-scoreboard players set #buPip bu 0

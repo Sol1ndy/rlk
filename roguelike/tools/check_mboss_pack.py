@@ -183,7 +183,9 @@ for b in specs:
             problems.append(f'special {b["id"]}: missing F:{f}')
     for h in L.HOOKS:
         d = FN / f'mboss/d/{h}.mcfunction'
-        if d.exists() and f'matches {b["n"]} run' not in d.read_text(encoding='utf-8') and h not in L.ALL_MODULE_HOOKS:
+        # (d/tick: a "bal" entry's line also says `unless score @s grgT matches 1..`, combat overhaul lane B)
+        if d.exists() and not re.search(rf'matches {b["n"]} (unless score @s grgT matches 1\.\. )?run', d.read_text(encoding='utf-8')) \
+                and h not in L.ALL_MODULE_HOOKS:
             problems.append(f'special {b["id"]}: dispatcher mboss/d/{h} does not name n {b["n"]}')
     if L.arena_of(b, REG)['aid'] == 'plaza':
         problems.append(f'special {b["id"]}: fights in the plaza (a special needs its own arena)')

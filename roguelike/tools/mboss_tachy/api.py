@@ -447,7 +447,7 @@ class Service:
 OWN = {
     'S3': ('spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause', 'resume', 'death_start',
            'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test', 'uninstall', 'init', 'core/', 'ai/',
-           'el/', 'mantle/', 'hud/', 'test/', 'rig_stub/') + tuple(f'p/{k}/' for k in MELEE),
+           'el/', 'mantle/', 'hud/', 'test/', 'rig_stub/', 'bal_') + tuple(f'p/{k}/' for k in MELEE),
     'S4': tuple(f'p/{k}/' for k in AIR + MANTLE),
     'S2seq': ('seq/',),
 }

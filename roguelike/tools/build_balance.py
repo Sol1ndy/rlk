@@ -58,7 +58,7 @@ FLASH = 6                       # ticks the pip just lost shows white
 FONT = 'rlk:bal'
 G = {'hf': 0xED00, 'he': 0xED01, 'hx': 0xED02, 'hg': 0xED03,      # head row: 7x7 filled / empty / flash / groggy
      'bf': 0xED10, 'be': 0xED11, 'bx': 0xED12, 'bg': 0xED13,      # boss row: 5x5, rows 14-18 of the bossui line
-     'sp': 0xED20, 'bpad': 0xED21}
+     'sp': 0xED20, 'bpad': 0xED21, 'bneg': 0xED22}
 C = {k: chr(v) for k, v in G.items()}
 HEAD_PX, BOSS_PX = 7, 5
 GAP = 2                         # the space after each pip: pitch = glyph + bitmap advance 1 + GAP (video: 7 px at 10.5 px)
@@ -66,11 +66,10 @@ HEAD_PITCH = HEAD_PX + 1 + GAP
 BOSS_PITCH = BOSS_PX + 1 + GAP
 BAR = 200                       # bossui bar width (tools/build_bossbar.py BAR)
 BOSS_W = TIERS[3]['pips'] * BOSS_PITCH
-BOSS_PAD = BAR - BOSS_W         # the boss row is exactly BAR px: bossui/pips moves back BAR and appends it
+BOSS_PAD = BAR - BOSS_W         # the boss row: back BAR px (bneg), the pips, the pad -> it adds no width to the bossui line
 HEAD_SCALE = 0.5                # text_display scale; 1 font px = 0.025 b at scale 1
 HEAD_Y = 0.02                   # under the shield / erosion band (0.15..0.25) and the HP bar (0.25..0.38)
-YELLOW, RIM, GREY, WHITE, GROG, GROG_RIM = (0xFF, 0xD2, 0x3F), (0xA0, 0x74, 0x10), (0x5E, 0x5E, 0x5E), \
-    (0xFF, 0xFF, 0xFF), (0xFF, 0x6A, 0x3C), (0x9A, 0x2A, 0x14)
+YELLOW, GREY, WHITE, GROG = (0xFF, 0xD2, 0x3F), (0x5E, 0x5E, 0x5E), (0xFF, 0xFF, 0xFF), (0xFF, 0x6A, 0x3C)
 
 
 def head_x(pips):
@@ -104,7 +103,7 @@ def row(n, maxp, flash, groggy, kind):
             k += 1
         s += (C[kind + 'e'] + C['sp']) * (maxp - k)
     if kind == 'b':
-        s += C['bpad']
+        s = C['bneg'] + s + C['bpad']
     return {'text': '', 'extra': [{'text': s, 'font': FONT, 'color': 'white'}]}
 
 
@@ -166,7 +165,7 @@ f('init',
   'execute if entity @s[tag=rlk_lobby] run return 0',
   'execute if entity @s[tag=rlk_pet] run return 0',
   '# bosses: a registry boss only when its module implements the balance hooks (registry "bal", mboss/d/bal_has)',
-  'execute if entity @s[tag=rlk_mb_body] unless function rlk:mboss/d/bal_has run return 0',
+  'execute if entity @s[tag=rlk_mb_body] unless function rlk:mboss/d/bal_has run return run data remove storage rlk:bal brow',
   'execute if entity @s[tag=rlk_mb_body] run scoreboard players set @s balC 3',
   'execute if entity @s[tag=rlk_raiden] run scoreboard players set @s balC 3',
   'execute if score @s balC matches 0 if entity @s[tag=rlk_c2e] run scoreboard players set @s balC 2',
@@ -255,9 +254,15 @@ f('amp',
 
 # ---------------------------------------------------------------- per tick
 f('tick',
-  '# @s = normal / elite enemy, at @s (mob/tick while balT >= 1): groggy countdown, else the flash and the regen',
+  '# @s = enemy, at @s (mob/tick while balT >= 1; Raiden runs bal/boss/tick from her own tick): groggy countdown, else the',
+  '# flash and the regen. A registry boss only while its fight runs (#mbSt 1, not paused: the clocks stop with the fight).',
+  'execute if score @s balC matches 3 run return run function rlk:bal/boss/tick_mob',
   'execute if score @s grgT matches 1.. run return run function rlk:bal/grog/tick',
   'function rlk:bal/regen_tick')
+f('boss/tick_mob',
+  'execute unless score #mbSt mb matches 1 run return 0',
+  'execute if score #mbPause mb matches 1 run return 0',
+  'function rlk:bal/boss/tick')
 f('regen_tick',
   '# @s = enemy with pips missing: the white pip goes back to empty, and after the delay +1 pip per step',
   'execute if score @s balF matches 1.. run function rlk:bal/flash',
@@ -371,7 +376,8 @@ f('fam/cm_off',
 
 # ---- bosses
 f('boss/tick',
-  '# @s = boss body, at @s (mboss/fight_tick, boss/raiden/tick while balT >= 1; a paused fight does not run it)',
+  '# @s = boss body, at @s (mob/tick -> bal/tick -> boss/tick_mob for a registry boss, boss/raiden/tick for Raiden, while',
+  '# balT >= 1; a paused fight does not run it)',
   'execute if entity @s[tag=rlk_bal_pend] run return run function rlk:bal/boss/pend_tick',
   'execute if score @s grgT matches 1.. run return run function rlk:bal/boss/grog_tick',
   'function rlk:bal/regen_tick')
@@ -451,7 +457,8 @@ f('ui/draw',
   'execute on passengers if entity @s[tag=rlk_hb_bal] run function rlk:bal/ui/head with storage rlk:bal a')
 f('ui/head', '$data modify entity @s text set from storage rlk:bal h$(m)[$(i)]')
 f('ui/boss',
-  '# the boss row (exactly the bossui bar width) for bossui/pips, drawn by the boss bars while #buPip bu is 1',
+  '# the boss row: back the bossui bar width, the pips, the pad to the bar end (adds no width); the boss bars show it after',
+  '# the bossui line ({nbt:"brow",storage:"rlk:bal"} in mboss/bars, boss/raiden/bars)',
   '$data modify storage rlk:bal brow set from storage rlk:bal b$(m)[$(i)]')
 
 f('uninstall',
@@ -502,10 +509,11 @@ def diamond(n, fill, rim, inner=None):
     return px
 
 
-GLYPHS = {'hf': (diamond(7, YELLOW, RIM), 7, 7), 'he': (diamond(7, None, None, (1, GREY)), 7, 7),
-          'hx': (diamond(7, WHITE, None), 7, 7), 'hg': (diamond(7, GROG, GROG_RIM), 7, 7),
-          'bf': (diamond(5, YELLOW, RIM), 5, -7), 'be': (diamond(5, None, None, (1, GREY)), 5, -7),
-          'bx': (diamond(5, WHITE, None), 5, -7), 'bg': (diamond(5, GROG, GROG_RIM), 5, -7)}
+# solid diamonds (a darker rim turns a 5-7 px diamond into a star at GUI scale)
+GLYPHS = {'hf': (diamond(7, YELLOW, None), 7, 7), 'he': (diamond(7, None, None, (1, GREY)), 7, 7),
+          'hx': (diamond(7, WHITE, None), 7, 7), 'hg': (diamond(7, GROG, None), 7, 7),
+          'bf': (diamond(5, YELLOW, None), 5, -7), 'be': (diamond(5, None, None, (1, GREY)), 5, -7),
+          'bx': (diamond(5, WHITE, None), 5, -7), 'bg': (diamond(5, GROG, None), 5, -7)}
 if RP:
     tex = RP / 'assets/rlk/textures/font/bal'
     if tex.exists():
@@ -515,7 +523,7 @@ if RP:
     for k, (px, n, asc) in GLYPHS.items():
         (tex / f'{k}.png').write_bytes(png(px, n, n))
         providers.append({'type': 'bitmap', 'file': f'rlk:font/bal/{k}.png', 'ascent': asc, 'height': n, 'chars': [C[k]]})
-    providers.append({'type': 'space', 'advances': {C['sp']: GAP, C['bpad']: BOSS_PAD}})
+    providers.append({'type': 'space', 'advances': {C['sp']: GAP, C['bpad']: BOSS_PAD, C['bneg']: -BAR}})
     providers.append({'type': 'reference', 'id': 'minecraft:default'})
     font = RP / 'assets/rlk/font/bal.json'
     font.parent.mkdir(parents=True, exist_ok=True)

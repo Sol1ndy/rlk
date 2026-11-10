@@ -140,8 +140,8 @@
 - **데이터팩**(레지스트리를 읽는 Python 생성기, 리소스팩 필요 없음): `bash roguelike/tools/dev/regen_all.sh roguelike [--mobs]` —
   core → arena → cboss_rooms → proto → cproto → spproto → guardian → butterfly → fieldgen → az_fx(`--skip-rp`) → azhdaha →
   ap_fx(`--skip-rp`) → apep → rift → tk_fx(`--skip-rp`) → tachy → kn_fx(`--skip-rp`) → arlecchino → hr_fx(`--skip-rp`) → scarlet →
-  `check_mboss_pack.py`(끝줄 `… 0 problem(s).`). `--mobs` 는 `build_ch2_mobs.py` · `build_ch3_mobs.py` 도 돌린다. 실패한 생성기의
-  로그만 보여 준다.
+  `build_balance.py`(균형치 `bal/**`, 전투 개편 B) → `check_mboss_pack.py`(끝줄 `… 0 problem(s).`). `--mobs` 는 `build_ch2_mobs.py` ·
+  `build_ch3_mobs.py` 도 돌린다. 실패한 생성기의 로그만 보여 준다.
   `regen_all.sh` 가 돌리지 않는 데이터팩 생성기: `python3 tools/build_skirk_metsu_fx.py`(스커크 극악기·멸 해방 검격 효과;
   `char/motion/skirk_fx/burst_metsu/t028`~ 과 `burst_metsu.mcfunction` 만 씀, RP 필요 없음, 다른 생성기와 순서 무관; 이 파일을 고쳤을
   때만 돌림), `python3 tools/flatten_zones.py [--check]`(배치를 바꿨을 때),
@@ -160,7 +160,7 @@
   python3 tools/build_mboss_hr_fx.py --resourcepack $RP       # 홍련 효과 킷(build_rift.py 다음: 도착 균열이 rift 모델을 씀) + 데이터팩 fx/**
   #   같은 꼴: build_tachy_rig.mjs + build_mboss_tk_fx.py, build_mboss_apep_rig.mjs + build_mboss_apep_org.mjs + build_mboss_ap_fx.py,
   #   build_mboss_azhdaha_rig.mjs + build_mboss_az_fx.py, build_mboss_{guardian,butterfly,fieldgen}_rig.mjs + build_mboss_{bf,fg}_fx.py,
-  #   build_rift.py, build_bossbar.py, build_minimap.py, build_navia_fx_cards.py
+  #   build_rift.py, build_bossbar.py, build_minimap.py, build_navia_fx_cards.py, build_balance.py(균형치 글꼴 rlk:bal; 데이터팩 몫은 regen_all 이 돌림)
   python3 tools/build_raiden_all.py --resourcepack $RP        # 나루카미 전부(데이터팩 + RP, 끝에 check_raiden_pack.py)
   node tools/build_player_rig.mjs --datapack . --resourcepack $RP && python3 tools/build_player_audio.py   # 아바타
   node tools/build_mobs.mjs --datapack . --resourcepack $RP && node tools/build_swordsman.mjs --datapack . --resourcepack $RP
@@ -286,7 +286,7 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
      `grep -rhoE 'scoreboard objectives add [A-Za-z0-9_.]+' data | sort -u` 로 확인한다.
    - 리그 UUID 는 `524c4b4d-<두 글자 ASCII 16진>-…-0000000000NN` 꼴이다. 쓴 것: 4150 AP · 415a AZ · 4246 BF · 4247 BG(파수꾼) ·
      4350 CP · 4647 FG · 4852 HR · 4b4e KN · 5244 RD · 544b TK.
-   - 킷 글꼴 코드 포인트는 다음 대역 U+ED00 을 쓴다(쓴 것 E100 · E300 · E400 · E500 … EB00 · EC00(홍련 `mboss_hr`), 리소스팩 README 2절).
+   - 킷 글꼴 코드 포인트는 다음 대역 U+EE00 을 쓴다(쓴 것 E100 · E300 · E400 · E500 … EB00 · EC00(홍련 `mboss_hr`) · ED00(균형치 `rlk:bal`), 리소스팩 README 2절).
    - 아틀라스: 11-06 에 12.919 M / 게이트 13.2 M 이라 새 보스 몫은 약 0.28 M 뿐이다(11-03 의 여유 0.57 M 가운데 홍련이 0.29 M 를 씀;
      아를레키노 계획은 ≤ 1.0 M 이었다). 계획에서 그
      안으로 잡거나, 다른 몫을 줄이거나, 게이트를 올린다(13.2 M 은 아를레키노 계획에서 정한 값; 클라이언트 한계 약 15.5 M). 올리면
@@ -408,6 +408,8 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   상속): 그래서 loadcheck · rplint 가 따로 있다. (봇 클라이언트로 실제 서버에 들어가 시험하는 것은 10-21 에 안 됐다: mineflayer
   4.39.0 / minecraft-data 3.117.0 이 26.1 프로토콜까지다. 새 버전이 26.3 을 지원하는지 먼저 보고, 안 되면 실제 게임 확인은 사용자에게
   부탁한다.)
+- 균형치(전투 개편 B): `sim/bal/tests/`(`test_bal` 핵심 · 일반 / 정예 가족 · 정리 115개, `test_bal_boss` 보스 11개를 실제 전투로 129개;
+  `lib/balsim.py` 는 `on passengers` · `ride` · NoAI 를 더한 mcsim, 보스는 `hr/tests/lib` · `ar/s3/lib` 의 모의기를 읽기만 함).
 - **보스마다 `<보스>/tests/` 에 스위트를 만들어 썼다.** 옮겨 둔 것: 아를레키노 `sim/ar/tests/`(`test_cm_ar` 틀 FN-1 · FN-3 · 라우팅,
   `test_arena_fl` 경기장, `test_kit` 효과 킷, `test_rig` 리그, `test_arlecchino` 코어 · 생명의 계약 · AI · 틱 비용, `pat_p1` · `pat_p2`
   패턴: 타격 틱 = 클립 이벤트 · 예고 · 범위 · 끝점 · 매 틱 취소, `kit_dry`), 홍련 `sim/hr/tests/`(11-05 I1: `test_special_hr` 특수 보스 틀
@@ -506,6 +508,16 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 **타키**
 - TK-09(작음): 클리어 때 꺼진 균열 위에 서 있으면 약 30틱 뒤 빨려 들어간다.
 - TK-10(작음): 특수 보스 전투가 취소되면 안내가 두 줄 나온다(중간보스와 같음).
+
+**균형치 (전투 개편 B, 11-10)**
+- 리소스팩: 마름모 글꼴 `rlk:bal`(U+ED00~ED22)은 `python3 tools/build_balance.py --resourcepack $RP` 로 넣어야 보인다(그 전에는 네모 상자).
+  더하는 파일: `assets/rlk/font/bal.json`, `assets/rlk/textures/font/bal/{hf,he,hx,hg,bf,be,bx,bg}.png`(바꾸는 기존 파일 없음).
+- 게임에서 확인할 것: 머리 위 줄의 높이 · 왼쪽 끝(텍스트 디스플레이 크기 0.5, x = -0.8 + 너비/2 로 계산; 방패병 · 로노바 잠식 띠와 겹치지
+  않는지), 보스바의 마름모 줄이 HP 바 아래 5 px 띠(14~18행)에 들어가 셋째 줄과 겹치지 않는지, 그로기 동안 리그가 멈춰 보이는지.
+- 야타용왕 · 아펩에는 그로기 클립이 없어 대기 자세로 멈춘다(클립은 리그 생성기 + 리소스팩이 필요). 나루카미 텐마 단계는 깎이지 않는다
+  (갑주가 게이지). 홍련의 어댑터는 H 레인이 새 전투에 맞춰 다시 만든다.
+- 보스 전투의 한 틱 비용: 늘지 않게 했다(시계는 원래 있던 `mob/tick` 줄, 그로기 분기는 `d/tick` 의 조건, 보스바 줄은 이름의 성분).
+  `test_m0diff` 의 B(가짜 플레이어 점수 목록)에 `#burstDmg tmp` 가 하나 더 보인다(이미 실패하던 검사).
 
 **틀 · 시험**
 - `test_m0diff` 틱당 명령 예산 초과(아를레키노 S1 보고 R6): proto +6.57 · 나비 +6.70 · 역장 +6.98 > 6.5(D0 에서 이미 +6.54 /
@@ -679,6 +691,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 | `#rxPlayerPct` | 플레이어가 맞는 원소 반응의 기준 = 받은 피해 × 이 값(%) | 50 |
 | `#kirionNeed` | 봉인된 검 → 마검: 키리온 변신 처치 수 | 300 |
 | `#forbNeed` | 금단의 도서 → 데모노미콘 변신 페이지 수 | 500 |
+| 균형치(`tools/build_balance.py` 의 `TIERS` · `BURST_PIPS` · `BURST_GAP` · `RX_GAP` · `RX_PIPS`; `bal/load` 가 `#pips1..3` · `#grg1..3` · `#amp1..3` · `#rd1..3` · `#rs1..3` · `#burst` · `#burstGap` · `#rxGap` (bal) 로 씀) | 등급(1 일반 · 2 정예 · 3 보스)별 칸 수 / 그로기 틱 / 그로기 동안 받는 피해 % / 회복 시작 틱 / 회복 간격 틱, 원소폭발 칸 · 간격, 반응 간격 | 4·7·12 / 60·80·100 / 150·140·130 / 200·240·300 / 60·80·100, 2 · 40, 30 |
 | `#riftPm` (room) | 전투 구역이 지어질 때 균열이 생길 확률(천분율, 한 판에 한 번, 아래 "균열") | 30 (3%) |
 | `#hrMoonAtk` / `#hrMoonCrit` / `#hrMoonSpd` / `#hrMoonRun` | 월하대작(특수 보스 홍련의 이벤트 버프): 최종 공격력(증폭 `ampAtk`) / 치명타 확률 / 이동 속도 + (%) / 범위(1 = 이번 런: `player/reset_one` 이 끄고 스탯 줄 "(이번 런)", 0 = 영구: 끄지 않고 "(영구)"). 이벤트 제목 · 균열 채팅 · 스탯 줄의 수는 이 값을 읽는다. 영구로 바꾸려면 여기서 8 / 4 / 4 와 `#hrMoonRun` 0, 그리고 `tools/mboss_scarlet/api.py` 의 `EVENT['buff_scope']` = `'forever'`(균열 채팅의 "이번 런 동안" → "영구히", 재생성)(계획 §7.5.3). S5(11-06): 공격력 20 → 27(아이템 ★★ 와 같은 값, 계획 §7.5.4) | 27 / 10 / 10 / 1 |
 
@@ -726,6 +739,54 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 - 다른 경로로 데미지를 줄 때: `function rlk:combat/clear_atkflags` 로 초기화한 뒤 `#dmg` `#crit` `#stunHit` 과
   원소(`#elem` 0~7, `#elU` 1000 = 1U 부착)를 설정하고 `execute as <몹> at @s run function rlk:combat/apply`.
 - 원소전투 스킬·원소폭발을 쓰면 `combat/on_skill` 이 호출되고, 스킬 피해는 `#skillDmg tmp` = 1 로 들어갑니다(금단의 도서/데모노미콘/고통 & 절망이 사용). 스킬 피해 계산은 `function rlk:char/dmg_calc {coef:200}` (공격력의 200%, 치명타 판정 포함).
+
+### 균형치 · 그로기 (`bal/`, 생성기 `tools/build_balance.py`; 전투 개편 B)
+모든 적에게 **균형치**(노란 마름모)가 있다. 다 깎이면 **그로기**: 몇 초 동안 행동 불능 + 받는 피해 증가, 끝나면 다시 가득 찬다.
+
+| 등급 | 누구 | 칸 | 그로기 | 받는 피해 | 회복(마지막으로 깎인 뒤) |
+|---|---|---|---|---|---|
+| 일반 | 1 · 2 · 3챕터 무리 몹, 바닐라 몹(허스크 · 스켈레톤 · 변명자) | 4 | 60틱 | 150 % | 200틱 뒤 60틱마다 +1 |
+| 정예 | `rlk_c2e` · `rlk_c3e`(카이라기 · 닌자 · 대장 · 전갈 · 독수리 · 포탑) | 7 | 80틱 | 140 % | 240틱 뒤 80틱마다 +1 |
+| 보스 | 중간보스 · 챕터 보스 · 특수 보스(레지스트리 `bal`), 나루카미 | 12 | 100틱 | 130 % | 300틱 뒤 100틱마다 +1 |
+
+- **없음**: 펫 · 소환물(`rlk_pet`), 보스의 보조 오브젝트 · 히트 프록시(`rlk_mb_aux` · `rlk_mb_hit` · `rlk_mb_px`), 나루카미 오브젝트,
+  포자 주머니, 치친(`rlk_cm_ci`, 한 대 몹), 로비의 허수아비(`rlk_lobby`).
+- **깎는 것**(사용자 결정 11-10): ① 퍼펙트 패링 1칸 — 패링(전투 개편 C)이 그 공격의 주인에게 `execute as <적> run function rlk:bal/hit {n:1}`
+  ② 원소폭발 적중 2칸(대상마다 40틱에 한 번: 여러 번 때리는 폭발도 한 번; `items/hook/burst_dmg` 가 세우는 `#burstDmg tmp`)
+  ③ 강한 원소 반응(대상마다 30틱에 한 번): 증발 · 융해 · 과부하 · 초전도 · 빙결 1칸, 쇄빙 2칸, 공허의 소각 · 단죄 1칸(그 밖의 반응은 0).
+  ②와 ③은 한 타격에서 더해진다. 진짜 피해 · 대상이 죽은 타격은 깎지 않는다(`combat/apply` 의 HP 차감 뒤 한 줄).
+- **회복**: 위 표대로 천천히(스텔라 블레이드처럼 공격받지 않는 동안만); 그로기 · 대기(아래) 중에는 없음. 영상(원작)에는 회복이 없지만 사용자 결정.
+- **모습**: 일반 · 정예는 머리 위 체력바 아래(왼쪽 끝을 맞춤) 텍스트 디스플레이 한 줄(`rlk_hb_bal`), 보스는 보스바 둘째 줄의 HP 바
+  아래(아래 칸 다음 5 px 띠): 보스바 이름의 둘째 성분 `{nbt:"brow",storage:"rlk:bal"}` — 바 너비만큼 되돌아가 그리고 바 끝까지 채우므로
+  줄 너비가 그대로이고 `bossui/draw` 는 바뀌지 않음, 매 틱 명령도 늘지 않음. 노란 마름모 = 남은 칸, 회색 네모 = 쓴 칸(오른쪽부터 빈다, 원작 영상 그대로),
+  방금 깎인 칸은 6틱 흰색, 그로기 동안은 주황색 줄. 글꼴 `rlk:bal`(U+ED00~ED21, `build_balance.py --resourcepack`). 그로기가 시작되면
+  방패 깨지는 소리 · 모루 소리 + 머리 위 노란 섬광, 일반 · 정예는 그동안 머리 위를 노란 별 둘이 돈다. 줄은 바뀔 때만 다시 그림.
+- **그로기의 몸**(가족별 어댑터): 커스텀 몹(cm) = 빙결과 같은 길(얼음 없이): 하던 공격 취소(`cm/cancel`; 정예는 다음 틱에 `reset`: 닌자가
+  보이고 전갈이 올라옴), NoAI, 붙잡기, 쿨 유지, 모든 리그가 자세를 멈춤(1챕터 `.mjs` · 2 · 3챕터 생성기의 `rig/tick`), 북잡이는 북을 멈춤,
+  독수리는 공중에서 멈춤, 모래 새끼는 순환을 멈춤. 바닐라 몹 = NoAI(빙결과 겹쳐도 원래 상태로 돌아옴: `element/frz_end` 한 줄).
+  레지스트리 보스 = 모듈의 훅 넷(`mboss_lib.BAL_HOOKS`: `bal_ok` 지금 그로기 가능? · `bal_on` 깨끗이 멈추고 그로기 모습 · `bal_tick`
+  그로기 동안 모듈 틱 대신 · `bal_off` 다시 AI): `mboss/d/tick` 의 줄마다 `unless score @s grgT matches 1..`, 마지막 줄이 `d/bal_tick`.
+  게이지 시계는 `mob/tick` 의 한 줄(레지스트리 보스는 전투가 `#mbSt 1` 이고 멈추지 않았을 때만, 나루카미는 자기 틱에서). 컷신 · 등장 · 사망 · 보스바 꺼짐(`#mbBarOff`) 중에는 깎이지
+  않고, `bal_ok` 가 거절하는 상태(대본 · 무적 · 기믹)에서 0이 되면 **대기**(`rlk_bal_pend`): 허락되는 첫 틱에 그로기. 보스 자신의 그로기
+  (파괴 · 기절 · 다운)가 시작되면 `rlk:bal/refill` 이 게이지를 채우고 대기를 지운다(둘이 이어 나오지 않게). 멈춘 전투(사망 · 부활 ·
+  선택 화면)에서는 그로기 시계도 멈춤.
+
+| 보스 | 그로기 모습 | 허락 안 하는 상태(`bal_ok`) |
+|---|---|---|
+| 파수꾼 | 패턴 취소 → 무릎(`groggy_a`), 마지막 34틱 `groggy_b` 로 일어남 → 대기 | 파수 모드 · 혼돈 · 자기 그로기 · 파수 휘두르기 / 실패 창 |
+| 나비 | 취소, 나비형이면 바로 인간형(인간형 순서는 여기서 셈) → `groggy_h` → 대기 | 달빛 축복 · 해제 · 변신 · 자기 그로기 / 회복 · 날개 준비 |
+| 역장 | 취소 → 주저앉음(`groggy/rig`) → 끝나면 자기 회복(`recover`) | 역장 단계 전부(역장은 20타 파괴가 따로 있음) · 파괴 · 그로기 |
+| 야타용왕 | 모든 슬롯 · 장판 · 구슬 취소 → 대기 자세로 멈춤(그로기 클립 없음) | 전환 · 예약된 바닥 · 땅속(B3) · 산사태 · 흡수 · 컷신 · 무적 |
+| 아펩 | 취소 → 1페이즈 대기 자세 멈춤 / 3페이즈 `crouch_p3` 로 웅크림, 끝에 `stand_p3` | 2페이즈 · 전환 · T1 · Q2 여파 · 실패 · 컷신 · 자세 전환 · 무적 |
+| 아를레키노 | 파괴처럼 취소(진짜 피해 없음) → 그녀의 기절(`brk` → `stun`/`stun2`)을 100틱 | 연회(F1) · E70 · Q5a/b · 파괴 창 · 기절 · 전환 · 재생 · 등장 |
+| 타키 | G3 역화처럼 취소(진짜 피해 없음) → `#stag` 100틱, 클립 `stun`(무릎) | 공중 패턴(10 · 11) · 블링크 무적 · 경직 · 원소 교체 · 외피 · 노바 · 전환 |
+| 홍련 | 취소 → 등을 대고 누움(`down`), 마지막 20틱 `kipup` → 회복 (H 레인이 다시 만듦) | 컷신 · 시퀀스 · 재생 · 부활 대기 · 건틀릿 · 다운 · 예약된 바닥 · 유령 · 무적 · A6 |
+| 나루카미 | 쇼군 단계의 기절(`rdSgStun 4`, `stagger` → `recover`)을 100틱 | 텐마(갑주가 게이지) · 변신 · 무력화 · 찰나의 포영 · 몽상의 일심 · 강제 후속 · 블링크 |
+| proto · cproto · spproto | 취소 후 멈춤(시험용) | cproto: 컷신 · 예약된 바닥 |
+
+- 시험: `tools/dev/sim/bal/tests/test_bal.py`(핵심 · 가족 · 정리, 115개) · `test_bal_boss.py`(보스 11개를 실제 전투로: 그로기 진입 · 아무것도
+  시작하지 않음 · 멈춤 · 끝 · 보호 상태의 대기 · 자기 그로기의 채움 · 그로기 중 사망). 조절값은 `build_balance.py` 맨 위(`TIERS` · `BURST_*` ·
+  `RX_*`)를 고치고 다시 만든다(`bal/load` 가 점수 `#<값><등급> bal` 로 씀).
 
 ### 공격 중 이동 · 점프 규칙 (모든 캐릭터, `player/swing/`)
 - **휘두르는 동안에는 멈추지 않고 느려집니다: 걷기는 절반 속도, 점프는 막힘.** 휘두르는 동안 = 평타를 시작한 순간부터 다음 평타 입력을 받을 수 있게 되는 틱 전까지(평타 간격 `atkCD`가 남아 있는 동안). 모든 캐릭터에 같습니다. 화면 확대(시야 좁아짐)는 없습니다.
