@@ -2156,7 +2156,7 @@
    "args": [
     "t"
    ],
-   "doc": "U cut1, the \"shattered glass\" (at the floor point the cuts cross: the player's spot; the executor's level = the floor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot through the arena round the executor in 2 t, low and nearly level (0.5-2.4 b up where they pass it: under the F5 camera; none dips under the floor), and stay {t} ticks (20: to cut2, where ult_burst takes them over); with them the screen overlay `web` (fx/hud/ovl, in 0, out 3) for the same {t} ticks.",
+   "doc": "U cut1, the \"shattered glass\" (at her body or the spot the cuts cross, at any height: the web is laid over the floor under the executor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot through the arena round the executor in 2 t, low and nearly level (0.5-2.4 b over the floor where they pass it: under the F5 camera; none dips under the floor), and stay {t} ticks (to cut2, where ult_burst takes them over). The screen overlay `web` is the caller's (fx/hud/ovl).",
    "cards": 16,
    "c_split": [],
    "ambient": false,
@@ -2164,7 +2164,7 @@
   },
   "ult_burst": {
    "args": [],
-   "doc": "U cut2 (the same floor point as ult_web, as its {t} ends): the 12 cut lines fly apart, each thrown 7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards flung out, a white glint; the white overlay and burst_radial are the caller's.",
+   "doc": "U cut2 (the same executor as ult_web, as its {t} ends; laid over the floor like it): the 12 cut lines fly apart, each thrown 7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards flung out, a white glint; the white overlay and burst_radial are the caller's.",
    "cards": 25,
    "c_split": [],
    "ambient": false,

@@ -431,7 +431,7 @@ HEIGHT = {'qi_arc': (1.0, 0.3), 'qi_ring': (0.8, 0.1), 'qi_band': (0.3, 1.1), 'q
           'ev_beam': (0.0,), 'ev_wind': (0.0,), 'ev_palm': (1.0,), 'ev_take': (1.2,)}
 # H1c: the rebuilt fight's presets (flash_blue at her chest; the web / the sky mark / the pillar at the lock point on the floor; the
 # beam from her blade in the air and from a low executor)
-HEIGHT.update({k: v for k, v in {'flash_blue': (1.2,), 'ult_web': (0.0,), 'ult_burst': (0.0,), 'sky_mark': (0.0,),
+HEIGHT.update({k: v for k, v in {'flash_blue': (1.2,), 'ult_web': (0.0, 1.2), 'ult_burst': (0.0, 1.2), 'sky_mark': (0.0,),
                                  'sky_pillar': (0.0,), 'qi_beam': (6.3, 2.5, 1.2, 0.4)}.items() if k in api.KIT_PRESETS})
 assert set(HEIGHT) == set(api.KIT_PRESETS)
 VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35}, {'r': 60, 'roll': 180},
@@ -1232,11 +1232,17 @@ if HR_PRESETS:
         check(all(stages(s, e.id).get('hrS') == T0 + G.FLASH_YELLOW_T + 1 for e in main), 'hr1c: flash_blue: the sphere shows at tick 4')
         check(all(killed(s, e) == T0 + G.FLASH_YELLOW_T + t_arg + 1 for e in main), f'hr1c: flash_blue: the sphere lasts t = {t_arg}')
         check(max(killed(s, e) for e in cs) <= T0 + G.FLASH_YELLOW_T + t_arg + 2, 'hr1c: flash_blue: nothing outlives the sphere')
-    # ---- ult_web {t} / ult_burst: 12 lines (+ 4 glows) for t ticks with the web overlay; the burst takes them over
+    # ---- ult_web {t} / ult_burst: 12 lines (+ 4 glows) for t ticks, laid over the floor whatever the caller's height (lane H1
+    #      calls it at her body, 1.2 b up); the overlay is the caller's; the burst takes the lines over
+    s = fresh()
+    s.run(G.fx('ult_web', t=20), pos=(X0, FLOOR + 1.2, Z0), rot=(0.0, 0.0))
+    high = sorted((round(e.pos[0], 2), round(e.pos[1], 2), round(e.pos[2], 2)) for e in s.cards())
     s = fresh()
     T0 = s.gt
     s.run(G.fx('ult_web', t=20), pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))
     cs = s.cards()
+    check(high == sorted((round(e.pos[0], 2), round(e.pos[1], 2), round(e.pos[2], 2)) for e in cs),
+          'hr1c: ult_web: called 1.2 b up (her body) the lines lie where they do called on the floor')
     check(len(cs) == 16 and {kind(s, e) for e in cs} == {'qline'}, f'hr1c: ult_web: 12 lines + 4 glows ({len(cs)})')
     core = [e for e in cs if end_scale(s, e)[0] < 0.3]
     check(len(core) == 12 and all(30 <= end_scale(s, e)[2] <= 40 for e in cs), 'hr1c: ult_web: 12 cores, every line 30-40 b long')
@@ -1251,8 +1257,11 @@ if HR_PRESETS:
               'hr1c: ult_web: a line passes 1.5-6.5 b beside the executor')
     check(max(mid) <= 2.5 and min(mid) >= 0.5, f'hr1c: ult_web: the lines pass the executor 0.5-2.5 b up ({min(mid):.2f}..{max(mid):.2f})')
     tt = [t for _g, t in s.titles if t.startswith('title {')]
-    check(tt and chr(api.OVERLAYS['web']) in tt[-1], 'hr1c: ult_web shows the web overlay')
-    check(s.sc(('e', s.player.id), 'vBig') == 20, 'hr1c: ult_web: the overlay lasts t (vBig 20)')
+    check(not tt, 'hr1c: ult_web draws the world only (the web overlay is the caller\'s fx/hud/ovl call)')
+    s.run(f'function {G.FN}hud/ovl {{g:"web",in:2,hold:16,out:2}}', pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))
+    tt = [t for _g, t in s.titles if t.startswith('title {')]
+    check(tt and chr(api.OVERLAYS['web']) in tt[-1] or any(chr(api.OVERLAYS['web']) in t or any(chr(G.GLYPHS[f'web_{k}'][0]) in t for k in range(1, G.OVL_STEPS)) for t in tt),
+          'hr1c: fx/hud/ovl {g:"web"} shows the web overlay')
     s.tick(19)
     check(len(s.cards()) == 16, 'hr1c: ult_web: the lines stay to t')
     s.run(G.fx('ult_burst'), pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))

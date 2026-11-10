@@ -1529,7 +1529,15 @@ def _web_lines():
 
 
 WEB_LINES = _web_lines()
-WEB_OUT = 3                            # the overlay's fade-out ticks at the end of ult_web's {t}
+WEB_OVL = (2, 16, 2)                   # the screen overlay `web` beside ult_web {t:22}: in / hold / out (the module's K.ovl call;
+#                                        the presets draw the world only, like every other preset)
+# the web lies over the floor whatever the caller's height (lane H1 calls it at her body, 1.2 b up): fx/e/hgt gives the
+# executor's height #h, the cards are made at the floor point under it
+WEB_FLOOR = [f'function {FN}e/hgt', f'execute store result storage {PA}.dy double -0.01 run scoreboard players get #h {OBJ}']
+
+
+def _on_floor(line):
+    return '$execute positioned ~ ~$(dy) ~ run ' + (line[1:] if line.startswith('$') else line)
 
 
 def _web_card(i, w, col, **kw):
@@ -1537,18 +1545,16 @@ def _web_card(i, w, col, **kw):
     return dict(kind='qline', pos=f'^{num(x, 2)} ^{num(h, 2)} ^{num(z, 2)}', rot=f'~{ang(yaw)} {ang(-up)}', col=col, **kw), w, ln
 
 
-@preset('ult_web', 'U cut1, the "shattered glass" (at the floor point the cuts cross: the player\'s spot; the executor\'s '
-        'level = the floor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot through the arena '
-        'round the executor in 2 t, low and nearly level (0.5-2.4 b up where they pass it: under the F5 camera; none dips '
-        'under the floor), and stay {t} ticks (20: to cut2, '
-        f'where ult_burst takes them over); with them the screen overlay `web` (fx/hud/ovl, in 0, out {WEB_OUT}) for the same '
-        '{t} ticks.',
-        pre=['$scoreboard players set #a hrFx $(t)', 'execute if score #a hrFx matches ..4 run scoreboard players set #a hrFx 5',
+@preset('ult_web', 'U cut1, the "shattered glass" (at her body or the spot the cuts cross, at any height: the web is laid '
+        'over the floor under the executor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot '
+        'through the arena round the executor in 2 t, low and nearly level (0.5-2.4 b over the floor where they pass it: under '
+        'the F5 camera; none dips under the floor), and stay {t} ticks (to cut2, where ult_burst takes them over). The screen '
+        'overlay `web` is the caller\'s (fx/hud/ovl).',
+        pre=WEB_FLOOR + ['$scoreboard players set #a hrFx $(t)', 'execute if score #a hrFx matches ..4 run scoreboard players set #a hrFx 5',
              # the lines crack in over three ticks (dly 0 / 1 / 2) and all end at t: lives t0 = t, t1 = t - 1, t2 = t - 2
              f'execute store result storage {PA}.t0 int 1 run scoreboard players get #a hrFx',
              f'execute store result storage {PA}.t1 int 1 run scoreboard players remove #a hrFx 1',
-             f'execute store result storage {PA}.t2 int 1 run scoreboard players remove #a hrFx 1',
-             f'execute store result storage {PA}.oh int 1 run scoreboard players remove #a hrFx {WEB_OUT - 2}'])
+             f'execute store result storage {PA}.t2 int 1 run scoreboard players remove #a hrFx 1'])
 def _p_ult_web():
     out = []
     for i in range(len(WEB_LINES)):
@@ -1557,13 +1563,13 @@ def _p_ult_web():
         if i % 3 == 0:
             kw, w, ln = _web_card(i, 0.45, PINK_GLOW, life='$(t0)', dur=2, dly=0)
             out.append(mac(card(s0=(w, w, round(ln * 0.12, 2)), s1=(w, w, round(ln, 2)), **kw)))
-    out.append(mac(f'function {FN}hud/ovl {{g:"web",in:0,hold:$(oh),out:{WEB_OUT}}}'))
-    return out + [dust(DUSTC[2], 1.4, '~ ~1.5 ~', (4.0, 1.5, 4.0), 30), part('end_rod', '~ ~2 ~', (5.0, 2.0, 5.0), 0.02, 16)]
+    out += [dust(DUSTC[2], 1.4, '~ ~1.5 ~', (4.0, 1.5, 4.0), 30), part('end_rod', '~ ~2 ~', (5.0, 2.0, 5.0), 0.02, 16)]
+    return [_on_floor(x) for x in out]
 
 
-@preset('ult_burst', 'U cut2 (the same floor point as ult_web, as its {t} ends): the 12 cut lines fly apart, each thrown '
-        '7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards flung out, a white '
-        'glint; the white overlay and burst_radial are the caller\'s.')
+@preset('ult_burst', 'U cut2 (the same executor as ult_web, as its {t} ends; laid over the floor like it): the 12 cut lines '
+        'fly apart, each thrown 7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards '
+        'flung out, a white glint; the white overlay and burst_radial are the caller\'s.', pre=WEB_FLOOR)
 def _p_ult_burst():
     rnd = RND(61)
     out = []
@@ -1575,8 +1581,9 @@ def _p_ult_burst():
     out += [fly(f'shards_{k % 2}', yaw, rnd.uniform(10, 50), rnd.uniform(5.0, 8.0), h=1.4, s0=0.7, s1=1.1, life=10, fade=4,
                 col=PINK_HOT, roll=rnd.randint(-60, 60)) for k, yaw in enumerate(radial(12, 10))]
     out.append(card('glint_0', '~ ~1.4 ~', bb='center', s0=1.0, s1=3.6, life=5, fade=2, col=WHITE))
-    return out + [dust(DUSTC[2], 1.6, '~ ~1.5 ~', (5.0, 2.0, 5.0), 40), part('end_rod', '~ ~2 ~', (4.0, 2.0, 4.0), 0.12, 24),
-                  blockp('amethyst_block', '~ ~1.5 ~', (3.0, 1.5, 3.0), 0.2, 20)]
+    out += [dust(DUSTC[2], 1.6, '~ ~1.5 ~', (5.0, 2.0, 5.0), 40), part('end_rod', '~ ~2 ~', (4.0, 2.0, 4.0), 0.12, 24),
+            blockp('amethyst_block', '~ ~1.5 ~', (3.0, 1.5, 3.0), 0.2, 20)]
+    return [_on_floor(x) for x in out]
 
 
 SKY_MARK_T, SKY_MARK_H, SKY_MARK_W = 7, 12.0, 2.0
@@ -2814,8 +2821,11 @@ def _demos():
     # H1 block (lane H1c): the presets of the rebuilt fight; the yellow tell's big size after the plain one
     D['yellow_tell'] += _ev(30, 'chest', f('yellow_tell', t=YELLOW_BIG + 12), snd('yellow_chime'))
     D['flash_blue'] = _ev(5, 'chest', f('flash_blue', t=15), snd('yellow_chime')) + _ev(5 + FLASH_YELLOW_T, 'chest', snd('flash_blue'))
-    D['ult_web'] = _ev(5, 'spotg', f('ult_web', t=20), snd('ult_cut1')) + _ev(25, 'spotg', f('ult_burst'), snd('ult_cut2'))
-    D['ult_burst'] = _ev(5, 'spotg', f('ult_burst'), snd('ult_cut2'))
+    # (the web as the module calls it: at her body, t 22 = cut2 - web + 2, the overlay beside it; the burst at cut2)
+    D['ult_web'] = (_ev(5, 'chest', f('ult_web', t=22), snd('ult_cut1'),
+                        'function %shud/ovl {g:"web",in:%d,hold:%d,out:%d}' % ((FN,) + WEB_OVL))
+                    + _ev(25, 'chest', f('ult_burst'), snd('ult_cut2')))
+    D['ult_burst'] = _ev(5, 'chest', f('ult_burst'), snd('ult_cut2'))
     D['sky_mark'] = _ev(5, 'spotg', f('sky_mark')) + _ev(12, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
     D['sky_pillar'] = _ev(5, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
     D['qi_beam'] = _ev(5, 'air', f('qi_beam', len=140), snd('band_sweep')) + _ev(25, 'air', f('qi_beam', len=160), snd('band_sweep'))
