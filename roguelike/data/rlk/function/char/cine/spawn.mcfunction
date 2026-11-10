@@ -2,8 +2,7 @@
 # displays in the avatar's idle pose with the current character's skin and the one sword; the avatar (and a rig character's own
 # displays, a floating catalyst) hidden. Called again it only moves the actor to the new stage.
 scoreboard objectives add cine dummy
-execute store result score #n cine if entity @e[type=minecraft:item_display,tag=rlk_cine_part]
-execute if score #n cine matches 11 if entity @e[type=minecraft:marker,tag=rlk_cine_root,limit=1] if score #cavCh cine = #charN tmp run return run function rlk:char/cine/place
+execute if entity 524c4b4d-4349-4e45-8000-000000000000 if entity 524c4b4d-4349-4e45-8000-000000000001 if entity 524c4b4d-4349-4e45-8000-000000000002 if entity 524c4b4d-4349-4e45-8000-000000000003 if entity 524c4b4d-4349-4e45-8000-000000000004 if entity 524c4b4d-4349-4e45-8000-000000000005 if entity 524c4b4d-4349-4e45-8000-000000000006 if entity 524c4b4d-4349-4e45-8000-000000000007 if entity 524c4b4d-4349-4e45-8000-000000000008 if entity 524c4b4d-4349-4e45-8000-000000000009 if entity 524c4b4d-4349-4e45-8000-00000000000a if entity @e[type=minecraft:marker,tag=rlk_cine_root,limit=1] if score #cavCh cine = #charN tmp run return run function rlk:char/cine/place
 function rlk:char/cine/clear
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_cine_root"]}
 data modify storage rlk:cine sp set value {k:"lumine"}

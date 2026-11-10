@@ -127,12 +127,12 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     storage: 'rlk:cine',
     calls: {spawn: `${NS}/spawn`, play: `${NS}/play {clip:"<id>"}`, tick: `${NS}/tick`, face: `${NS}/face {yaw:<deg>}`, stop: `${NS}/stop`},
     characters: CINE_CHARS.map(c => ({n: c.n, id: c.id, models: `rlk:player_motion/${c.key}/<part>`, skin: 'rlk:skin/' + c.skin, rig: c.rig})),
-    sword: {model: 'rlk:player_motion/weapons/cine_sword', of: 'rlk:item/player_motion/weapons/sword', scale: 1, hilt_to_tip: +SWORD.tip.toFixed(4), hilt_to_pommel: +(-SWORD.pommel).toFixed(4), blade_root: SWORD.root},
+    sword: {model: 'rlk:player_motion/weapons/cine_sword', of: 'rlk:item/player_motion/weapons/sword', scale: 1, hilt_to_tip: +SWORD.tip.toFixed(4), hilt_to_pommel: +(-SWORD.pommel).toFixed(4), blade_root: SWORD.root, left_hand: SWORD.left},
     hip_y: HIP_Y, height: 2, sync_grid: GRID, limit: LIMIT, contact: CONTACT, clips: {}, checks: {},
   };
   const dbgPut = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
   if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/cine_dbg'), {recursive: true, force: true});
-  const ends = {};
+  const ends = {}, hists = {};
   CLIPS.forEach((clip, ci) => {
     const id = ci + 1, L = clip.len, name = clip.id;
     // 1. solve the tracks, tick by tick (the limbs keep their bend side from the tick before)
@@ -140,10 +140,13 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     clip.build(tr);
     fail(`${name}: a channel drifts over a long gap (hold it first)`, tr.slow().filter(x => !(clip.slow || []).includes(x)));
     const solved = [], shortAll = [];
-    let hist = null;
+    // a clip that takes over from another without a respawn starts from that clip's solve (the limbs' bend sides carry on)
+    let hist = clip.after ? hists[clip.after[0]][clip.after[1]] : null;
+    hists[name] = {};
     for (let t = 0; t <= L; t++) {
       const s = solve(tr.sample(t), t, hist);
       hist = s.hist; solved.push(roundPose(s.pose));
+      if ((clip.keep || []).includes(t)) hists[name][t] = hist;
       for (const [k, v] of Object.entries(s.info.short)) if (v > .03) shortAll.push(`t${t} ${k} ${v.toFixed(3)}`);
     }
     // 2. the clip file: keys whose linear interpolation gives every tick back (eulers 0.02 degrees, the shift 0.0004 b)
@@ -305,8 +308,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     '# displays in the avatar\'s idle pose with the current character\'s skin and the one sword; the avatar (and a rig character\'s own',
     '# displays, a floating catalyst) hidden. Called again it only moves the actor to the new stage.',
     `scoreboard objectives add ${OBJ} dummy`,
-    `execute store result score #n ${OBJ} if entity ${PARTSEL}`,
-    `execute if score #n ${OBJ} matches ${PARTS.length} if entity ${ROOT} if score #cavCh ${OBJ} = #charN tmp run return run function ${NS}/place`,
+    `execute ${PARTS.map((n, i) => `if entity ${UUID(i)}`).join(' ')} if entity ${ROOT} if score #cavCh ${OBJ} = #charN tmp run return run function ${NS}/place`,
     `function ${NS}/clear`,
     `summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","${TAG.root}"]}`,
     `data modify storage rlk:cine sp set value {k:"${CINE_CHARS[0].key}"}`,

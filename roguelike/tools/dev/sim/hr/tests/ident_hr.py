@@ -162,6 +162,10 @@ ALLOW[LANE_B] = (
         'mboss/fieldgen/groggy/begin', 'boss/arlecchino/core/stun_start', 'boss/arlecchino/hud/bar_stun',
         'boss/tachy/el/backfire', 'boss/tachy/mantle/break', 'boss/raiden/bars', 'boss/raiden/tick',
         'boss/raiden/exhausted_start', 'boss/raiden/sg/stun_begin', 'boss/raiden/sg/stun_tick')])
+# 11-11 홍련 rebuild, lane H3 (wip/combat-hr3; tools/dev/plan/combat/h3_progress.md): the cutscene actor — the generated
+# rlk:char/cine/** and its manifest (tools/build_player_cine.mjs, run by build_player_rig.mjs). It changes and removes nothing.
+LANE_H3 = 'scarlet rebuild H3 (11-11): the cutscene actor'
+ALLOW[LANE_H3] = [F + r'char/cine/.+', r'tools/player_motion/cine/manifest\.json']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash
