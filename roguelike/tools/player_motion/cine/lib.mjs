@@ -228,12 +228,14 @@ export function solve(c, t, hist = null) {
     return {S, E: s.E, W: s.W, v: s.v, Qa: segQ(sub(s.E, S), ua, s.v, true), Qf: segQ(sub(s.W, s.E), ua, s.v, true)};
   };
   const AR = arm('R', A(c.hR), c.wR);
-  // the sword looks the same rolled half round its blade: of the two rolls of the held-in-space frame take the one nearer the
-  // tick before (else nearer the in-hand frame), so a blend or a turning edge never spins the blade through 180 degrees
+  // The sword looks the same rolled half round its blade. The held-in-space frame takes the roll nearer the in-hand frame (a
+  // blend goes the short way), and what is shown takes the roll nearer the tick before, so neither a blend nor a turning
+  // edge ever spins the blade through 180 degrees.
   const QwFk = mul(AR.Qf, q(c.sw));
   let QwAbs = sp(A(c.bd), A(c.bn));
-  { const alt = mul(QwAbs, [0, 1, 0, 0]), ref = hist?.Qw || QwFk; if (qdot(alt, ref) > qdot(QwAbs, ref)) QwAbs = alt; }
-  const Qw = c.ws <= 0 ? QwFk : slerp(QwFk, QwAbs, c.ws);
+  { const alt = mul(QwAbs, [0, 1, 0, 0]); if (qdot(alt, QwFk) > qdot(QwAbs, QwFk)) QwAbs = alt; }
+  let Qw = c.ws <= 0 ? QwFk : slerp(QwFk, QwAbs, c.ws);
+  if (hist?.Qw) { const alt = mul(Qw, [0, 1, 0, 0]); if (qdot(alt, hist.Qw) > qdot(Qw, hist.Qw)) Qw = alt; }
   const blade = rot(Qw, [0, 1, 0]);
   const pommel = add(AR.W, times(blade, SWORD.left));
   const wL = c.wL + (1 - c.wL) * c.two;
@@ -250,7 +252,7 @@ export function solve(c, t, hist = null) {
     left_leg: E('left_leg', mul(conj(Qroot), LL.Ql)), left_knee: E('left_knee', mul(conj(LL.Ql), LL.Qs)),
     weapon: E('weapon', mul(conj(AR.Qf), Qw)), weapon_shift: [0, 0, 0], weapon_scale: [1, 1, 1],
   };
-  return {pose, info, hist: {pose, Qw: c.ws > 0 ? QwAbs : QwFk, v: {legR: LR.v, legL: LL.v, armR: AR.v, armL: AL.v}}};
+  return {pose, info, hist: {pose, Qw, v: {legR: LR.v, legL: LL.v, armR: AR.v, armL: AL.v}}};
 }
 
 // the shoulder joints (ST) of a channel set: where the arms hang from (the clip helpers fit the body to a grip with it)

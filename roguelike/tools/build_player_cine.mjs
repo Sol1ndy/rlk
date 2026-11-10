@@ -199,7 +199,9 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     if (blade.length) warns.push(`${name}: the blade inside the head / torso (${blade.length}): ${blade.slice(0, 10).join('; ')}`);
     for (const t of clip.handback) {
       if (!same(rootAt[t], [0, 0, 0])) fail(`${name}: shift at the hand-back tick ${t}`, [`[${rootAt[t]}]`]);
-      const off = PARTS.filter(n => dist(disp[t][n].t, IDLE_D[n].t) > 2e-4 || qAngle(disp[t][n].q, IDLE_D[n].q) > .02);
+      // (the sword may be rolled half round its blade: the same picture)
+      const roll = Q => [-Q[2], Q[3], Q[0], -Q[1]];           // Q * (a half turn about the blade, model Y)
+      const off = PARTS.filter(n => dist(disp[t][n].t, IDLE_D[n].t) > 2e-4 || (qAngle(disp[t][n].q, IDLE_D[n].q) > .02 && !(n === 'weapon' && qAngle(roll(disp[t][n].q), IDLE_D[n].q) < .02)));
       if (off.length) fail(`${name}: tick ${t} is not the avatar's idle`, off);
     }
     for (const [a, b] of clip.grounded || []) for (let t = a; t <= b; t++) if (!same(rootAt[t], [0, 0, 0])) { fail(`${name}: shift in ${a}-${b}`, [`t${t} [${rootAt[t]}]`]); break; }

@@ -59,7 +59,8 @@ const READY = {R: [.2, .26], L: [-.2, -.24]};
 // a sword held in space: the grip point, the blade's direction, the side its edge faces (the broad face's normal follows)
 const blade = (hilt, dir, edge = [0, 0, 1]) => { const d = norm(dir); return {hR: hilt, wR: 1, bd: d, bn: norm(cross(d, edge)), ws: 1}; };
 // the blade-lock convention of §3.0, the actor's half of the X: hilt 0.3 below K, 0.3 to its right, 0.25 before it
-const lock = Kp => { const hilt = add(Kp, [.3, -.3, -.25]); return blade(hilt, sub(Kp, hilt), [0, 0, 1]); };
+const ELBOWS_OUT = {pL: [-1, -.4, .35], pR: [1, -.45, .1]};       // two hands on the hilt: the elbows point out and forward, clear of the chest
+const lock = Kp => { const hilt = add(Kp, [.3, -.3, -.25]); return {...blade(hilt, sub(Kp, hilt), [0, 0, 1]), ...ELBOWS_OUT}; };
 const pommelOf = c => add(c.hR, mulv(norm(c.bd), SWORD.left));
 
 // The pelvis offset (hip) that keeps both shins upright over planted feet at the given drop: with no ankle the sole only lies
@@ -119,13 +120,14 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const slerpDir = (a, b, u) => { a = norm(a); b = norm(b); const th = Math.acos(Math.max(-1, Math.min(1, dot(a, b)))); if (th < 1e-4) return a; const s = Math.sin(th); return a.map((x, i) => (x * Math.sin((1 - u) * th) + b[i] * Math.sin(u * th)) / s); };
 // A cut: the grip and the blade's direction swept between two held poses with a key on every tick (a sparse key would let the
 // client cut the corner: a swing would read as a thrust). The broad face lies in the swing's plane, so the edge leads.
-function sweep(tr, t0, t1, from, to, {ease = 'io', via = null, n = null} = {}) {
+function sweep(tr, t0, t1, from, to, {ease = 'io', via = null, n = null, hvia = null} = {}) {
   const axis = n || norm(cross(norm(from.bd), norm(via || to.bd)));
   tr.hold(t0, 'hR', 'bd', 'bn');
   for (let t = t0 + 1; t <= t1; t++) {
     const u = EZ[ease]((t - t0) / (t1 - t0));
     const dir = via ? (u < .5 ? slerpDir(from.bd, via, u * 2) : slerpDir(via, to.bd, u * 2 - 1)) : slerpDir(from.bd, to.bd, u);
-    tr.at(t, {hR: mix(from.hR, to.hR, u), bd: dir, bn: axis}, 'l');
+    const h = hvia ? (u < .5 ? mix(from.hR, hvia, u * 2) : mix(hvia, to.hR, u * 2 - 1)) : mix(from.hR, to.hR, u);
+    tr.at(t, {hR: h, bd: dir, bn: axis}, 'l');
   }
 }
 // The switch from the sword carried by the arm's angles to the sword held in space: at tick t the held values are set to
@@ -286,7 +288,7 @@ function cs1(tr) {
 // the right leg back 120-128, the kick at KK 129; back-flip to the mark 132-138, lands, the idle at 140. `{at:5}` shows
 // ticks 0-129 only (the ending's tick 0 is the kick's pose).
 function repel(tr) {
-  const hiltR = add(K.KR, [.35, -.2, -.2]), gR = blade(hiltR, sub(K.KR, hiltR), [0, 1, .3]);
+  const hiltR = add(K.KR, [.35, -.2, -.2]), gR = {...blade(hiltR, sub(K.KR, hiltR), [0, 1, .3]), ...ELBOWS_OUT};
   const st0 = stance(O, [.27, .14], [-.25, -.2], {drop: .1});
   const base = {...REST, ...st0, ...gR, two: 1, tor: [-4, 6, 0], head: [10, 0, 0], kR: [.3, 0, 1], kL: [-.4, 0, 1], look: [0, 2.2, 1.3], wl: .5};
   const g0 = fit(base);
@@ -314,17 +316,18 @@ function repel(tr) {
   step(tr, 'R', 33, 38, [.3, .36], .05);
   tr.at(43, {hip: add(grab.hip, [0, .015, .02])}, 'io');
   // 46-49 the hilt strike: a short hop, the pommel driven forward and down onto her hat
-  const hand49 = [.03, 1.97, .78], pd = norm([0, -.5, -.87]);
-  const hit = fit({...REST, root: A1, ...feet(O, [.3, .36], [-.16, .62]), rot: [0, 0, 0], tor: [-14, -18, 0], hip: [-.04, .1, .2], ...blade(hand49, pd, [1, 0, 0])}, {reach: .57, vars: ['hr', 'hf', 'ty', 'tr']});
+  const pd = norm([.6, -.6, -.53]), hand49 = sub(add(K.KH, [0, -.04, -.02]), mulv(pd, SWORD.pommel));
+  const hit = fit({...REST, root: A1, ...feet(O, [.3, .36], [-.16, .62]), rot: [0, 0, 0], tor: [-4, -14, 0], hip: [0, .14, .04], ...blade(hand49, pd, [1, 0, 0])}, {reach: .58, vars: ['hr', 'ty', 'tr']});
   tr.hold(43, 'hR', 'bd', 'bn');
-  tr.at(47, {hR: [.36, 1.9, .5], bd: norm([.1, .35, -.93])}, 'io');
+  tr.at(47, {hR: [.5, 1.92, .46], bd: norm([.3, .35, -.89])}, 'io');
   tr.hold(46, 'hip', 'tor', 'rot', 'head', 'lfR', 'lfL', 'lR', 'lL');
   tr.hold(48, 'wL', 'hL', 'aL');
   tr.at(49, {hip: hit.hip, tor: hit.tor, rot: hit.rot, head: [14, 0, 0], hR: hand49, bd: pd, bn: [1, 0, 0], lfR: 1, lfL: 1, lR: [8, 0, -4, 14], lL: [-6, 0, 4, 20]}, 'i');
-  tr.at(49, {aL: [60, 0, 30, 60]}, 'l');
-  tr.at(54, {wL: 0, aL: ARM.balL}, 'io');
+  tr.at(49, {aL: [110, 0, 64, 30]}, 'l');
+  tr.at(51, {wL: 0}, 'l');
+  tr.at(55, {aL: ARM.balL}, 'io');
   // 49-52 lands, the blade dropping to the low left for the rising cut
-  const lowL = blade(add(A1, [-.12, .88, .22]), [-.62, -.5, .6], [0, 1, 0]);
+  const lowL = blade(add(A1, [-.1, .94, .42]), [-.62, -.4, .68], [0, 1, 0]);
   tr.at(52, {hip: [0, -.1, .1], tor: [-12, -24, 0], rot: [0, 0, 0], head: [4, 20, 0], lfR: 0, lfL: 0, hR: lowL.hR, bd: lowL.bd, bn: lowL.bn}, 'o');
   // 52-56 the rising cut, lower left to upper right; 56-62 the blade comes round level; 62-68 the level cut carries past her
   const highR = blade(add(A1, [.42, 1.56, .42]), [.5, .82, .28], [0, 1, 0]);
@@ -352,12 +355,12 @@ function repel(tr) {
   const hook = blade([.26, 1.6, 1.74], [.7, .68, -.2], [0, 0, 1]);
   tr.at(70, {head: [0, 20, 0], tor: [8, 0, 0], hip: [0, -.1, -.06]}, 'io');
   tr.at(76, {hip: [0, -.14, -.02], tor: [10, 4, 0], head: [-6, 24, 0], hR: hook.hR, bd: hook.bd, bn: hook.bn, pR: [.9, -.2, .3]}, 'io');
-  tr.mv(72, 78, {hL: [.06, 1.5, 1.72], wL: 1, pL: [-.9, -.2, .3]}, 'io');
+  tr.mv(72, 78, {hL: [-.02, 1.2, 2.12], wL: 1, pL: [-1, -.4, .1]}, 'io');
   // 78-96 bends and throws: the hips under her, both arms pull her over and down; 96-102 straightens
   tr.hold(78, 'hip', 'tor', 'head', 'hR', 'bd', 'bn', 'rot');
-  tr.at(84, {hip: [0, -.2, -.14], tor: [-48, 0, 0], head: [-14, 0, 0], hR: [.26, 1.34, 2.16], bd: norm([.8, .55, .2]), hL: [.0, 1.3, 2.14]}, 'i');
-  tr.at(90, {hip: [0, -.16, -.2], tor: [-78, 0, 0], head: [-10, 0, 0], hR: [.3, .86, 2.32], bd: norm([.85, -.1, .5]), hL: [-.06, .8, 2.3]}, 'l');
-  tr.at(96, {hip: [0, -.1, -.12], tor: [-58, 0, 0], head: [10, 0, 0], hR: [.36, .74, 2.2], bd: norm([.6, -.45, .66]), hL: [-.2, .8, 2.1], wL: 1}, 'o');
+  tr.at(84, {hip: [0, -.2, -.14], tor: [-48, 0, 0], head: [-14, 0, 0], hR: [.3, 1.0, 2.48], bd: norm([.8, .55, .2]), hL: [-.12, .84, 2.5]}, 'i');
+  tr.at(90, {hip: [0, -.16, -.2], tor: [-78, 0, 0], head: [-10, 0, 0], hR: [.32, .6, 2.5], bd: norm([.85, -.1, .5]), hL: [-.12, .52, 2.48]}, 'l');
+  tr.at(96, {hip: [0, -.1, -.12], tor: [-58, 0, 0], head: [10, 0, 0], hR: [.38, .62, 2.4], bd: norm([.7, -.28, .66]), hL: [-.24, .6, 2.36], wL: 1}, 'o');
   const over = blade(add(A2, [.32, 1.06, .34]), [-.3, -.6, .74], [0, 0, 1]);
   tr.at(102, {hip: [0, -.02, .02], tor: [-10, 0, 0], head: [16, 0, 0], hR: add(A2, [.4, .9, .2]), bd: norm([.2, -.5, .84]), wL: 0, aL: ARM.balL, pR: REST.pR}, 'io');
   // 104-118 stands over her, the point at her
@@ -410,9 +413,10 @@ function ending(tr) {
   tr.mv(50, 54, {root: E2}, 'io');
   step(tr, 'R', 50, 54, [.24, 1.3 + .34], .06);
   const l2 = fit({...r1, root: E2, ...feet(E2, [.24, .34], [-.2, -.5 - .0]), ...lkE, two: 1, rot: [0, -6, 0], tor: [-12, 8, 0], hip: [.05, -.1, .0], head: [6, 4, 0], wl: 0});
-  tr.hold(50, 'hip', 'rot', 'tor', 'head', 'two', 'wl', 'aL');
+  tr.hold(50, 'hip', 'rot', 'tor', 'head', 'two', 'wl', 'aL', 'pL', 'pR');
   tr.at(52, {hip: [.04, -.1, .04], tor: [-8, -6, 0]}, 'i');
-  tr.at(56, {hip: l2.hip, rot: l2.rot, tor: l2.tor, head: l2.head, two: 1, wl: 0}, 'o');
+  tr.hold(53, 'two');
+  tr.at(56, {hip: l2.hip, rot: l2.rot, tor: l2.tor, head: l2.head, two: 1, wl: 0, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR}, 'o');
   tr.mv(50, 56, {fL: [-.2, 0, 1.3 - .3]}, 'io');
   // 56-80 lock; the burst at 70 jolts both; 76-80 pushing
   tr.at(69, {hip: add(l2.hip, [0, -.03, -.02])}, 'io');
@@ -435,7 +439,7 @@ function ending(tr) {
   tr.hold(118, ...Object.keys(REST));
   tr.at(124, {root: E5}, 'io');
   const cutA = {hR: add(E4, [.5, .74, -.16]), bd: back.bd}, cutB = blade(add(E5, [-.3, 1.0, .5]), [-.9, .1, .42], [0, 1, 0]);
-  sweep(tr, 118, 124, cutA, cutB, {ease: 'io', via: norm([.6, .05, .8]), n: [0, 1, 0]});
+  sweep(tr, 118, 124, cutA, cutB, {ease: 'io', via: norm([.6, .05, .8]), n: [0, 1, 0], hvia: [.5, .98, .1]});
   tr.at(119, {lfR: 1, lfL: 1, lR: [60, 0, -6, 60], lL: [-40, 0, 6, 50], hip: [0, -.16, .04]}, 'l');
   tr.at(121, {hip: [0, -.13, .1], tor: [-30, -10, 0], head: [22, 6, 0], lR: [62, 0, -6, 62], lL: [-48, 0, 6, 22], aL: [-30, 0, 40, 30]}, 'l');
   const land5 = stance(E5, [.22, .42], [-.2, -.5], {drop: .22, yaw: 0});
@@ -465,8 +469,8 @@ function ending(tr) {
   sweep(tr, 186, 188, up5, mid5, {ease: 'i'});
   sweep(tr, 188, 190, mid5, lk5, {ease: 'l'});
   const l5 = fit({...r5, root: E6, ...feet(E6, [.24, .34], [-.2, -.46]), ...lk5, two: 1, rot: [0, -6, 0], tor: [-12, 8, 0], hip: [.05, -.1, .02], head: [6, 4, 0], wl: 0});
-  tr.hold(187, 'two', 'rot', 'head', 'wl');
-  tr.at(190, {hip: l5.hip, rot: l5.rot, tor: l5.tor, head: l5.head, two: 1, wl: 0, aL: ARM.balL}, 'i');
+  tr.hold(187, 'two', 'rot', 'head', 'wl', 'pL', 'pR');
+  tr.at(190, {hip: l5.hip, rot: l5.rot, tor: l5.tor, head: l5.head, two: 1, wl: 0, aL: ARM.balL, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR}, 'i');
   tr.at(197, {hip: add(l5.hip, [0, -.06, -.03])}, 'io');
   tr.at(204, {hip: add(l5.hip, [0, -.12, -.02])}, 'io');
   // 204-216 springs up to (0, 6.0, 1.5); the legs trail, the sword ready at the right
@@ -489,16 +493,17 @@ function ending(tr) {
   tr.at(228, {tor: [-8, 4, 0], head: [-2, 0, 0], aL: [-34, 0, 44, 30]}, 'i');
   tr.at(232, {tor: [-10, -30, 0], head: [0, 26, 0], lR: [10, 0, -8, 40], lL: [26, 0, 6, 60]}, 'o');
   // 232-252 drifts back and up from the pass, the sword carried round over the right shoulder; 252-260 into the level guard
-  const U2 = [-.5, 5.42, 2.28];
+  const U2 = [-.5, 5.51, 2.17];
   tr.hold(232, 'root');
   tr.at(242, {root: [.12, 6.1, 1.36]}, 'o'); tr.at(252, {root: [-.2, 5.9, 1.8]}, 'io');
   tr.at(236, {hR: [.3, 7.0, 1.86], bd: norm([-.3, .7, .65]), tor: [-6, -10, 0], head: [0, 6, 0], aL: [10, 0, 30, 60]}, 'io');
   tr.at(243, {hR: [.6, 7.5, 1.3], bd: norm([.3, .9, -.3]), bn: [1, 0, 0], tor: [4, 16, 0], head: [-8, -12, 0], lR: [14, 0, -8, 40], lL: [30, 0, 6, 64]}, 'io');
-  tr.at(252, {hR: [.1, 7.4, 1.95], bd: norm([.8, .58, .1]), tor: [2, -6, 0], lR: [20, 0, -8, 60], lL: [4, 0, 6, 50]}, 'io');
+  tr.at(252, {hR: [.26, 7.46, 2.1], bd: norm([.8, .58, .1]), tor: [2, -6, 0], lR: [20, 0, -8, 60], lL: [4, 0, 6, 50]}, 'io');
   const hA2 = add(K.KA2, [-.45, 0, -.05]), gA2 = blade(hA2, [1, 0, .08], [0, 1, 0]);
-  const b262 = fit({...REST, ...air(U2), rot: [0, 0, 0], tor: [6, -22, 0], head: [-16, 16, 0], ...gA2, two: 1, lR: [40, 0, -8, 76], lL: [14, 0, 6, 64]}, {reach: .57, vars: ['hr', 'hf', 'ty', 'tr', 'tp']});
+  const b262 = fit({...REST, ...air(U2), rot: [0, 0, 0], tor: [5, -22, 0], head: [-16, 16, 0], ...gA2, ...ELBOWS_OUT, two: 1, lR: [40, 0, -8, 76], lL: [14, 0, 6, 64]}, {reach: .57, vars: ['hr', 'hf', 'ty', 'tr', 'tp']});
   tr.at(256, {two: 0}, 'l');
-  tr.at(260, {root: U2, hR: gA2.hR, bd: gA2.bd, bn: gA2.bn, hip: b262.hip, tor: b262.tor, head: b262.head, two: 1, lR: b262.lR, lL: b262.lL, wl: 0}, 'io');
+  tr.hold(256, 'pL', 'pR');
+  tr.at(260, {root: U2, hR: gA2.hR, bd: gA2.bd, bn: gA2.bn, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR, hip: b262.hip, tor: b262.tor, head: b262.head, two: 1, lR: b262.lR, lL: b262.lL, wl: 0}, 'io');
   // 262 her cut falls on the guard: the arms give, the body drops; 266-286 swings out and round into the big cut at KA3
   tr.hold(262, 'root', 'hR', 'hip', 'tor', 'bd', 'bn', 'head', 'lR', 'lL');
   tr.at(265, {root: add(U2, [0, -.3, -.12]), hip: add(b262.hip, [0, -.06, 0]), hR: add(gA2.hR, [0, -.34, -.14]), tor: add(b262.tor, [8, 0, 0])}, 'o');
@@ -516,7 +521,7 @@ function ending(tr) {
   // 290-298 into the lock at KA4 (two hands), pressing to 304
   const U4 = [.0, 5.45, 1.85], lk4 = lock(K.KA4);
   const b4 = fit({...REST, ...air(U4), rot: [0, 0, 0], tor: [-10, 8, 0], head: [4, 4, 0], ...lk4, two: 1, hip: [.2, 0, .0], lR: [36, 0, -8, 70], lL: [-16, 0, 6, 44]});
-  tr.mv(291, 298, {root: U4, hR: lk4.hR, bd: lk4.bd, bn: lk4.bn, hip: b4.hip, tor: b4.tor, head: b4.head, two: 1, lR: b4.lR, lL: b4.lL}, 'io');
+  tr.mv(291, 298, {root: U4, hR: lk4.hR, bd: lk4.bd, bn: lk4.bn, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR, hip: b4.hip, tor: b4.tor, head: b4.head, two: 1, lR: b4.lR, lL: b4.lL}, 'io');
   tr.at(304, {hip: add(b4.hip, [0, 0, .05]), tor: add(b4.tor, [-6, 0, 0])}, 'io');
   // 304-330 pushed off: falls back to the mark, lands in a crouch, rises by 338
   tr.hold(304, ...Object.keys(REST));
