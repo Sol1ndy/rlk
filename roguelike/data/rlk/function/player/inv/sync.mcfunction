@@ -13,6 +13,6 @@ execute store result score #syN tmp run data get storage rlk:pinv order
 execute store result score #syP tmp if items entity @s inventory.* *[minecraft:custom_data~{rlk:{}}]
 execute store result score #syH tmp if items entity @s hotbar.* *[minecraft:custom_data~{rlk:{}}]
 scoreboard players operation #syP tmp += #syH tmp
-execute if score #syN tmp = #syO tmp if score #syP tmp = #syN tmp run return run function rlk:player/inv/collect_none
+execute if score #syN tmp = #syO tmp if score #syP tmp = #syN tmp run return 0
 data modify storage rlk:pinv cscan set from storage rlk:items ids
 function rlk:player/inv/collect_loop

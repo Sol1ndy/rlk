@@ -33,7 +33,12 @@ SCRATCH_SC = {('#syO', 'tmp'), ('#syN', 'tmp'), ('#syP', 'tmp'), ('#syH', 'tmp')
               # last-loop values the item scan leaves (the full scan ends on the last registry id, the fast scan on the last
               # held id); every reader sets them first: #cnt (ditem/retrieve_p), #enh (all enh_get callers, tune/apply),
               # #cntF (scan_add_prep), #fA/#fD/#fC (tune/fac before every use)
-              ('#cnt', 'tmp'), ('#cntF', 'tmp'), ('#enh', 'tmp'), ('#fA', 'tmp'), ('#fD', 'tmp'), ('#fC', 'tmp')}
+              ('#cnt', 'tmp'), ('#cntF', 'tmp'), ('#enh', 'tmp'), ('#fA', 'tmp'), ('#fD', 'tmp'), ('#fC', 'tmp'),
+              # order_count2 / collect_check temporaries (#c1 renamed #oc1 with the #c2 fix; read only right after being set)
+              ('#c1', 'tmp'), ('#oc1', 'tmp'), ('#oc2', 'tmp'), ('#left', 'tmp')}
+# the intended change of the #c2 fix: load's constant #c2 tmp (= 2, char/nefer/cat_tick) is no longer overwritten by
+# order_count2 (0 after any sort before the fix); reported apart, never a difference
+INTENDED_SC = {('#c2', 'tmp')}
 
 MIX = ['sword_hwamu', 'whetstone', 'whetstone', 'old_slate', 'hood', 'demonomicon', 'old_slate', 'pebble', 'mech_heart',
        'sealed_sword', 'lucky_coin', 'crimson_moon']
@@ -151,7 +156,7 @@ for name, script in SCEN.items():
         continue
     ra, sa = run(args.a, script, args.mode)
     rb, sb = run(args.b, script, args.mode)
-    ig_sc = [lambda k: k in SCRATCH_SC]
+    ig_sc = [lambda k: k in SCRATCH_SC or k in INTENDED_SC]
     if args.mode == 'settled':
         ig_sc.append(lambda k: k[1] in ('scanTick', 'hudKey'))
     nd = 0

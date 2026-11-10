@@ -28,7 +28,7 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 sword's dash window)
   release       pack.mcmeta: the build stamp at the end of its description (README 0-5 step 3; V-I, 11-06)
   combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
-                inv/collect_none}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
+                inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files).
 """
@@ -80,10 +80,11 @@ ALLOW = {
     # V-I (11-06): every release re-stamps the datapack's pack.mcmeta description (README 0-5 step 3)
     'release build stamp (README 0-5 step 3)': ['pack.mcmeta'],
     # combat lane P (11-10, wip/combat-perf; plan/combat/research_misc.md §4): the late-game lag fixes — rebuilt hotbar items
-    # finished inside player/tick, the F-swap event, the inventory sync / equipment scan / engraving sort fast paths
+    # finished inside player/tick, the F-swap event, the inventory sync / equipment scan / engraving sort fast paths;
+    # order_count2's temporaries no longer overwrite load's constant #c2 tmp
     # (items/enh_add, load, uninstall are already on the SR list)
     'combat P late-game lag (11-10)': [F + f'player/{n}.mcfunction' for n in ('tick', 'hotbar/place', 'hotbar/wrap', 'inv/sync',
-                                                                               'inv/manage', 'inv/collect_none')]
+                                                                               'inv/manage', 'inv/order_count2')]
     + [F + 'items/equip_scan.mcfunction', F + r'items/scan_[a-z_]+\.mcfunction', F + r'items/scan_s/[a-z_]+\.mcfunction']
     + [F + r'engravings/info_(build|bucket|bucket_loop|bucket_put|pass|pass_one)\.mcfunction'],
 }
