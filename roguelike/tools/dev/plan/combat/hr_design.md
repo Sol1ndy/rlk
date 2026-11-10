@@ -663,3 +663,31 @@ G2's cut count (9-11), `PP_FLINCH` 0-10. The item (`sword_hwamu`) and the buff a
 | 14 | Balance after the first repel | + 3 of 12 (the video: + 4 of 20) | `BAL['after_repel']` |
 | 15 | The one sword of the actor | the player rig's existing `sword` model under the id `cine_sword` (0 new atlas px) | H3 |
 | 16 | The ending (68.6 s) cannot be skipped, as today | kept | — |
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 8. Lead rulings (11-11) — binding; where they differ from the text above, these win
+1. **Open questions**: the defaults of 1-4, 6-9 and 11-16 stand.
+2. **Question 5 — the grab of `q` is unparriable.** The user's decision names grabs (`decisions.md`: 「보스의 일부 큰 공격만
+   (범위 공격 · 잡기 등)」). `q_grab`: purple flash (`star4`) at tick **8** (12 t before the grab at 20), no parry cue,
+   `hz_opts(noparry=1)`; events `glint 0, ghost 4, star 8, lock 13, go 16, grab 20, end 40`. Outcomes: missed / PD / left
+   the disc → reform, end 34; landed → `q_air`. The PP branch is gone. §2.5: `q` parryable 2 (beam, dive), unparriable 2
+   (grab, pillar).
+3. **Question 10 — lanes.** The work is split in five (file owners; nobody edits another lane's source files):
+   | lane | branch | owns |
+   |---|---|---|
+   | H1 | `wip/combat-hr1` | `tools/mboss_scarlet/{api,ai,p1,p_ghost,core,shield,s3lib}.py`, FN-bal (`build_balance.py`'s one line), the pattern / gauntlet / gauge / balance suites, `hrfair` 2.0. New fight clips are placeholders of the contract length, kit calls are guarded |
+   | H1c | `wip/combat-hr1c` | the 12 new fight clips in `tools/scarlet_clips.mjs` (§2.3), the H1 block of `build_mboss_hr_fx.py` (presets `flash_blue ult_web ult_burst sky_mark sky_pillar qi_beam`, the sounds, the `web` overlay, `parry_cue`) |
+   | H2 | `wip/combat-hr2` | FN-cam (`build_mboss_core.py`, `mboss_lib.py`), the RIGLIB look target, `tools/mboss_scarlet/{seq,cam}.py` (all sequences, shot tables, lines, effects, skips, hand-backs), `view/tick`'s guard; her cinematic clips are placeholders until H2c lands |
+   | H2c | `wip/combat-hr2c` | her 8 cinematic clips in `tools/scarlet_cine.mjs` (§4.1, the contacts of §4.3), the `gold` overlay block of the kit |
+   | H3 | `wip/combat-hr3` | the actor: `build_player_rig.mjs` (cine part), `tools/player_motion/cine/**`, `F:char/cine/**`, the RP's actor models (§4.2, §4.3, §5.3) |
+   Generated outputs (`rig/**`, `fx/**`, manifests, module functions) are never merged by hand: the lead regenerates them
+   at each merge. Merge order at HI: H1 → H1c → H2 → H2c → H3.
+4. **Interface commit.** H1's first commit (subject starts with `H1 interface`) adds §5.1's names to `api.py` additively
+   (the old module keeps building) and is pushed to `wip/combat-hr1` at once. The other lanes take names and numbers
+   from this file until it is there, then merge it (`git fetch origin wip/combat-hr1`).
+5. **Airborne spans** (타키's lesson, README 0-6): `nb` (44 t) and each half of `q_air` (38 t) are the ceiling; no clip
+   may hold her out of reach longer, and none hovers idle.
+6. **The sky mark** stays a line (the light line and the 2-b line at the feet): never an area on the floor.
+7. Commit trailer for every lane from now on:
+   `Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
