@@ -328,6 +328,18 @@ def t_input():
        (sh.data, P(s, 'dgAt'), s.gt))
     ck('input: the dodge leaves its start box rlk_dgo and opens the window (#dgEnd = now + 2)',
        len(s.select('@e[tag=rlk_dgo]', pctx(s))) == 1 and G(s, '#dgEnd', 'cb') == s.gt + G(s, '#dgPW') - 1)
+    # a chapter boss's hit proxy (rlk_mb_px) and a foreign interaction (a lobby object): the proxy's right-click is consumed
+    # by the pre-pass too, the foreign one is left alone
+    s.gt += 40
+    P(s, 'dashCool', 0)
+    px = Ent('interaction', (3.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_px', 'boss'])
+    px.data['interaction'] = {'timestamp': s.gt}
+    lo = Ent('interaction', (5.5, 64.0, 0.5), (0.0, 0.0), ['rlk_lobj'])
+    lo.data['interaction'] = {'timestamp': s.gt}
+    s.ents += [px, lo]
+    s.call('rlk:player/def/input', pctx(s))
+    ck('input: a boss proxy right-click is consumed by the pre-pass (dodge now), a lobby interaction is left alone',
+       'interaction' not in px.data and 'interaction' in lo.data and P(s, 'dgAt') == s.gt)
     t1 = P(s, 'dgAt')
     s.gt += 5
     s.call('rlk:player/dash', pctx(s))

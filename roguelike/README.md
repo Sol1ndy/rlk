@@ -746,7 +746,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 - **F(양손 바꾸기) = 패링**(`player/def/input` → `player/f_key`; 넘어간 아이템은 `player/hotbar/tick` 이 제자리로 되돌림). 무기를 든 채 Shift + F =
   레벨 업 아이템 선택(개발자 모드; F5 시점은 웅크리기 키 한 번, 12번)은 그대로다(패링이 아님).
 - **입력은 틱 맨 앞에서 받는다**(`rlk:tick` 의 `player/def/input`, 이번 틱의 피격 — 아바타의 바닐라 피격 · 커스텀 몹 · 나루카미 · 중간보스 — 보다
-  먼저): F, 눈앞 실드 · 몹 / 아바타 실드에 남은 우클릭(`player/def/rc_int`), F5 의 우클릭 누름(`rcU` → `player/def/rc` → `combat/rc_hold`).
+  먼저): F, 눈앞 실드 · 몹 / 아바타 실드 · 챕터 보스의 타격 대역(`rlk_mb_px`)에 남은 우클릭(`player/def/rc_int`), F5 의 우클릭 누름(`rcU` → `player/def/rc` → `combat/rc_hold`).
   그래서 어느 경로로 눌러도 "누른 틱 = 0" 이 같다. 좌클릭은 예전처럼 틱 끝(`combat/atkblock_manage`).
 - 액션바(`player/hud/`)는 항상 **HP 바 · 원소 에너지 · 골드 · 주사위** 순으로 표시합니다(닷지 게이지는 없음).
   - HP 바: `❤ [||||||||||]` 30칸 + `현재/최대`. 절반 초과 = 초록, 20% 초과 = 주황, 그 이하 = 빨강. 방어막(◈)과 내 몸에 붙은 원소 아이콘은 있을 때만 HP 옆에 나옵니다.
@@ -816,7 +816,9 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   패링 포함) 닷지(퍼펙트 · 넓은) · 퍼펙트 패링으로 흘려낼 때(무적은 아님). 야타용왕 낙인 정화의 "완벽 회피" `#mbDodgeOk` = 퍼펙트 닷지 또는 퍼펙트 패링
   (`mboss/hurt_dodge`). 홍련의 실드 조각은 베기의 타격 틱에 퍼펙트 창(닷지 또는 F, 0~2틱; `player/def/q_pf0` · `q_pf1`)이 열려 있고 6.2칸 안이면 깎임.
   방패병 돌진은 퍼펙트 패링에 끝나고(닷지로 피하면 계속 달림), 아펩 생명체의 탄은 퍼펙트 패링이면 거기서 끝난다(닷지면 심장으로 날아감).
-  넉백 · 원소 반응 DoT 는 무적(`dashInvT`)과 닷지 이동(`dashMoveT`) 동안 그대로 막힌다.
+  넉백 · 원소 반응 DoT 는 무적(`dashInvT`)과 닷지 이동(`dashMoveT`) 동안 그대로 막힌다. 보스 틀의 묶음(`#hzGrp` · `#pjGrp`: 처음 맞은 한 번이 묶음을
+  끔)은 퍼펙트 패링으로 막은 것은 맞은 것으로 치지 않아 묶음의 다른 것도 하나씩 막아야 하고, 1 · 2단계 패링은 맞은 것이라 묶음을 끈다(역장의 판석
+  `#fq6SH`, 생명의 계약 `#mbHitBol`, 나루카미의 악의 +60 도 같음).
 - **조절 지점**(`load`): `#dgPW` `#dgLW` `#dgLooseC` `#dgEn` `#dashCoolBase` · `#parW3` `#parW2` `#parW1` `#parGap` `#parRe` `#parChain` `#parKeep2`
   `#parKeep1` `#parCut` · `#npGap`.
 - 시험: `tools/dev/sim/cb/tests/test_cb.py`(0-8).
