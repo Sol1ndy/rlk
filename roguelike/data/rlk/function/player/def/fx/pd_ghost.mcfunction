@@ -1,0 +1,8 @@
+# 붉은 잔상 (위치 · 방향 = 닷지를 시작한 자리, 아바타가 보던 쪽): 지금 캐릭터 모습의 마네킹(투명 + 빛남 = 붉은 테두리만), 8틱
+kill @e[tag=rlk_cb_ghost]
+execute if data storage rlk:chars cur.info.prof run function rlk:player/def/fx/pd_ghost_m with storage rlk:chars cur.info
+execute unless data storage rlk:chars cur.info.prof run summon minecraft:mannequin ~ ~ ~ {Tags:["rlk_cb_fx","rlk_cb_ghost","rlk_pet","rlk_cb_new"],hide_description:1b,immovable:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,Glowing:1b,active_effects:[{id:"minecraft:invisibility",duration:-1,amplifier:0,show_particles:0b,ambient:1b}]}
+team join rlk_cbred @e[tag=rlk_cb_ghost,tag=rlk_cb_new]
+execute as @e[tag=rlk_cb_ghost,tag=rlk_cb_new] run rotate @s ~ 0
+scoreboard players set @e[tag=rlk_cb_ghost,tag=rlk_cb_new] cb 8
+tag @e[tag=rlk_cb_new] remove rlk_cb_new

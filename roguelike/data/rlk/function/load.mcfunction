@@ -44,7 +44,6 @@ scoreboard objectives add invEvt dummy
 scoreboard objectives add invCnt dummy
 # 장비 스캔의 빠른 길: 플레이어 = 마지막 스캔 번호, #scEp = 전체 스캔 번호(items/equip_scan · items/scan_fast)
 scoreboard objectives add eqEp dummy
-scoreboard objectives add hudKey dummy
 scoreboard objectives add hudHold dummy
 
 # 전투/조작
@@ -59,10 +58,24 @@ scoreboard objectives add swungAt dummy
 scoreboard objectives add intOwner dummy
 scoreboard objectives add msid dummy
 
-# 대쉬(충전식)
-scoreboard objectives add dashCharge dummy
-scoreboard objectives add dashRegen dummy
+# 닷지(우클릭; 옛 대쉬의 이동 · 재사용 대기) · 패링(F) — 전투 개편 C (player/def/)
+# dashCool = 닷지 재사용 대기(틱), dashInvT = 대쉬가 아닌 무적(원소폭발 시전 · 로노바 부활 · 추락 뒤; 닷지는 쓰지 않음)
+# 시각(gametime) 도장: parAt 받은 F · parLk 이때까지 F 무시 · parHit 그 F 로 막은 틱 · dgAt 닷지 시작 · dgRw 보상을 준 닷지
 scoreboard objectives add dashCool dummy
+scoreboard objectives add parAt dummy
+scoreboard objectives add parLk dummy
+scoreboard objectives add parHit dummy
+scoreboard objectives add dgAt dummy
+scoreboard objectives add dgRw dummy
+# 전투 개편 C 의 전역 값(#now 이번 틱 gametime, #dgOpen 퍼펙트 닷지 창이 열림, #dgEnd · #dgKill, 섬광 간격)
+scoreboard objectives add cb dummy
+# 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
+scoreboard players set #hcK tmp 0
+scoreboard players set #hcC tmp 0
+scoreboard players set #hcNP tmp 0
+scoreboard players set #hcND tmp 0
+scoreboard players set #parT tmp 0
+scoreboard players set #pdg tmp 0
 scoreboard objectives add dashInvT dummy
 scoreboard objectives add dashMoveT dummy
 scoreboard objectives add dashPX dummy
@@ -770,13 +783,29 @@ scoreboard players set #skPtMax tmp 12
 # 기본 공격에 맞은 몹: 경직 시간(틱) / 밀려나는 세기(칸/틱 × 1000. 바닐라 넉백 = 400, 0 이면 안 밀림)
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180
-# 대쉬: 최대 충전 수 / 1개 충전 시간(틱) / 대쉬 직후 자체 쿨타임(틱)
-# 대쉬 최대 충전 수·충전 시간의 기본값(Base). 실제 값(#dashMax, #dashRegenT)은 각인(질주)에 따라 engravings/scan_more 가 계산
-scoreboard players set #dashMaxBase tmp 2
-scoreboard players set #dashRegenBase tmp 20
-scoreboard players set #dashMax tmp 2
-scoreboard players set #dashRegenT tmp 20
-scoreboard players set #dashCoolT tmp 5
+# 닷지(우클릭 · 옛 대쉬 이동): 재사용 대기(틱)의 기본값. 실제 값 #dashCoolT 는 각인(질주 2개: -#dashEngSpd %)에 따라 engravings/scan_more 가 계산
+scoreboard players set #dashCoolBase tmp 12
+scoreboard players set #dashCoolT tmp 12
+# 닷지 창(누른 틱 = 0): #dgPW 틱 미만에 맞을 공격 = 퍼펙트 닷지(모든 적), #dgLW 틱 미만 = 일반 몹(#dgLooseC: 0 일반만, 1 정예까지)만 회피
+scoreboard players set #dgPW tmp 3
+scoreboard players set #dgLW tmp 7
+scoreboard players set #dgLooseC tmp 1
+# 퍼펙트 닷지: 원소 에너지(× 100, 고정량 · 원소 충전 효율 미적용)
+scoreboard players set #dgEn tmp 1000
+# 패링 창(F 를 받은 틱 = 0): #parW3 틱 미만 = 3단계(퍼펙트), #parW2 미만 = 2단계, #parW1 미만 = 1단계, 그 뒤 = 실패
+scoreboard players set #parW3 tmp 3
+scoreboard players set #parW2 tmp 6
+scoreboard players set #parW1 tmp 10
+# 받은 F 뒤 다시 받지 않는 시간 / 그동안 또 누르면 그 뒤로 늘어나는 시간 / 패링이 된 뒤의 대기(틱; 연타 · 누르고 있기 방지)
+scoreboard players set #parGap tmp 12
+scoreboard players set #parRe tmp 4
+scoreboard players set #parChain tmp 2
+# 2단계 · 1단계가 남기는 피해(%) / 퍼펙트 패링의 원소전투 스킬 재사용 대기 감소(틱)
+scoreboard players set #parKeep2 tmp 20
+scoreboard players set #parKeep1 tmp 50
+scoreboard players set #parCut tmp 20
+# 패링 불가 공격의 섬광: 같은 공격자에게 다시 띄우지 않는 간격(틱)
+scoreboard players set #npGap tmp 10
 # 기본공격 콤보 딜레이(공격속도 100% 기준 틱×100): 1타→2타, 2타→1타
 scoreboard players set #comboD12 tmp 600
 scoreboard players set #comboD21 tmp 1000
@@ -786,8 +815,6 @@ scoreboard players set #forbNeed tmp 250
 
 # 액션바 HUD: 다른 액션바 안내(골드 부족 등)가 뜰 때 HUD 를 잠시 멈추는 시간(틱)
 scoreboard players set #hudHoldT tmp 40
-# 대쉬 게이지 한 칸의 조각 수 (바꾸면 player/hud/setup 의 조각 수도 같이 바꿀 것)
-scoreboard players set #hudSeg tmp 15
 
 # 레벨: 1레벨 기초 수치 / 레벨당 증가량 / 필요 경험치(1레벨 → 2레벨) / 레벨당 필요 경험치 증가 / 몹 처치 경험치(몹의 xpDrop 스코어가 우선, 0 = 없음)
 scoreboard players set #lvHp0 tmp 100
@@ -891,8 +918,7 @@ scoreboard players set #cycleCd tmp 15
 scoreboard players set #cycleCut tmp 10
 #   예리: 확정 치명타 쿨타임(틱)
 scoreboard players set #keenCdT tmp 80
-#   질주: 대쉬 충전 추가 개수 / 충전 속도 증가% (대쉬 통과 피해 80% 는 engravings/dash/hit)
-scoreboard players set #dashEngMax tmp 1
+#   질주: 닷지 재사용 대기 감소% (닷지 통과 피해 80% 는 engravings/dash/hit)
 scoreboard players set #dashEngSpd tmp 20
 #   빙설: 얼음 원소 피해 증가% / 빙결된 적 치명타 확률 증가(%p)
 scoreboard players set #frostDmg tmp 15
@@ -1222,6 +1248,8 @@ execute unless data storage rlk:room {area:"s0"} run data modify storage rlk:roo
 # 접속 중인 플레이어 초기화
 execute as @a[tag=player] unless score @s init matches 1 run function rlk:player/init
 execute as @a[tag=player] unless score @s level matches 1.. run function rlk:player/init
+# 전투 개편 C 전에 저장된 플레이어: 패링 · 닷지 시각 도장(대쉬 충전은 없어짐)
+execute as @a[tag=player] unless score @s parHit matches -2147483648.. run function rlk:player/def/reset
 # 이미 초기화된 플레이어(업데이트 전 월드)도 보유 칸 수가 있게
 execute as @a[tag=player] unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
@@ -1259,6 +1287,11 @@ forceload add 1000000 1000000
 team add rlk_nfshade
 team modify rlk_nfshade color dark_green
 team modify rlk_nfshade collisionRule never
+# 퍼펙트 닷지의 붉은 잔상(빛나는 테두리 색, player/def/fx/pd_ghost)
+team add rlk_cbred
+team modify rlk_cbred color red
+team modify rlk_cbred collisionRule never
+team modify rlk_cbred seeFriendlyInvisibles false
 # ===== 1챕터 커스텀 몹(cm) =====
 scoreboard players set #15 tmp 15
 scoreboard players set #6 tmp 6

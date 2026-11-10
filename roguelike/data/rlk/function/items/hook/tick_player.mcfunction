@@ -75,7 +75,7 @@ execute if score #src4 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src5 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src6 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src7 itv matches 1.. run scoreboard players add #srcN itv 1
-# 생명줄: 대쉬가 끝났으면 실이 감긴 적에게 피해
+# 생명줄: 닷지가 끝났으면 실이 감긴 적에게 피해
 execute if entity @e[tag=rlk_llm,limit=1] unless score @s dashMoveT matches 1.. at @e[tag=rlk_body,limit=1] run function rlk:items/proc/lifeline_fire
 execute if score #srcN itv matches 1.. run scoreboard players operation 음원 stacks = #srcN itv
 execute if score #srcN itv matches 1.. run scoreboard players display name 음원 stacks {text:"켜진 음원",color:"#A5D94A"}

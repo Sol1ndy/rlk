@@ -3663,8 +3663,8 @@
  "space": "U+EC1F (-1)",
  "warn": {
   "bossbar": "rlk:hr_warn",
-  "text": "대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다",
-  "component": "{text:\"\",extra:[{text:\"대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 \",color:\"white\",font:\"minecraft:default\"},{text:\"즉사\",color:\"#FF3A55\",bold:true,font:\"minecraft:default\"},{text:\"합니다\",color:\"white\",font:\"minecraft:default\"}]}"
+  "text": "베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다",
+  "component": "{text:\"\",extra:[{text:\"베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 \",color:\"white\",font:\"minecraft:default\"},{text:\"즉사\",color:\"#FF3A55\",bold:true,font:\"minecraft:default\"},{text:\"합니다\",color:\"white\",font:\"minecraft:default\"}]}"
  },
  "skip": {
   "text": "⊙ 건너뛰기",

@@ -1,0 +1,9 @@
+execute if score @s pmTick matches 0 run function rlk:char/motion/clips/skirk/guard/pose/0 with storage rlk:player_motion active
+execute if score @s pmTick matches 1 run function rlk:char/motion/clips/skirk/guard/pose/1 with storage rlk:player_motion active
+execute if score @s pmTick matches 2 run function rlk:char/motion/clips/skirk/guard/pose/2 with storage rlk:player_motion active
+execute if score @s pmTick matches 3 run function rlk:char/motion/clips/skirk/guard/pose/3 with storage rlk:player_motion active
+execute if score @s pmTick matches 4 run function rlk:char/motion/clips/skirk/guard/pose/4 with storage rlk:player_motion active
+execute if score @s pmTick matches 5 run function rlk:char/motion/clips/skirk/guard/pose/5 with storage rlk:player_motion active
+execute if score @s pmTick matches 6 run function rlk:char/motion/clips/skirk/guard/pose/6 with storage rlk:player_motion active
+execute if score @s pmTick matches 7 run function rlk:char/motion/clips/skirk/guard/pose/7 with storage rlk:player_motion active
+execute if score @s pmTick matches 8 run function rlk:char/motion/clips/skirk/guard/pose/8 with storage rlk:player_motion active

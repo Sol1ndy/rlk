@@ -1,4 +1,4 @@
-# 살짝 전진 중 (@s = 플레이어, at 몸 rotated ~ 0). player/dash_move_tick 과 같은 이동, 대쉬 효과·아이템 발동은 없다
+# 살짝 전진 중 (@s = 플레이어, at 몸 rotated ~ 0). player/dash_move_tick 과 같은 이동, 닷지 효과·아이템 발동은 없다
 scoreboard players operation #subx tmp = @s dashDX
 scoreboard players operation #subx tmp /= #st4 tmp
 scoreboard players operation #subz tmp = @s dashDZ

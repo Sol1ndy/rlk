@@ -4,6 +4,8 @@ scoreboard players set #mbPause mb 0
 scoreboard players set #mbNoLeash mb 0
 # hr FN-f: no fight starts with the module's bars-off flag (mboss/bars_off / bars_on; world skips mboss/bars while it is 1)
 scoreboard players set #mbBarOff mb 0
+# combat overhaul C: the framework draws the unparriable warning glint (np_glint) unless the module sets #mbNpOwn 1 at its spawn
+scoreboard players set #mbNpOwn mb 0
 execute store result score #mbId mb run data get storage rlk:mboss cur.n
 execute store result score #mbDmgMul mb run data get storage rlk:mboss cur.dmgMul
 execute store result score #mbGoldMul mb run data get storage rlk:mboss cur.goldMul

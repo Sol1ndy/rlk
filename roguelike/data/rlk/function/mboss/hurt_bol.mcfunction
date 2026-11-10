@@ -11,9 +11,11 @@ scoreboard players operation #cmLv tmp = #mbLv mb
 scoreboard players operation #cmKB tmp = #mbKB mb
 kill @e[tag=rlk_plkb_source]
 execute if score #cmKB tmp matches 1.. run function rlk:mboss/kb_src
-execute unless score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
-# #mbNoDodge mb 1 (a #hzNoDodge hazard): dash i-frames do not help this hit
-execute if score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/hurt_nd
+# combat overhaul C: the hit context for player/def/judge (boss class; kind 1 direct / sector / line / disc, 2 projectile,
+# 3 ring / full / mask; #mbNoDodge = no dodge and no i-frames, #mbNoParry = unparriable), the attacker = the boss body
+function rlk:mboss/hurt_ctx
+execute as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
+scoreboard players set #mbNoParry mb 0
 scoreboard players set #mbNRNow mb 0
 kill @e[tag=rlk_plkb_source]
 scoreboard players set #mbKBDir mb 0

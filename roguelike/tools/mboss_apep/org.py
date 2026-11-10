@@ -417,9 +417,9 @@ def emit(g):
                          snd('o2_hit'), 'kill @s'])
     g.w('org/pj_end', ['# Hook pj_end of an organism prop (@s = the bolt, #pjEv 1 wall / 2 life over / 4 hit the player): a bolt that',
                        '# struck the player ends there (#pjKeep 0: the Heart is spared, plan 7.6.1 body-blocking) with the hit sound; a',
-                       '# dodged one flies on (harmless to the player) to the Heart.',
+                       '# dodged one flies on (harmless to the player) to the Heart; a parried one (any tier, combat overhaul C) ends.',
                        'execute unless score #pjEv mb matches 4 run return 0',
-                       'execute if score #dodged tmp matches 1 run return 0',
+                       'execute if score #dodged tmp matches 1 unless score #parT tmp matches 3 run return 0',
                        'scoreboard players set #pjKeep mb 0', f'execute at @s run {snd("o2_hit")}'])
     g.w('org/basic/die', ['# @s = a basic broken by the player: the burst, its death clip; a buffed one costs its 양육 (link lost).',
                           om('basic', 'play/org_die'), f'execute at @s positioned ~ ~0.6 ~ run {fx("org_burst")}',

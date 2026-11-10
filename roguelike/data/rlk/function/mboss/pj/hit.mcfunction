@@ -8,10 +8,12 @@ scoreboard players operation #cmEl tmp = @s mbPjE
 scoreboard players operation #mbKB mb = @s mbPjB
 scoreboard players set #mbKBDir mb 1
 scoreboard players operation #mbNoDodge mb = @s mbPjND
+scoreboard players operation #mbNoParry mb = @s mbPjNP
 scoreboard players operation #mbNoRx mb = @s mbPjNR
 scoreboard players set #mbSrc mb 2
 function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
+scoreboard players set #mbNoParry mb 0
 scoreboard players operation #g mb = @s mbPjG
 execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
 scoreboard players set #pjEv mb 4

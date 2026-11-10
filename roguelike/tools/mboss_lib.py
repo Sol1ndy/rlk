@@ -404,10 +404,12 @@ def _tenths(v):
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
             sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None,
-            norx=None, safe_g=None, pm=None, pm_lethal=None, bol=None):
+            norx=None, safe_g=None, pm=None, pm_lethal=None, bol=None, noparry=None):
     """Lines that set the one-shot options of the next hazard (reset after each create).
     grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group.
-    nododge=1: dash i-frames do not help (#hzNoDodge). rearm=N: a hit disarms it for N ticks only (#hzRearm;
+    nododge=1: no dodge and no i-frames help (#hzNoDodge). noparry=1 / 0 (combat overhaul C, #hzNoParry): unparriable /
+    parryable regardless of the default rule (framework hz/np_def: no-dodge, per-mille, re-arm, ring, full, mask, a disc of
+    r >= 4.5 b, a sector / line reaching >= 8 b are unparriable and flash the warning glint). rearm=N: a hit disarms it for N ticks only (#hzRearm;
     with a volley group the whole group re-arms together: at most one hit per N ticks).
     Chapter mode (AZ-CM): norx=1: no player-side element reaction from its hit (#hzNR); safe_g=G: the safe group of a
     mask hazard (#hzSafeG, 0 = its own id; 'cur' = the group of the last hz/safe_new, #mbSafeG, cm.md 13.6).
@@ -432,10 +434,12 @@ def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, b
         assert pm is not None and int(pm_lethal) in (0, 1)
     if bol is not None:
         assert 1 <= int(bol) <= 100
+    if noparry is not None:
+        assert int(noparry) in (0, 1)
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
              ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet),
              ('#hzNoDodge', nododge), ('#hzRearm', rearm), ('#hzNR', norx), ('#hzSafeG', safe_g),
-             ('#hzPm', pm), ('#hzPmL', pm_lethal), ('#hzBol', bol)]
+             ('#hzPm', pm), ('#hzPmL', pm_lethal), ('#hzBol', bol), ('#hzNoParry', noparry)]
     for k, v in pairs:
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
@@ -480,18 +484,19 @@ def tell_line(length, width, tell):
     return hz_line(length, width, tell, 0)
 
 
-def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False, nododge=None, norx=None, bol=None):
+def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False, nododge=None, norx=None, bol=None, noparry=None):
     """Lines that set the one-shot options of the next pj/launch (reset after it). shape 0 sphere, 1 blade
     (hr = half width across the flight); grp=True joins the current volley group #mbGrp (grp_new).
-    Chapter mode (AZ-CM): nododge=1: dash i-frames do not help (#pjNoDodge); norx=1: no player-side reaction (#pjNR).
+    Chapter mode (AZ-CM): nododge=1: no dodge and no i-frames help (#pjNoDodge); norx=1: no player-side reaction (#pjNR).
+    Combat overhaul C: noparry=1 / 0 (#pjNoParry): unparriable / parryable (default: parryable unless nododge).
     ar FN-1: bol=N (1..100): a Bond-of-Life projectile (#pjBol), as hz_opts(bol=)."""
     out = []
-    for v in (nododge, norx):
+    for v in (nododge, norx, noparry):
         assert v is None or int(v) in (0, 1)
     if bol is not None:
         assert 1 <= int(bol) <= 100
     for k, v in (('#pjEl', el), ('#pjKB', kb), ('#pjRet', ret), ('#pjWall', wall), ('#pjShape', shape),
-                 ('#pjNoDodge', nododge), ('#pjNR', norx), ('#pjBol', bol)):
+                 ('#pjNoDodge', nododge), ('#pjNR', norx), ('#pjBol', bol), ('#pjNoParry', noparry)):
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
     if grp:

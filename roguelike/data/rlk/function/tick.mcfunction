@@ -10,6 +10,12 @@ execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이�
 execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
+# 전투 개편 C: 입력 앞 단계. 이번 틱의 모든 피격(아바타의 바닐라 피격 · 커스텀 몹 · 나루카미 · 중간보스)보다 먼저 F(패링)와
+# 우클릭(닷지)을 받고, 이번 틱의 gametime(#now cb)과 퍼펙트 닷지 창(#dgOpen cb)을 정한다(player/def/input)
+execute store result score #now cb run time query gametime
+execute as @a[tag=player] at @s run function rlk:player/def/input
+execute store success score #dgOpen cb if score #now cb <= #dgEnd cb
+execute if score #now cb = #dgKill cb run kill @e[tag=rlk_dgo]
 
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
@@ -45,9 +51,12 @@ execute unless entity @e[tag=rlk_mob,limit=1] if entity @e[tag=rlk_hb_bg,limit=1
 execute if entity @e[tag=rlk_mshield,limit=1] run function rlk:combat/mshield_tick
 
 # 커스텀 몹(cm): 두뇌 · 투사체 · 모습/부착물 정리
+# 퍼펙트 닷지 창이 열린 동안(#dgOpen cb 1)은 몸 자리를 닷지를 시작한 자리(rlk_dgo)로 두고 판정한다: 그 자리에 닿은 공격 = 퍼펙트 닷지
+execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_on
 execute if entity @e[tag=rlk_cmb,limit=1] run function rlk:cm/world
 execute unless entity @e[tag=rlk_cmb,limit=1] if entity @e[tag=rlk_cmglob,limit=1] run kill @e[tag=rlk_cmglob]
 execute if entity @e[tag=rlk_cmp,limit=1] run function rlk:cm/pj/world
+execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_off
 execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
 # Narukami boss AI, telegraphs, combat objects and orphan cleanup.
 execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
@@ -56,6 +65,8 @@ execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
 # 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
 execute if score #mbLive mb matches 1 run function rlk:mboss/main
+# 전투 개편 C: 퍼펙트 닷지 창 동안 보스의 위험 지대 · 투사체를 닷지를 시작한 자리에서 한 번 더 판정(mboss/near_all; 몸이 이미 빠져나간 퍼펙트 닷지)
+execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 run function rlk:mboss/near_all
 execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
@@ -70,13 +81,15 @@ execute as @e[tag=rlk_epart] at @s run function rlk:char/particle_tick
 execute as @e[tag=rlk_jav] at @s run function rlk:char/lumine/jav_tick
 # 나비아 금빛 카드 효과(tools/build_navia_fx_cards.py): 수명·보간·정리
 function rlk:fx/nv/world
+# 전투 개편 C: 패링 · 닷지 · 경고 섬광 효과의 나이(player/def/fx/world)
+execute if entity @e[tag=rlk_cb_fx,limit=1] run function rlk:player/def/fx/world
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems
 
-# 눈앞 atkBlock/atkStrike 인터랙션 유지 + 클릭 폴링 (좌클릭=공격, 우클릭=대쉬)
+# 눈앞 atkBlock/atkStrike 인터랙션 유지 + 좌클릭 폴링(공격). 우클릭(닷지)은 맨 앞의 player/def/input 이 받는다
 execute as @a[tag=player] run function rlk:combat/atkblock_manage
-# 대쉬 방향용 이전 위치 저장(다음 틱 델타)
+# 닷지 방향용 이전 위치 저장(다음 틱 델타)
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPX run data get entity @e[tag=rlk_body,limit=1] Pos[0] 100
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPZ run data get entity @e[tag=rlk_body,limit=1] Pos[2] 100
 # 로비

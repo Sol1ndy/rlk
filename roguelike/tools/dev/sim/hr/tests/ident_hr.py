@@ -31,6 +31,9 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 the migration char/migrate_yoi*, the hand files that called them, mboss/px/db), the first-person mode and the
                 shoulder view (view/**, lobby/** settings and tutorial texts, char/{ronova,nefer}/def texts), the pick subtitle
                 (lvup/pick_sub)
+  lane C        the combat overhaul's parry / dodge (11-10, wip/combat-core): player/def/**, the dash files (its charges, gauge
+                and i-frame files gone), cm hit context, the boss framework's no-parry / near re-test / glint lines, Raiden's
+                hazard land, 홍련's pips and yellow-flag marks, the item / engraving / character texts, the guard clips
   combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
                 inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
   combat B      the balance gauge / groggy (11-10, wip/combat-bal): F:bal/**, the bosses' bal_{ok,on,tick,off} hooks and their
@@ -113,6 +116,38 @@ ALLOW[LANE_R] = (
                                              'rays', 'slow', 'spawn', 'sync', 'ttl_blank')]
     + [F + n for n in ('items/q/run.mcfunction', 'lvup/pick_sub.mcfunction', 'mob/tick.mcfunction', 'room/fall/mob_reward.mcfunction',
                        'room/fall/player.mcfunction', 'tick.mcfunction')])
+# 11-10 combat overhaul, lane C (wip/combat-core; tools/dev/plan/combat/c_progress.md): the parry on F, the dodge replacing the
+# dash (its charge / gauge / i-frame files are removed on purpose), the damage context and judge (player/def/**), the boss
+# framework's no-parry / near re-test / glint, Raiden's hazard land, 홍련's pips and yellow-flag marks, the readers, lores
+LANE_C = 'combat overhaul C (11-10): parry, dodge, damage context, unparriable attacks'
+_LANE_C_FN = (
+    'boss/apep/org/pj_end', 'boss/raiden/hazard/land', 'boss/raiden/hazard/land_nd',
+    'boss/raiden/hazard/new', 'boss/raiden/hazard/try', 'boss/raiden/hazard/try_near', 'boss/scarlet/core/setup',
+    'boss/scarlet/fx/hud/warn', 'boss/scarlet/g/disc/throw', 'boss/scarlet/p/a10/k/21', 'boss/scarlet/p/a9/k/27',
+    'boss/scarlet/shield/pip', 'char/arlecchino/def', 'char/cd_cut', 'char/clorinde/auto_tick', 'char/clorinde/def',
+    'char/lumine/def', 'char/motion/guard', 'char/navia/def', 'char/nefer/def', 'char/ronova/def', 'char/skirk/def',
+    'cm/hit_pl', 'cm/hit_pl2', 'cm/pj/cb_boom', 'cm/pj/ic_boom', 'cm/sh/rcontact', 'combat/atkblock_manage',
+    'combat/rclick_do', 'element/on_player_hurt', 'engravings/dash/regen', 'engravings/register', 'engravings/scan',
+    'engravings/scan_more', 'items/epic/crane_feather/def', 'items/epic/lifeline/def', 'items/hook/on_basic_attack',
+    'items/hook/on_dash', 'items/hook/on_dash_move', 'items/hook/on_parry', 'items/hook/on_parry_press',
+    'items/hook/on_pdodge', 'items/hook/tick_player', 'items/legendary/pain_despair/def',
+    'items/legendary/sword_kirion/def', 'items/mythic/sword_hwamu/def', 'items/proc/hw_ctr', 'items/proc/hw_ctr_q',
+    'items/proc/hw_dash', 'items/proc/hw_due', 'items/proc/hw_reset', 'items/proc/kslash_burst',
+    'items/proc/lifeline_fire', 'items/rare/kinetic_scale/def', 'items/tune/b10', 'items/tune/b7', 'load',
+    'lobby/tut/s1', 'mboss/cproto/test/help', 'mboss/fight_vars', 'mboss/hurt', 'mboss/hurt_bol', 'mboss/hurt_ctx',
+    'mboss/hurt_dodge', 'mboss/hurt_nd', 'mboss/hz/disc', 'mboss/hz/full', 'mboss/hz/hurt', 'mboss/hz/hurt_pm',
+    'mboss/hz/init', 'mboss/hz/line', 'mboss/hz/near', 'mboss/hz/np_def', 'mboss/hz/ring', 'mboss/hz/sector',
+    'mboss/init', 'mboss/near_all', 'mboss/np_glint', 'mboss/opts_reset', 'mboss/pj/hit', 'mboss/pj/launch',
+    'mboss/pj/near', 'mboss/pl_dot', 'mboss/uninstall', 'player/dash', 'player/dash_fail', 'player/dash_go',
+    'player/dash_iframe', 'player/dash_move_tick', 'player/dash_refill', 'player/dash_regen', 'player/dash_sub',
+    'player/dash_up_x', 'player/f_key', 'player/hotbar/fix_attack', 'player/hotbar/tick', 'player/hud/build',
+    'player/hud/build_slot', 'player/hud/part', 'player/hud/setup', 'player/hud/tick', 'player/init',
+    'player/knockback/start', 'player/nudge', 'player/step_move_tick', 'player/swing/tick', 'player/take_damage',
+    'player/tick', 'tick', 'uninstall', 'view/av_tick', 'view/dash_dir', 'view/move', 'view/ride_tick')
+ALLOW[LANE_C] = ([F + f'{n}.mcfunction' for n in _LANE_C_FN]
+                 + [F + r'player/def/.+\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/guard/.+\.mcfunction',
+                    F + r'char/motion/(?:arle_fx|skirk_fx|navia_fx|events/arle|events/skirk|events/navia)/guard\.mcfunction',
+                    'items.md'])
 # 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
 # the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
 # call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's
@@ -129,6 +164,7 @@ ALLOW[LANE_B] = (
         'boss/raiden/exhausted_start', 'boss/raiden/sg/stun_begin', 'boss/raiden/sg/stun_tick')])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
+              LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash
               'combat P late-game lag (11-10)'}     # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 
@@ -139,7 +175,13 @@ def in_scope(rel):
                 and rel.endswith('.json')))
 
 
-def allowed(rel):
+def allowed(rel, gone=False):
+    """The first group that allows rel; for a gone file the first such group in ALLOW_GONE (a path several groups own, e.g.
+    player/dash_iframe of SR and lane C, passes as gone when one of them may remove it)."""
+    if gone:
+        g = next((grp for grp, p in PATS if grp in ALLOW_GONE and p.fullmatch(rel)), None)
+        if g:
+            return g
     return next((grp for grp, p in PATS if p.fullmatch(rel)), None)
 
 
@@ -171,7 +213,7 @@ def main():
     groups, bad = {}, []
     for kind, lst in (('changed', changed), ('new', new), ('gone', gone)):
         for rel in lst:
-            g = allowed(rel)
+            g = allowed(rel, gone=kind == 'gone')
             if g and (kind != 'gone' or g in ALLOW_GONE):
                 groups.setdefault(g, {}).setdefault(kind, []).append(rel)
             else:

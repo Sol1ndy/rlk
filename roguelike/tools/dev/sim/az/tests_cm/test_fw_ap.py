@@ -184,8 +184,22 @@ hid = disc(s, CX, CZ, hzPm=200)
 m = hz(s, hid)
 M.run(s, 24)
 ev = events(s)
-check('1j dash i-frames dodge a per-mille hazard: no HP lost, a dodge event (#mbDodgeOk 1: one-shot, tell 20), consumed',
+# combat overhaul C (11-10): i-frames avoid it through player/def/judge (the dodge event only; #mbDodgeOk is for a perfect
+# dodge / parry)
+check('1j i-frames dodge a per-mille hazard: no HP lost, a dodge event (#mbDodgeOk 0: not a perfect dodge), consumed',
+      hp(s, pl) == 5000 and ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == 0 and ev['#mbHitEv'] == 0, (hp(s, pl), ev))
+iframes(s, pl, False)
+clear_events(s)
+for o in ('parAt', 'parLk', 'parHit', 'dgRw'):
+    s.setsc(('e', pl.id), o, -1000000)
+disc(s, CX, CZ, hzPm=200)
+s.setsc(('e', pl.id), 'dgAt', s.t + 19)      # a dodge started 0-2 t before the strike (tell 20)
+M.run(s, 24)
+ev = events(s)
+check('1j2 a perfect dodge avoids a per-mille hazard (boss class: only the perfect window): no HP lost, #mbDodgeOk 1',
       hp(s, pl) == 5000 and ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == 1 and ev['#mbHitEv'] == 0, (hp(s, pl), ev))
+s.setsc(('e', pl.id), 'dgAt', -1000000)
+iframes(s, pl, True)
 clear_events(s)
 disc(s, CX, CZ, hzPm=200, hzNoDodge=1)
 M.run(s, 24)

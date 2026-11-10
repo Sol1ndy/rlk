@@ -18,6 +18,6 @@ execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub
 execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub with storage rlk:dm
 execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub with storage rlk:dm
 scoreboard players remove @s dashMoveT 1
-# 아이템 대쉬 이동 중 트리거
+# 아이템 닷지 이동 중 트리거
 function rlk:items/hook/on_dash_move
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:cloud ~ ~0.1 ~ 0.08 0.02 0.08 0.005 1

@@ -75,6 +75,8 @@ scoreboard objectives add mbHzSG dummy
 scoreboard objectives add mbPjND dummy
 scoreboard objectives add mbPjNR dummy
 scoreboard objectives add mbPart dummy
+scoreboard objectives add mbHzNP dummy
+scoreboard objectives add mbPjNP dummy
 scoreboard objectives add mbHzPm dummy
 scoreboard objectives add mbHzPmL dummy
 scoreboard objectives add mbBol dummy
@@ -133,6 +135,10 @@ execute unless score #mbGrpL2 mb matches 0.. run scoreboard players set #mbGrpL2
 execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0
 execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0
 scoreboard players set #mbNoDodge mb 0
+scoreboard players set #mbNoParry mb 0
+# combat overhaul C: the unparriable-attack glint spacing (np_glint) and a module that draws its own warnings (#mbNpOwn 1)
+execute unless score #mbNpAt mb matches -2147483648.. run scoreboard players set #mbNpAt mb -1000000
+execute unless score #mbNpOwn mb matches 0..1 run scoreboard players set #mbNpOwn mb 0
 # Chapter mode (AZ-CM): the fight arena (#mbAr = arena n, plaza 0) and its walk / safe radius in tenths, the
 # chapter flag, proxies, pools, floor, cine, music, the running arena job (re-armed after /reload).
 execute unless score #mbAr mb matches 0.. run scoreboard players set #mbAr mb 0

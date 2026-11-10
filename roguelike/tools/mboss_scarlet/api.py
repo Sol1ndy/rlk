@@ -141,6 +141,12 @@ KB_CHAIN, KB_FINAL, KB_SINGLE, KB_CUT = 0, 3, 2, 0    # chain hits / the last hi
 #   following the player until strike - LOCK_LEAD; pj_disc(hr, speed, life) = the moon disc (DISC, disc()).
 # Every hit Electro 1U, #hzQuiet 1, no floor decal (PLAN §1.4). The a8 / a13 / r1 / r2 / r3 entries are derived from the
 # scripts of section 3 by _script_hits (section 7): each cut lands on the move whose clip 'hit' meets its strike tick.
+# Combat overhaul C (11-10): the yellow-flagged attacks (her own yellow tell, video_notes 1.6: never parried in the original)
+# are unparriable (hz_opts / pj_opts noparry=1): A9 (dash line + the locked disc), A10 (the plunge) and the R2 moon disc
+# after the A7 tell. Her other hits follow the framework rule (all parryable: discs < 4.5 b, sectors / lines < 8 b, the
+# counting / ghost cuts). She draws her own yellow tells, so the framework glint is off for her (#mbNpOwn 1, core/setup).
+NOPARRY = ('a9', 'a10')
+NOPARRY_DISC = True
 HITS = {
     'a1': [('a1', 'hit', 'sector', (4.0, 80), 'T2', KB_SINGLE)],
     'a2': [('a2', 'hit', 'sector', (3.6, 70), 'T2', KB_SINGLE)],
@@ -195,8 +201,11 @@ PH = {'intro': 0, 'p1': 1, 'cs1': 2, 'sq1': 3, 'a8': 4, 'cs2': 5, 'down': 6, 'p2
 FLOOR_P1 = 600            # per mille of mhpM: the hit reaching it stops there; CS1 at the next decision
 FLOOR_ULT = 50            # per mille: the 5 % floor (set at CS1 0); A13 at the next decision (40 t later from the down)
 PIPS = 5
-PIP_RULE = 'timed_dash'   # PLAN §5.1: at the strike tick s a pip goes when dashInvT is 1..6 (at s + 1: 1..5) and the
-PIP_DASH = {0: (1, 6), 1: (1, 5)}   # player's feet are within PIP_R of the cut's lock point; one per cut, any direction
+PIP_RULE = 'perfect'      # combat overhaul C (11-10; was 'timed_dash' on dashInvT): at the strike tick s a pip goes when the
+# player's perfect window covers s - a dodge started 0..2 t before (player/def/q_pf0, #dgPW) or an F press 0..2 t before
+# (a perfect parry, #parW3) - checked at s (q_pf0) and at s + 1 (q_pf1: the same window one tick back), with the
+# player's feet within PIP_R of the cut's lock point; one per cut, any direction. Lane H rebuilds 홍련 on this system.
+PIP_Q = {0: 'rlk:player/def/q_pf0', 1: 'rlk:player/def/q_pf1'}
 PIP_R = CUT_R + 3.0       # 6.2
 BU_SHIELD, BU_DOWN = 1, 8  # under-bar colours (#buSubCol): electro for the shield (max 5), gold for the down timer (max 200)
 
@@ -324,7 +333,7 @@ REVIVE = {'dist': 8.0, 'wait': 60}                # after a Ronova revive: she s
 ULT60_LETHAL = False      # A8 fail = the 500 per-mille hit (True: the instant death + the banner)
 ULT5_LETHAL = True        # A13 fail = the instant death (ult/fatal; Ronova's revive applies) + the banner
 DARK_LIGHT = True         # the `dark` look dims the walk light layer (False: fallback B, dome / moon / lanterns only)
-WARN_TEXT = '대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다'
+WARN_TEXT = '베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다'   # combat overhaul C (was 대시)
 WARN_HL = ('즉사', '#FF3A55')   # bossbar rlk:hr_warn: white text, this word crimson; only while a lethal gauntlet runs
 END_PROFILE = 'std'       # CS4 profile (question 7); only std is built: short (~600 t) / full (~1500 t) = a request
 END_H = {'std': 1042}     # CS4 length H (= clip `ending`); registry death = H + EVENT['len'] + 2
@@ -1103,7 +1112,7 @@ _OWN_FILES = {
     'S4': (('T:mboss_scarlet/p_ghost.py', ()), ('F:boss/scarlet/g/**', ()),
            *((f'F:boss/scarlet/p/{k}/**', ()) for k in P2), ('HR:tests/pat_ghost.py', ()), ('HR:s4/**', ()),
            ('HR:renders/s4_*', ())),
-    'SR': (('F:items/**', ()), ('F:player/take_damage', ()), ('F:player/dash_iframe', ()), ('F:player/reset_one', ()),
+    'SR': (('F:items/**', ()), ('F:player/take_damage', ()), ('F:player/def/judge', ()), ('F:player/reset_one', ()),
            ('F:player/update_item', ()), ('F:player/update_item_macro', ()), ('F:player/hr_moon/**', ()),
            ('F:codex/labels', ()), *((f'F:snd/f{i}', ()) for i in range(422, 430)), ('F:load', ()), ('F:uninstall', ()),
            ('R:items.md', ()), ('HR:tests/test_hwamu.py', ()), ('HR:tests/test_moon.py', ()), ('HR:sr/**', ()),
@@ -1154,7 +1163,7 @@ FILES_9_1 = (
     'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/r1/start',
     'F:boss/scarlet/p/r2/start', 'F:boss/scarlet/p/r3/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
     'F:items/mythic/sword_hwamu/def', 'F:items/proc/hw_hit', 'F:items/register', 'F:player/take_damage',
-    'F:player/dash_iframe', 'F:player/reset_one', 'F:player/update_item', 'F:player/update_item_macro',
+    'F:player/def/judge', 'F:player/reset_one', 'F:player/update_item', 'F:player/update_item_macro',
     'F:player/hr_moon/apply', 'F:codex/labels', 'F:snd/f422', 'F:snd/f429', 'F:load', 'F:uninstall', 'R:items.md',
     'HR:tests/test_hwamu.py', 'HR:tests/test_moon.py', 'HR:renders/sr_tooltip.txt',
     *(f'HR:requests/{o.lower()}.md' for o in _OWN_FILES if o != 'lead'),

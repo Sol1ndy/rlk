@@ -48,6 +48,15 @@ REPO = Path('/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/s
 if not REPO.exists():                  # the worktree was removed after its merge: any clone of the repo has the commits
     REPO = Path('/home/user/rlk')        # (read-only git commands: archive / ls-tree / show)
 CMD_BUDGET = 6.5        # extra commands per mid-boss fight tick (sim count; +15.9..+18.4 before the CM fix round)
+# combat overhaul C (11-10): its own allowance on top, kept apart so the older overrun stays visible: the parry / dodge judge
+# and the hit context per player hit (player/def/judge fast path, mboss/hurt_ctx), the no-parry rule per hazard and the
+# warning glint per unparriable hazard (hz/np_def, np_glint), the no-parry options (opts_reset, hz/hurt, pj/hit, pj/launch).
+# It is a cost per event, not per tick: about 11 commands per hazard made (np_def 7, hz/init 4; + the glint when unparriable)
+# and about 28 per player hit (judge 12, hurt_ctx 9, end 5, hit_pl2 2). Measured on the merged tree (lanes R + P + B + C)
+# against origin/wip/combat 58c6c13f1 (R + P + B: proto +6.40, Guardian +5.75, butterfly +6.51, fieldgen +6.80): lane C adds
+# proto +0.74, Guardian +0.49, butterfly +0.78, fieldgen +1.08 per tick (totals +7.14 / +6.24 / +7.29 / +7.88; fieldgen's
+# older overrun of +0.30 keeps its check failing, as on the base).
+LANE_C_CMD = 1.2
 DRAW_BUDGET = 6         # extra commands per bossui/draw with the options unset (sim count: the colour test, the nums
                         # call, the two resets; measured +6, was +15 before the fix round)
 # chapter-mode names a mid-boss fight may hold on the tree only (cm.md 4.1 / 4.2 / 11 / 13, and their internal temporaries)
@@ -57,9 +66,25 @@ NEW_FAKE = {'#atkSeq', '#auxResEl', '#auxResElV', '#buHpCol', '#buNoNum', '#c280
             '#mbMusPh', '#mbMusT', '#mbNRIn', '#mbNRNow', '#mbNoRx', '#mbPart', '#mbPoolPct', '#mbPushOn', '#mbPx', '#mbQi',
             '#mbRamp', '#mbShIn', '#mbSrc', '#mbSrcIn', '#mbTot', '#pjNR', '#pjNoDodge', '#pxIn',
             '#mbGrpL2',      # AZ FIX FAIR-3: the last group landed by a one-shot hit (#mbGrpL stays M0's)
-            '#mbBarOff'}     # 홍련 FN-f (S1, I1 request s1-1): the module's bars-off flag, zeroed by fight_vars / cleanup_fight
+            '#mbBarOff',     # 홍련 FN-f (S1, I1 request s1-1): the module's bars-off flag, zeroed by fight_vars / cleanup_fight
+            # combat overhaul C (11-10): the one-shot hit context / judge scratch (player/def/judge), the no-parry one-shot and
+            # the warning glint's clock / owner flag of the framework
+            '#hcK', '#hcC', '#hcNP', '#hcND', '#jK', '#jC', '#jNP', '#jND', '#jd', '#jp', '#jpv', '#parT', '#pdg',
+            '#mbNoParry', '#mbNpAt', '#mbNpOwn', '#npNow', '#hcId', '#hzNoParry', '#pjNoParry',
+            # ... and its tunables set by rlk:load (README 3 「패링 · 닷지」)
+            '#dashCoolBase', '#dgPW', '#dgLW', '#dgLooseC', '#dgEn', '#parW3', '#parW2', '#parW1', '#parGap', '#parRe',
+            '#parChain', '#parKeep2', '#parKeep1', '#parCut', '#npGap'}
+# fake-player scores of the base whose value changed on purpose: the dash's cooldown constant is now the dodge's (5 -> 12 t)
+CHANGED_FAKE = {'#dashCoolT'}
+# ... and the ones lane C removed with the dash charges / gauge
+GONE_FAKE = {'#dashMaxBase', '#dashRegenBase', '#dashMax', '#dashRegenT', '#hudSeg', '#dashEngMax'}
 NEW_OBJ = {'mbRes0', 'mbRes1', 'mbRes2', 'mbRes3', 'mbRes4', 'mbRes5', 'mbRes6', 'mbRes7', 'mbRes8', 'mbHzNR', 'mbHzSG',
-           'mbPjND', 'mbPjNR', 'mbPart'}
+           'mbPjND', 'mbPjNR', 'mbPart',
+           # combat overhaul C (11-10): the player's parry / dodge stamps, lane C's globals (cb), hazard / prop no-parry
+           'parAt', 'parLk', 'parHit', 'dgAt', 'dgRw', 'cb', 'mbHzNP', 'mbPjNP'}
+# combat overhaul C (11-10): its effect entities (the unparriable warning glint text_displays, rlk_cb_fx) live a few ticks
+# in the game (rlk:tick's player/def/fx/world ages them); azsim's world never runs that ager, so they are left out here
+FX = 'rlk_cb_fx'
 NEW_STORAGE = {'rlk:mboss': {'creg', 'cbyid'}}
 NEW_REC = {'kind', 'ar', 'arena', 'px', 'pxBase', 'shield', 'res', 'phases', 'music', 'ch', 'route', 'theme'}
 FAIL = []
@@ -93,7 +118,8 @@ def counted(s):
 def row(s, pl):
     b = A.body_of(s)
     return (s.t, s.sc(('e', pl.id), 'curHealth'), s.sc(('e', b.id), 'mhpC') if b and b.alive else None,
-            len([e for e in s.ents if e.alive]), tuple(round(x, 3) for x in pl.pos), s.sc('#mbSt', 'mb'), s.sc('#mbOn', 'mb'))
+            len([e for e in s.ents if e.alive and FX not in e.tags]), tuple(round(x, 3) for x in pl.pos), s.sc('#mbSt', 'mb'),
+            s.sc('#mbOn', 'mb'))
 
 
 def logs_of(s):
@@ -149,7 +175,7 @@ def ent_key(e):
 
 
 def end_state(s):
-    live = {e.id: e for e in s.ents if e.alive}
+    live = {e.id: e for e in s.ents if e.alive and FX not in e.tags}
     fake, ents = {}, {}
     for (h, o), v in s.scores.items():
         if isinstance(h, str):
@@ -172,8 +198,8 @@ def norm_rec(a, b):
 def compare_end(label, r0, r1):
     f0, e0, l0, st0 = end_state(r0['s'])
     f1, e1, l1, st1 = end_state(r1['s'])
-    gone = sorted(str(k) for k in f0 if k not in f1)
-    diff = sorted(f'{k}: {f0[k]} -> {f1[k]}' for k in f0 if k in f1 and f0[k] != f1[k])
+    gone = sorted(str(k) for k in f0 if k not in f1 and k[0] not in GONE_FAKE)
+    diff = sorted(f'{k}: {f0[k]} -> {f1[k]}' for k in f0 if k in f1 and f0[k] != f1[k] and k[0] not in CHANGED_FAKE)
     extra = sorted(str(k) for k in f1 if k not in f0 and k[0] not in NEW_FAKE and k[1] not in NEW_OBJ)
     check(f'{label}: fake-player scores of the base equal on the tree (new ones only chapter-mode names)',
           not gone and not diff and not extra, (gone[:5], diff[:5], extra[:8]))
@@ -255,7 +281,7 @@ def main():
             check(f'A force {f}: dmg / dodge / hz / pj / rig / line logs identical', not dl, dl)
             per = (r1['cmds'] - r0['cmds']) / r0['ticks']
             check(f'A force {f}: commands per tick {r0["cmds"] / r0["ticks"]:.1f} -> {r1["cmds"] / r1["ticks"]:.1f} '
-                  f'(+{per:.2f}/t, budget {CMD_BUDGET})', per <= CMD_BUDGET, per)
+                  f'(+{per:.2f}/t, budget {CMD_BUDGET} + lane C {LANE_C_CMD})', per <= CMD_BUDGET + LANE_C_CMD, per)
         print('== B. kill / cancel / pause / reload: traces and end states')
         for mode in [m for m in args.modes.split(',') if m]:
             for f in forces:

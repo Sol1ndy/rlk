@@ -61,7 +61,13 @@ def logged(s):
     def call(fid, ctx, macro=None):
         log.append((s.t, fid, ctx.ex, tuple(ctx.pos), dict(macro) if macro else None))
         if fid == 'rlk:cm/hit_pl2' and getattr(s, 'ifr', False) and (s.sc('#mbNoDodge', 'mb') or 0) != 1 and ctx.ex is not None:
-            s.setsc(('e', ctx.ex.id), 'dashInvT', 1)      # the dash i-frames at the moment of the hit (mboss/hurt_nd zeroes them)
+            s.setsc(('e', ctx.ex.id), 'dashInvT', 1)      # i-frames at the moment of the hit (a no-dodge hit ignores them)
+        if fid == 'rlk:cm/hit_pl2' and getattr(s, 'pdg', False) and ctx.ex is not None:
+            # combat overhaul C: a dodge started this tick (the stamp player/def/dodge_stamp writes) = a perfect dodge
+            for o in ('parAt', 'parLk', 'parHit', 'dgRw'):
+                if s.sc(('e', ctx.ex.id), o) is None:
+                    s.setsc(('e', ctx.ex.id), o, -1000000)
+            s.setsc(('e', ctx.ex.id), 'dgAt', s.t)
         return orig(fid, ctx, macro)
     s.call = call
     return log
@@ -218,19 +224,25 @@ ev = events(s)
 check('2b a re-arming hazard with a shield up: #mbHitRA 1, #mbHitSh 1', ev['#mbHitEv'] >= 1 and ev['#mbHitRA'] == 1 and ev['#mbHitSh'] == 1, ev)
 s.setsc(('e', pl.id), 'shieldHP', 0)
 s.call('rlk:mboss/lib_clear', C0)
-for tell, ok in ((20, 1), (8, 0)):
+# combat overhaul C (11-10): #mbDodgeOk = a perfect dodge / perfect parry (the timing judge, any tell) of a non-re-arming
+# attack; i-frames (burst, revive, fall) give the dodge event only
+for tell, how, ok in ((20, 'pdg', 1), (8, 'pdg', 1), (20, 'ifr', 0)):
     clear_events(s)
-    iframes(s, pl, True)
+    iframes(s, pl, how == 'ifr')
+    s.pdg = how == 'pdg'
     disc(s, CX, CZ, tell=tell)
     M.run(s, tell + 4)
     ev = events(s)
-    check(f'2c a dodged one-shot strike with tell {tell}: #mbDodgeEv 1, #mbDodgeOk {ok}', ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == ok
-          and ev['#mbHitEv'] == 0, ev)
+    check(f'2c a {"perfect-dodged" if how == "pdg" else "i-frame-dodged"} one-shot strike with tell {tell}: #mbDodgeEv 1, '
+          f'#mbDodgeOk {ok}', ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == ok and ev['#mbHitEv'] == 0, ev)
 clear_events(s)
+iframes(s, pl, False)
+s.pdg = True
 disc(s, CX, CZ, tell=20, hzRearm=10, hzAct=12)
 M.run(s, 24)
 ev = events(s)
-check('2d a dodged re-arming hazard: dodge events but #mbDodgeOk 0', ev['#mbDodgeEv'] >= 1 and ev['#mbDodgeOk'] == 0, ev)
+check('2d a perfect-dodged re-arming hazard: dodge events but #mbDodgeOk 0', ev['#mbDodgeEv'] >= 1 and ev['#mbDodgeOk'] == 0, ev)
+s.pdg = False
 iframes(s, pl, False)
 s.call('rlk:mboss/lib_clear', C0)
 clear_events(s)
@@ -260,11 +272,12 @@ s, pl, log, b = setup()
 pl.pos = [b.pos[0], 201.0, b.pos[2] + 4.0]
 M.moved(s)
 clear_events(s)
-iframes(s, pl, True)
+s.pdg = True
 projectile(s, b, pl)
 M.run(s, 30)
+s.pdg = False
 ev = events(s)
-check('2g a dodged projectile: #mbDodgeEv 1, #mbDodgeOk 1', ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == 1, ev)
+check('2g a perfect-dodged projectile: #mbDodgeEv 1, #mbDodgeOk 1', ev['#mbDodgeEv'] == 1 and ev['#mbDodgeOk'] == 1, ev)
 
 # ------------------------------------------------------------------------------------------------- 3 pl_dot
 print('== 3. pl_dot')

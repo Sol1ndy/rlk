@@ -9,13 +9,13 @@ scoreboard players set #dandHeal tmp 150
 scoreboard players set #quillCoef tmp 45
 # 해파리 등불: 파동 피해 = 최대 체력의 ‰ (items/proc/jelly_pulse 의 고정값 대신) · 회복을 ‰ 로 (20‰ = 2%, 값은 load 에서 ‰ 로 설정. jelly_heal 이 ‰ 로 계산)
 scoreboard players set #jellyPm tmp 50
-# 생명줄: 대쉬 끝 물 피해 = 최대 체력의 ‰ (items/proc/lifeline_fire 의 고정값 대신)
+# 생명줄: 닷지 끝 물 피해 = 최대 체력의 ‰ (items/proc/lifeline_fire 의 고정값 대신)
 scoreboard players set #lifelinePm tmp 80
 # 별의 징조: 징조 지속 시간(틱) · 받는 피해 증가 % (#eb eng 가 % 단위라 그대로. 단계별 10/13/17/20)
 data modify storage rlk:tune t.astral_omen set value [{n:"#omenDur",m:"d"},{n:"#omenDmg",m:"a"}]
 data modify storage rlk:tune ids append value "astral_omen"
 # 주방장의 특선: 능력치만 있어 자동 배율 (표 없음)
-# 선학의 깃: 피해 계수 · 대쉬 뒤 유효 시간(틱). 반경 4.5칸은 고정
+# 선학의 깃: 피해 계수 · 닷지 뒤 유효 시간(틱). 반경 4.5칸은 고정
 data modify storage rlk:tune t.crane_feather set value [{n:"#craneCoef",m:"a"},{n:"#craneDur",m:"d"}]
 data modify storage rlk:tune ids append value "crane_feather"
 # 민들레 씨앗: 회복 계수 · 이동 속도 증가 % · 지속 시간(틱)

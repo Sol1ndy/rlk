@@ -27,9 +27,12 @@ scoreboard players operation @s mbPjRet = #pjRet mb
 scoreboard players operation @s mbPjW = #pjWall mb
 scoreboard players operation @s mbPjK = #pjShape mb
 scoreboard players operation @s mbPjG = #pjGrp mb
-# chapter mode (AZ-CM): no dash dodge / no player-side reaction
+# chapter mode (AZ-CM): no dodge (and no i-frames) / no player-side reaction
 scoreboard players operation @s mbPjND = #pjNoDodge mb
 scoreboard players operation @s mbPjNR = #pjNR mb
+# combat overhaul C: unparriable prop (#pjNoParry; default: only a no-dodge prop)
+scoreboard players operation @s mbPjNP = #pjNoParry mb
+execute unless score @s mbPjNP matches 0..1 run scoreboard players operation @s mbPjNP = @s mbPjND
 # ar FN-1: the Bond-of-Life option (#pjBol, spent there)
 execute if score #pjBol mb matches 1.. run function rlk:mboss/pj/init_bol
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1

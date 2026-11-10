@@ -177,16 +177,25 @@ if want(1):
     except Exception as e:      # noqa: BLE001
         check('1e api.fn1_ready()', False, repr(e))
     delta = {}
+    # combat overhaul lane C (11-10) on top of FN-1: mboss/hurt +1 (hurt_ctx + the #mbNoParry reset, the two no-dodge
+    # branches -> one), hz/hurt / pj/hit +2 (#mbNoParry set / reset), hz/init +3 (mbHzNP, np_def, np_glint), pj/launch +2
+    # (mbPjNP), opts_reset +2 (#hzNoParry / #pjNoParry), hz/hurt_pm +4 (the judge with its context instead of the own dash
+    # line); hurt_dodge keeps its count (#mbDodgeOk = a perfect dodge / parry of a non-re-arming attack)
+    LANE_C = {'mboss/hurt': 1, 'mboss/hz/hurt': 2, 'mboss/pj/hit': 2, 'mboss/hz/init': 3, 'mboss/pj/launch': 2,
+              'mboss/opts_reset': 2, 'mboss/hz/hurt_pm': 4}
     for rel, exp in (('mboss/hurt', 1), ('mboss/hz/hurt', 0), ('mboss/pj/hit', 0), ('mboss/hz/init', 1), ('mboss/pj/launch', 1),
                      ('mboss/opts_reset', 0), ('mboss/hz/make', 0), ('mboss/hurt_ev', 0), ('mboss/hurt_dodge', 0),
                      ('mboss/pl_dot', 0), ('mboss/hz/hurt_pm', 1)):
+        exp += LANE_C.get(rel, 0)
         b, t = base_text(rel), tree_text(rel)
         delta[rel] = (len(cmds_of(t)) - len(cmds_of(b)), exp) if b and t else ('missing', exp)
-    check('1f commands per call vs D0: mboss/hurt +1 (every hit), hz/hurt / pj/hit / hurt_ev / pl_dot +0, hz/init +1 and '
-          'pj/launch +1 (per creation), hz/hurt_pm +1 (per-mille hits only), opts_reset / hz/make +0',
+    check('1f commands per call vs D0 (FN-1 + lane C): mboss/hurt +2 (every hit), hz/hurt / pj/hit +2, hurt_ev / pl_dot +0, '
+          'hz/init +4 and pj/launch +3 (per creation), hz/hurt_pm +5 (per-mille hits only), opts_reset +2, hz/make / hurt_dodge +0',
           all(v[0] == v[1] for v in delta.values()), delta)
     bt, tt = cmds_of(base_text('mboss/hurt')), cmds_of(tree_text('mboss/hurt'))
-    extra = [x for x in tt if x not in bt]
+    lane_c = {'function rlk:mboss/hurt_ctx', 'execute as @a[tag=player,limit=1] run function rlk:cm/hit_pl2',
+              'scoreboard players set #mbNoParry mb 0'}
+    extra = [x for x in tt if x not in bt and x not in lane_c]
     check('1g the one new mboss/hurt line: the bol branch after the raw damage, before the clamp',
           extra == ['execute if score @s mbBol matches 1.. run return run function rlk:mboss/hurt_bol']
           and tt.index(extra[0]) == tt.index('scoreboard players operation #cmDmg tmp /= #c10000 mb') + 1, extra)

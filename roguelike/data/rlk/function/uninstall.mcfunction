@@ -236,6 +236,15 @@ scoreboard objectives remove dashRegen
 scoreboard objectives remove dashUX
 scoreboard objectives remove dashUZ
 scoreboard objectives remove dashUpN
+scoreboard objectives remove parAt
+scoreboard objectives remove parLk
+scoreboard objectives remove parHit
+scoreboard objectives remove dgAt
+scoreboard objectives remove dgRw
+scoreboard objectives remove cb
+team remove rlk_cbred
+kill @e[tag=rlk_cb_fx]
+kill @e[tag=rlk_dgo]
 scoreboard objectives remove db
 scoreboard objectives remove dbgDropI
 scoreboard objectives remove dbgPage

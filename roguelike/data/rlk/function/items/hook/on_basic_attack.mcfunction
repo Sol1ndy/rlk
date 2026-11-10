@@ -10,7 +10,7 @@ execute if score @s infuse matches 3 run scoreboard players set @e[tag=rlk_core,
 execute if score @s it_pain_despair matches 1.. run function rlk:items/proc/pd_gain
 # 빗줄기 검집: 원소폭발 뒤 한동안 기본 공격마다 물의 검
 execute if score #rainT itv matches 1.. unless score #rainCd itv matches 1.. if entity @e[tag=rlk_mob,distance=..7,limit=1] run function rlk:items/proc/rain_sword
-# 선학의 깃: 대쉬 뒤 첫 기본 공격 → 다음 틱에 바람 폭발
+# 선학의 깃: 닷지 뒤 첫 기본 공격 → 다음 틱에 바람 폭발
 execute if score #craneT itv matches 1.. run scoreboard players set #craneQ itv 1
 execute if score #craneT itv matches 1.. run scoreboard players set #craneT itv 0
 # 튜토리얼 캐릭터 1쪽: 기본 공격 횟수

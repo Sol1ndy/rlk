@@ -304,9 +304,10 @@ def record(txt, bid, n):
 
 # =================================================================================================== S3 additions (11-05)
 # The 홍련 module suites (test_scarlet.py, pat_p1.py, test_reward.py; S4's pat_ghost.py may use them): ScSim = HrSim +
-# - a dash i-frame model: s.dash() starts a dash on the next world tick (dashInvT 6 there, then 5, 4 ... 1, 0; the
-#   framework's hazards read it through the REAL player/take_damage: azsim's hit_pl2 gets the same window), so the pip rule
-#   of shield/cut (dashInvT 1..6 at the strike) runs as in game;
+# - a dodge model (combat overhaul C, 11-10; was a dash i-frame model on dashInvT): s.dash() starts a dodge on the next world
+#   tick: the player's dgAt = that tick's gametime (fgsim's gametime is the world tick), so the REAL player/def/judge (through
+#   player/take_damage) sees a perfect dodge for 0..2 t and the pip rule of shield/pip (player/def/q_pf0 / q_pf1: a dodge or
+#   an F press 0..2 t before the strike) runs as in game; s.parry() stamps an F press (parAt) the same way. No i-frames;
 # - `if|unless predicate rlk:in_sneak` (and the selector argument predicate=rlk:in_sneak): the player's e.data['sneak'];
 # - `scoreboard players reset * <objective>`, `scoreboard objectives remove <objective>` (its scores go); per-world-tick command counts (s.cmd_hist); the rig calls of the module
 #   (s.rigl: (tick, call)); every hazard made (s.hzr: options, position, yaw, #pt / #pat / #ph of hr); every player hit
@@ -518,28 +519,41 @@ class ScSim(HrSim):
                 self.call(fid, C0)
 
     def dash(self, v0=6, at=None):
-        """A dash seen by the world tick `at` (default: the next one) with dashInvT v0 there, then counting down 1 per tick
-        (player/dash_go sets 6; player/tick removes 1 per tick)."""
+        """A dodge started on the world tick `at` (default: the next one): world_sc stamps dgAt = that tick there (as the
+        input pre-pass + player/def/dodge_stamp do before every hit of the tick). v0 is kept for the old call sites and
+        ignored (11-10: no dash i-frames any more)."""
         self.dash_t0 = self.t + 1 if at is None else at
         self.dash_v0 = v0
 
+    def parry(self, at=None):
+        """An F press on the world tick `at` (default: the next one): world_sc stamps parAt there (lockouts not modelled)."""
+        self.parry_t0 = self.t + 1 if at is None else at
+
     def dash_inv(self, t=None):
-        t = self.t if t is None else t
-        if self.dash_t0 is None or t < self.dash_t0:
-            return 0
-        return max(0, getattr(self, 'dash_v0', 6) - (t - self.dash_t0))
+        """11-10: the dodge gives no i-frames (kept for old callers: always 0)."""
+        return 0
 
 
 def world_sc(s):
-    """One game tick as azsim.world (rlk:tick's order) with the dash model: dashInvT is set before the player tick and
-    kept through mboss/main (the module's pip check and the hazards read it); Ronova's revive counts down."""
+    """One game tick as azsim.world (rlk:tick's order) with the dodge model: a dodge (s.dash) or an F press (s.parry) of this
+    tick is stamped before the player tick, as the input pre-pass does before every hit (the module's pip check and the
+    hazards read it through player/def/judge / q_pf0); Ronova's revive counts down."""
     s.t += 1
     n0, k0 = s.ncmd, s.nkit
     pl = s.player()
     if pl is not None:
-        v = s.dash_inv()
+        v = 0
         s.setsc(('e', pl.id), 'dashInvT', v)
-        s.iframe_end = s.t if v >= 1 else -1
+        s.iframe_end = -1
+        if s.sc(('e', pl.id), 'parHit') is None:
+            for o in ('parAt', 'parLk', 'parHit', 'dgAt', 'dgRw'):
+                s.setsc(('e', pl.id), o, -1000000)
+        if s.dash_t0 is not None and s.t == s.dash_t0:
+            s.setsc(('e', pl.id), 'dgAt', s.t)
+            s.setsc(('e', pl.id), 'dgRw', -1000000)
+        if getattr(s, 'parry_t0', None) is not None and s.t == s.parry_t0:
+            s.setsc(('e', pl.id), 'parAt', s.t)
+            s.setsc(('e', pl.id), 'parHit', -1000000)
         if s.rn_left > 0:
             s.rn_left -= 1
             if s.rn_left == 0:

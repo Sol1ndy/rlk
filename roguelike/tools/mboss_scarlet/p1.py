@@ -368,7 +368,7 @@ def build_a9(W):
     pb.motions.append((go, cut, 'dash'))
     # one strike group: the dash line from the start point along the dash + the disc at the locked spot (one landing)
     g = pb.group(cut - 1)
-    hl = S.hz_opts(api.HITS[key][0][5], grp=True)
+    hl = S.hz_opts(api.HITS[key][0][5], grp=True, noparry=1 if key in api.NOPARRY else None)
     hl += [f'execute at @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_a9s,'
            f'limit=1] positioned ~ {CY} ~ run function rlk:mboss/hz/line with storage {api.STORAGE} core.a9', S.hz_tag(key)]
     pb.at(cut - 1, hl)

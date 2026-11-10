@@ -112,8 +112,9 @@ def t_static():
        'execute as @e[tag=rlk_arrow] at @s run function rlk:char/bow/arrow_tick' in fns['tick'])
     ck('static: player_init still kills leftover rlk_arrow projectiles (로노바)', 'kill @e[tag=rlk_arrow]' in code_lines(fns['char/player_init']))
     fk = code_lines(fns['player/f_key'])
-    ck('static: plain F (player/f_key) is no bow-aim toggle any more: its guards, then the dash',
-       not [l for l in fk if 'bow' in l or 'wType' in l] and fk[-1] == 'execute at @e[tag=rlk_body,limit=1] run function rlk:player/dash', fk)
+    # lane C (11-10) made plain F the parry press: its guards, then player/def/press (test_cb input)
+    ck('static: plain F (player/f_key) is no bow-aim toggle any more: its guards, then the parry press (lane C)',
+       not [l for l in fk if 'bow' in l or 'wType' in l] and fk[-1] == 'function rlk:player/def/press', fk)
     ck('static: the melee normal attack is #wType 1 (combat/on_attack)', any('if score #wType tmp matches 1 unless score #clShoot' in l
                                                                              for l in code_lines(fns['combat/on_attack'])))
     rc = code_lines(fns['combat/rclick_do'])

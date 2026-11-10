@@ -14,6 +14,9 @@ scoreboard players set #hzLinger mb 8
 scoreboard players set #hzQuiet mb 0
 scoreboard players set #hzNoDodge mb 0
 scoreboard players set #hzRearm mb 0
+# combat overhaul C: no-parry options (-1 = the default rule: hz/np_def; props: parryable unless no-dodge)
+scoreboard players set #hzNoParry mb -1
+scoreboard players set #pjNoParry mb -1
 scoreboard players set #pjEl mb -1
 scoreboard players set #pjKB mb 2
 scoreboard players set #pjRet mb 0

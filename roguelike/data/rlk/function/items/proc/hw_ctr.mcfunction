@@ -5,7 +5,7 @@ scoreboard players set #hwCtrQ itv 0
 execute if score #hwCtrCd itv matches 1.. run return 0
 tag @e[tag=rlk_mob,tag=!rlk_mb_inv,distance=..12,sort=nearest,limit=1] add rlk_hw_t
 execute unless entity @e[tag=rlk_hw_t,limit=1] run return 0
-# 재사용 대기: #hwCtrCd 1 인 동안 새 예약 없음(player/take_damage · dash_iframe 의 줄), #hwCtrEnd = 끝나는 시각
+# 재사용 대기: #hwCtrCd 1 인 동안 새 예약 없음(player/take_damage · player/def/judge 의 줄), #hwCtrEnd = 끝나는 시각
 scoreboard players set #hwCtrCd itv 1
 scoreboard players operation #hwCtrEnd itv = #hwNow itv
 scoreboard players operation #hwCtrEnd itv += #hwCtrCdT tmp

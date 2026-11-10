@@ -459,8 +459,9 @@ HOME = {'stand': (C[0] + 0.5, C[2] + 6.0), 'out': (C[0], C[2] + 8.0), 'side': (C
 
 def agent(g, mode, speed, off):
     """Before each world tick: the pattern tick it will run is p = #pt + 1. In [lock, strike + 1] of every cut the agent walks
-    along its direction (fixed at the lock: away from C / tangential / toward C; stand: still), dashes at strike + off
-    (dashInvT 6 that tick, 1 b per tick along the direction / the look for 3 t), and is put back home at strike + 2."""
+    along its direction (fixed at the lock: away from C / tangential / toward C; stand: still), dodges at strike + off
+    (combat overhaul C: the dodge stamp dgAt that tick, hrsim's s.dash; 1 b per tick along the direction / the look for 3 t),
+    and is put back home at strike + 2."""
     st = {'dir': None, 'dash': None}
     hx, hz = HOME[mode]
 
@@ -496,25 +497,19 @@ def agent(g, mode, speed, off):
     return each
 
 
-def dash_economy(dash_ticks, mx=2, regen=20, cool=5):
-    """F:player/dash (cooldown, a charge), player/tick (cooldown - 1, dash_regen while charge < max: + 1, refill at regen:
-    charge + 1, regen 0): whether every dash in dash_ticks finds a charge (the tick's regen runs before the input)."""
-    charge, rg, cd, out = mx, 0, 0, []
+def dash_economy(dash_ticks, cool=12):
+    """F:player/dash (combat overhaul C: no charges, the cooldown #dashCoolT 12 t; player/tick removes 1 per tick before the
+    input of the next tick): whether every dodge in dash_ticks is off cooldown."""
+    cd, out = 0, []
     want = set(dash_ticks)
     for t in range(0, max(dash_ticks) + 1):
+        if t in want:
+            ok = cd == 0
+            out.append((t, ok, cd))
+            if ok:
+                cd = cool
         if cd >= 1:
             cd -= 1
-        if charge < mx:
-            rg += 1
-            if rg >= regen:
-                charge += 1
-                rg = 0
-        if t in want:
-            ok = cd == 0 and charge >= 1
-            out.append((t, ok, charge))
-            if ok:
-                charge -= 1
-                cd = cool
     return out
 
 
@@ -524,7 +519,7 @@ def sec_pips():
         for mode, speed in AGENTS:
             s, pl = world(31 + len(res))
             n_take, n_dash, hits_on_cut, tried = 0, 0, [], 0
-            for off in (-4, -3, -2, -1, 0):
+            for off in (-2, -1, 0):
                 hx, hz = HOME[mode]
                 place(s, hx, hz, yaw=yaw_of((hx, 0, hz), C))
                 s.watch[TAKE] = []
@@ -541,13 +536,13 @@ def sec_pips():
                 tried += sum(1 for t, pct, el, pat in s.phits[p0:] if pat == TID[g] and P.get(t) in win)
             frac = n_take / n_dash
             res[(g, mode, speed)] = frac
-            check(f'P1 {g} {mode}{f" {speed} b/t" if speed else ""}: dashes at strike - 2 +- 2 score {n_take}/{n_dash} = {frac:.0%} '
+            check(f'P1 {g} {mode}{f" {speed} b/t" if speed else ""}: dodges at strike - 1 +- 1 (the perfect window) score {n_take}/{n_dash} = {frac:.0%} '
                   f'(>= 90 %), never hurt by a cut ({tried} cut hits dodged)', frac >= 0.9 and not hits_on_cut, (frac, hits_on_cut[:6]))
     print('  pips: ' + ', '.join(f'{g} {m}{" " + str(v) if v else ""} {f:.0%}' for (g, m, v), f in res.items()))
     for g in GAUNT:
-        for off in (-4, -2, 0):
+        for off in (-2, -1, 0):
             ec = dash_economy([st + off for st in STRIKES[g]])
-            check(f'P2 {g}: a 2-charge dasher (20 t each, 5-t cooldown) dashing at strike {off:+d} reaches every counting window',
+            check(f'P2 {g}: a dodger (12-t cooldown) dodging at strike {off:+d} reaches every counting window',
                   all(ok for _, ok, _ in ec), ec)
 
 

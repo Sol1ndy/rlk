@@ -22,8 +22,8 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            102; the down window's both exits (the timer -> kipup -> P2; the 5 % floor -> lead_down 40 t later); durations;
            the arena ambience (I1b round 1: ambient_p1 every 10 t in P1, ambient_p2 every 6 t in A8 / the down window / P2 /
            A13, none in a sequence)
-  pips     a timed dash at a counting cut's strike (dashInvT 1..6 at s, 1..5 at s + 1) removes one pip whatever its
-           direction; outside the strike ticks / beyond 6.2 b / a dash started after s: nothing; one per cut; never < 0
+  pips     a timed dodge at a counting cut's strike (combat overhaul C: started 0..2 t before s, or an F press then) removes
+           one pip whatever its direction; earlier / beyond 6.2 b / a dodge started after s: nothing; one per cut; never < 0
   judge    0 pips -> #gres 1 + the deflect staging (g_deflect, the sound); >= 1 -> #gres 2
   fail60   the A8 fail: 500 per mille of max HP (pl_dot, Electro), never kills at 1 HP, the push ring (3 b away), P2 at
            T + 214 with her HP unchanged
@@ -209,7 +209,7 @@ def strike(s, dmg=10 ** 7, skill=False):
 
 
 def dasher(cuts, off=0, v0=6, phases=(PH['a8'], PH['a13'])):
-    """An agent dashing so that the world tick with #pt = s + off sees dashInvT v0, for every s in cuts."""
+    """An agent dodging on the world tick with #pt = s + off, for every s in cuts (hrsim s.dash: the dodge stamp; v0 unused)."""
     cuts = set(cuts)
 
     def each(s):
@@ -523,13 +523,21 @@ def a8_run(seed, each=None, n=API.JUDGE_T['a8'] - 1, pips=None, tid=21):
 
 
 def sec_pips():
-    # stand + a timed dash at the strike of the first cut (dashInvT 6 at s)
-    for off, v0, want, what in ((0, 6, 1, 'dashInvT 6 at s'), (0, 1, 1, 'dashInvT 1 at s'), (1, 5, 1, 'dashInvT 5 at s + 1'),
-                                (1, 6, 0, 'dashInvT 6 at s + 1 (a dash after s)'), (-1, 1, 0, 'dashInvT 0 at s (ended at s - 1)'),
-                                (2, 4, 0, 'dashInvT 4 at s + 2 (window closed)'), (-8, 6, 0, 'a dash 8 t early')):
-        s, R = a8_run(21, each=dasher(CUTS['a8'][:1], off=off, v0=v0), n=CUTS['a8'][0] + 4)
+    # stand + a timed dodge at the strike of the first cut (combat overhaul C: the perfect window, started 0..2 t before s)
+    for off, want, what in ((0, 1, 'a dodge at s'), (-1, 1, 'a dodge at s - 1'), (-2, 1, 'a dodge at s - 2'),
+                            (-3, 0, 'a dodge at s - 3 (too early)'), (1, 0, 'a dodge at s + 1 (after s)'),
+                            (-8, 0, 'a dodge 8 t early')):
+        s, R = a8_run(21, each=dasher(CUTS['a8'][:1], off=off), n=CUTS['a8'][0] + 4)
         lost = API.PIPS - hr(s, '#pips')
         check(f'S1 A8 cut 1 (strike {CUTS["a8"][0]}): {what} -> {want} pip', lost == want, lost)
+    # a perfect parry press (F 0..2 t before s) counts the same
+    for off, want in ((0, 1), (-2, 1), (-3, 0)):
+        def each(s, off=off, cut=CUTS['a8'][0]):
+            if hr(s, '#ph') == PH['a8'] and hr(s, '#pt') + 1 - off == cut:
+                s.parry()
+        s, R = a8_run(21, each=each, n=CUTS['a8'][0] + 4)
+        lost = API.PIPS - hr(s, '#pips')
+        check(f'S1 A8 cut 1: an F press at s {off:+d} -> {want} pip', lost == want, lost)
     # whatever the direction: the player moves 0.6 b / t (forward, back, sideways) during the dash, within 6.2 b
     for name, (dx, dz) in (('forward', (0, -0.6)), ('back', (0, 0.6)), ('left', (0.6, 0)), ('right', (-0.6, 0))):
         def each(s, dx=dx, dz=dz, d=dasher(CUTS['a8'][:1])):
@@ -547,9 +555,9 @@ def sec_pips():
             H.place_player(s, API.CX + 0.5, API.CZ + 6.0 + 7.0)
     s, R = a8_run(23, each=away, n=CUTS['a8'][0] + 3)
     check(f'S3 a timed dash {API.PIP_R + 0.8:.1f} b from the lock point: no pip', hr(s, '#pips') == API.PIPS, hr(s, '#pips'))
-    # one per cut: a dash whose window covers s and s + 1 removes one pip; five cuts -> 0
-    s, R = a8_run(24, each=dasher(CUTS['a8'][:1], off=0, v0=6), n=CUTS['a8'][0] + 3)
-    check('S4 one pip per cut (dashInvT 6 at s and 5 at s + 1: one pip)', API.PIPS - hr(s, '#pips') == 1, hr(s, '#pips'))
+    # one per cut: a dodge whose window covers s and s + 1 removes one pip; five cuts -> 0
+    s, R = a8_run(24, each=dasher(CUTS['a8'][:1], off=0), n=CUTS['a8'][0] + 3)
+    check('S4 one pip per cut (a dodge at s: open at s and s + 1, one pip)', API.PIPS - hr(s, '#pips') == 1, hr(s, '#pips'))
     s, R = a8_run(25, each=dasher(CUTS['a8']))
     pips = [r['pips'] for r in R]
     check('S5 a timed dash at every cut: 5 -> 0 at the 5th, never below 0 for the 4 extra cuts',

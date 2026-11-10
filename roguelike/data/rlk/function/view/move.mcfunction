@@ -1,5 +1,5 @@
 # 입력(WASD·점프·달리기) → 아바타 이동 (@s = 플레이어). 방향 기준 = 카메라가 보는 쪽
-# 대쉬로 이동하는 동안은 건드리지 않음
+# 닷지로 이동하는 동안은 건드리지 않음
 scoreboard players set #inAct view 0
 # 조준선을 봐야 하는 상태(#lk = 1)면 걷는 방향으로 몸을 돌리지 않는다
 scoreboard players set #lk view 0
@@ -60,7 +60,7 @@ execute store result score #mx view run data get entity @e[tag=rlk_vmk,limit=1] 
 execute store result score #mz view run data get entity @e[tag=rlk_vmk,limit=1] Pos[2] 1000
 scoreboard players operation #mx view -= #ax view
 scoreboard players operation #mz view -= #az view
-# 대쉬 방향용: 지금 누르고 있는 이동 방향(단위 벡터 × 1000)
+# 닷지 방향용: 지금 누르고 있는 이동 방향(단위 벡터 × 1000)
 scoreboard players set #inAct view 1
 scoreboard players operation #inx view = #mx view
 scoreboard players operation #inz view = #mz view
