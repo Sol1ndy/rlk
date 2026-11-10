@@ -3,22 +3,33 @@
 datapack root (read only).
 
     python3 test_cb.py <datapack root> [section ...]
-      sections: static input judge tiers dodge context energy cd bal boss near raiden readers fx cost   (default: all)
+      sections: static input lock judge tiers dodge cool context energy cd bal boss near raiden readers fx bossloop cost
+                (default: all)
 
   static   the dash charges / HUD gauge / dash_iframe / hurt_nd are gone; dashInvT is written only by the non-dodge
            i-frames; the tick order (the input pre-pass before view/tick, player/tick, the cm worlds, Raiden, the bosses;
            the dodge-start box around the cm worlds); lores and the tutorial say 닷지 / 패링, no 대쉬; the generated
            framework lines (np_def's rule, the glint, hurt_ctx, hz/hit_near, pj/step_n, hurt_pm's judge) and Raiden's land
-  input    the real F path (player/def/input -> f_key -> press): an accepted press stamps parAt = now and locks #parGap;
-           presses inside the lockout only push it (now + #parRe: mashing and a held key never press again); refusals
-           (map, selection, dead, burst cast, Ronova revival, Raiden camera); Shift+F is not a parry; a right-click on
-           the eye shield is consumed by the pre-pass (dodge in the same tick) and the dodge cooldown / no charges
+  input    the real F path (rlk:tick's pre-pass lines -> player/def/input -> f_key -> press): an accepted press stamps
+           parAt = now and locks #parGap; a press inside the lockout is ignored and blocks every press for #parRe ticks
+           (#parMl cb); refusals (map, selection, dead, burst cast, Ronova revival, Raiden camera); Shift+F is not a
+           parry; a right-click on the eye shield is consumed by the pre-pass (dodge in the same tick); the held
+           use-item click (rcU) fires on ticks 1, 5, 9 ... only, with no fail sound while held (review A-02); F and a
+           right-click in one tick both act (A-08); a player without stamps keeps the first dodge and the dodge-start
+           box always goes (A-07)
+  lock     review A-01: the whiff streak (lock 12 / 24 / 36 / 48 t, cleared by a pause or a tier 2-3 parry, kept by tier
+           1), presses every 1-2 t are accepted once, blind pressing at every period 1-40 t and at irregular gaps keeps
+           <= 10 % of the ticks in a perfect window (and of real strikes), legit play is never refused (h - 1 for chains
+           with gaps >= 10 t, F every 3 t and every 2 t in any phase), one mistimed or stray press costs at most the
+           next hit, mashing through a 3-t string parries one cut
   judge    the order i-frames > perfect dodge > perfect parry > loose dodge > tier 2 > tier 1 > hit, the outputs
            (#dodged / #parT / #pdg), the one-shot context reset, no-dodge (ignores dodges and i-frames), no-parry
   tiers    the real hit (cm/hit_me -> cm/hit_pl -> hit_pl2 -> take_damage) with F pressed 0..12 t before the hit: tier 3
            at 0-2 t (no damage), tier 2 at 3-5 t (20 % kept), tier 1 at 6-9 t (50 % kept), none at 10+; one press parries
            every hit of one tick, then it is spent; no knockback / hurt flash on a parry
   dodge    perfect 0-2 t for every class; loose 3-6 t for normal and elite, not for bosses; 7+ nothing
+  cool     review A-12: the dodge cooldown is 18 t after a dodge that avoided nothing and 12 t after one that avoided an
+           attack (perfect or loose; the refund once per dodge); 질주 2 = 14 / 10; the fail sound only on a fresh press
   context  cm brain / projectile (owner by cmId) / elite class / Raiden / the boss framework (hurt_ctx: boss body) /
            vanilla (ctx_va): attacker tag rlk_hc_atk, class, kind; the tag never outlives the judge
   energy   +10 pt (1000) once per dodge (a second hit in the same window gives none), clamped at the burst cost, 스커크
@@ -36,12 +47,19 @@ datapack root (read only).
   readers  화무십일홍 (queued by a dodge / perfect parry, not by i-frames), 홍련 pips (q_pf0 / q_pf1), the shield rush
            ends on a perfect parry, Apep's parried bolt ends, the item hooks, the tutorial counter
   fx       each tier's effects (star glyph text_display, overlays only when no other big title / bottom line is up),
-           the perfect dodge's red ghost and wash, the effect entities age out
+           the perfect dodge's red ghost and wash, the effect entities age out; nothing is aged away in its spawn tick
+           (A-05: the jolt's two turns are one tick apart, the star grows after its first tick); the ghost is never
+           killed where it stood (A-03: glow off and moved to the far chunk first), it faces as the body did (A-06);
+           the crosshair is sent in the tick an overlay ends (A-09)
+  bossloop review A-11: a real mid-boss fight (the vendored azsim world of tools/dev/sim/hr/tests/lib, read only) with
+           rlk:tick's pre-pass lines and its mboss/near_all line in the world loop: the pre-pass runs every tick, the
+           near pass only in the window, a dodge whose body has left finds its perfect dodge through near_all
   cost     the pre-pass costs a handful of commands per idle tick
 
 Harness: lib/psim.py + lib/mcsim.py (lane R's vendored harness) with gametime (`time query gametime` = s.gt) and a call log.
 Prints one line per check; exit 1 on any failure. Run it from a copy outside the datapack (tools/dev/sim/README.md 1).
 """
+import random
 import re
 import sys
 from pathlib import Path
@@ -50,6 +68,7 @@ sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / 'lib'))
 from psim import PSim, Ent, Ctx, pctx  # noqa: E402
+from mcsim import split  # noqa: E402
 
 ARGS = [a for a in sys.argv[1:] if not a.startswith('-')]
 DP = Path(ARGS[0]).resolve()
@@ -88,8 +107,12 @@ class CSim(PSim):
         self.watch = {'rlk:bal/hit', 'rlk:items/proc/hw_ctr_q', 'rlk:player/def/fx/p3', 'rlk:player/def/fx/p2',
                       'rlk:player/def/fx/p1', 'rlk:player/def/fx/pd', 'rlk:player/knockback/start', 'rlk:cm/hurt_fx',
                       'rlk:char/cd_cut', 'rlk:items/hook/on_parry', 'rlk:items/hook/on_pdodge', 'rlk:player/dash_go',
-                      'rlk:player/def/fx/glint', 'rlk:char/motion/guard', 'rlk:mboss/hurt_dodge'}
+                      'rlk:player/def/fx/glint', 'rlk:char/motion/guard', 'rlk:mboss/hurt_dodge', 'rlk:combat/rclick_do',
+                      'rlk:player/dash_fail', 'rlk:snd/f228', 'rlk:char/cast_skill_r', 'rlk:bal/take', 'rlk:bal/grog/start',
+                      'rlk:view/xhair', 'rlk:player/def/box_end', 'rlk:player/def/fx/t_arc'}
         self.titles = []
+        self.cmdlog = []                 # (gametime, text) of the rotate / data merge entity commands
+        self.killed = []                 # (type, tags, position, data) of every entity a kill removed
 
     def cmd(self, t, ctx):
         if t[:3] == ['time', 'query', 'gametime']:
@@ -97,6 +120,28 @@ class CSim(PSim):
             return self.gt
         if t[0] == 'title':
             self.titles.append(' '.join(t[1:]))
+        if t[0] == 'rotate' and len(t) == 4:               # relative to the command's rotation, as the game does
+            self.n += 1
+            self.cmdlog.append((self.gt, ' '.join(t)))
+            for e in self.select(t[1], ctx):
+                e.rot = [ctx.rot[i] + float(v[1:] or 0) if v.startswith('~') else float(v) for i, v in enumerate(t[2:4])]
+            return 1
+        if t[:3] == ['data', 'merge', 'entity'] and len(t) >= 5:
+            self.n += 1
+            self.cmdlog.append((self.gt, ' '.join(t)))
+            m = re.search(r'Glowing:(\d)b', t[4])
+            for e in self.select(t[3], ctx):
+                if m:
+                    e.data['Glowing'] = int(m.group(1))
+            return 1
+        if t[0] == 'kill' and len(t) == 2 and t[1].startswith('@'):   # the game's result: how many it removed (0 = it fails)
+            self.n += 1
+            es = self.select(t[1], ctx)
+            for e in es:
+                self.killed.append((e.etype, sorted(e.tags), tuple(e.pos), dict(e.data)))
+                e.alive = False
+            self.ents = [e for e in self.ents if e.alive]
+            return len(es)
         if t[:3] == ['data', 'remove', 'entity'] and len(t) == 5 and re.fullmatch(r'[A-Za-z_]+', t[4]):
             self.n += 1
             for e in (self.select(t[3], ctx) if t[3] != '@s' else [ctx.ex]):
@@ -104,9 +149,29 @@ class CSim(PSim):
             return 1
         return super().cmd(t, ctx)
 
+    def execute(self, t, ctx):
+        # `if|unless data entity <sel> interaction|attack` at the head of an execute (after `as <sel>` too: psim recurses
+        # here): a click the entity really holds. psim answers every entity data test with true, so every eye shield in
+        # the world would be "clicked" on every tick
+        if len(t) > 4 and t[0] in ('if', 'unless') and t[1:3] == ['data', 'entity'] and t[4] in ('interaction', 'attack'):
+            es = self.select(t[3], ctx)
+            if (bool(es) and t[4] in es[0].data) == (t[0] == 'unless'):
+                return 0
+            return self.execute(t[5:], ctx) if len(t) > 5 else 1
+        return super().execute(t, ctx)
+
+    def select(self, sel, ctx):
+        res = super().select(sel, ctx)                     # (mcsim ignores the argument it does not know)
+        m = re.search(r'[\[,]x_rotation=([^,\]]+)', sel)
+        if m:
+            lo, dots, hi = m.group(1).partition('..')
+            hi = hi if dots else lo
+            res = [e for e in res if (lo == '' or e.rot[1] >= float(lo)) and (hi == '' or e.rot[1] <= float(hi))]
+        return res
+
     def call(self, fid, ctx, macro=None):
         if fid in self.watch:
-            self.log.append((fid, sorted(ctx.ex.tags) if ctx.ex is not None else None, macro))
+            self.log.append((fid, sorted(ctx.ex.tags) if ctx.ex is not None else None, macro, tuple(ctx.pos)))
         return super().call(fid, ctx, macro)
 
     def calls(self, fid):
@@ -199,6 +264,69 @@ def run(name):
     return not ONLY or name in ONLY
 
 
+UI = {'id': 'minecraft:stick', 'count': 1, 'c': {'minecraft:custom_data': {'rlk_ui': {'role': 'attack'}}}}
+C0 = Ctx(None, (0, 0, 0), (0, 0))
+_TICK = code(rd('tick'))
+_I0 = next(i for i, l in enumerate(_TICK) if l.startswith('execute store result score #now cb run time query gametime'))
+_I1 = next((i for i, l in enumerate(_TICK) if 'player/def/box_end' in l), None)
+if _I1 is None:                          # (the tree before the review fixes: the kill line)
+    _I1 = next(i for i, l in enumerate(_TICK) if 'kill @e[tag=rlk_dgo]' in l)
+PRE = _TICK[_I0:_I1 + 1]                 # rlk:tick's pre-pass: #now, player/def/input, #dgOpen, the dodge-start box
+COOL = next(l for l in code(rd('player/tick')) if 'remove @s dashCool 1' in l)
+
+
+def prepass(s, f=False, rc=False, swap=False, rcu=False, item=None):
+    """The next game tick's pre-pass, run from rlk:tick's own lines. f: F was pressed (the held item is in the off hand;
+    swap = the main hand is empty, as the real swap leaves it); rc: a right-click sits on the eye shield; rcu: the F5
+    use-item click (the advancement of the tick before). Returns (F accepted, dodge started)."""
+    s.gt += 1
+    pl = s.player
+    inv = s.inv_of(pl)
+    it = dict(item or UI)
+    inv['hotbar.0'] = dict(it)
+    if f:
+        inv['weapon.offhand'] = dict(it)
+        P(s, 'sneakT', 0)
+        if swap:
+            inv.pop('hotbar.0', None)
+    if rc:
+        sh = getattr(s, 'eye', None)
+        if sh is None or sh not in s.ents:
+            sh = s.eye = Ent('interaction', (0.5, 65.6, 0.8), (0.0, 0.0), ['atkBlock'])
+            s.ents.append(sh)
+        sh.data['interaction'] = {'timestamp': s.gt}
+    if rcu:
+        P(s, 'rcU', 1)
+    a0, d0 = P(s, 'parAt'), P(s, 'dgAt')
+    for l in PRE:
+        s.cmd(split(l), C0)
+    inv.pop('weapon.offhand', None)
+    inv['hotbar.0'] = dict(it)
+    return P(s, 'parAt') == s.gt and a0 != s.gt, P(s, 'dgAt') == s.gt and d0 != s.gt
+
+
+def cooldown(s):
+    """player/tick's dodge cooldown line (the rest of player/tick is not needed here)"""
+    s.cmd(split(COOL), pctx(s))
+
+
+def fresh(s):
+    """no press, no dodge, no lock, no streak (the state of a new player)"""
+    nopress(s)
+    P(s, 'parLk', -1000000)
+    P(s, 'dashCool', 0)
+    for n, v in (('#parWs', 0), ('#parMl', -1000000), ('#dgRf', -1000000), ('#dgTry', -1000000)):
+        s.setsc(n, 'cb', v)
+
+
+def no_errors(s, name):
+    # (fx/t_star stores an entity's transformation: psim has no entity NBT store)
+    bad = {k: v for k, v in s.errors.items() if k[0].startswith(('rlk:player/def', 'rlk:player/f_key', 'rlk:player/dash',
+                                                                  'rlk:combat/rc', 'rlk:view/big_dec', 'rlk:engravings/'))
+           and k[0] != 'rlk:player/def/fx/t_star'}
+    ck(f'{name}: the simulator ran every command of the parry / dodge functions (no swallowed error)', not bad, list(bad)[:4])
+
+
 # ================================================================================================== static
 def t_static():
     fns = {p.relative_to(FN).as_posix()[:-len('.mcfunction')]: p.read_text(encoding='utf-8') for p in FN.rglob('*.mcfunction')}
@@ -230,9 +358,32 @@ def t_static():
        'player/f_key' not in '\n'.join(code(fns['player/hotbar/tick'])) and fns['player/hotbar/tick'].count('lvup/toggle') == 2)
     ck('static: view/ride_tick no longer handles rcU (the pre-pass does)', 'rc_hold' not in '\n'.join(code(fns['view/ride_tick']))
        and 'player/def/rc' in fns['player/def/input'] and 'combat/rc_hold' in fns['player/def/rc'])
+    inp = code(fns['player/def/input'])
+    i_rst = next((i for i, l in enumerate(inp) if 'set @s rcT 0' in l), -1)
+    i_rc = next((i for i, l in enumerate(inp) if 'function rlk:player/def/rc' in l and 'rc_int' not in l), -1)
+    ck('static: the pre-pass tests the release (rcT 0 unless rcU) before player/def/rc clears rcU (review A-02)', -1 < i_rst < i_rc, (i_rst, i_rc))
+    ck('static: rlk:tick removes the dodge-start box through player/def/box_end (#dgBox, now >= #dgKill; review A-07)',
+       any('#dgBox cb matches 1' in l and '#now cb >= #dgKill cb' in l and 'player/def/box_end' in l for l in tick))
+    ck('static: dodge_stamp initialises a player without stamps before it writes, flags the box and turns it as the body '
+       '(reviews A-07, A-06)', all(x in fns['player/def/dodge_stamp'] for x in (
+           'unless score @s parHit matches -2147483648.. run function rlk:player/def/reset', 'set #dgBox cb 1',
+           'rotated as @e[tag=rlk_body,limit=1] as @e[tag=rlk_dgo,limit=1] run rotate @s ~ 0'))
+       and fns['player/def/dodge_stamp'].index('player/def/reset') < fns['player/def/dodge_stamp'].index('operation @s dgAt = #now cb'))
+    ck('static: no effect entity is removed with a bare kill while it is a living ghost: fx/tick sends the mannequin through '
+       'fx/ghost_out one tick before its end, pd_ghost never kills (review A-03)',
+       'kill' not in '\n'.join(code(fns['player/def/fx/pd_ghost'])) and 'fx/ghost_out' in fns['player/def/fx/pd_ghost']
+       and code(fns['player/def/fx/tick']).index(next(l for l in code(fns['player/def/fx/tick']) if 'fx/ghost_out' in l))
+       < code(fns['player/def/fx/tick']).index(next(l for l in code(fns['player/def/fx/tick']) if 'run kill @s' in l))
+       and all(x in fns['player/def/fx/ghost_out'] for x in ('Glowing:0b', 'in minecraft:overworld run tp @s 1000000.5 400 1000000.5'))
+       and 'forceload add 1000000 1000000' in fns['load'])
+    ck('static: view/tick lowers vBig through view/big_dec, which re-arms the crosshair on the tick it ends (review A-09)',
+       'if score @s vBig matches 1.. run function rlk:view/big_dec' in fns['view/tick']
+       and 'execute if score @s vBig matches 0 run scoreboard players set #xh view 9' in fns.get('view/big_dec', ''))
     hud = fns['player/hud/tick']
     ck('static: the HUD actionbar has no dash gauge', 'line[]' not in hud and 'dashRegen' not in hud)
     lores = [k for k in fns if re.match(r'char/[a-z]+/def$', k)]
+    ck('static: the 7 weapon lores and the tutorial give both dodge cooldowns (0.9초, 피하면 0.6초)', all(
+        '0.9초' in fns[k] and '0.6초' in fns[k] for k in lores + ['lobby/tut/s1']), [k for k in lores + ['lobby/tut/s1'] if '0.9초' not in fns[k]])
     ck('static: all 7 weapon lores say 우클릭 · 닷지 and F 키 · 패링 (no 대쉬)', len(lores) == 7 and all(
         '우클릭 · 닷지' in fns[k] and 'F 키 · 패링' in fns[k] and '대쉬' not in fns[k] for k in lores), lores)
     user = [k for k, v in fns.items() if ('대쉬' in '\n'.join(l for l in v.split('\n') if not l.lstrip().startswith('#')))
@@ -240,8 +391,8 @@ def t_static():
     ck('static: no user-facing text says 대쉬 any more', not user, user[:8])
     ck('static: the tutorial step 1 is 이동 · 닷지 · 패링 (target 닷지 · 패링 3번)', '이동 · 닷지 · 패링' in fns['lobby/tut/s1']
        and '닷지 · 패링 3번 하기' in fns['lobby/tut/s1'])
-    ck('static: 질주 (2) = 닷지 재사용 대기 -20 % (lore and engravings/scan_more)', '닷지 재사용 대기 ' in fns['engravings/register']
-       and '#dashCoolBase' in fns['engravings/scan_more'])
+    ck('static: 질주 (2) = 닷지 재사용 대기 -20 % (lore and engravings/scan_more: both cooldowns)', '닷지 재사용 대기 ' in fns['engravings/register']
+       and '#dashCoolBase' in fns['engravings/scan_more'] and '#dashCoolHitBase' in fns['engravings/scan_more'])
     ck('static: 화무십일홍 lore: 닷지 · 패링으로 흘려내면', '닷지 · 패링으로 흘려내면' in fns['items/mythic/sword_hwamu/def'])
     # generated framework lines
     npd = fns.get('mboss/hz/np_def', '')
@@ -271,7 +422,7 @@ def t_static():
        and '#hcND tmp 1' in fns['boss/raiden/hazard/land_nd'] and 'hazard/try_near' in fns['boss/raiden/hazard/try'])
     ck('static: rlk:bal/hit is lane B\'s (takes #n bal through bal/take) and the perfect parry calls it as the attacker',
        'function rlk:bal/take' in fns.get('bal/hit', '')
-       and 'execute as @e[tag=rlk_hc_atk,limit=1] run function rlk:bal/hit {n:1}' in fns['player/def/par3_go'])
+       and 'execute as @e[tag=rlk_hc_atk,limit=1] at @s run function rlk:bal/hit {n:1}' in fns['player/def/par3_go'])
     ck('static: the guard clip exists for the three rig characters', all(f'char/motion/clips/{c}/guard/start' in fns
        for c in ('arle', 'skirk', 'navia')) and fns.get('char/motion/guard', '').count('clip:"guard"') == 3)
     gl = fns.get('player/def/fx/g/glint', '') + fns.get('player/def/fx/g/t_streak', '')
@@ -283,84 +434,355 @@ def t_static():
 def t_input():
     s, pl = world()
     inv = s.inv_of(pl)
-    UI = {'id': 'minecraft:stick', 'count': 1, 'c': {'minecraft:custom_data': {'rlk_ui': {'role': 'attack'}}}}
-    nopress(s)
-    P(s, 'parLk', -1000000)
-    s.setsc('#now', 'cb', s.gt)
-
-    def f(sneak=0):
-        inv['weapon.offhand'] = dict(UI)
-        P(s, 'sneakT', sneak)
-        s.setsc('#now', 'cb', s.gt)
-        s.log.clear()
-        s.call('rlk:player/def/input', pctx(s))
-        inv.pop('weapon.offhand', None)
-    f()
-    ck('input: F (offhand UI item, no sneak) -> parAt = now, lock until now + #parGap', P(s, 'parAt') == s.gt
+    fresh(s)
+    s.log.clear()
+    acc, _ = prepass(s, f=True)
+    ck('input: F (offhand UI item, no sneak) -> parAt = now, lock until now + #parGap', acc and P(s, 'parAt') == s.gt
        and P(s, 'parLk') == s.gt + G(s, '#parGap'), (P(s, 'parAt'), P(s, 'parLk')))
     ck('input: the press plays the guard (char/motion/guard)', bool(s.calls('rlk:char/motion/guard')))
     t0 = s.gt
-    s.gt += 3
-    f()
-    ck('input: a press inside the lockout is ignored (parAt kept) and pushes the lock to now + #parRe at least',
-       P(s, 'parAt') == t0 and P(s, 'parLk') == max(t0 + G(s, '#parGap'), s.gt + G(s, '#parRe')))
-    # mash every 3 ticks: never accepted again
-    acc = 0
-    for _ in range(12):
-        s.gt += 3
-        before = P(s, 'parAt')
-        f()
-        acc += P(s, 'parAt') != before
-    ck('input: mashing F every 3 t (or a held key repeating) is never accepted again', acc == 0)
-    s.gt += 40
-    f()
-    ck('input: after a pause longer than the lock, F is accepted again', P(s, 'parAt') == s.gt)
+    prepass(s)
+    prepass(s)
+    acc, _ = prepass(s, f=True)
+    ck('input: a press inside the lockout is ignored (parAt and parLk kept) and blocks every press until now + #parRe (#parMl cb)',
+       not acc and P(s, 'parAt') == t0 and P(s, 'parLk') == t0 + G(s, '#parGap') and G(s, '#parMl', 'cb') == s.gt + G(s, '#parRe'),
+       (P(s, 'parAt'), P(s, 'parLk'), G(s, '#parMl', 'cb'), s.gt))
+    for _ in range(40):
+        prepass(s)
+    acc, _ = prepass(s, f=True)
+    ck('input: after a pause longer than the lock, F is accepted again', acc)
     for o, v in (('vMap', 1), ('pkMode', 1), ('dead', 1), ('buT', 5), ('rnDie', 3), ('rdCam', 1), ('pmMoveLock', 1)):
-        s.gt += 40
+        fresh(s)
         P(s, o, v)
-        before = P(s, 'parAt')
-        f()
-        ck(f'input: refused while {o} {v}', P(s, 'parAt') == before)
+        acc, _ = prepass(s, f=True)
+        ck(f'input: refused while {o} {v}', not acc and P(s, 'parAt') == -1000000)
         P(s, o, 0)
-    s.gt += 40
-    before = P(s, 'parAt')
-    f(sneak=1)
-    ck('input: Shift+F (sneakT >= 1) is not a parry (player/hotbar/tick keeps lvup/toggle)', P(s, 'parAt') == before)
+    fresh(s)
+    s.gt += 1
+    inv['weapon.offhand'] = dict(UI)
+    P(s, 'sneakT', 1)
+    for l in PRE:
+        s.cmd(split(l), C0)
+    inv.pop('weapon.offhand', None)
+    P(s, 'sneakT', 0)
+    ck('input: Shift+F (sneakT >= 1) is not a parry (player/hotbar/tick keeps lvup/toggle)', P(s, 'parAt') == -1000000)
     # right-click on the eye shield, consumed by the pre-pass: the dodge starts in this tick
-    s.gt += 40
-    P(s, 'dashCool', 0)
-    sh = Ent('interaction', (0.5, 65.6, 0.8), (0.0, 0.0), ['atkBlock'])
-    sh.data['interaction'] = {'timestamp': s.gt}
-    s.ents.append(sh)
-    inv['hotbar.0'] = dict(UI)
-    s.call('rlk:player/def/input', pctx(s))
+    fresh(s)
+    _, dg = prepass(s, rc=True)
+    sh = s.eye
     ck('input: a right-click on the eye shield is consumed by the pre-pass and dodges in the same tick (dgAt = now)',
-       'interaction' not in sh.data and P(s, 'dgAt') == s.gt and P(s, 'dashCool') == G(s, '#dashCoolT'),
-       (sh.data, P(s, 'dgAt'), s.gt))
-    ck('input: the dodge leaves its start box rlk_dgo and opens the window (#dgEnd = now + 2)',
-       len(s.select('@e[tag=rlk_dgo]', pctx(s))) == 1 and G(s, '#dgEnd', 'cb') == s.gt + G(s, '#dgPW') - 1)
+       dg and 'interaction' not in sh.data and P(s, 'dashCool') == G(s, '#dashCoolT'), (sh.data, P(s, 'dgAt'), s.gt))
+    ck('input: the dodge leaves its start box rlk_dgo and opens the window (#dgEnd = now + 2, #dgOpen 1)',
+       len(s.select('@e[tag=rlk_dgo]', pctx(s))) == 1 and G(s, '#dgEnd', 'cb') == s.gt + G(s, '#dgPW') - 1 and G(s, '#dgOpen', 'cb') == 1)
+    opened = []
+    for _ in range(4):
+        prepass(s)
+        opened.append((G(s, '#dgOpen', 'cb'), len(s.select('@e[tag=rlk_dgo]', pctx(s)))))
+    ck('input: rlk:tick keeps the window open 2 more ticks and removes the box on the tick after (player/def/box_end)',
+       opened == [(1, 1), (1, 1), (0, 0), (0, 0)] and G(s, '#dgBox', 'cb') == 0, opened)
     # a chapter boss's hit proxy (rlk_mb_px) and a foreign interaction (a lobby object): the proxy's right-click is consumed
     # by the pre-pass too, the foreign one is left alone
-    s.gt += 40
-    P(s, 'dashCool', 0)
+    fresh(s)
     px = Ent('interaction', (3.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_px', 'boss'])
-    px.data['interaction'] = {'timestamp': s.gt}
     lo = Ent('interaction', (5.5, 64.0, 0.5), (0.0, 0.0), ['rlk_lobj'])
-    lo.data['interaction'] = {'timestamp': s.gt}
     s.ents += [px, lo]
-    s.call('rlk:player/def/input', pctx(s))
+    px.data['interaction'] = {'timestamp': s.gt + 1}
+    lo.data['interaction'] = {'timestamp': s.gt + 1}
+    _, dg = prepass(s)
     ck('input: a boss proxy right-click is consumed by the pre-pass (dodge now), a lobby interaction is left alone',
-       'interaction' not in px.data and 'interaction' in lo.data and P(s, 'dgAt') == s.gt)
+       'interaction' not in px.data and 'interaction' in lo.data and dg)
     t1 = P(s, 'dgAt')
-    s.gt += 5
+    for _ in range(5):
+        prepass(s)
+        cooldown(s)
     s.call('rlk:player/dash', pctx(s))
     ck('input: a second dodge inside the cooldown is refused (no charges any more)', P(s, 'dgAt') == t1)
-    ck('input: #dashCoolT 12 by default', G(s, '#dashCoolT') == 12)
-    s.setsc('dash', 'engN', 2)
-    s.call('rlk:engravings/scan_more', pctx(s))
-    ck('input: 질주 2: the cooldown is 9 (-20 %)', G(s, '#dashCoolT') == 9, G(s, '#dashCoolT'))
-    s.setsc('dash', 'engN', 0)
-    s.call('rlk:engravings/scan_more', pctx(s))
+    # review A-02: the F5 use-item click (rcU, set by the advancement of the tick before) held for 30 ticks
+    fresh(s)
+    s.log.clear()
+    hold, rct, dodges = [], [], []
+    for k in range(30):
+        for key in [key for key in s.scores if key[1] == 'snd']:
+            del s.scores[key]                              # rlk:tick line 3
+        n0 = len(s.calls('rlk:combat/rclick_do'))
+        _, dg = prepass(s, rcu=True)
+        if len(s.calls('rlk:combat/rclick_do')) > n0:
+            hold.append(k)
+        if dg:
+            dodges.append(k)
+        rct.append(P(s, 'rcT'))
+        cooldown(s)
+    ck('input: a held use-item click (rcU every tick, 30 t) is a right-click on ticks 0, 4, 8 ... only (review A-02)',
+       hold == list(range(0, 30, 4)), hold)
+    ck('input: ... rcT counts the held ticks (1..30) and the dodge repeats only when the cooldown is over',
+       rct == list(range(1, 31)) and dodges == [0, 20], (rct[:6], dodges))
+    ck('input: ... and no fail sound plays while it is held (dash_fail is silent on the 4-t repeats)',
+       len(s.calls('rlk:player/dash_fail')) == 6 and not s.calls('rlk:snd/f228'), (len(s.calls('rlk:player/dash_fail')), len(s.calls('rlk:snd/f228'))))
+    prepass(s)
+    ck('input: ... the tick after the release rcT is 0 again', P(s, 'rcT') == 0, P(s, 'rcT'))
+    # a skill item held the same way: the skill is cast on ticks 0 and 4, not on every tick
+    fresh(s)
+    s.stub.add('rlk:char/cast_skill_r')
+    s.log.clear()
+    SK = {'id': 'minecraft:stick', 'count': 1, 'c': {'minecraft:custom_data': {'rlk_ui': {'role': 'skill'}}}}
+    for k in range(6):
+        prepass(s, rcu=True, item=SK)
+    ck('input: a held skill item casts on ticks 0 and 4 only (스커크 fast move no longer ends one tick after it starts)',
+       len(s.calls('rlk:char/cast_skill_r')) == 2, len(s.calls('rlk:char/cast_skill_r')))
+    s.stub.discard('rlk:char/cast_skill_r')
+    prepass(s)
+    inv['hotbar.0'] = dict(UI)
+    # a fresh click inside the cooldown plays the fail sound once; its 4-t repeat (a held click on the eye shield) is silent
+    fresh(s)
+    prepass(s, rc=True)
+    for _ in range(7):
+        prepass(s)
+        cooldown(s)
+    s.log.clear()
+    prepass(s, rc=True)
+    a1 = len(s.calls('rlk:snd/f228'))
+    for _ in range(3):
+        prepass(s)
+    prepass(s, rc=True)
+    ck('input: a new click inside the cooldown plays the fail sound, the repeat 4 t later does not',
+       a1 == 1 and len(s.calls('rlk:snd/f228')) == 1 and len(s.calls('rlk:player/dash_fail')) == 2, (a1, len(s.calls('rlk:snd/f228'))))
+    # review A-08: F and a right-click in one tick (the swap has emptied the main hand)
+    fresh(s)
+    acc, dg = prepass(s, f=True, rc=True, swap=True)
+    ck('input: F and a right-click in the same tick both act (parry stamp and dodge; review A-08)',
+       acc and dg and 'interaction' not in s.eye.data and P(s, 'dashCool') == G(s, '#dashCoolT'), (acc, dg, P(s, 'dashCool')))
+    # review A-07: a player saved before the overhaul (no stamps at all): the first dodge is kept, the box goes
+    e = brain(s)
+    for o in ('parAt', 'parLk', 'parHit', 'dgAt', 'dgRw'):
+        s.scores.pop((('e', pl.id), o), None)
+    P(s, 'dashCool', 0)
+    P(s, 'energy', 0)
+    _, dg = prepass(s, rc=True)
+    lost = cm_hit(s, e, 60)
+    ck('input: a player without stamps: the dodge and a strike in the same tick = a perfect dodge (review A-07)',
+       dg and lost == 0 and G(s, '#pdg') == 1 and P(s, 'dgAt') == s.gt and P(s, 'energy') == 1000, (dg, lost, G(s, '#pdg'), P(s, 'energy')))
+    for _ in range(4):
+        prepass(s)
+    ck('input: ... and the dodge-start box is removed after the window', not s.select('@e[tag=rlk_dgo]', pctx(s)))
+    # a box that could not be removed on its tick (rlk:tick returned early, its chunk was not loaded, a server stop)
+    fresh(s)
+    prepass(s, rc=True)
+    s.gt += 6                                              # the ticks of the window and the kill tick never ran
+    prepass(s)
+    ck('input: a dodge-start box that missed its tick is removed on the next tick that runs', not s.select('@e[tag=rlk_dgo]', pctx(s))
+       and G(s, '#dgBox', 'cb') == 0)
+    fresh(s)
+    P(s, 'dashCool', 0)
+    prepass(s, rc=True)
+    box = s.select('@e[tag=rlk_dgo]', pctx(s))[0]
+    s.ents.remove(box)                                     # (its chunk is not loaded: the kill finds nothing)
+    for _ in range(5):
+        prepass(s)
+    f1 = G(s, '#dgBox', 'cb')
+    s.ents.append(box)
+    prepass(s)
+    ck('input: ... while its chunk is not loaded the removal is retried every tick (#dgBox stays 1) until it succeeds',
+       f1 == 1 and not s.select('@e[tag=rlk_dgo]', pctx(s)) and G(s, '#dgBox', 'cb') == 0, (f1, G(s, '#dgBox', 'cb')))
+    fresh(s)
+    P(s, 'dashCool', 0)
+    prepass(s, rc=True)
+    s.ents.remove(s.select('@e[tag=rlk_dgo]', pctx(s))[0])
+    s.gt += 210
+    prepass(s)
+    ck('input: ... and the retry stops after 200 t (the next dodge removes a leftover)', G(s, '#dgBox', 'cb') == 0)
+    no_errors(s, 'input')
+
+
+# ================================================================================================== the parry lock (A-01)
+def chain(s, e, hits, presses):
+    """One fight on the real path: F in the pre-pass of the ticks in `presses`, a real strike (cm/hit_me) on the ticks in
+    `hits` (tick numbers from 0; the ticks between are skipped: the lock is made of game-time stamps only).
+    -> (tier per hit, number of presses that were not accepted)"""
+    fresh(s)
+    t0 = s.gt
+    tiers, refused = [], 0
+    for t in sorted(set(hits) | set(presses)):
+        s.gt = t0 + t
+        acc, _ = prepass(s, f=(t in presses))
+        refused += (t in presses) and not acc
+        if t in hits:
+            cm_hit(s, e, 60)
+            tiers.append(G(s, '#parT'))
+    return tiers, refused
+
+
+def blind(s, e, press, total, st=None):
+    """Blind pressing: F on the ticks of `press`. Without strikes: the share of ticks in which a parriable strike would
+    get tier 3 / 2 / 1 / none. With strikes (a set of ticks): per-strike tiers and the damage taken. Ticks without a
+    press or a strike only read the stamps."""
+    fresh(s)
+    w3, w2, w1 = G(s, '#parW3'), G(s, '#parW2'), G(s, '#parW1')
+    share, tiers, acc, lost = [0, 0, 0, 0], [0, 0, 0, 0], 0, 0
+    t0 = s.gt
+    for t in range(total):
+        if t in press or (st is not None and t in st):
+            s.gt = t0 + t
+            a, _ = prepass(s, f=(t in press))
+            acc += a
+        now = t0 + t + 1
+        p = now - P(s, 'parAt')
+        k = 0
+        if P(s, 'parHit') < P(s, 'parAt') and p >= 0:
+            k = 3 if p < w3 else 2 if p < w2 else 1 if p < w1 else 0
+        share[k] += 1
+        if st is not None and t in st:
+            lost += cm_hit(s, e, 60)
+            tiers[G(s, '#parT')] += 1
+    s.gt = t0 + total
+    return acc, [100.0 * x / total for x in share], tiers, lost
+
+
+def t_lock():
+    s, pl = world()
+    e = brain(s)
+    # thousands of parries follow: their effect entities (never aged here) would only slow every selector down
+    s.stub |= {'rlk:player/def/fx/p1', 'rlk:player/def/fx/p2', 'rlk:player/def/fx/p3', 'rlk:player/def/guard'}
+    ck('lock: the constants (load): #parGap 12, streak cap 3 within 80 t, cleared from tier 2, #parRe 3, #parChain 1',
+       (G(s, '#parGap'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr'), G(s, '#parRe'), G(s, '#parChain')) == (12, 3, 80, 2, 3, 1),
+       (G(s, '#parGap'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr'), G(s, '#parRe'), G(s, '#parChain')))
+    gap = G(s, '#parGap') or 12
+    # the whiff streak: every accepted press that follows an unused one within #parWsT lengthens the lock
+    fresh(s)
+    locks = []
+    for k in range(6):
+        acc, _ = prepass(s, f=True)
+        locks.append((acc, P(s, 'parLk') - s.gt, G(s, '#parWs', 'cb')))
+        for _ in range(P(s, 'parLk') - s.gt - 1):
+            prepass(s)
+    ck('lock: unused presses one after the other: the lock is 12 / 24 / 36 / 48 / 48 t (the whiff streak 0-3)',
+       locks == [(True, gap * (min(k, 3) + 1), min(k, 3)) for k in range(6)], locks)
+    for _ in range(81):
+        prepass(s)
+    acc, _ = prepass(s, f=True)
+    ck('lock: a pause longer than #parWsT after an unused press clears the streak (lock 12 again)',
+       acc and P(s, 'parLk') - s.gt == gap and G(s, '#parWs', 'cb') == 0, (acc, P(s, 'parLk') - s.gt, G(s, '#parWs', 'cb')))
+
+    def streak2():
+        fresh(s)
+        prepass(s, f=True)
+        for _ in range(gap - 1):
+            prepass(s)
+        prepass(s, f=True)
+        for _ in range(2 * gap - 1):
+            prepass(s)
+        prepass(s, f=True)                                 # the third unused press in a row: streak 2
+        return G(s, '#parWs', 'cb')
+    for ago, tier, keep in ((7, 1, True), (4, 2, False), (1, 3, False)):
+        w = streak2()
+        for _ in range(ago):
+            prepass(s)
+        cm_hit(s, e, 30)
+        got = (G(s, '#parT'), G(s, '#parWs', 'cb'), P(s, 'parLk') - s.gt)
+        acc, _ = prepass(s, f=True)
+        ck(f'lock: streak 2, then a tier-{tier} parry: the streak is {"kept" if keep else "cleared"}, the next press is taken '
+           f'on the next tick (lock {gap * (3 if keep else 1)})', w == 2 and got == (tier, 2 if keep else 0, G(s, '#parChain'))
+           and acc and P(s, 'parLk') - s.gt == gap * (3 if keep else 1), (w, got, acc, P(s, 'parLk') - s.gt))
+    # ignored presses: nothing is accepted for #parRe ticks after one, a parry does not clear that
+    fresh(s)
+    prepass(s, f=True)
+    for _ in range(gap - 2):
+        prepass(s)
+    a1, _ = prepass(s, f=True)                             # tick 11: inside the lock -> ignored
+    a2, _ = prepass(s, f=True)                             # tick 12: the lock is over, but 1 t after an ignored press
+    prepass(s)
+    prepass(s)
+    a3, _ = prepass(s, f=True)                             # 3 t after the last ignored press
+    ck('lock: a press 1 t after an ignored press is ignored too (even with the lock over); 3 t after the last one it is taken',
+       (a1, a2, a3) == (False, False, True), (a1, a2, a3))
+    for per in (1, 2):
+        acc, share, _, _ = blind(s, e, set(range(0, 240, per)), 240)
+        ck(f'lock: F every {per} t for 240 t (mashing, a held key) is accepted once', acc == 1, acc)
+    # blind pressing (the reviewer's loop 1): every regular period and irregular gaps
+    worst = (0, None, 100, None, 0, None)
+    pats = [(f'every {p} t', set(range(0, 600, p))) for p in range(3, 41)]
+    for lo, hi in ((2, 3), (3, 4), (3, 5), (4, 6), (5, 8), (8, 14), (10, 20), (12, 30), (20, 40)):
+        r, t, press = random.Random(7), 0, set()
+        while t < 600:
+            press.add(t)
+            t += r.randint(lo, hi)
+        pats.append((f'gaps {lo}-{hi} t', press))
+    for name, press in pats:
+        acc, share, _, _ = blind(s, e, press, 600)
+        dmg = share[0] + 0.5 * share[1] + 0.2 * share[2]
+        if share[3] > worst[0]:
+            worst = (share[3], name) + worst[2:]
+        if dmg < worst[2]:
+            worst = worst[:2] + (dmg, name) + worst[4:]
+        if acc > worst[4]:
+            worst = worst[:4] + (acc, name)
+    ck(f'lock: blind F at every period 3-40 t and 9 irregular rhythms, 600 t each: at most {worst[0]:.1f} % of the ticks are in a '
+       f'perfect window (<= 10; {worst[1]}), a strike would still do {worst[2]:.1f} % of its damage (>= 70; {worst[3]}), at most '
+       f'{worst[4]} presses accepted (<= 18; {worst[5]})', worst[0] <= 10 and worst[2] >= 70 and worst[4] <= 18, worst)
+    # ... and against real strikes (the reviewer's loop 2: cm/hit_me at random 20-60 t gaps)
+    r, t, st = random.Random(11), 0, set()
+    while True:
+        t += r.randint(20, 60)
+        if t >= 9000:
+            break
+        st.add(t)
+    _, _, _, base = blind(s, e, set(), 9000, st)
+    out = []
+    for name, press in (('every 4 t', set(range(0, 9000, 4))), ('every 12 t', set(range(0, 9000, 12))), ('every 13 t', set(range(0, 9000, 13)))):
+        acc, _, tiers, lost = blind(s, e, press, 9000, st)
+        out.append((name, round(100.0 * tiers[3] / len(st), 1), round(100.0 * lost / base, 1), acc))
+    ck(f'lock: blind F against {len(st)} real strikes (9000 t): {out} (name, % perfect <= 10, % of the damage >= 70, presses)',
+       all(o[1] <= 10 and o[2] >= 70 for o in out), out)
+    # legit play is never refused
+    for g_ in (10, 11, 12, 15, 20, 40):
+        hits = [20 + g_ * i for i in range(7)]
+        tiers, ref = chain(s, e, set(hits), {h - 1 for h in hits})
+        ck(f'lock: F one tick before every hit of a {g_}-t chain: 7 perfect parries, no press refused', tiers == [3] * 7 and ref == 0, (tiers, ref))
+    for g_, phases in ((3, (0, 1, 2)), (2, (0, 1))):
+        for ph in phases:
+            hits = [20 + g_ * i for i in range(9)]
+            tiers, ref = chain(s, e, set(hits), {h - ph for h in hits})
+            ck(f'lock: a {g_}-t string with F every {g_} t, {ph} t before each cut: 9 perfect parries, no press refused',
+               tiers == [3] * 9 and ref == 0, (tiers, ref))
+    # one mistake costs at most the next hit
+    bad = []
+    for g_ in (10, 11, 12, 13, 16, 24):
+        hits = [40 + g_ * i for i in range(8)]
+        proper = {h - 1 for h in hits}
+        for early in range(10, 31):                        # the first press is too early
+            tiers, _ = chain(s, e, set(hits), (proper - {hits[0] - 1}) | {hits[0] - early})
+            if tiers[1:] != [3] * 7:
+                bad.append(('early', g_, early, tiers))
+        for late in range(1, g_ - 1):                      # a press comes after its hit
+            tiers, _ = chain(s, e, set(hits), (proper - {hits[2] - 1}) | {hits[2] + late})
+            if tiers[:2] != [3, 3] or tiers[4:] != [3] * 4:
+                bad.append(('late', g_, late, tiers))
+        for x in range(hits[2] + 1, hits[3] - 1):          # one extra press between two hits
+            tiers, _ = chain(s, e, set(hits), proper | {x})
+            if tiers[:3] != [3] * 3 or tiers[4:] != [3] * 4:
+                bad.append(('stray', g_, x - hits[2], tiers))
+    ck('lock: chains of 10-24 t: one press too early, one too late or one extra press costs at most the next hit '
+       '(every later h - 1 press is a perfect parry)', not bad, bad[:4])
+    bad = []
+    hits = [20 + 3 * i for i in range(9)]
+    for ph in (0, 1, 2):
+        for k in range(1, 8):
+            for dx in (1, 2):
+                x = hits[k] - ph + dx
+                presses = {h - ph for h in hits}
+                if x in presses:
+                    continue
+                tiers, _ = chain(s, e, set(hits), presses | {x})
+                if tiers.count(0) > 1 or len([t for t in tiers if t != 3]) > 2:
+                    bad.append((ph, k, dx, tiers))
+    ck('lock: a 3-t string: one extra F (a double tap) loses at most one cut', not bad, bad[:4])
+    got = []
+    for per in (1, 2):
+        for start in range(10, 20):
+            tiers, _ = chain(s, e, set(hits), set(range(start, hits[-1] + 1, per)))
+            got.append(len([t for t in tiers if t]))
+    ck('lock: mashing F every 1-2 t through a 3-t string parries the first cut or two (the first press, and a second one '
+       '2 t later that follows a parry), never the string', max(got) <= 2, got)
+    no_errors(s, 'lock')
 
 
 # ================================================================================================== judge
@@ -428,8 +850,8 @@ def t_tiers():
     s.gt += 1
     l3 = cm_hit(s, e, 60)
     ck('tiers: the next tick the press is spent (the hit lands)', l3 == base and G(s, '#parT') == 0, (l3, G(s, '#parT')))
-    ck('tiers: after a parry the next press is allowed 2 t later (parLk = parry tick + #parChain)',
-       P(s, 'parLk') == P(s, 'parHit') + G(s, '#parChain'))
+    ck('tiers: after a parry the next press is allowed from the next tick (parLk = parry tick + #parChain 1)',
+       P(s, 'parLk') == P(s, 'parHit') + G(s, '#parChain') and G(s, '#parChain') == 1)
 
 
 # ================================================================================================== dodge windows
@@ -452,6 +874,84 @@ def t_dodge():
         dodge(s, ago)
         d, p, pdg = judge(s, K=3, C=2)
         ck(f'dodge: boss, dodge {ago} t before -> {"perfect" if ago <= 2 else "hit"}', (d == 1) == (ago <= 2) and pdg == (1 if ago <= 2 else 0))
+
+
+# ================================================================================================== dodge cooldown (A-12)
+def t_cool():
+    s, pl = world()
+    e = brain(s)
+    ck('cool: #dashCoolT 18 (a dodge that avoided nothing), #dashCoolHitT 12 (one that avoided an attack)',
+       (G(s, '#dashCoolT'), G(s, '#dashCoolHitT'), G(s, '#dashCoolBase'), G(s, '#dashCoolHitBase')) == (18, 12, 18, 12),
+       (G(s, '#dashCoolT'), G(s, '#dashCoolHitT')))
+
+    def again(hit_at=None, cls=0, hits=1):
+        """a dodge on tick 0, a strike `hit_at` ticks later (or none), a right-click on every later tick: -> the tick of
+        the next dodge, what the strike did"""
+        fresh(s)
+        P(s, 'energy', 0)
+        prepass(s, rc=True)
+        cooldown(s)
+        res = None
+        for k in range(1, 40):
+            _, dg = prepass(s, rc=True)
+            if dg:
+                return k, res
+            if hit_at is not None and k == hit_at:
+                for _ in range(hits):
+                    if cls == 2:
+                        full(s)
+                        hp0 = P(s, 'curHealth')
+                        for o, v in (('#cmDmg', 60), ('#cmLv', 1), ('#cmEl', 0), ('#cmKB', 0), ('#hcC', 2), ('#hcK', 1)):
+                            s.setsc(o, 'tmp', v)
+                        s.call('rlk:cm/hit_pl2', pctx(s))
+                        lost = hp0 - P(s, 'curHealth')
+                    else:
+                        lost = cm_hit(s, e, 60)
+                res = (lost, G(s, '#pdg'))
+            cooldown(s)
+        return None, res
+    ck('cool: a dodge that meets no attack: the next one 18 t later', again() == (18, None), again())
+    ck('cool: a perfect dodge (strike 1 t after): the next one 12 t later', again(1) == (12, (0, 1)), again(1))
+    ck('cool: ... also when the strike comes in the dodge tick itself or 2 t after', again(2) == (12, (0, 1)), again(2))
+    ck('cool: a loose dodge of a normal mob (strike 5 t after): 12 t too', again(5) == (12, (0, 0)), again(5))
+    ck('cool: two strikes avoided by one dodge refund once (12 t, not 6)', again(1, hits=2)[0] == 12, again(1, hits=2))
+    r = again(4, cls=2)
+    ck('cool: a boss strike 4 t after the dodge is not avoided: 18 t', r[0] == 18 and r[1][0] > 0, r)
+    r = again(8)
+    ck('cool: a strike after the window (8 t) lands: 18 t', r[0] == 18 and r[1][0] > 0, r)
+    s.setsc('dash', 'engN', 2)
+    s.call('rlk:engravings/scan_more', pctx(s))
+    ck('cool: 질주 2 (-20 %, rounded): 14 t / 10 t after an avoided attack', (G(s, '#dashCoolT'), G(s, '#dashCoolHitT')) == (14, 10)
+       and again()[0] == 14 and again(1)[0] == 10, (G(s, '#dashCoolT'), G(s, '#dashCoolHitT'), again()[0], again(1)[0]))
+    s.setsc('dash', 'engN', 0)
+    s.call('rlk:engravings/scan_more', pctx(s))
+    ck('cool: without the engraving the two values are the base again', (G(s, '#dashCoolT'), G(s, '#dashCoolHitT')) == (18, 12))
+    # dodging on every tick the cooldown allows, standing in a swordsman's reach (the reviewer's loop, 3000 t)
+    r_, t, st = random.Random(11), 0, set()
+    while True:
+        t += r_.randint(20, 60)
+        if t >= 3000:
+            break
+        st.add(t)
+    fresh(s)
+    s.stub |= {'rlk:player/def/fx/pd', 'rlk:player/dash_go'}
+    s.cache_dash = None
+    land = perf = dodges = 0
+    s.stub.discard('rlk:player/dash_go')
+    s.stub |= {'rlk:char/motion/dash', 'rlk:items/hook/on_dash', 'rlk:player/dash_dir'}
+    for t in range(3000):
+        _, dg = prepass(s, rc=True)
+        dodges += dg
+        cooldown(s)
+        if t in st:
+            lost = cm_hit(s, e, 60)
+            perf += G(s, '#pdg') == 1
+            land += lost > 0
+    s.stub -= {'rlk:player/def/fx/pd', 'rlk:char/motion/dash', 'rlk:items/hook/on_dash', 'rlk:player/dash_dir'}
+    n = len(st)
+    ck(f'cool: dodging whenever the cooldown allows against {n} strikes of a normal mob: {land} land (>= 45 %), {perf} perfect '
+       f'(<= 25 %), {dodges} dodges in 3000 t (<= 3000 / 12)', land >= 0.45 * n and perf <= 0.25 * n and dodges <= 250, (land, perf, dodges, n))
+    no_errors(s, 'cool')
 
 
 # ================================================================================================== context
@@ -617,6 +1117,8 @@ def t_bal():
     lost = cm_hit(s, e, 30)
     ck('bal: a perfect parry on a strike takes exactly one pip from the attacker (and no damage)', bal(s, e) == mx - 1 and lost == 0,
        (bal(s, e), mx, lost))
+    tk = s.calls('rlk:bal/take')
+    ck('bal: the pip is taken at the enemy (as the enemy, at its position; review B-05)', len(tk) == 1 and tk[0][3] == tuple(e.pos), tk)
     cm_hit(s, e, 30)
     ck('bal: a second hit in the same tick (the same press) takes no second pip', bal(s, e) == mx - 1, bal(s, e))
     s.gt += 1
@@ -671,6 +1173,19 @@ def t_bal():
     lost = cm_hit(s, el, 30)
     ck('bal: a groggy attacker keeps its pips (rlk:bal/hit fails), the perfect parry still nullifies and cuts the skill',
        bal(s, el) == emx - 1 and lost == 0 and P(s, 'skillCd') == 80, (bal(s, el), lost, P(s, 'skillCd')))
+    # review B-05: the groggy starts where the enemy is
+    far = brain(s, (), pos=(14.5, 64.0, 3.5), cid=31)
+    gauge(s, far)
+    s.setsc(('e', far.id), 'bal', 1)
+    nopress(s)
+    s.gt += 40
+    press(s, 1)
+    cm_hit(s, far, 30)
+    gs = s.calls('rlk:bal/grog/start')
+    ck('bal: the last pip by a perfect parry starts the groggy at the enemy 14 b away, not at the player',
+       bal(s, far) == 0 and len(gs) == 1 and gs[0][3] == tuple(far.pos) and 'rlk_cmb' in gs[0][1], (bal(s, far), gs))
+    far.alive = False
+    s.ents.remove(far)
     # a registry boss body in the fight state (bal/boss/may): one pip of the boss gauge
     body = Ent('husk', (8.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_body', 'rlk_mob', 'boss'])
     s.ents.append(body)
@@ -936,6 +1451,139 @@ def t_fx():
         s.call('rlk:player/def/fx/world', Ctx(None, (0, 0, 0), (0, 0)))
     ck('fx: every effect entity is gone after 12 ticks of fx/world', not s.select('@e[tag=rlk_cb_fx]', pctx(s)))
 
+    def age():
+        """rlk:tick's effect line (once per tick, after that tick's hits), then the next tick"""
+        if s.select('@e[tag=rlk_cb_fx,limit=1]', pctx(s)):
+            s.call('rlk:player/def/fx/world', C0)
+        s.gt += 1
+    # review A-05: nothing is aged away in the tick it is made
+    for g in list(s.select('@e[tag=rlk_dgo]', pctx(s))):
+        g.alive = False
+    s.ents = [x for x in s.ents if x.alive]
+    nopress(s)
+    s.gt += 30
+    press(s, 1)
+    P(s, 'vBig', 0)
+    pl.rot = [40.0, 20.0]
+    s.cmdlog.clear()
+    t0 = s.gt
+    cm_hit(s, e, 20)
+    s.log.clear()
+    seen = []
+    for k in range(8):
+        seen.append((len(s.select('@e[tag=rlk_cb_star]', pctx(s))), len(s.select('@e[tag=rlk_cb_jolt]', pctx(s))),
+                     len(s.select('@e[tag=rlk_cb_arc]', pctx(s)))))
+        age()
+    rot = [(t - t0, c) for t, c in s.cmdlog if c.startswith('rotate')]
+    ck('fx: the perfect parry turns the view in its tick and back one tick later, to where it was (review A-05)',
+       rot == [(0, 'rotate @s ~1.5 ~-1'), (1, 'rotate @s ~-1.5 ~1')] and [round(v, 3) for v in pl.rot] == [40.0, 20.0], (rot, pl.rot))
+    mg = [(t - t0, 'grow' if 'scale' not in c else 'shrink') for t, c in s.cmdlog if c.startswith('data merge') and 'interpolation' in c]
+    ck('fx: the star is shown for its first tick as made, grows from the next tick (2 t), shrinks away (2 t) and is removed '
+       'on the 5th tick after', mg == [(1, 'grow'), (3, 'shrink')] and [x[0] for x in seen] == [1, 1, 1, 1, 1, 1, 0, 0], (mg, [x[0] for x in seen]))
+    for _ in range(6):
+        age()
+    ck('fx: the jolt marker is removed 2 ticks after, the ground arc crawls for 10 ticks; then nothing is left',
+       [x[1] for x in seen] == [1, 1, 1, 0, 0, 0, 0, 0] and len(s.calls('rlk:player/def/fx/t_arc')) == 10
+       and not s.select('@e[tag=rlk_cb_fx]', pctx(s)), ([x[1] for x in seen], len(s.calls('rlk:player/def/fx/t_arc'))))
+    pl.rot = [10.0, -89.5]                                   # looking almost straight up: the pitch would clamp
+    nopress(s)
+    s.gt += 30
+    press(s, 1)
+    P(s, 'vBig', 0)
+    s.cmdlog.clear()
+    cm_hit(s, e, 20)
+    age()
+    age()
+    ck('fx: looking straight up the jolt is yaw only (no 1-degree drift from the pitch clamp)',
+       [c for _, c in s.cmdlog if c.startswith('rotate')] == ['rotate @s ~1.5 ~', 'rotate @s ~-1.5 ~'] and [round(v, 3) for v in pl.rot] == [10.0, -89.5],
+       ([c for _, c in s.cmdlog if c.startswith('rotate')], pl.rot))
+    pl.rot = [0.0, 0.0]
+    for _ in range(12):
+        age()
+    # reviews A-03 / A-06: the red ghost through the real path (right-click -> the dodge-start box -> a strike in the window)
+    fresh(s)
+    pl.rot = [135.0, 0.0]
+    prepass(s, rc=True)
+    box = s.select('@e[tag=rlk_dgo]', pctx(s))
+    ck('fx: the dodge-start box takes the body\'s yaw (review A-06)', len(box) == 1 and [round(v, 1) for v in box[0].rot] == [135.0, 0.0],
+       [b.rot for b in box])
+    pl.pos = [3.5, 64.0, 0.5]                                # the body has moved on; the swordsman strikes the start
+    pl.rot = [20.0, 0.0]
+    s.killed.clear()
+    P(s, 'vBig', 0)
+    s.call('rlk:player/def/ghost_on', C0)
+    lost = cm_hit(s, e, 20)
+    s.call('rlk:player/def/ghost_off', C0)
+    gh = s.select('@e[tag=rlk_cb_ghost]', pctx(s))
+    ck('fx: the afterimage stands at the dodge start and faces as the body did then (yaw 135), not south',
+       lost == 0 and len(gh) == 1 and [round(v, 1) for v in gh[0].pos] == [0.5, 64.0, 0.5] and [round(v, 1) for v in gh[0].rot] == [135.0, 0.0],
+       (lost, [(g.pos, g.rot) for g in gh]))
+    g0 = gh[0]
+    life = []
+    for k in range(10):
+        life.append((g0.alive, 'rlk_cb_ghost' in g0.tags, tuple(round(v, 1) for v in g0.pos), g0.data.get('Glowing')))
+        age()
+    FAR = (1000000.5, 400.0, 1000000.5)
+    ck('fx: the ghost is shown 8 ticks where it was made; then its glow is switched off and it is moved to the far chunk '
+       '(review A-03)', all(x == (True, True, (0.5, 64.0, 0.5), None) for x in life[:8]) and life[8] == (True, False, FAR, 0), life)
+    dead = [k for k in s.killed if k[0] == 'mannequin']
+    ck('fx: ... and it is killed only there, one tick later, with the glow off (no death animation at the dodge start)',
+       not g0.alive and life[9][0] is False and len(dead) == 1 and dead[0][2] == FAR and dead[0][3].get('Glowing') == 0, (life[9], dead))
+    # a second perfect dodge while a ghost is still up: the old one is moved out, never killed in place
+    pl.pos = [0.5, 64.0, 0.5]
+    fresh(s)
+    prepass(s, rc=True)
+    cm_hit(s, e, 20)
+    first = s.select('@e[tag=rlk_cb_ghost]', pctx(s))[0]
+    age()
+    age()
+    s.killed.clear()
+    P(s, 'dashCool', 0)
+    s.gt += 20
+    prepass(s, rc=True)
+    cm_hit(s, e, 20)
+    ck('fx: a new ghost moves the earlier one out first (glow off, far chunk), it is not killed in place',
+       len(s.select('@e[tag=rlk_cb_ghost]', pctx(s))) == 1 and first.alive and tuple(first.pos) == FAR and first.data.get('Glowing') == 0
+       and not [k for k in s.killed if k[0] == 'mannequin'], (first.pos, first.data, s.killed))
+    for _ in range(12):
+        age()
+    ck('fx: ... and both are gone afterwards, each killed at the far chunk', not s.select('@e[tag=rlk_cb_fx]', pctx(s))
+       and [k[2] for k in s.killed if k[0] == 'mannequin'] == [FAR, FAR], [k[2] for k in s.killed if k[0] == 'mannequin'])
+    pl.rot = [0.0, 0.0]
+    # review A-09: the crosshair comes back in the tick the overlay ends (view/tick's vBig line, then view/ride_tick's lines)
+    vb = next(l for l in code(rd('view/tick')) if 'vBig matches 1..' in l)
+    xh = [l for l in code(rd('view/ride_tick')) if '#xh view' in l]
+    nopress(s)
+    s.gt += 30
+    press(s, 1)
+    P(s, 'vBig', 0)
+    cm_hit(s, e, 20)
+    s.setsc('#xh', 'view', 1)                                # the 10-tick resend has just fired
+    s.log.clear()
+    sent = []
+    for k in range(1, 9):                                    # the view ticks after the parry tick
+        for l in [vb] + xh:
+            s.cmd(split(l), pctx(s))
+        if s.calls('rlk:view/xhair'):
+            sent.append(k)
+            s.log.clear()
+    ck('fx: after the 6-tick streak overlay the crosshair is sent on the 6th tick, not up to 9 ticks later (review A-09)',
+       len(xh) == 3 and sent[:1] == [6], (len(xh), sent))
+    no_errors(s, 'fx')
+
+
+# ================================================================================================== boss world loop (A-11)
+def t_bossloop():
+    import subprocess
+    r = subprocess.run([sys.executable, str(HERE / 'bossloop_cb.py'), str(DP)], capture_output=True, text=True, timeout=1800)
+    n = 0
+    for line in r.stdout.split('\n'):
+        if line.startswith(('ok   ', 'FAIL ')):
+            n += 1
+            name, _, info = line[5:].partition('  -- ')
+            ck(name, line.startswith('ok'), info)
+    ck('bossloop: bossloop_cb.py ran to the end (5+ checks, exit 0)', n >= 5 and r.returncode == 0, (n, r.returncode, r.stderr[-400:]))
+
 
 # ================================================================================================== cost
 def t_cost():
@@ -947,9 +1595,9 @@ def t_cost():
     ck(f'cost: the idle pre-pass runs {n} commands (<= 6)', n <= 6, n)
 
 
-SECTIONS = [('static', t_static), ('input', t_input), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge),
+SECTIONS = [('static', t_static), ('input', t_input), ('lock', t_lock), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge), ('cool', t_cool),
             ('context', t_context), ('energy', t_energy), ('cd', t_cd), ('bal', t_bal), ('boss', t_boss), ('near', t_near), ('raiden', t_raiden),
-            ('readers', t_readers), ('fx', t_fx), ('cost', t_cost)]
+            ('readers', t_readers), ('fx', t_fx), ('bossloop', t_bossloop), ('cost', t_cost)]
 for name, fn in SECTIONS:
     if run(name):
         fn()

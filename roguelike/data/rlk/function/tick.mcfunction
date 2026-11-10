@@ -15,7 +15,8 @@ execute if score #pcount tmp matches 2.. run return 0
 execute store result score #now cb run time query gametime
 execute as @a[tag=player] at @s run function rlk:player/def/input
 execute store success score #dgOpen cb if score #now cb <= #dgEnd cb
-execute if score #now cb = #dgKill cb run kill @e[tag=rlk_dgo]
+# 창이 끝난 다음 틱에 시작 자리 상자를 지운다(그 틱을 놓쳤어도 지울 때까지: player/def/box_end)
+execute if score #dgBox cb matches 1 if score #now cb >= #dgKill cb run function rlk:player/def/box_end
 
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용

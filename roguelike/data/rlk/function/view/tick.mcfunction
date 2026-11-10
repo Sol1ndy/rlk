@@ -4,7 +4,7 @@ execute if score #vFresh view matches 1 run function rlk:view/fresh
 # 시점 시스템 매 틱 (@s = 플레이어). player/tick 보다 먼저 실행된다
 # 큰 제목(vBig = 제목 줄을 쓰는 남은 틱)은 모든 상태(F5 · 개발자 모드 · 지도 · 선택 공간 · 사망)에서 틱마다 준다. 읽는 곳: F5 조준점
 # (ride_tick · sel_xhair: 이 줄 뒤에 읽음), 화무십일홍의 화면 가장자리 어둠(items/proc/hw_slash_q), 중간보스 덮개의 멈춤 정리(fieldgen · butterfly pause)
-execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1
+execute if score @s vBig matches 1.. run function rlk:view/big_dec
 # 지도 클릭 잠금/길게 누름 판정
 execute if score @s vMapH matches 1.. run scoreboard players remove @s vMapH 1
 execute if score @s vMapL matches 1.. run scoreboard players remove @s vMapL 1
