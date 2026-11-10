@@ -806,19 +806,29 @@ def build_q(W):
     pb.track(1, lock - 1, TRK['deg'])
     pb.at(ghost, api.rig('look/form/ghost'), f'tag @s add {TAG_GHOST}', S.snd('g_tell'),
           S.fx('ghost_burst', puff_fb(n=20), pos=at_body(0.95)))
-    pb.at(lock, P1F.lock_fn(pb, key), FACE_LOCK)
+    reach = num(dmax + 1.6, 2)
+    pb.at(lock, P1F.lock_fn(pb, key), FACE_LOCK,
+          # a locked spot beyond her reach is pulled in along her aim: the grab lands where she arrives, never farther
+          f'execute at @s positioned ~ {CY} ~ unless entity {S.LOCK_M[:-1]},distance=..{reach}] rotated as @s rotated ~ 0 '
+          f'positioned ^ ^ ^{reach} run tp {S.LOCK_M} ~ ~ ~')
     w(f'p/{key}/lunge', [
-        f'# Q ghost lunge (@s = the body, tick {go}): along the locked aim to 1.6 b before the player, at most {num(dmax)} b (probe,',
-        f'# mv/ok), in {grab - go} t.',
-        'function rlk:mboss/mv/dist',
-        f'scoreboard players operation #t {OBJ} = #mbDist mb',
-        f'scoreboard players remove #t {OBJ} 16',
-        f'scoreboard players operation #t {OBJ} /= #c5 {OBJ}',
-        f'execute if score #t {OBJ} matches ..-1 run {sset("#t", 0)}',
-        f'execute if score #t {OBJ} matches {int(dmax * 2) + 1}.. run {sset("#t", int(dmax * 2))}',
-        f'execute at @s rotated as @s rotated ~ 0 run {fn("core/dash/probe")}',
+        f'# Q ghost lunge (@s = the body, tick {go}): along the locked aim to within 2 b of the locked spot, at most {num(dmax)} b',
+        f'# (0.5 b probe steps through mv/ok), in {grab - go} t.',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]',
+        f'execute at @s positioned ~ {CY} ~ run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(TAG_P, S.PROBE_T)}}}',
+        f'execute at @s rotated as @s as {S.PROBE_M} run tp @s ~ ~ ~ ~ 0',
+        sset('#t', int(dmax * 2)), sset('#t2', 0),
+        f'execute as {S.PROBE_M} at @s run {fn(f"p/{key}/lstep")}',
         f'execute positioned as {S.PROBE_M} run function rlk:mboss/mv/glide {{t:{grab - go}}}',
         f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'])
+    w(f'p/{key}/lstep', [
+        '# Q lunge probe step (@s = the probe, at / rotated as it): 0.5 b on while mv/ok passes, until within 2 b of the lock.',
+        f'execute if score #t2 {OBJ} >= #t {OBJ} run return 0',
+        f'execute if entity {S.LOCK_M[:-1]},distance=..2.0] run return 0',
+        'execute positioned ^ ^ ^0.5 unless function rlk:mboss/mv/ok run return 0',
+        'tp @s ^ ^ ^0.5',
+        f'scoreboard players add #t2 {OBJ} 1',
+        f'execute at @s run {fn(f"p/{key}/lstep")}'])
     pb.at(go, fn(f'p/{key}/lunge'), S.snd('g_dash'),
           S.fx('ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], pos=at_body(0.95), len=int(dmax * 10)))
     pb.motions.append((go, grab, 'ghost lunge'))

@@ -329,11 +329,12 @@ DS_M = f'@e[type=minecraft:marker,tag={DS_T},limit=1]'
 DASH_STO = f'{api.STORAGE} core.dash'
 
 
-def dash_through(pb, key, go, cut, row=0, short=0.0):
+def dash_through(pb, key, go, cut, row=0, grp=True):
     """The dash of A9 / HCUT / BLUE / KCUT (@s = the body, tick `go`): through the locked spot to api.DASH_BEYOND b beyond it,
     at most api.DASH_LEN b, probed in 0.5 b steps through mv/ok; she glides there in cut - go ticks. The start marker
     (rlk_hr_a9s, rotated along the dash) and the probed length (storage core.dash {len,w,tell,dmg}) feed the dash-line
-    hazard of api.HITS[key][row], made at cut - 1 (strikes at cut). Returns the hazard lines' position prefix."""
+    hazard of api.HITS[key][row], made at cut - 1 (strikes at cut; grp: it joins the volley group the caller opened with
+    pb.group(cut - 1) - a line alone must not join a stale group). Returns the hazard lines' position prefix."""
     W = pb.W
     beyond, dmax = api.DASH_BEYOND[key], api.DASH_LEN[key]
     h = api.HITS[key][row]
@@ -372,11 +373,24 @@ def dash_through(pb, key, go, cut, row=0, short=0.0):
     pb.at(go, fn(f'p/{key}/dash'))
     pb.motions.append((go, cut, 'dash'))
     ds = f'at {DS_M} rotated as {DS_M}'
-    hl = S.hz_opts(h[5], grp=True, noparry=1 if h[6] == 'N' else 0)
+    hl = S.hz_opts(h[5], grp=grp, noparry=1 if h[6] == 'N' else 0)
     hl += [f'execute {ds} positioned ~ {CY} ~ run function rlk:mboss/hz/line with storage {DASH_STO}', S.hz_tag(key)]
     pb.at(cut - 1, hl)
     pb.at(cut + 1, f'kill @e[type=minecraft:marker,tag={DS_T}]')
     return ds
+
+
+def reach_clamp(key):
+    """After the lock (@s = the body, facing the lock marker): a locked spot farther than the dash can carry her (DASH_LEN -
+    DASH_BEYOND) is pulled in along her aim to that distance, so the cut never lands where she does not go."""
+    r = num(api.DASH_LEN[key] - api.DASH_BEYOND[key], 2)
+    return (f'execute at @s positioned ~ {CY} ~ unless entity {S.LOCK_M[:-1]},distance=..{r}] rotated as @s rotated ~ 0 '
+            f'positioned ^ ^ ^{r} run tp {S.LOCK_M} ~ ~ ~')
+
+
+def lock_dash(pb, key):
+    """The lock step of a dash pattern: the marker at the player's spot, she faces it, the reach clamp."""
+    return [lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0', reach_clamp(key)]
 
 
 def streak(ds, h=0.8, c='magenta'):
@@ -396,7 +410,7 @@ def build_a9(W):
     pb.track(1, lock - 1, TRK['deg'])
     pb.at(ring, S.fx('qi_ring', [part(S.DUST['lilac'], 1.4, 0.05, 1.4, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~0.8 ~', r=35,
                      c=api.C_LILAC))
-    pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
+    pb.at(lock, lock_dash(pb, key))
     pb.at(flash, [x for x in (api.K.ovl('magenta', 0, 3, 6),) if x], S.snd('a9_flash'))
     # one strike group: the dash line from the start point along the dash + the disc at the locked spot (one landing);
     # the flashes of the group are the row 0's: yellow 8, purple 16 (exactly 12 t before the cut)
@@ -622,6 +636,8 @@ def build_ult(W):
           S.fx('ult_burst', [part(S.DUST['white'], 8.0, 1.5, 8.0, 0.2, 100)], pos=f'{S.AT_BODY} positioned ~ ~1.2 ~'),
           S.fx('burst_radial', [part(S.DUST['lilac'], 2.5, 0.2, 2.5, 0, 50)], pos=f'{S.AT_BODY} positioned ~ ~0.1 ~', r=60),
           S.snd('ult_cut2'))
+    # the second cut strikes after this module tick: its own landed hit must not charge the spent gauge
+    pb.at(cut2 + 1, sset(api.GAUGE_FP, 0))
     tail(pb, cut2, end)
     return finish(pb, key)
 
@@ -639,7 +655,7 @@ def build_hcut(W):
     pb.track(1, lock - 1, TRK['deg'])
     for t in range(sparkle, sparkle + 9, 4):
         pb.at(t, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['white'], 0.08, 0.08, 0.08, 0, 6)], c=api.C_WHITE)))
-    pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
+    pb.at(lock, lock_dash(pb, key))
     g = pb.group(cut - 1)
     ds = dash_through(pb, key, go, cut)
     pb.at(go, S.snd('g_dash'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
@@ -663,8 +679,8 @@ def build_blue(W):
     assert lock == hit - S.LOCK
     pb.at(0, FACE, api.play(key))
     pb.track(1, lock - 1, TRK['deg'])
-    pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
-    ds = dash_through(pb, key, go, hit)
+    pb.at(lock, lock_dash(pb, key))
+    ds = dash_through(pb, key, go, hit, grp=False)
     pb.at(go, S.snd('lunge'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
     pb.note_hit(0, hit, tell_from=0)
     pb.at(hit, streak(ds, 0.9, 'lilac'), S.snd('a2_hit'))
@@ -688,7 +704,7 @@ def build_kcut(W):
     pb.at(glow, look('blade', 'lilac'))
     pb.at(go, look('blade', 'off'))
     pb.cancel_lines.append(f'execute as {S.BODY} run {look("blade", "off")}')
-    pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
+    pb.at(lock, lock_dash(pb, key))
     g = pb.group(cut - 1)
     ds = dash_through(pb, key, go, cut)
     pb.at(go, S.snd('kcut_go'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))

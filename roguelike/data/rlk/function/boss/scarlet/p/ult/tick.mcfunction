@@ -9,5 +9,6 @@ execute if score #pt hr matches 26 run function rlk:boss/scarlet/p/ult/k/26
 execute if score #pt hr matches 34 run function rlk:boss/scarlet/p/ult/k/34
 execute if score #pt hr matches 45 run function rlk:boss/scarlet/p/ult/k/45
 execute if score #pt hr matches 46 run function rlk:boss/scarlet/p/ult/k/46
+execute if score #pt hr matches 47 run scoreboard players set #gau hr 0
 execute if score #pt hr matches 50 run function rlk:boss/scarlet/ai/tail
 execute if score #pt hr matches 58 run scoreboard players set #done hr 1

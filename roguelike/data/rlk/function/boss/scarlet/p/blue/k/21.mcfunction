@@ -1,5 +1,4 @@
 # BLUE pattern tick 21
-scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzEl mb 3
 scoreboard players set #hzKB mb 2
 scoreboard players set #hzSfx mb 0
