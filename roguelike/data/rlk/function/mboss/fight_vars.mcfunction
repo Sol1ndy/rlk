@@ -6,6 +6,8 @@ scoreboard players set #mbNoLeash mb 0
 scoreboard players set #mbBarOff mb 0
 # combat overhaul C: the framework draws the unparriable warning glint (np_glint) unless the module sets #mbNpOwn 1 at its spawn
 scoreboard players set #mbNpOwn mb 0
+# hr FN-bal (hr_design §1.3): no fight starts with a module's balance-off flag (#mbBalOff 1: bal/boss/may refuses balance damage)
+scoreboard players set #mbBalOff mb 0
 execute store result score #mbId mb run data get storage rlk:mboss cur.n
 execute store result score #mbDmgMul mb run data get storage rlk:mboss cur.dmgMul
 execute store result score #mbGoldMul mb run data get storage rlk:mboss cur.goldMul

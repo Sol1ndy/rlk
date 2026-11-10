@@ -4,6 +4,7 @@
 execute if entity @s[tag=rlk_mb_body] unless score #mbSt mb matches 1 run return fail
 execute if entity @s[tag=rlk_mb_body] if score #mbCine mb matches 1 run return fail
 execute if entity @s[tag=rlk_mb_body] if score #mbBarOff mb matches 1 run return fail
+execute if entity @s[tag=rlk_mb_body] if score #mbBalOff mb matches 1 run return fail
 execute if entity @s[tag=rlk_mb_dying] run return fail
 execute if entity @s[tag=rlk_raiden] unless score @s rdPhase matches 0 run return fail
 execute if entity @s[tag=rlk_raiden] if score @s rdDeath matches 1.. run return fail

@@ -3139,6 +3139,51 @@
     0.7,
     1.4
    ]
+  ],
+  "parry_cue": [
+   [
+    "block.amethyst_block.chime",
+    0.6,
+    1.9
+   ]
+  ],
+  "flash_blue": [
+   [
+    "block.beacon.activate",
+    0.5,
+    1.8
+   ]
+  ],
+  "ult_cut1": [
+   [
+    "item.trident.thunder",
+    0.6,
+    1.6
+   ],
+   [
+    "block.glass.break",
+    0.7,
+    0.6
+   ]
+  ],
+  "ult_cut2": [
+   [
+    "entity.generic.explode",
+    0.4,
+    1.6
+   ],
+   [
+    "block.glass.break",
+    0.8,
+    0.5
+   ]
+  ],
+  "sky_pillar": [
+   [
+    "item.trident.thunder",
+    0.5,
+    1.9
+   ]
   ]
  },
  "hud": {
@@ -3163,48 +3208,48 @@
   "1": {
    "text": "꽃 속에 술 한 병 놓고,",
    "steps": 7,
-   "on_screen": 40,
+   "on_screen": 54,
    "colour": "#F2D0E8",
    "width": 86
   },
   "2": {
    "text": "벗 없이 혼자 술잔 드네.",
    "steps": 6,
-   "on_screen": 40,
+   "on_screen": 60,
    "colour": "#F2D0E8",
    "width": 90
   },
   "3": {
    "text": "잔 들어 밝은 달 맞이하니,",
    "steps": 7,
-   "on_screen": 40,
+   "on_screen": 60,
    "colour": "#F2D0E8",
    "width": 98
   },
   "4": {
    "text": "달과 나와 그림자 셋이 되었네...",
    "steps": 8,
-   "on_screen": 50,
+   "on_screen": 84,
    "colour": "#F2D0E8",
    "width": 118
   },
   "5": {
    "text": "그리고 이제 친구가 와 주었으니 월하독작이 아니라, 대작이 되겠구만.",
    "steps": 18,
-   "on_screen": 100,
+   "on_screen": 130,
    "colour": "#F2D0E8",
    "width": 260,
    "pages": [
     {
      "text": "그리고 이제 친구가 와 주었으니",
      "from": 0,
-     "to": 47,
+     "to": 61,
      "width": 120
     },
     {
      "text": "월하독작이 아니라, 대작이 되겠구만.",
-     "from": 47,
-     "to": 100,
+     "from": 61,
+     "to": 130,
      "width": 136
     }
    ]
@@ -3212,7 +3257,7 @@
   "6": {
    "text": "낭자, 내 말하지 않았던가?",
    "steps": 7,
-   "on_screen": 50,
+   "on_screen": 64,
    "colour": "#F2D0E8",
    "width": 100
   },
@@ -3233,21 +3278,21 @@
   "9": {
    "text": "신세진 것도 있겠다, 이 달 아래서...",
    "steps": 10,
-   "on_screen": 56,
+   "on_screen": 90,
    "colour": "#F2D0E8",
    "width": 132
   },
   "10": {
    "text": "한 수 가르침을 청하고 싶네만.",
    "steps": 9,
-   "on_screen": 50,
+   "on_screen": 70,
    "colour": "#F2D0E8",
    "width": 114
   },
   "11": {
    "text": "낭자 생각은 어떤가?",
    "steps": 6,
-   "on_screen": 68,
+   "on_screen": 62,
    "colour": "#F2D0E8",
    "width": 78
   },
@@ -3261,14 +3306,14 @@
   "13": {
    "text": "낭자, 대단하구만.",
    "steps": 5,
-   "on_screen": 44,
+   "on_screen": 52,
    "colour": "#F2D0E8",
    "width": 64
   },
   "14": {
    "text": "진심으로 가겠네.",
    "steps": 5,
-   "on_screen": 42,
+   "on_screen": 40,
    "colour": "#F2D0E8",
    "width": 62
   },
@@ -3282,62 +3327,62 @@
   "16": {
    "text": "이런 것일세.",
    "steps": 4,
-   "on_screen": 40,
+   "on_screen": 36,
    "colour": "#F2D0E8",
    "width": 46
   },
   "17": {
    "text": "낭자, 여기까지 하세.",
    "steps": 5,
-   "on_screen": 60,
+   "on_screen": 58,
    "colour": "#F2D0E8",
    "width": 76
   },
   "18": {
    "text": "대단하네, 좋은 수련이 되었어.",
    "steps": 8,
-   "on_screen": 68,
+   "on_screen": 66,
    "colour": "#F2D0E8",
    "width": 112
   },
   "19": {
    "text": "이제 정말 가야겠네.",
    "steps": 5,
-   "on_screen": 45,
+   "on_screen": 42,
    "colour": "#F2D0E8",
    "width": 74
   },
   "20": {
    "text": "다음 번에 만나면, 그땐 같이 한잔 하면 좋을 텐데...",
    "steps": 11,
-   "on_screen": 119,
+   "on_screen": 118,
    "colour": "#F2D0E8",
    "width": 192
   },
   "21": {
    "text": "달빛과 바람을 안주 삼아... 말일세.",
    "steps": 9,
-   "on_screen": 130,
+   "on_screen": 128,
    "colour": "#F2D0E8",
    "width": 128
   },
   "22": {
    "text": "어디 보자, 낭자네에선 이렇게 인사한다고 들었는데...",
    "steps": 14,
-   "on_screen": 130,
+   "on_screen": 128,
    "colour": "#F2D0E8",
    "width": 196,
    "pages": [
     {
      "text": "어디 보자,",
      "from": 0,
-     "to": 26,
+     "to": 25,
      "width": 38
     },
     {
      "text": "낭자네에선 이렇게 인사한다고 들었는데...",
-     "from": 26,
-     "to": 130,
+     "from": 25,
+     "to": 128,
      "width": 154
     }
    ]
@@ -3345,7 +3390,7 @@
   "23": {
    "text": "당신의 기억이 이어지기를.",
    "steps": 8,
-   "on_screen": 90,
+   "on_screen": 88,
    "colour": "#F2D0E8",
    "width": 98
   },
@@ -3663,8 +3708,8 @@
  "space": "U+EC1F (-1)",
  "warn": {
   "bossbar": "rlk:hr_warn",
-  "text": "베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다",
-  "component": "{text:\"\",extra:[{text:\"베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 \",color:\"white\",font:\"minecraft:default\"},{text:\"즉사\",color:\"#FF3A55\",bold:true,font:\"minecraft:default\"},{text:\"합니다\",color:\"white\",font:\"minecraft:default\"}]}"
+  "text": "베기를 완벽하게 패링해 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다",
+  "component": "{text:\"\",extra:[{text:\"베기를 완벽하게 패링해 실드를 모두 깎으세요 — 실드가 남으면 \",color:\"white\",font:\"minecraft:default\"},{text:\"즉사\",color:\"#FF3A55\",bold:true,font:\"minecraft:default\"},{text:\"합니다\",color:\"white\",font:\"minecraft:default\"}]}"
  },
  "skip": {
   "text": "⊙ 건너뛰기",

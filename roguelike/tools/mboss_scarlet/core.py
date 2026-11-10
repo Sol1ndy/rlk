@@ -29,7 +29,7 @@ CY = api.CY
 PH = api.PH
 TID = S.TID
 GAUNT = api.GAUNTLETS
-SEQ_FIGHT = ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand')     # sequences of the fight state (#mbSt 1)
+SEQ_FIGHT = ('cs1', 'lead60', 'repel', 'lead5', 'lead_re')     # sequences of the fight state (#mbSt 1)
 INTRO_LEN = api.SEQ_LEN['intro']
 TAGS_ALL = sorted(set(api.TAGS.values()))        # I1 (s3-5): S3's extra tags are in api.TAGS now
 
@@ -471,11 +471,11 @@ def phase_files(W, ctx):
         sset('#inv', 1), 'tag @s add rlk_mb_inv', L.cine(True), api.bars(0), sset('#hud', 0),
         f'scoreboard players operation #mbFloor mb = #fl5 {OBJ}', fn('core/stop_move'), fn('core/ground'),
         fn('core/seq/cs1')])
-    w('core/sq1/start', [
-        '# SQ1 tick 0 (CS1 ended, a reload in CS1 / SQ1, tests; @s = body): cine off, the bars back with the shield 5/5 under',
-        '# them, the A8 chain (#gk 1; its fail is lethal only with ULT60_LETHAL: #warn).',
-        L.cine(False), api.bars(1), sset('#hud', 1), fn('shield/arm'), sset('#ph', PH['sq1']), sset('#inv', 1),
-        sset('#gk', S.GK['a8']), sset('#warn', int(api.ULT60_LETHAL)), fn('core/looks'), fn('core/seq/sq1')])
+    w('core/lead60/start', [
+        '# lead60 tick 0 (CS1 ended, a reload in CS1 / lead60, tests; @s = body): cine off, the bars back with the shield 5/5',
+        '# under them, the A8 chain (#gk 1; its fail is lethal only with ULT60_LETHAL: #warn).',
+        L.cine(False), api.bars(1), sset('#hud', 1), fn('shield/arm'), sset('#ph', PH['lead60']), sset('#inv', 1),
+        sset('#gk', S.GK['a8']), sset('#warn', int(api.ULT60_LETHAL)), fn('core/looks'), fn('core/seq/lead60')])
     # the gauntlets
     for g in GAUNT:
         w(f'core/g/start/{g}', [
@@ -543,9 +543,9 @@ def phase_files(W, ctx):
     w('core/p2/from_fail', [f'# P2 after the A8 fail (T + {api.FAIL60_P2_T}; @s = body): her HP unchanged, no counter, no down window.']
       + p2 + [fn('ai/rec_start'), sset('#rec', 1)])
     # the lead-ins
-    for name, g, what in (('down', 'a13', 'lead_down (from the down window)'), ('a13', 'a13', 'lead_stand {g:"a13"} (P2 standing)'),
-                          ('a8', 'a8', 'lead_stand {g:"a8"} (an A8 restart)')):
-        sq = 'lead_down' if name == 'down' else 'lead_stand'
+    for name, g, what in (('down', 'a13', 'lead5 (the 5 % floor reached in the down window)'), ('a13', 'a13', 'lead5 (the 5 % floor reached in P2)'),
+                          ('re_a8', 'a8', 'lead_re {g:"a8"} (an A8 restart)'), ('re_a13', 'a13', 'lead_re {g:"a13"} (an A13 restart)')):
+        sq = 'lead_re' if name.startswith('re_') else 'lead5'
         w(f'core/lead/{name}', [
             f'# The {what} -> {g.upper()} (@s = body): invulnerable to CS4 (A13) / CS2 (A8); the shield off until the refill beat',
             '# (#sq_sig refill -> shield/arm); the warning banner belongs to the sequence (when #warn: the gauntlet\'s fail is lethal).',
@@ -553,16 +553,16 @@ def phase_files(W, ctx):
             sset('#ph', PH['lead']), sset('#gk', S.GK[g]), sset('#fl', 0), sset('#flw', 0), sset('#rvw', 0), sset('#kip', 0),
             sset('#inv', 1), 'tag @s add rlk_mb_inv', fn('shield/off'), L.cine(False),
             sset('#warn', int(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL)),
-            fn(f'core/seq/{sq}' + ('' if sq == 'lead_down' else f'_{g}'))])
+            fn(f'core/seq/{sq}' + ('' if sq == 'lead5' else f'_{g}'))])
     w('core/revive/start', [
         f'# The instant death was survived (Ronova\'s revive; @s = body): the darkness lifted, she stands {L.num(api.REVIVE["dist"])} b from',
-        f'# the player in her stance; {api.REVIVE["wait"]} t later lead_stand {{g:"a13"}} -> A13 again (shield 5/5, the banner).',
+        f'# the player in her stance; {api.REVIVE["wait"]} t later lead_re {{g:"a13"}} -> A13 again (shield 5/5, the banner).',
         fn('core/cancel_d'), sset('#pat', 0), sset('#ph', PH['lead']), sset('#gk', S.GK['a13']), sset('#sqn', 0), sset('#inv', 1),
         'tag @s add rlk_mb_inv', fn('shield/off'), *warn(0), *look_req('crimson'), fn('core/stop_move'), fn('core/place8'),
         api.rig('look/form/normal'), api.play('idle2'), sset('#rvw', api.REVIVE['wait'])])
-    w('core/revive/tick', ['# The revive stance (@s = body): she faces the player; lead_stand {g:"a13"} when the wait ran out.',
+    w('core/revive/tick', ['# The revive stance (@s = body): she faces the player; lead_re {g:"a13"} when the wait ran out.',
                            'function rlk:mboss/mv/turn {max:10}', f'scoreboard players remove #rvw {OBJ} 1',
-                           f'execute if score #rvw {OBJ} matches ..0 run {fn("core/lead/a13")}'])
+                           f'execute if score #rvw {OBJ} matches ..0 run {fn("core/lead/re_a13")}'])
 
 
 # ================================================================================================== sequences
@@ -572,14 +572,14 @@ def seq_runner(W, ctx):
     def start(name, args=None, sfx=''):
         return [f'# The sequence {name}{" " + str(args) if args else ""} from tick 0 (@s = body).',
                 sset('#sqn', S.SEQ_ID[name]), sset('#sq', 0), sset('#sqdone', 0), sset('#sq_sig', 0), seq(ctx, name, 'start', args)]
-    for name in ('cs1', 'sq1', 'lead_down', 'ending', 'event'):
+    for name in ('cs1', 'lead60', 'lead5', 'ending', 'event'):
         w(f'core/seq/{name}', start(name))
     w('core/seq/repel', [f'# The counter cinematic by the chain: repel {{at:{S.AT_OF["a8"]}}} (CS2) / {{at:{S.AT_OF["a13"]}}} (CS3).',
                          f'execute if score #gk {OBJ} matches {S.GK["a13"]} run return run {fn("core/seq/repel_5")}',
                          fn('core/seq/repel_60')])
     for g in GAUNT:
         w(f'core/seq/repel_{S.AT_OF[g]}', start('repel', {'at': S.AT_OF[g]}))
-        w(f'core/seq/lead_stand_{g}', start('lead_stand', {'g': f'"{g}"'}))
+        w(f'core/seq/lead_re_{g}', start('lead_re', {'g': f'"{g}"'}))
     tk = ['# A sequence tick of the fight state (@s = body): #sq + 1, seq/<name>/tick, its signal (#sq_sig, read right after the',
           '# tick), its end (#sqdone).', f'scoreboard players add #sq {OBJ} 1']
     for name in SEQ_FIGHT:
@@ -590,8 +590,8 @@ def seq_runner(W, ctx):
     w('core/seq/tick', tk)
     w('core/seq/end', ['# A fight-state sequence ended (@s = body): the next step of the chain.',
                        sset('#sqdone', 0),
-                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["cs1"]} run return run {fn("core/sq1/start")}',
-                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["sq1"]} run return run {fn("core/g/start/a8")}',
+                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["cs1"]} run return run {fn("core/lead60/start")}',
+                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead60"]} run return run {fn("core/g/start/a8")}',
                        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["repel"]} run return run {fn("core/repel/end")}',
                        f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/g/start/a8")}',
                        fn('core/g/start/a13')])
@@ -715,8 +715,8 @@ def hooks(W, ctx):
         if k not in GAUNT and ctx.pat_file(W, k, 'resume'):
             resume.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/resume")}')
     pause.append(f'execute if score #pat {OBJ} matches {min(TID[g] for g in GAUNT)}.. run {fn("core/g/pause")}')
-    resume += [f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/a8")}',
-               f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
+    resume += [f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/re_a8")}',
+               f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/re_a13")}',
                f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}',
                *grs_go(), *seq_hold('#grs'), sset('#grs', 0)]
@@ -754,7 +754,7 @@ def hooks(W, ctx):
             if g == 'a13':
                 fnow.append(f'execute if score #gk {OBJ} matches {S.GK[g]} run return run {fn("core/revive/start")}')
             else:
-                fnow += [f'execute if score #gk {OBJ} matches {S.GK[g]} run {fn("core/lead/a8")}',
+                fnow += [f'execute if score #gk {OBJ} matches {S.GK[g]} run {fn("core/lead/re_a8")}',
                          f'execute if score #gk {OBJ} matches {S.GK[g]} run {sset("#sq", -1)}']
         w('core/g/fail_now', fnow)
     # stop everything of the fight state
@@ -824,7 +824,7 @@ def hooks(W, ctx):
         f'execute if score #ph {OBJ} matches {PH["p2"]} if score #pat {OBJ} matches 1.. run {fn("core/cancel_pat")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]}.. run {fn("core/re/look")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]} run return run {fn("core/re/cs1")}',
-        f'execute if score #ph {OBJ} matches {PH["sq1"]} run return run {fn("core/re/sq1")}',
+        f'execute if score #ph {OBJ} matches {PH["lead60"]} run return run {fn("core/re/lead60")}',
         f'execute if score #ph {OBJ} matches {PH["a8"]} run return run {fn("core/re/g")}',
         f'execute if score #ph {OBJ} matches {PH["a13"]} run return run {fn("core/re/g")}',
         f'execute if score #ph {OBJ} matches {PH["cs2"]} run return run {fn("core/re/repel")}',
@@ -833,15 +833,15 @@ def hooks(W, ctx):
         f'execute if score #ph {OBJ} matches {PH["lead"]} run return run {fn("core/re/lead")}'])
     w('core/re/look', ['# After a reload from CS1 on: the crimson look requested again (a job cut by the reload is redone).']
       + look_req('crimson'))
-    w('core/re/cs1', ['# /reload in CS1: its end state = SQ1 tick 0 (crimson, phase p2, music 2, the bars shown).',
-                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/sq1/start'), sset('#sq', -1)])
-    w('core/re/sq1', ['# /reload in SQ1: SQ1 again from tick 0 (the crimson look first).', seq(ctx, 'sq1', 'cancel'), sset('#sqn', 0),
-                      fn('core/sq1/start'), sset('#sq', -1)])
+    w('core/re/cs1', ['# /reload in CS1: its end state = lead60 tick 0 (crimson, phase p2, music 2, the bars shown).',
+                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/lead60/start'), sset('#sq', -1)])
+    w('core/re/lead60', ['# /reload in lead60: lead60 again from tick 0 (the crimson look first).', seq(ctx, 'lead60', 'cancel'), sset('#sqn', 0),
+                         fn('core/lead60/start'), sset('#sq', -1)])
     w('core/re/g', ['# /reload in a gauntlet: as a pause (cancelled, the darkness lifted), then at once its restart (F1: or P2 after',
                     '# the judged A8 fail; a pending lethal fail lands now when the player is back and alive, else at the resume).',
                     fn('core/g/pause'),
-                    f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/a8")}',
-                    f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
+                    f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/re_a8")}',
+                    f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/re_a13")}',
                     f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                     f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', *grs_go(reload=True), *seq_hold('#grs'),
                     (f'execute unless score #grs {OBJ} matches 5 run {sset("#grs", 0)}' if any(LETHAL.values()) else sset('#grs', 0))])
@@ -860,10 +860,10 @@ def hooks(W, ctx):
     w('core/re/lead', ['# /reload in a lead-in / the revive stance: the lead-in again from 0 (the crimson look first), its clock held',
                        '# one tick (I1, s3-10).', fn('core/re/lead_go'), sset('#sq', -1)])
     w('core/re/lead_go', ['# /reload in a lead-in / the revive stance: which lead-in starts again.',
-                       f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/lead/a13")}',
-                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead_down"]} run return run {fn("core/lead/down")}',
-                       f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/lead/a8")}',
-                       fn('core/lead/a13')])
+                       f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/lead/re_a13")}',
+                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead5"]} run return run {fn("core/lead/a13")}',
+                       f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/lead/re_a8")}',
+                       fn('core/lead/re_a13')])
     # bars: the under bar
     w('bars', ['# Hook bars (@s = body, every tick in intro / fight while the bars are on): the under bar = the shield (electro, 5)',
                '# or the down timer (gold, 200); nothing while the module HUD is off (#hud 0: CS1). F2 (HR-29): the HP bar fills',
@@ -995,17 +995,15 @@ def stand_in_seqs(W, ctx):
         elif name == 'cs1':
             d[E('cs1', 'recolour')] = [api.rig('look/phase/p2')] + look_req('crimson')
             d[E('cs1', 'music')] = [music_to(2)]
-        elif name == 'sq1':
-            d[E('sq1', 'dark')] = look_req('dark')
+        elif name == 'lead60':
             if api.ULT60_LETHAL:
-                d[E('sq1', 'dark') + 1] = warn(1)
+                d[1] = warn(1)
         elif name == 'repel':
             for i, e in enumerate(api.COUNTER_EV):
                 d[E('repel', e)] = [sset('#sq_sig', api.SIG[f'hp{i + 1}'])]
-        elif name in ('lead_down', 'lead_stand'):
-            d[E(name, 'refill')] = [sset('#sq_sig', api.SIG['refill'])]
-            d[E(name, 'dark')] = look_req('dark')
-            d[E(name, 'brim')] = [S.gate(f'if score #warn {OBJ} matches 1', x) for x in warn(1)]
+        elif name in ('lead5', 'lead_re'):
+            # hr_design §3.3: the refill beat (gauge 5/5) + the warning banner while the gauntlet's fail is lethal (#warn)
+            d[E(name, 'refill')] = [sset('#sq_sig', api.SIG['refill'])] + [S.gate(f'if score #warn {OBJ} matches 1', x) for x in warn(1)]
         elif name == 'ending':
             d[E('ending', 'music')] = [api.music(3)]
         elif name == 'event':

@@ -8,4 +8,4 @@ scoreboard players set #sqn hr 1
 scoreboard players set #skip hr 0
 scoreboard players set #inv hr 1
 function rlk:mboss/bars_off
-function rlk:boss/scarlet/seq/intro/start
+function rlk:boss/scarlet/core/sq/intro/start
