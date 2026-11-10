@@ -569,6 +569,8 @@ scoreboard players set #mbPause mb 0
 scoreboard players set #mbNoLeash mb 0
 # hr FN-f: no fight starts with the module's bars-off flag (mboss/bars_off / bars_on; world skips mboss/bars while it is 1)
 scoreboard players set #mbBarOff mb 0
+# combat overhaul C: the framework draws the unparriable warning glint (np_glint) unless the module sets #mbNpOwn 1 at its spawn
+scoreboard players set #mbNpOwn mb 0
 execute store result score #mbId mb run data get storage rlk:mboss cur.n
 execute store result score #mbDmgMul mb run data get storage rlk:mboss cur.dmgMul
 execute store result score #mbGoldMul mb run data get storage rlk:mboss cur.goldMul
@@ -3469,6 +3471,8 @@ execute if score #mbSt mb matches 2 run return 0
 # parry never reduces a per-mille hit (only an avoided hit counts: #dodged 1)
 function rlk:mboss/hurt_ctx
 scoreboard players set #hcK tmp 3
+scoreboard players operation #hcND tmp = @s mbHzND
+scoreboard players operation #hcNP tmp = @s mbHzNP
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/def/judge
 execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_dodge
 scoreboard players set #mbShIn mb 0

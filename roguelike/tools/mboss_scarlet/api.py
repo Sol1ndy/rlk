@@ -141,6 +141,12 @@ KB_CHAIN, KB_FINAL, KB_SINGLE, KB_CUT = 0, 3, 2, 0    # chain hits / the last hi
 #   following the player until strike - LOCK_LEAD; pj_disc(hr, speed, life) = the moon disc (DISC, disc()).
 # Every hit Electro 1U, #hzQuiet 1, no floor decal (PLAN §1.4). The a8 / a13 / r1 / r2 / r3 entries are derived from the
 # scripts of section 3 by _script_hits (section 7): each cut lands on the move whose clip 'hit' meets its strike tick.
+# Combat overhaul C (11-10): the yellow-flagged attacks (her own yellow tell, video_notes 1.6: never parried in the original)
+# are unparriable (hz_opts / pj_opts noparry=1): A9 (dash line + the locked disc), A10 (the plunge) and the R2 moon disc
+# after the A7 tell. Her other hits follow the framework rule (all parryable: discs < 4.5 b, sectors / lines < 8 b, the
+# counting / ghost cuts). She draws her own yellow tells, so the framework glint is off for her (#mbNpOwn 1, core/setup).
+NOPARRY = ('a9', 'a10')
+NOPARRY_DISC = True
 HITS = {
     'a1': [('a1', 'hit', 'sector', (4.0, 80), 'T2', KB_SINGLE)],
     'a2': [('a2', 'hit', 'sector', (3.6, 70), 'T2', KB_SINGLE)],

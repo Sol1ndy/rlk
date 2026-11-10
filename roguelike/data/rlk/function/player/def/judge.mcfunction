@@ -17,6 +17,8 @@ scoreboard players set #hcND tmp 0
 scoreboard players set #parT tmp 0
 scoreboard players set #pdg tmp 0
 execute store result score #now cb run time query gametime
+# 시각 도장이 없는 플레이어(전투 개편 전 저장 · 시험 세계): 먼 과거로
+execute unless score @s parHit matches -2147483648.. run function rlk:player/def/reset
 # 1. 닷지가 아닌 무적(원소폭발 시전 · 로노바 부활 · 추락 뒤): 닷지로 못 피하는 공격은 무시
 execute if score #jND tmp matches 0 if score @s dashInvT matches 1.. run return run function rlk:player/def/inv
 # 2. 퍼펙트 닷지(모든 적)

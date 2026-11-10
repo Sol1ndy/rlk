@@ -68,6 +68,13 @@ scoreboard objectives add dgAt dummy
 scoreboard objectives add dgRw dummy
 # 전투 개편 C 의 전역 값(#now 이번 틱 gametime, #dgOpen 퍼펙트 닷지 창이 열림, #dgEnd · #dgKill, 섬광 간격)
 scoreboard objectives add cb dummy
+# 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
+scoreboard players set #hcK tmp 0
+scoreboard players set #hcC tmp 0
+scoreboard players set #hcNP tmp 0
+scoreboard players set #hcND tmp 0
+scoreboard players set #parT tmp 0
+scoreboard players set #pdg tmp 0
 scoreboard objectives add dashInvT dummy
 scoreboard objectives add dashMoveT dummy
 scoreboard objectives add dashPX dummy
@@ -776,8 +783,8 @@ scoreboard players set #skPtMax tmp 12
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180
 # 닷지(우클릭 · 옛 대쉬 이동): 재사용 대기(틱)의 기본값. 실제 값 #dashCoolT 는 각인(질주 2개: -#dashEngSpd %)에 따라 engravings/scan_more 가 계산
-scoreboard players set #dashCoolBase tmp 15
-scoreboard players set #dashCoolT tmp 15
+scoreboard players set #dashCoolBase tmp 12
+scoreboard players set #dashCoolT tmp 12
 # 닷지 창(누른 틱 = 0): #dgPW 틱 미만에 맞을 공격 = 퍼펙트 닷지(모든 적), #dgLW 틱 미만 = 일반 몹(#dgLooseC: 0 일반만, 1 정예까지)만 회피
 scoreboard players set #dgPW tmp 3
 scoreboard players set #dgLW tmp 7

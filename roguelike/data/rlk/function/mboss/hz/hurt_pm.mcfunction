@@ -14,6 +14,8 @@ execute if score #mbSt mb matches 2 run return 0
 # parry never reduces a per-mille hit (only an avoided hit counts: #dodged 1)
 function rlk:mboss/hurt_ctx
 scoreboard players set #hcK tmp 3
+scoreboard players operation #hcND tmp = @s mbHzND
+scoreboard players operation #hcNP tmp = @s mbHzNP
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/def/judge
 execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_dodge
 scoreboard players set #mbShIn mb 0

@@ -147,8 +147,9 @@ def build(W, ctx):
         '# framework\'s start_go show guarded by it, CS0 never shows a bar; core/intro/begin repeats it, intro/done ends it).',
         f'execute positioned {api.xyz(seat)} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
         at_body(fn('core/setup')), api.bars(0)] + [sset(k, 0) for k in api.EV_FP])
-    w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props.',
-                     fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
+    w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props;',
+                     '# she draws her own yellow warning tells: the framework\'s unparriable glint is off (#mbNpOwn mb 1, combat overhaul C).',
+                     'scoreboard players set #mbNpOwn mb 1', fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
                      fn('core/deco'), 'data modify storage rlk:mboss sub set value []'])
     w('core/looks', ['# The rig looks the module owns (form, phase, blade, state) for the current phase (@s = body; reload, tests).',
                      api.rig('look/form/normal'),

@@ -12,6 +12,7 @@ execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] run function rlk:boss/
 scoreboard players set #pjEl mb 3
 scoreboard players set #pjWall mb 1
 scoreboard players set #pjShape mb 1
+scoreboard players set #pjNoParry mb 1
 $scoreboard players set #pjKB mb $(kb)
 execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] at @s rotated as @s run function rlk:mboss/pj/launch {spd:17,life:16,dmg:42,hr:14}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] run function rlk:boss/scarlet/fx/prop/disc

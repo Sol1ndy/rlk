@@ -5,8 +5,8 @@
 tag @e[tag=rlk_hc_atk] remove rlk_hc_atk
 execute if entity @s[tag=rlk_rd_hazard] run return run function rlk:player/def/ctx_rd
 scoreboard players set #hcC tmp 0
-execute if score #hcK tmp matches 0 if entity @s[tag=rlk_cmb] run scoreboard players set #hcK tmp 1
-execute if score #hcK tmp matches 0 run scoreboard players set #hcK tmp 2
+execute unless score #hcK tmp matches 1.. if entity @s[tag=rlk_cmb] run scoreboard players set #hcK tmp 1
+execute unless score #hcK tmp matches 1.. run scoreboard players set #hcK tmp 2
 execute if entity @s[tag=rlk_cmb] run tag @s add rlk_hc_atk
 execute unless entity @s[tag=rlk_cmb] if score @s cmId matches 1.. run function rlk:player/def/ctx_owner
 execute if entity @e[tag=rlk_hc_atk,tag=rlk_c2e,limit=1] run scoreboard players set #hcC tmp 1

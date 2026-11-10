@@ -251,7 +251,7 @@ def disc_files(W):
         f'minecraft:item_display ~ ~ ~ {nbt}',
         f'execute as {new} at @s facing entity {S.LOCK_M} feet rotated ~ 0 run tp @s ~ ~ ~ ~ ~',
         f'execute as {new} run {fn("g/disc/tag")}']
-    lines += L.pj_opts(el=api.ELEC, wall=1, shape=D['shape'])
+    lines += L.pj_opts(el=api.ELEC, wall=1, shape=D['shape'], noparry=1 if api.NOPARRY_DISC else None)
     lines += ['$scoreboard players set #pjKB mb $(kb)',
               f'execute as {new} at @s rotated as @s run {L.pj_launch(D["speed"], D["life"], api.DMG[D["tier"]], D["hr"])}']
     if kit:

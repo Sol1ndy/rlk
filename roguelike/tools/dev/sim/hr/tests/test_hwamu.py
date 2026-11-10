@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """test_hwamu.py: the mythic item 「[ MYTHIC ] 화무십일홍」 (sword_hwamu), stage SR (scratchpad hr/PLAN.md §7.4, §7.6;
 contract §1 SR row, §3.7). Hand-maintained files only (no generator). The item's functions, char/dmg_calc, combat/apply
-(azsim: element reactions, level factor, the kill path), player/take_damage, player/dash_iframe, the tune engine
+(azsim: element reactions, level factor, the kill path), player/take_damage, player/def/judge, the tune engine
 (items/tune/apply -> fac -> apply_loop, disp_build -> fmt) and the tooltip builder (items/build_display -> build_lore)
 run for real from the datapack in the vendored sims (HR/tests/lib, read only) through SR's helpers HR/sr/srsim.py.
 
@@ -19,9 +19,9 @@ run for real from the datapack in the vendored sims (HR/tests/lib, read only) th
   stacks   4 hits -> 1 stack, max 5, refresh on every gain, all drop after exactly #hwStkDur ticks, ATK % per stack,
            sidebar, the cues
   cost     HP cost 4 % of current above 50 %, none at <= 50 %, never below 1
-  counter  on a landed hit (queued, never inside take_damage) and on dash_iframe, 2-s cooldown, nearest rlk_mob <= 12 b,
-           no target = no cooldown, damage = atk x coef, Electro 1U, #sub itv 1; F3 (HR-09): a dodge counts only inside a
-           real dash's own i-frames (items/hook/on_dash -> hw_dash, the dash tick + 6), never burst / fall / revive i-frames,
+  counter  on a landed hit (queued, never inside take_damage) and on a dodge / perfect parry (combat overhaul C:
+           player/def/judge's pd / loose / par3), 2-s cooldown, nearest rlk_mob <= 12 b, no target = no cooldown, damage =
+           atk x coef, Electro 1U, #sub itv 1; F3 (HR-09): never on burst / fall / revive i-frames (dashInvT, player/def/inv),
            a landed (killing) hit still queues; F3 (HR-39): an invulnerable body (rlk_mb_inv) is no target (no counter, no
            cooldown; the nearest other mob instead)
   low      crit dmg + only at HP <= 60 % (exact integer threshold)
@@ -146,12 +146,16 @@ def burst(s, pl):
 
 
 def dash(s, pl):
-    """A real dash's item hook (player/dash_go's last line: items/hook/on_dash, @s = the player, at @s); the other items'
-    lines of the hook see no item (their scores 0)."""
+    """A dodge (combat overhaul C): the stamp player/def/dodge_stamp writes (dgAt = now; no i-frames any more) and the item
+    hook of player/dash_go (items/hook/on_dash; the other items' lines see no item, their scores 0)."""
     P = ('e', pl.id)
     for o in ('it_sword_kirion', 'it_pain_despair', 'it_kinetic_scale', 'it_crane_feather'):
         if s.sc(P, o) is None:
             s.setsc(P, o, 0)
+    for o in ('parAt', 'parLk', 'parHit', 'dgRw'):
+        if s.sc(P, o) is None:
+            s.setsc(P, o, -1000000)
+    s.setsc(P, 'dgAt', now(s))
     s.call('rlk:items/hook/on_dash', S.pctx(s, pl))
 
 
@@ -177,8 +181,10 @@ def t_static():
     reg = S.snbt_parse(body[0].split(' set value ', 1)[1])
     if has(PLAN, 'def = PLAN §7.4.4'):
         blk = plan_block('data modify storage rlk:items registry.sword_hwamu set value', 'data modify storage rlk:items ids append')
-        plan_v = S.snbt_parse((blk[0] + ''.join(l[1:] if l.startswith(' ') else l for l in blk[1:])).split(' set value ', 1)[1])
-        ck('def = PLAN §7.4.4 (whole registry value)', reg == plan_v)
+        plan_txt = (blk[0] + ''.join(l[1:] if l.startswith(' ') else l for l in blk[1:])).split(' set value ', 1)[1]
+        # combat overhaul C (11-10): the dash became the dodge / parry; the lore line says so (the only change to PLAN's value)
+        plan_v = S.snbt_parse(plan_txt.replace('공격을 받거나 대쉬로 흘려내면', '공격을 받거나 닷지 · 패링으로 흘려내면'))
+        ck('def = PLAN §7.4.4 (whole registry value; 대쉬 -> 닷지 · 패링, combat overhaul C)', reg == plan_v)
     ck('def: vanilla item = api.ITEM_VANILLA', reg['item'] == API.ITEM_VANILLA, reg['item'])
     ck('def: model = api.ITEM_MODEL', reg['model'] == API.ITEM_MODEL, reg['model'])
     ck('def: name = api.ITEM_NAME', reg['name'] == API.ITEM_NAME)
@@ -238,9 +244,13 @@ def t_static():
                                    'execute unless score @s it_sword_hwamu matches 1.. if score #hwOn itv matches 1 run function rlk:items/proc/hw_clear'],
         'items/hook/on_cast_burst': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwSlCd itv matches 1.. run function rlk:items/proc/hw_slash_q'],
         'player/take_damage': ['execute if score @s it_sword_hwamu matches 1.. if score #hurtDmg tmp matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
-        'player/dash_iframe': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
-        # F3 (HR-09): the dash's own i-frame window; F3 (HR-10): the per-run reset
-        'items/hook/on_dash': ['execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_dash'],
+        # combat overhaul C (11-10): a dodge (perfect / loose) or a perfect parry flows the hit off (player/def/judge's branches);
+        # the dash's own i-frame window (hw_dash) is gone with the dash; F3 (HR-10): the per-run reset
+        'player/def/pd': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
+        'player/def/loose': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
+        'player/def/par3': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
+        'player/def/inv': [],
+        'items/hook/on_dash': [],
         'player/reset_one': ['function rlk:items/proc/hw_reset'],
     }
     for rel, ls in want.items():
@@ -248,9 +258,9 @@ def t_static():
         ck(f'hook {rel}: exactly the PLAN §7.4.6 line(s)', got == ls, got)
     td = lines('player/take_damage')
     ck('take_damage: after the lion line (:37)', td[-1] == want['player/take_damage'][0] and 'lion_queue' in td[-2])
-    di = rd('player/dash_iframe').split('\n')
-    ck('dash_iframe: right after :2 (#dodged 1)', di[1] == 'scoreboard players set #dodged tmp 1' and di[3] == want['player/dash_iframe'][0])
-    ck('dash_iframe: still sets #dodged first', di.index('scoreboard players set #dodged tmp 1') < di.index(want['player/dash_iframe'][0]))
+    for rel in ('player/def/pd', 'player/def/loose', 'player/def/par3'):
+        di = lines(rel)
+        ck(f'{rel}: sets #dodged 1 before the counter line', di.index('scoreboard players set #dodged tmp 1') < di.index(want[rel][0]))
     # sounds
     sid = set((DP / 'tools/dev/sim/rd/tests/sound_ids.txt').read_text(encoding='utf-8').split())
     recipes = {422: ('block.amethyst_block.chime', '0.45', '1.3'), 423: ('block.cherry_leaves.break', '0.4', '1.2'),
@@ -281,7 +291,7 @@ def t_static():
         added += [(p.name, l) for l in p.read_text(encoding='utf-8').split('\n')]
     for rel in ('items/register', 'items/build_rarbuckets', 'items/tune/b10', 'items/hook/on_hit', 'items/hook/stat_buffs',
                 'items/hook/tick_player', 'items/hook/on_cast_burst', 'items/enh_add', 'player/take_damage',
-                'player/dash_iframe', 'codex/labels', 'items/hook/on_dash', 'player/reset_one'):
+                'player/def/pd', 'player/def/loose', 'player/def/par3', 'codex/labels', 'items/hook/on_dash', 'player/reset_one'):
         added += [(rel, l) for l in rd(rel).split('\n') if 'hw' in l or 'sword_hwamu' in l]
     neg = [(f, l) for f, l in added if re.search(r'scoreboard players (add|remove) \S+ \S+ -', l)]
     ck('no negative literal in scoreboard players add/remove', not neg, neg)
@@ -522,26 +532,28 @@ def t_counter():
     n0 = len(s.log)
     tick(s, pl)
     ck('counter again after the cooldown', len(applies(s, n0)) == 1)
-    # dash i-frames eat a hit -> counter, no HP lost (a real dash: items/hook/on_dash, 3 ticks before)
+    # a dodge eats a hit -> counter, no HP lost (a dodge 3 ticks before: the loose window of a normal mob)
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
     m = S.mob(s, (6.5, 64.0, 0.5))
     hp0 = s.sc(('e', pl.id), 'curHealth')
     dash(s, pl)
     s.t += 3
-    inside = hurt(s, pl, dash=3)
-    ck('dash i-frames: hit dodged (no HP lost), counter queued', inside == [] and s.sc(('e', pl.id), 'curHealth') == hp0
+    inside = hurt(s, pl)
+    ck('a dodge (3 t before, normal mob): hit dodged (no HP lost), counter queued', inside == [] and s.sc(('e', pl.id), 'curHealth') == hp0
        and s.sc('#hwCtrQ', 'itv') == 1 and s.sc('#dodged', 'tmp') == 1)
     n0 = len(s.log)
     tick(s, pl)
-    ck('dash counter next tick', [x[2]['target'] for x in applies(s, n0)] == [m.id])
-    # the framework hazard path (mboss/hz/hurt_pm calls player/dash_iframe directly), inside a dash
+    ck('dodge counter next tick', [x[2]['target'] for x in applies(s, n0)] == [m.id])
+    # the framework hazard path (mboss/hz/hurt_pm calls player/def/judge directly, boss class), a perfect dodge
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
     S.mob(s, (6.5, 64.0, 0.5))
     dash(s, pl)
-    s.call('rlk:player/dash_iframe', S.pctx(s, pl))
-    ck('dash_iframe alone (hazard dodge) queues the counter', s.sc('#hwCtrQ', 'itv') == 1)
+    s.setsc('#hcC', 'tmp', 2)
+    s.setsc('#dodged', 'tmp', 0)
+    s.call('rlk:player/def/judge', S.pctx(s, pl))
+    ck('the judge alone (a hazard, perfect dodge) queues the counter', s.sc('#hwCtrQ', 'itv') == 1 and s.sc('#dodged', 'tmp') == 1)
     # no target within 12 b: no damage, no cooldown, queue cleared
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
@@ -581,14 +593,15 @@ def t_counter():
     ap = applies(s, n0)
     cd1 = (b10('#hwCtrCdT') * 1200 + 500) // 1000        # ★☆☆: the c factor 1.2 (F:items/tune/register), S5: 96 t
     ck(f'★☆☆: 92 % and cooldown {cd1} t', ap and ap[0][2]['dmgBase'] == 92 and s.sc('#hwCtrEnd', 'itv') == now(s) + cd1)
-    # F3 (HR-09): only a real dash's own i-frames count as a dodge; burst / fall / revive i-frames reuse dashInvT
+    # F3 (HR-09) under combat overhaul C: a dodge (perfect 0-2 t, loose 3-6 t vs a normal mob) counts; burst / fall / revive
+    # i-frames (dashInvT) never do, and they take the hit first (player/def/judge: i-frames > dodge)
     for label, inv, dash_ago, rn, want in (
-            ('burst wind-up i-frames (dashInvT 24, no dash)', 24, None, 0, False),
-            ('void-fall i-frames (dashInvT 20, no dash)', 20, None, 0, False),
-            ('downed Ronova (rnDie 60, dashInvT 80, no dash)', 80, None, 60, False),
-            ('a dash 6 ticks ago (its last i-frame tick), burst i-frames on', 24, 6, 0, True),
-            ('a dash 7 ticks ago (its i-frames over), burst i-frames on', 24, 7, 0, False),
-            ('a dash this tick', 6, 0, 0, True)):
+            ('burst wind-up i-frames (dashInvT 24, no dodge)', 24, None, 0, False),
+            ('void-fall i-frames (dashInvT 20, no dodge)', 20, None, 0, False),
+            ('downed Ronova (rnDie 60, dashInvT 80, no dodge)', 80, None, 60, False),
+            ('a dodge 6 ticks ago (the last loose tick)', 0, 6, 0, True),
+            ('a dodge 1 tick ago (perfect)', 0, 1, 0, True),
+            ('a dodge this tick, burst i-frames on (the i-frames take it)', 24, 0, 0, False)):
         s, pl = S.world(DP, hp=2000)
         S.set_star(s, 3)
         S.mob(s, (4.5, 64.0, 0.5))
@@ -607,13 +620,15 @@ def t_counter():
            s.sc(P, 'curHealth') == hp0 and (q == 1 and len(got) == 1 if want
                                             else q == 0 and not got and (s.sc('#hwCtrCd', 'itv') or 0) == 0),
            (q, len(got), s.sc('#hwCtrCd', 'itv')))
-    # the hazard path (mboss/hz/hurt_pm -> player/dash_iframe) under burst i-frames, no dash: no counter
+    # the hazard path (mboss/hz/hurt_pm -> player/def/judge) under burst i-frames, no dodge: no counter
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
     S.mob(s, (6.5, 64.0, 0.5))
     s.setsc(('e', pl.id), 'dashInvT', 24)
-    s.call('rlk:player/dash_iframe', S.pctx(s, pl))
-    ck('HR-09 hazard dodge under burst i-frames (no dash): no queue', (s.sc('#hwCtrQ', 'itv') or 0) == 0)
+    s.setsc('#dodged', 'tmp', 0)
+    s.call('rlk:player/def/judge', S.pctx(s, pl))
+    ck('HR-09 hazard dodge under burst i-frames (no dodge): avoided, no queue', s.sc('#dodged', 'tmp') == 1
+       and (s.sc('#hwCtrQ', 'itv') or 0) == 0)
     # a landed hit while downed (the killing blow that downed Ronova, rnDie set by then): still queues (as designed)
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)

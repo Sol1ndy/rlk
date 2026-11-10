@@ -180,10 +180,11 @@ def hz_tag(key):
             f'function {NS}core/hz_tag/{key}')
 
 
-def hz_opts(kb, grp=False, act=None):
+def hz_opts(kb, grp=False, act=None, noparry=None):
     """The one-shot options of every hazard of 홍련: quiet (#hzQuiet 1, no framework outline or flash: no floor decal of
-    any kind, PLAN §1.4), no framework sound (the kit / stand-in sounds are the pattern's), Electro (el 3), knockback."""
-    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.ELEC, act=act)
+    any kind, PLAN §1.4), no framework sound (the kit / stand-in sounds are the pattern's), Electro (el 3), knockback;
+    noparry=1 for the yellow-flagged attacks (api.NOPARRY, combat overhaul C)."""
+    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.ELEC, act=act, noparry=noparry)
 
 
 def hazard(key, hit, grp=False, tell=1, pos=None, dims=None):
@@ -193,7 +194,7 @@ def hazard(key, hit, grp=False, tell=1, pos=None, dims=None):
     dims = dims or hdims
     if shape == 'pdisc':
         shape = 'disc'
-    out = hz_opts(kb, grp=grp)
+    out = hz_opts(kb, grp=grp, noparry=1 if key in api.NOPARRY else None)
     call = SHAPE_FN[shape](*dims, tell, api.DMG[tier])
     where = pos or f'{AT_BODY} positioned ~ {CY} ~'
     out.append(f'execute {where} run {call}')
