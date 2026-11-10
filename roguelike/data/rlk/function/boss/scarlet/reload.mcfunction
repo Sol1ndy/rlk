@@ -15,7 +15,7 @@ execute if score #ph hr matches 1 if score #pat hr matches 1.. run function rlk:
 execute if score #ph hr matches 7 if score #pat hr matches 1.. run function rlk:boss/scarlet/core/cancel_pat
 execute if score #ph hr matches 2.. run function rlk:boss/scarlet/core/re/look
 execute if score #ph hr matches 2 run return run function rlk:boss/scarlet/core/re/cs1
-execute if score #ph hr matches 3 run return run function rlk:boss/scarlet/core/re/sq1
+execute if score #ph hr matches 3 run return run function rlk:boss/scarlet/core/re/lead60
 execute if score #ph hr matches 4 run return run function rlk:boss/scarlet/core/re/g
 execute if score #ph hr matches 9 run return run function rlk:boss/scarlet/core/re/g
 execute if score #ph hr matches 5 run return run function rlk:boss/scarlet/core/re/repel

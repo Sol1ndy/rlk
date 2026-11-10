@@ -1,4 +1,4 @@
-function rlk:boss/scarlet/seq/intro/cancel
+function rlk:boss/scarlet/core/sq/intro/cancel
 function rlk:boss/scarlet/core/skip_clear
 scoreboard players set #rp hr 0
 scoreboard players set #sqn hr 0

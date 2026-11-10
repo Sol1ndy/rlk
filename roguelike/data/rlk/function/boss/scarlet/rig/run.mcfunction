@@ -1,3 +1,3 @@
 # Current clip -> its runner. @s = rig anchor.
-execute if score @s hrRigC matches ..22 run return run function rlk:boss/scarlet/rig/d/0_22
-function rlk:boss/scarlet/rig/d/23_46
+execute if score @s hrRigC matches ..28 run return run function rlk:boss/scarlet/rig/d/0_28
+function rlk:boss/scarlet/rig/d/29_58

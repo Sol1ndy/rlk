@@ -1,4 +1,4 @@
-# The lead_down (from the down window) -> A13 (@s = body): invulnerable to CS4 (A13) / CS2 (A8); the shield off until the refill beat
+# The lead5 (the 5 % floor reached in the down window) -> A13 (@s = body): invulnerable to CS4 (A13) / CS2 (A8); the shield off until the refill beat
 # (#sq_sig refill -> shield/arm); the warning banner belongs to the sequence (when #warn: the gauntlet's fail is lethal).
 function rlk:boss/scarlet/core/cancel_d
 kill @e[tag=rlk_hr_p]
@@ -16,4 +16,4 @@ tag @s add rlk_mb_inv
 function rlk:boss/scarlet/shield/off
 function rlk:mboss/cine/end
 scoreboard players set #warn hr 1
-function rlk:boss/scarlet/core/seq/lead_down
+function rlk:boss/scarlet/core/seq/lead5

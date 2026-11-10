@@ -3,14 +3,14 @@
 # them again) and storage core.* / seq.*. Never the event scores (api.EV_FP, saved around `reset *`) nor ev.*: the
 # reward hook reads them after this.
 function rlk:boss/scarlet/core/stop_all
-function rlk:boss/scarlet/seq/intro/cancel
-function rlk:boss/scarlet/seq/cs1/cancel
-function rlk:boss/scarlet/seq/sq1/cancel
-function rlk:boss/scarlet/seq/repel/cancel
-function rlk:boss/scarlet/seq/lead_down/cancel
-function rlk:boss/scarlet/seq/lead_stand/cancel
-function rlk:boss/scarlet/seq/ending/cancel
-function rlk:boss/scarlet/seq/event/cancel
+function rlk:boss/scarlet/core/sq/intro/cancel
+function rlk:boss/scarlet/core/sq/cs1/cancel
+function rlk:boss/scarlet/core/sq/lead60/cancel
+function rlk:boss/scarlet/core/sq/repel/cancel
+function rlk:boss/scarlet/core/sq/lead5/cancel
+function rlk:boss/scarlet/core/sq/lead_re/cancel
+function rlk:boss/scarlet/core/sq/ending/cancel
+function rlk:boss/scarlet/core/sq/event/cancel
 function rlk:boss/scarlet/fx/clear
 function rlk:boss/scarlet/fx/hud/clear
 function rlk:boss/scarlet/fx/hud/warn {on:0}

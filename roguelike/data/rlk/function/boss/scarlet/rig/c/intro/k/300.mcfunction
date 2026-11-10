@@ -1,5 +1,0 @@
-data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:52,transformation:{translation:[0.13539f,0.87167f,0.24425f],left_rotation:[-0.84891f,0.148f,-0.3174f,-0.39585f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:52,transformation:{translation:[0.13539f,0.87167f,0.24425f],left_rotation:[-0.84891f,0.148f,-0.3174f,-0.39585f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.25467f,0.92733f,0.17918f],left_rotation:[-0.80665f,0.1177f,0.23877f,0.52768f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.25467f,0.92733f,0.17918f],left_rotation:[-0.80665f,0.1177f,0.23877f,0.52768f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-scoreboard players set @s hrRigSc 0

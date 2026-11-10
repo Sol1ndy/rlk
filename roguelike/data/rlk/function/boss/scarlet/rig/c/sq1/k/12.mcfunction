@@ -1,9 +1,0 @@
-data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.35041f,1.30676f,0.00771f],left_rotation:[-0.79909f,-0.48596f,-0.04319f,0.35133f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.55216f,1.37697f,0.13758f],left_rotation:[-0.72386f,-0.22307f,-0.43389f,-0.48786f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000015 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.10173f,1.36863f,-0.38217f],left_rotation:[-0.74336f,-0.04424f,-0.03571f,0.66648f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.10173f,1.36863f,-0.38217f],left_rotation:[-0.99816f,-0.00791f,-0.0563f,-0.02117f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:16,transformation:{translation:[0.24312f,0.8966f,0.28973f],left_rotation:[-0.77106f,0.22514f,-0.37614f,-0.46185f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:16,transformation:{translation:[0.24312f,0.8966f,0.28973f],left_rotation:[-0.77106f,0.22514f,-0.37614f,-0.46185f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:48,transformation:{translation:[-0.25f,0.87715f,0.18f],left_rotation:[-0.81435f,0.13794f,0.21567f,0.52085f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-function rlk:boss/scarlet/rig/m/forearm_r/grip
-scoreboard players set @s hrRigHat 2
