@@ -308,7 +308,7 @@ def dealt(s, target, elem, dmg=1000):
     hit_ctx(s, pl, dmg, elem)
     s.setsc(('e', b.id), 'mhpC', 10 ** 7)
     s.setsc(('e', b.id), 'mhpM', 10 ** 7)
-    for o in ('elAct', 'aFire', 'aWater', 'aThunder', 'aIce', 'aGrass', 'aVoid', 'scT', 'mirEnd', 'aurEnd'):
+    for o in ('elAct', 'aFire', 'aWater', 'aThunder', 'aIce', 'aGrass', 'aVoid', 'scT', 'mirEnd'):
         s.setsc(('e', b.id), o, 0)
     h0 = M.esc(s, b, 'mhpC')
     s.call('rlk:combat/apply', Ctx(target, tuple(target.pos), (0, 0)))
@@ -458,15 +458,15 @@ check('10c ... so arDir lands on the body only', (M.esc(s, b, 'arDir') or 0) > s
       (M.esc(s, b, 'arDir'), [M.esc(s, e, 'arDir') for e in (core, tail)]))
 for e in s.ents:
     e.tags.discard('rlk_hit')
-for o, v in (('scT', 240), ('rnNoE', 200), ('mirEnd', s.t + 400), ('aurEnd', s.t + 300)):
+for o, v in (('scT', 240), ('rnNoE', 200), ('mirEnd', s.t + 400)):
     s.setsc(('e', b.id), o, 0)
     s.setsc(('e', core.id), o, v)
 s.setsc(('e', b.id), 'elAct', 0)
 M.run(s, 1)
-check('10d px/db: superconduct / echo window / mirror / aura on a proxy move to the body (the proxy drops them), elAct 1',
-      all((M.esc(s, b, o) or 0) >= v - 2 for o, v in (('scT', 240), ('rnNoE', 200), ('mirEnd', 1), ('aurEnd', 1)))
-      and all((M.esc(s, core, o) or 0) == 0 for o in ('scT', 'rnNoE', 'mirEnd', 'aurEnd')) and M.esc(s, b, 'elAct') == 1,
-      [(o, M.esc(s, b, o), M.esc(s, core, o)) for o in ('scT', 'rnNoE', 'mirEnd', 'aurEnd')])
+check('10d px/db: superconduct / echo window / mirror on a proxy move to the body (the proxy drops them), elAct 1',
+      all((M.esc(s, b, o) or 0) >= v - 2 for o, v in (('scT', 240), ('rnNoE', 200), ('mirEnd', 1)))
+      and all((M.esc(s, core, o) or 0) == 0 for o in ('scT', 'rnNoE', 'mirEnd')) and M.esc(s, b, 'elAct') == 1,
+      [(o, M.esc(s, b, o), M.esc(s, core, o)) for o in ('scT', 'rnNoE', 'mirEnd')])
 lines = (FN / 'char/ronova/na_aim_hit.mcfunction').read_text(encoding='utf-8').split('\n')
 s.setsc('#rnAimTg', 'tmp', 0)
 for line in lines[1:3]:

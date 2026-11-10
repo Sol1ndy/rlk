@@ -1,6 +1,6 @@
 # 로비 시스템 매 틱 (루트 tick 의 맨 끝)
 # 방 짓기: 판 번호(built)가 다르면 다시 짓는다 (청크가 불러와졌을 때)
-execute unless data storage rlk:lobby {built:11} in minecraft:overworld if loaded 80 192 14 if loaded 106 192 36 if loaded 134 192 16 if loaded 134 192 64 if loaded 92 192 50 run function rlk:lobby/build
+execute unless data storage rlk:lobby {built:12} in minecraft:overworld if loaded 80 192 14 if loaded 106 192 36 if loaded 134 192 16 if loaded 134 192 64 if loaded 92 192 50 run function rlk:lobby/build
 # 접속 처리
 execute as @a[tag=!rlk_seen] run function rlk:lobby/first
 execute as @a[scores={rlkLeave=1..}] run function rlk:lobby/rejoin

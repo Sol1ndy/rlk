@@ -7,7 +7,6 @@ scoreboard players operation @s dashInvT = @s buT
 scoreboard players operation @s dashInvT += #burstInv tmp
 scoreboard players set @s dashMoveT 0
 scoreboard players set @s stepT 0
-execute if score @s bowT matches 1.. run function rlk:char/bow/cancel
 # 이동 속도 -100%: 1인칭에서는 제자리에 서고, 시야가 좁아져 화면이 확대된다. 점프·넉백도 막는다
 attribute @s minecraft:movement_speed modifier remove rlk:burst_cast
 attribute @s minecraft:movement_speed modifier add rlk:burst_cast -1 add_multiplied_total

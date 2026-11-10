@@ -9,3 +9,5 @@ function rlk:player/inv/frame
 function rlk:player/inv/place_items
 # 4) 핫바 3~8번 · 커서에 잘못 놓인 아이템 청소
 function rlk:player/inv/sweep_stray
+# 바로 뒤의 items/equip_scan 에: 실물이 order 대로 놓였음(빠른 스캔을 써도 됨, items/scan_fast)
+scoreboard players set #scM tmp 1

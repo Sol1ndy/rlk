@@ -36,8 +36,6 @@ execute if score #srcN itv matches 3.. run scoreboard players operation @s cryoB
 execute if score #srcN itv matches 3.. run scoreboard players operation @s geoBonus += #srcDmg tmp
 execute if score #srcN itv matches 3.. run scoreboard players operation @s anemoBonus += #srcDmg tmp
 execute if score #srcN itv matches 3.. run scoreboard players operation @s dendroBonus += #srcDmg tmp
-# 요이미야 고유 특성 소매불 백경도: 스택당 불 원소 피해 보너스
-execute if score #charN tmp matches 2 if score @s yoiP matches 1.. run function rlk:char/yoimiya/passive_stat
 # 클로린드 고유 특성: 생명의 계약이 변할 때마다 치명타 확률
 execute if score #charN tmp matches 4 if score @s clP matches 1.. run function rlk:char/clorinde/passive_stat
 # 아를레키노: 붉은 죽음의 가면 중 불 원소 피해 보너스

@@ -5,7 +5,6 @@ scoreboard players set #inAct view 0
 scoreboard players set #lk view 0
 execute if score @s vAimT matches 1.. run scoreboard players set #lk view 1
 execute if score @s buT matches 1.. run scoreboard players set #lk view 1
-execute if score @s bowT matches 1.. run scoreboard players set #lk view 1
 execute if score @s nvA matches 1.. run scoreboard players set #lk view 1
 execute if score @s clAuto matches 1 run scoreboard players set #lk view 1
 execute if score @s arSk matches 1.. run scoreboard players set #lk view 1
@@ -74,8 +73,6 @@ scoreboard players operation #sp view *= @s moveSpeed
 scoreboard players operation #sp view /= #100 tmp
 execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
 execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
-execute if score @s bowT matches 1.. run scoreboard players operation #sp view *= #bowSlow tmp
-execute if score @s bowT matches 1.. run scoreboard players operation #sp view /= #100 tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view *= #skDashSpd tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view /= #100 tmp
 # 평타를 휘두르는 동안(swHold, player/swing/tick): 걷는 속도 × #swSlow%(50). 걷던 속도에서 바로 줄어들고(매 틱 속도를 새로 정함),

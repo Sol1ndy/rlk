@@ -16,7 +16,6 @@ execute if score @s it_hourglass_shard matches 1.. run function rlk:items/proc/h
 execute if score cycle engN matches 2.. run function rlk:engravings/cycle/cd
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 execute if score #charN tmp matches 1 run function rlk:char/lumine/skill
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/skill
 execute if score #charN tmp matches 5 run function rlk:char/arlecchino/skill
 # 아이템: 원소전투 스킬을 썼을 때
 function rlk:items/hook/on_cast_skill

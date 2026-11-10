@@ -171,7 +171,7 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 | `test_kit.py` | `<dp> [<rp>]` | 효과 도구: 계약의 이름 · 인자, 모듈이 부르는 모든 킷 호출(합친 트리면 그 트리의 모듈, 킷만 있는 트리면 `wip/hr-s4` · `wip/hr-s2b` 를 임시로 빌드), 카드 엔진 · 풀, 프리셋 높이(I2: 플레이어 크기 몸의 부르는 높이, S2d 요청 s2d-3) · 수명 · 색, 소품(앉는 돌 위의 병 · 잔 0.19칸 위 이상, 달무리 `p1b` / `p2b` 의 밝기 비 포함), `leaves_dark` 의 음수 `n`(뒤쪽 잎: `{n:20}` + `{n:-20}` = 40장), 정리 · 제거, 바닐라 소리, HUD, RP 를 주면 그림 · 아틀라스 · 글꼴; F-I: 보기(`view`) 카메라는 S2d 몸의 가슴(모듈 기본 효과 높이 1.0칸)을 봄, A1 부채의 F5 바닥값 165 px(S2d 의 작은 부채), 롤 90 쐐기 변형의 길이 × 0.78; V2(HR-48): A1 의 효과(부채 · 초승달)는 7틱 중 3틱 이상에서 두 시점 모두 1 500 px(부채의 F5 는 250 px), 다른 효과는 최댓값; (HR-52) 앉는 돌의 병 · 잔은 틱마다 도는 `e/anim` 밖(10틱마다 `e/stay_t`), `bare` 로 바로 사라짐 |
 | `test_arena_hr.py` | `<dp>` | 경기장 `hr_field`: 명세 = 레지스트리 · 걷는 원 · 방벽 · 빛 · 식물의 받침(`hr/s1k/vanilla` 태그) · 모습 셋의 절대 채우기 · `dark` 3틱 간격 · 조각 한도 · cmsim 으로 실제 짓기 · `ensure`; V2(HR-55): 1e 의 두 번째 인터프리터는 `-B`(1f: 시험한 트리에 바이트코드를 쓰지 않음) |
 | `test_hwamu.py` · `test_moon.py` | `<dp> [절 …]` | 아이템 화무십일홍(정의 · 등록 · 풀 밖 · ★ 표 · 세 효과 · 정리 · 틱당 명령 수) · 버프 월하대작(stat_buffs · × 1.20 · reset · uninstall · 스탯 줄). `test_hwamu` 는 계획 `PLAN.md` 와 저장한 위키 `wiki/w2.txt` 를 `$HR_DOCS` 나 스위트 옆(`hr/`)에서 찾고, 없으면 그 글과 맞추는 검사만 건너뛴다(끝에 `SKIPPED` 목록) |
-| `ident_hr.py` | `<dp> [--base 35b82e5]` | 11-03 트리 `35b82e5` 와 바이트 비교: 계약 §5 허용 목록 · SR 손 파일 · `boss/scarlet/**` · 이 보스의 매니페스트 밖은 같아야 함 |
+| `ident_hr.py` | `<dp> [--base 35b82e5]` | 11-03 트리 `35b82e5` 와 바이트 비교: 계약 §5 허용 목록 · SR 손 파일 · `boss/scarlet/**` · 이 보스의 매니페스트 밖은 같아야 함(11-10: 전투 개편 lane R 이 바꾸고 · 더하고 · 지운 파일 묶음 `LANE_R` 을 더함 — 지운 파일이 허용되는 묶음은 이것뿐; 다른 레인도 자기 묶음을 더한다) |
 | `gen_check_hr.py` | `<dp> --rp <rp>` | 복사본(`tmp/`)에서 이 보스에 닿는 생성기(코어 · 경기장 · 리그 · 킷 · 모듈 · 검사)를 두 번 · 정해진 순서 / 거꾸로 · 소유 경로만 쓰는지 · 리그와 킷의 RP 쪽 두 번 |
 
 - `hr/tests/lib/hrsim.py`(I1b 검증 1차): `kit_on(s)` 이면 효과 도구(`boss/scarlet/fx/**`)가 대역 없이 진짜로 돈다(`azsim` 의 KITS 처럼;
@@ -179,6 +179,19 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
   (`hr/s1k/lib/hrfxsim.py`)과 명령 수까지 같다. `s.kit_hist`(틱마다 효과 도구 몫), `kit_ex(s, 이름)`(킷 호출의 실행자 태그 · 부른 함수 · `#ph`).
 - `hr/tests/lib/hrsim.py`(I1): `#rlk:dash_pass` · `#rlk:cm_pass` 를 데이터팩의 태그 파일대로 푼다(26.3 의 `#minecraft:replaceable` 포함) —
   사본 `cmsim.py` 는 공기와 빛만 통과시켜, 경기장의 마른 풀 · 진홍 뿌리 칸에서 `mv/ok` 가 막혔다(게임에서는 통과).
+
+### 3-5. 전투 개편 lane R (`cb/tests/`; 11-10, 가지 `wip/combat-rm`)
+`python3 test_rm.py <dp> [static yoi view picksub]`(데이터팩 밖 사본에서). 모의기 `cb/tests/lib/psim.py` + `lib/mcsim.py` = 전투 개편 조사의
+하네스(`tools/dev/plan/combat/perf_harness/psim.py`, 그 mcsim = `ar/tests/lib/mcsim.py` 에 값 없는 점수를 0 으로 읽는 판)를 복사해 둔 것이고,
+고친 곳은 두 가지(같은 폴더의 mcsim 을 읽음, 값이 그대로인 `data modify storage … set` 은 게임처럼 0 을 돌려줌). 진짜 `rlk:load` · `rlk:player/tick` ·
+`lvup/pick_sub` · `view/tick` 을 돌린다.
+
+| 절 | 무엇 |
+|---|---|
+| `static` | 요이미야 · 활 파일 · 호출 · 점수판 · 생성된 `px/db` 의 `aurEnd` 줄이 없음, 로노바 · 클로린드의 투사체 틀(`char/bow/arrow_*` · `assist` · `calc`)은 남고 종류 7 · 8 만, F(`player/f_key`)는 조준 켜기가 아님 |
+| `yoi` | 저장 월드 이전: 요이미야로 저장 → 다시 켬(플레이어 없이 load) → 루미네 · `start_char` · 선택지 / 떨굴 목록에서 카드 뺌 → 접속한 플레이어의 틱에 한 번 다시 고르기(무기 · 조준 감속 · 사이드바 · 바닥 카드), 다른 캐릭터로 저장된 월드는 목록만 |
+| `view` | F5 하나: 모드 · 숄더뷰 파일 없음, 로비 「시점」 버튼 없음 · `built` 12, `#on view 1` · `#vmode view 2` 는 load 의 고정값(생성된 파수꾼 줄만 읽음), 1인칭 · 숄더뷰로 저장된 월드 → F5(옛 카메라 저장값 지움, 다음 틱 아바타 길), 개발자 모드는 `view/fps_tick` |
+| `picksub` | 「고를 아이템 N개」가 방 전투(`#active room 1` + `#combat room 1..`) · 보스 엔진(`#mbLive mb 1`) 동안 안 뜸, 싸움이 시작되면 바로 지움(아랫줄만), 끝나면 20틱 안에 다시 뜸, 싸움 중 레벨 업, 예전 규칙(선택 공간 · 사망 · `ttlT`) — 바꾸기 전 트리에서는 5개 실패 |
 
 ## 4. 균형 탐침 (`ar/review/bal/`, `ap/balance/azfair_core.py`)
 - `knfair5.py <dp> <mode> <policy> <dodge> <char> <seed> [n] [lv] [plv] [out.json]`: 아이템 없는 Lv15 플레이어 대 L18 보스,

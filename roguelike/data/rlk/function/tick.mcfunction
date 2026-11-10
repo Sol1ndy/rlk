@@ -28,7 +28,7 @@ function rlk:combat/text_tick
 function rlk:minimap/tick
 function rlk:ditem/tick
 function rlk:shop/tick
-# 화살(활 캐릭터)
+# 투사체(로노바의 구체 · 잔향; 틀은 char/bow/arrow_*)
 execute as @e[tag=rlk_arrow] at @s run function rlk:char/bow/arrow_tick
 
 # 몹 처리 (넉백저항·경직·체력바·상태이상)

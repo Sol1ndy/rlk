@@ -3991,8 +3991,7 @@ tag @s remove rlk_mb_pxinv
 # (max). Proxies are interactions: mob/tick never runs on them, so a value left there would never decay.
 PX_DB = (('scT', 'superconduct (element/run/supercond)', True),
          ('rnNoE', "Ronova's echo window (char/ronova/echo_boom)", True),
-         ('mirEnd', 'the mirror item (items/proc/mirror)', False),
-         ('aurEnd', "Yoimiya's aura (char/yoimiya/rocket_boom, aur_move)", False))
+         ('mirEnd', 'the mirror item (items/proc/mirror)', False))
 w('px/db', ['# @s = the body (px/tick): proxy-held target state moves to the body (cm.md 9.6 audit).']
   + [f'execute as @e[type=minecraft:interaction,tag=rlk_mb_px,scores={{{o}=1..}}] run function rlk:mboss/px/db/{o.lower()}' for o, _, _ in PX_DB])
 for o, what, timer in PX_DB:

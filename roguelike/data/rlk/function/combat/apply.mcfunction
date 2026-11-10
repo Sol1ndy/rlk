@@ -83,7 +83,6 @@ execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_c3] run function rl
 execute if score #mobHP tmp matches ..0 run function rlk:combat/heal_orb_roll
 execute if score #mobHP tmp matches ..0 run function rlk:combat/kill_xp
 execute if score #mobHP tmp matches ..0 run function rlk:combat/gold_drop
-execute if score #mobHP tmp matches ..0 if score #charN tmp matches 2 run function rlk:char/yoimiya/aur_move
 execute if score #mobHP tmp matches ..0 if score #charN tmp matches 5 run function rlk:char/arlecchino/dir_death
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_rndoom] run function rlk:element/void/doom_death
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/death/start

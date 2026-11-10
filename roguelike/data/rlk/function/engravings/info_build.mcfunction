@@ -2,44 +2,24 @@
 #   인벤토리 첫 줄 3~6번 칸: 개수가 같은 각인끼리 한 칸에 묶어, 개수 많은 묶음부터 왼쪽에. 아이템 개수 = 각인 개수,
 #     설명은 묶음 안의 각인마다 켜진 효과만 밝게
 #   7번 칸: 4묶음을 넘는 나머지 각인(이름과 개수). 나머지가 없으면 가진 각인 전체 요약
-# 1) 개수 많은 순으로 정렬: 12개 이상 → 11 → ... → 1 순서로 훑으며 sorted 에 담는다
+# 1) 개수 많은 순으로 정렬: 각인 목록을 한 번 훑어 개수(12 이상은 12)별 묶음 b.n1~n12 에 담고(묶음 안은 목록 순서),
+#    n12 → n1 순서로 sorted 에 이어 붙인다 — 12 → 1 을 12번 훑던 예전 판과 같은 sorted({id, n}, 같은 개수는 목록 순서; 0 은 빠짐)
+data modify storage rlk:eng b set value {n1:[],n2:[],n3:[],n4:[],n5:[],n6:[],n7:[],n8:[],n9:[],n10:[],n11:[],n12:[]}
+data modify storage rlk:eng q set from storage rlk:engravings ids
+function rlk:engravings/info_bucket_loop
 data modify storage rlk:eng sorted set value []
-scoreboard players set #want eng 12
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 11
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 10
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 9
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 8
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 7
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 6
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 5
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 4
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 3
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 2
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
-scoreboard players set #want eng 1
-data modify storage rlk:eng q set from storage rlk:engravings ids
-function rlk:engravings/info_pass
+execute if data storage rlk:eng b.n12[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n12[]
+execute if data storage rlk:eng b.n11[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n11[]
+execute if data storage rlk:eng b.n10[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n10[]
+execute if data storage rlk:eng b.n9[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n9[]
+execute if data storage rlk:eng b.n8[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n8[]
+execute if data storage rlk:eng b.n7[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n7[]
+execute if data storage rlk:eng b.n6[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n6[]
+execute if data storage rlk:eng b.n5[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n5[]
+execute if data storage rlk:eng b.n4[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n4[]
+execute if data storage rlk:eng b.n3[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n3[]
+execute if data storage rlk:eng b.n2[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n2[]
+execute if data storage rlk:eng b.n1[0] run data modify storage rlk:eng sorted append from storage rlk:eng b.n1[]
 # 2) 같은 개수끼리 묶기: groups = [{n, ids:[...]}] (sorted 가 많은 순이라 차례대로 묶으면 된다)
 data modify storage rlk:eng groups set value []
 data modify storage rlk:eng sq set from storage rlk:eng sorted
