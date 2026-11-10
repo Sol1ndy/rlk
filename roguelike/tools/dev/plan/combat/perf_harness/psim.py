@@ -377,6 +377,25 @@ class PSim(mcsim.Sim):
             return self.c_clear(t, ctx)
         if c == 'give':
             return self.c_give(t, ctx)
+        if (c == 'data' and len(t) > 9 and t[1] == 'modify' and t[2] == 'storage' and t[5] == 'append' and t[6] == 'from'
+                and t[7] == 'storage'):
+            # the game appends every element the source path matches (`list[]` concatenates); mcsim took the first only
+            try:
+                src = [x for x in mcsim.nbt_slots(self.storage.get(t[8], {}), mcsim.nbt_nodes(t[9]))]
+            except (KeyError, IndexError, TypeError, ValueError):
+                return 0
+            if not src:
+                self.errors[(self.stack[-1] if self.stack else '?', 'append-from-none', t[9])] += 1
+                return 0
+            st = self.storage.setdefault(t[3], {})
+            try:
+                lst = self.path_get(st, t[4])
+            except KeyError:
+                lst = []
+                self.path_set(st, t[4], lst)
+            for cc, k in src:
+                lst.append(copy.deepcopy(cc[k] if cc is not None else self.storage.get(t[8], {})))
+            return len(src)
         if c == 'data' and len(t) > 6 and t[1] == 'modify' and t[2] == 'storage' and t[5] in ('merge', 'prepend', 'insert'):
             st = self.storage.setdefault(t[3], {})
             try:
