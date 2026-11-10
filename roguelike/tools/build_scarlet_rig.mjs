@@ -40,7 +40,7 @@ import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, boxDepth
   CLEAR_GUARDS, CLEAR_GATE, FIST_AXIS, HILT_AXIS, GUARD_RIM,
   BOX, ARM_REACH} from './scarlet_pose.mjs';
 import {retarget, overlay, refCore, hatSwitches, bladeChannels, setHatFace, faceSpot, PATCHES, HAT_REST, HAT_FLIGHTS, SUPPORTS, S_LEG, S_ARM, S_SCAB, K_ARC,
-  IAI_DELTA, ASIDE, hipDirChannels} from './scarlet_retarget.mjs';
+  IAI_DELTA, ASIDE, hipDirChannels, SHEATHE} from './scarlet_retarget.mjs';
 import {CLIPS as AUTHORED, CINE_PLACEHOLDER, accumulate, sampleClip, DEFAULT_POSE, H_POSE} from './scarlet_clips.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, interp, shown, summonPart, summonShadow, cullOverhang} from './mboss_rig_compile.mjs';
 import {qAngle, len, sub, add, rot, mul, q, times, unit, cross, dot, perp, basisQ} from './mboss_rig_math.mjs';
@@ -67,7 +67,40 @@ const STUB = JSON.parse(execFileSync('python3', ['-c', 'import json, sys; sys.pa
   'print(json.dumps(m, ensure_ascii=False))'], {cwd: path.join(here, '..'), encoding: 'utf8'}));
 const API = STUB._api; delete STUB._api;
 if (JSON.stringify(STUB.parts.map(p => p.name)) !== JSON.stringify(PART_NAMES)) throw new Error('parts differ from the contract');
-const CONTRACT = STUB.clips;                    // {name: {id, len, loop, events, owner}}
+// the cinematic clips (H2c's tools/scarlet_cine.mjs; the 11-11 rebuild, hr_design.md §4.1): the module states the contract it was
+// authored to (CONTRACT: name -> {len, events}) and the builder cross-checks it against api.py. While api.py still carries the
+// 11-06 cinematic table (H1's interface commit not merged yet) the module's table stands in for those rows (STAND-IN (H2c):
+// replaced at the merge - api.py is H1's and wins whole; then this is only the cross-check).
+const CINE_FILE = path.join(here, 'scarlet_cine.mjs');
+const cineMod = fs.existsSync(CINE_FILE) ? await import('./scarlet_cine.mjs') : null;
+const CINE_OWNERS = ['S2b', 'H2', 'H2c'], FIGHT_OWNERS = ['S2a', 'H1', 'H1c'];
+let CINE_STANDIN = false;
+function cineContract(clips) {
+  const want = cineMod && cineMod.CONTRACT;
+  if (!want) return clips;
+  const names = Object.keys(want), have = names.filter(n => clips[n]);
+  const same = n => clips[n] && clips[n].len === want[n].len && JSON.stringify(clips[n].events) === JSON.stringify(want[n].events);
+  if (have.length === names.length) {
+    const bad = names.filter(n => !same(n));
+    if (!bad.length) return clips;
+    // api.py has every clip of the new table but some rows differ: with the 11-06 lead-ins gone it is the new contract (an error);
+    // with them still there it is the 11-06 table (the stand-in below)
+    if (!['sq1', 'lead_down', 'lead_stand'].some(n => clips[n])) throw new Error(`scarlet_cine.mjs CONTRACT differs from api.py: ${bad.map(n => `${n} (cine ${want[n].len} t ${JSON.stringify(want[n].events)} / api ${clips[n].len} t ${JSON.stringify(clips[n].events)})`).join('; ')}`);
+  }
+  const OLD = {sq1: 'lead60', lead_down: 'lead5', lead_stand: 'lead_re'};
+  const rows = Object.entries(clips).sort((a, b) => a[1].id - b[1].id).map(([n, c]) => {
+    const m = OLD[n] || n;
+    return want[m] ? [m, {...c, len: want[m].len, loop: null, events: {...want[m].events}, owner: 'S2b'}] : [n, c];
+  });
+  const got = new Set(rows.map(r => r[0]));
+  for (const n of names) if (!got.has(n)) rows.push([n, {id: 0, len: want[n].len, loop: null, events: {...want[n].events}, owner: 'S2b'}]);
+  rows.forEach(([, c], i) => { c.id = i; });
+  CINE_STANDIN = true;
+  console.warn('STAND-IN (H2c): api.py still carries the 11-06 cinematic clip table; building the cinematic clips to scarlet_cine.mjs CONTRACT (hr_design.md §4.1)');
+  return Object.fromEntries(rows);
+}
+const CONTRACT = cineContract(STUB.clips);      // {name: {id, len, loop, events, owner}}
+STUB.clips = CONTRACT;
 const CLIP_NAMES = Object.keys(CONTRACT).sort((a, b) => CONTRACT[a].id - CONTRACT[b].id);
 const LOOKS = STUB.looks;
 const ANCHORS = STUB.anchors;
@@ -164,13 +197,12 @@ const EL_BUDGET = 6500;
 for (const [f, n] of Object.entries(ELEMENTS)) if (n > EL_BUDGET) throw new Error(`form ${f}: ${n} elements at rest > ${EL_BUDGET}`);
 
 // ---- clips: contract + authored motion (S2a) + the cinematic clips (S2b's scarlet_cine.mjs, else the placeholder) -----------
-const CINE_FILE = path.join(here, 'scarlet_cine.mjs');
-const cineMod = fs.existsSync(CINE_FILE) ? await import('./scarlet_cine.mjs') : null;
 const CINE = cineMod ? cineMod.CLIPS : CINE_PLACEHOLDER;
 const CINE_SOURCE = cineMod ? 'tools/scarlet_cine.mjs' : 'placeholder (scarlet_clips.CINE_PLACEHOLDER)';
-const cineNames = Object.keys(CONTRACT).filter(n => CONTRACT[n].owner === 'S2b');
-if (JSON.stringify(CINE.map(c => c.name).sort()) !== JSON.stringify([...cineNames].sort())) throw new Error(`cinematic clips ${CINE.map(c => c.name)} != the contract's S2b clips ${cineNames}`);
-for (const c of AUTHORED) if (CONTRACT[c.name]?.owner !== 'S2a') throw new Error(`clip ${c.name}: not an S2a clip of the contract`);
+const cineNames = cineMod && cineMod.CONTRACT ? Object.keys(cineMod.CONTRACT) : Object.keys(CONTRACT).filter(n => CINE_OWNERS.includes(CONTRACT[n].owner));
+if (JSON.stringify(CINE.map(c => c.name).sort()) !== JSON.stringify([...cineNames].sort())) throw new Error(`cinematic clips ${CINE.map(c => c.name)} != the contract's cinematic clips ${cineNames}`);
+for (const n of cineNames) if (!CONTRACT[n] || !CINE_OWNERS.includes(CONTRACT[n].owner)) throw new Error(`cinematic clip ${n}: not a cinematic clip of the contract (owner ${CONTRACT[n]?.owner})`);
+for (const c of AUTHORED) if (!CONTRACT[c.name] || !FIGHT_OWNERS.includes(CONTRACT[c.name].owner)) throw new Error(`clip ${c.name}: not a fight clip of the contract`);
 const byName = Object.fromEntries([...AUTHORED, ...CINE].map(c => [c.name, c]));
 const missing = CLIP_NAMES.filter(n => !byName[n]);
 if (missing.length && !flag('--allow-missing')) throw new Error(`clips not authored: ${missing.join(', ')}`);
@@ -392,7 +424,7 @@ const tipOf = (fr, n) => {
   setHatFace({t: fs.t, q: fs.q});
 }
 {
-  const {q: q304, o} = probe('ending', 304);
+  const {q: q304, o} = probe(SHEATHE.clip, SHEATHE.t1);
   const ax = rot(o.scabbard.q, [0, 1, 0]), Ryaw = q([0, q304.rot[1], 0]), R0 = o.pelvis.t;
   const SLp = add(o.torso.t, rot(o.torso.q, SK.shoulder));
   let sh = q304.sh || 0;
@@ -405,14 +437,34 @@ const tipOf = (fr, n) => {
   // the free blade of SH0' reproduces the on-axis frame
   const fb = freeBlade({...q304, ...SH0P}, R0, Ryaw, SLp, add(R0, rot(Ryaw, SK.swing)));
   const da = qAngle(fb.SQ, SQ), dg = len(sub(fb.G, G));
-  if (da > 1 || dg > .01) throw new Error(`SH0': the free blade at ending 304 is ${dg.toFixed(3)} b / ${da.toFixed(2)} deg off the scabbard axis`);
+  if (da > 1 || dg > .01) throw new Error(`SH0': the free blade at ${SHEATHE.clip} ${SHEATHE.t1} is ${dg.toFixed(3)} b / ${da.toFixed(2)} deg off the scabbard axis`);
+}
+// her points of one solved frame (rig frame): the sword's grip and tip (null while it is not in her hand), the grips of both hands,
+// the left elbow, the soles (the shin's end), the pelvis pivot, the head centre, the crown top, the brim (centre, normal)
+function cinePoints(o, qq) {
+  const A = o._anchors, held = o.sword.s[0] > 1e-4 && (qq.sword || 'hand') === 'hand' && (qq.shW || 0) < .5;
+  const sole = n => add(o[n].t, rot(o[n].q, [0, -SK.shin, 0]));
+  return {hilt: held ? o.sword.t : null, tip: held ? A.blade_tip : null, hand_l: A.hand_l, hand_r: A.hand_r, elbow_l: o.forearm_l.t,
+    foot_l: sole('shin_l'), foot_r: sole('shin_r'), pelvis: o.pelvis.t, head: A.head, hat_crown: A.hat_crown,
+    brim: o.hat.s[0] > 1e-4 ? {c: o.hat.t, n: rot(o.hat.q, [0, 1, 0])} : null,
+    boxes: ['pelvis', 'torso', 'thigh_l', 'thigh_r'].map(n => ({n, t: o[n].t, q: o[n].q}))};
 }
 const supportTable = {}, retargetTable = {}, boundErrors = [], KEEP_F = {};
 const spansOf = flags => { const out = []; let a = -1; flags.forEach((f, t) => { if (f && a < 0) a = t; if (!f && a >= 0) { out.push([a, t - 1]); a = -1; } }); if (a >= 0) out.push([a, flags.length - 1]); return out; };
 const clipTime = {};
+// --only a,b (authoring, with --datapack <scratch dir>): solves / compiles / gates only these clips (+ idle and ev_give, which the
+// built dimensions read) and writes neither the manifest nor the cinematic tracks
+const ONLY = arg('--only') ? new Set([...arg('--only').split(','), 'idle', 'ev_give']) : null;
+if (ONLY && dp === path.resolve(here, '..')) throw new Error('--only needs --datapack <scratch dir> (it writes a partial rig)');
+// the cinematic tracks (H2c; hr_design.md §4.3 / §5.3): per cinematic clip tick her points in the rig frame, turned into the stage
+// frame with scarlet_cine.mjs rootAt (the root track the clips are choreographed to)
+const cineTracks = {};
 for (const c of CLIPS) {
+  if (ONLY && !ONLY.has(c.name)) continue;
   const tc0 = Date.now();
   const F = solveClip(c);
+  if (cineMod && cineMod.rootAt && cineNames.includes(c.name)) cineTracks[c.name] = F.map(fr => cinePoints(fr.o, fr.q));
+  if (ONLY) json(path.join(dp, `guards_${c.name}.json`), F.map(fr => ({...Object.fromEntries(Object.entries(fr.o._guard).map(([n, v]) => [n, +gv(v).toFixed(1)]).filter(([, v]) => v > .5)), ...(Math.abs(fr.o._support.dy) > .005 ? {_dy: +fr.o._support.dy.toFixed(3)} : {}), ...(fr.o._lift > .005 ? {_lift: +fr.o._lift.toFixed(3)} : {}), ...(fr.q.wLie > .01 ? {_wLie: +fr.q.wLie.toFixed(2)} : {}), _low: +fr.ref.low.toFixed(2)})));
   clipTime[c.name] = Date.now() - tc0;
   // the guards' bounds (hard: a value at its bound is an error; the scabbard's first axis may give way to the second)
   F.forEach((fr, t) => {
@@ -790,6 +842,51 @@ fail('what ships off the solved frame after the first key (beyond TOL x 1.25)', 
 fail('rotations above 120 degrees per tick or per key', motionErrors);
 fail('a correction guard at its bound (scarlet_pose.mjs GUARD_BOUND)', boundErrors);
 fail('culling box overhang', cullWarn);
+// ---- the cinematic tracks and contacts (H2c; hr_design.md §4.3): stage frame ST(r, u, f) ------------------------------------------
+// stage point of a rig-frame point P for a root {p: [r, u, f], yaw} (yaw 0 = facing +f, + = turning to her right; rig +X = her left,
+// -Z = her front): r = p.r - x cos(yaw) - z sin(yaw), u = p.u + y, f = p.f + x sin(yaw) - z cos(yaw)
+const toStage = (R, P) => { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a); return [R.p[0] - P[0] * c - P[2] * s_, R.p[1] + P[1], R.p[2] + P[0] * s_ - P[2] * c]; };
+const toStageDir = (R, P) => toStage({p: [0, 0, 0], yaw: R.yaw}, P);
+const segDist = (P, A, B) => { const ab = sub(B, A), u = Math.max(0, Math.min(1, dot(sub(P, A), ab) / Math.max(1e-9, dot(ab, ab)))); return len(sub(P, add(A, times(ab, u)))); };
+const contactErrors = [], contactReport = {};
+if (cineMod && cineMod.rootAt) {
+  const r3 = v => v.map(x => +x.toFixed(3));
+  const out = {schema: 1, source: 'tools/build_scarlet_rig.mjs (clips tools/scarlet_cine.mjs)',
+    _doc: 'Her side of the cutscene contacts (hr_design.md §4.3, §5.3): per cinematic clip, per clip tick, her points in the stage frame ST(r, u, f) (origin = the avatar\'s feet, f toward her, r to the actor\'s right, u up; blocks). root = [r, u, f, yaw] = the root track the clip is choreographed to (scarlet_cine.mjs ROOTS: her body as the sequence moves it; yaw 0 faces +f, 180 faces the actor); hilt / tip = the grip centre and the tip of her sword (null while it is not in her hand); hand_l / hand_r = the grips; elbow_l; foot_l / foot_r = the soles; pelvis = its pivot; head; hat_crown; brim = [centre, normal] of the hat brim (radius brim_r). seq = the sequence and the #sq tick of clip tick 0. Generated: never edit.',
+    brim_r: HAT.R, tol: cineMod.TOL || null, contacts: [], clips: {}};
+  for (const n of cineNames) {
+    const T = cineTracks[n]; if (!T) continue;
+    const info = cineMod.SEQ_OF[n];
+    const rows = T.map((P, t) => ({R: cineMod.rootAt(n, t), P}));
+    if (!rows[0].R) { out.clips[n] = {len: CONTRACT[n].len, seq: info || null, staged: false}; continue; }
+    const col = k => rows.map(({R, P}) => (P[k] ? r3(toStage(R, P[k])) : null));
+    out.clips[n] = {len: CONTRACT[n].len, seq: info, staged: true, root: rows.map(({R}) => [...r3(R.p), +R.yaw.toFixed(2)]),
+      hilt: col('hilt'), tip: col('tip'), hand_l: col('hand_l'), hand_r: col('hand_r'), elbow_l: col('elbow_l'), foot_l: col('foot_l'), foot_r: col('foot_r'),
+      pelvis: col('pelvis'), head: col('head'), hat_crown: col('hat_crown'),
+      brim: rows.map(({R, P}) => (P.brim ? [r3(toStage(R, P.brim.c)), r3(toStageDir(R, P.brim.n))] : null))};
+    // the contact rows of this clip (her side): the distance per tick, the worst kept
+    for (const K of (cineMod.CONTACTS || []).filter(k => k.clip === n)) {
+      let worst = 0, at = K.t0;
+      for (let t = K.t0; t <= K.t1; t++) {
+        const {R, P} = rows[t], S = k => toStage(R, P[k]);
+        let d;
+        if (K.kind === 'blade') d = P.hilt ? segDist(K.p, S('hilt'), S('tip')) : 9;
+        else if (K.kind === 'forearm_l') d = segDist(K.p, S('elbow_l'), S('hand_l'));
+        else if (K.kind === 'brim') { if (!P.brim) d = 9; else { const c = toStage(R, P.brim.c), nn = toStageDir(R, P.brim.n), v = sub(K.p, c), h = dot(v, nn), rad = len(sub(v, times(nn, h))); d = Math.hypot(h, rad - HAT.R); } }
+        else if (K.kind === 'body') d = Math.min(...P.boxes.map(b => { const L = rot([-b.q[0], -b.q[1], -b.q[2], b.q[3]], sub(toRig(R, K.p), b.t)), [lo, hi] = BOX[b.n]; return Math.hypot(...L.map((x, i) => Math.max(lo[i] - x, 0, x - hi[i]))); }));
+        else d = len(sub(K.p, S(K.kind)));
+        if (d > worst) { worst = d; at = t; }
+      }
+      contactReport[K.id] = {clip: n, ticks: [K.t0, K.t1], kind: K.kind, point: K.p, tol: K.tol, worst: +worst.toFixed(3), at};
+      out.contacts.push({id: K.id, ...contactReport[K.id]});
+      if (worst > K.tol) contactErrors.push(`${K.id} (${n} ${K.t0}-${K.t1}, ${K.kind}): ${worst.toFixed(3)} b from ST(${K.p}) at t${at} > ${K.tol}`);
+    }
+  }
+  if (!ONLY) json(path.join(here, 'dev/sim/hr/cine/her_tracks.json'), out);
+  else { const pf = path.join(dp, 'her_tracks.json'), prevT = fs.existsSync(pf) ? JSON.parse(fs.readFileSync(pf, 'utf8')) : {clips: {}}; out.clips = {...prevT.clips, ...out.clips}; json(pf, out); for (const [id, c] of Object.entries(contactReport)) console.log(`contact ${id}: worst ${c.worst} at t${c.at} (tol ${c.tol})`); }
+}
+function toRig(R, S) { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a), dr = S[0] - R.p[0], df = S[2] - R.p[2]; return [-dr * c + df * s_, S[1] - R.p[1], -dr * s_ - df * c]; }
+fail('a cutscene contact off its stage point (hr_design.md §4.3, her side)', contactErrors);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
 
 // ---- follow, init, spawn, tick, kill, uninstall, state, flash, face -----------------------------------------------------------
@@ -942,7 +1039,7 @@ fn('look_apply', ['# Re-applies every stored model look (spawn): form, phase, bl
 // ---- anchors: rig/anchor/<name> moves the one rlk_hr_anchor marker to that point of the current clip tick ----------------------
 fn('an/load', ['# Internal (init, once per table version): the anchor table rlk:hr rig.an[<clip id>].<anchor>[<tick 0..len+1>] = "^left ^up ^forward".',
   'data modify storage rlk:hr rig.an set value []',
-  ...CLIPS.flatMap(c => ['data modify storage rlk:hr rig.an append value {}',
+  ...CLIPS.filter(c => anchorTable[c.name]).flatMap(c => ['data modify storage rlk:hr rig.an append value {}',
     ...ANCHORS.map(a => `data modify storage rlk:hr rig.an[${c.id}].${a} set value ${JSON.stringify(anchorTable[c.name][a])}`)]),
   `data modify storage rlk:hr rig.anv set value ${anVer}`]);
 for (const a of ANCHORS) fn(`anchor/${a}`, [`# Moves the rlk_hr_anchor marker to ${a} of the current clip tick (yaw = the boss's). Effects run at / as it. @s = the boss, at its feet.`,
@@ -998,7 +1095,7 @@ const manifest = {
     cull_overhang_ticks: cullWarn.length},
   sprites: ledger,
 };
-json(path.join(here, 'scarlet_rig_manifest.json'), manifest);
+if (!ONLY) json(path.join(here, 'scarlet_rig_manifest.json'), manifest);
 if (process.env.HR_TIMES) console.log('solve ms per clip', JSON.stringify(clipTime));
 console.log(`Built the Scarlet rig: ${PART_NAMES.length} parts, ${CLIPS.length} clips (${missing.length} stand-ins; cine: ${CINE_SOURCE}), ${keyFiles} key files, ${keyLines} keys, ` +
   `${fnFiles.files} rig functions (${(fnFiles.bytes / 1e6).toFixed(2)} MB), ${Object.keys(models).length} models, ${Object.keys(sprites).length} sprites ${(atlasPx / 1e6).toFixed(3)} M px, ` +
