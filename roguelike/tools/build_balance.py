@@ -217,16 +217,21 @@ f('refill',
   'scoreboard players set @s balF 0',
   'function rlk:bal/ui/draw')
 
-# ---------------------------------------------------------------- sources (combat/apply)
+# ---------------------------------------------------------------- the damage path (combat/apply_mods, one line)
+f('mods',
+  '# @s = enemy with a gauge, in combat/apply_mods (after element/on_hit, before the boss incoming hooks / HP floors; never',
+  '# true damage): a groggy enemy takes the tier %, else a burst hit / a strong reaction takes balance (not on a killing blow)',
+  'execute if score @s grgT matches 1.. run return run function rlk:bal/amp',
+  'execute unless score #burstDmg tmp matches 1.. unless score #rx tmp matches 1.. run return 0',
+  'execute if score #dmg tmp >= @s mhpC run return 0',
+  'function rlk:bal/src/hit')
 f('src/hit',
-  '# @s = enemy with pips left, after combat/apply took its HP (it survived; not true damage). A burst hit (#burstDmg tmp,',
-  '# set by items/hook/burst_dmg) and a strong reaction (#rx tmp, element/react) take balance; their per-target windows',
-  '# make a multi-hit burst or a chain of reactions count once.',
-  'execute unless score #burstDmg tmp matches 1 unless score #rx tmp matches 1.. run return 0',
-  'execute if score @s grgT matches 1.. run return 0',
+  '# @s = enemy with pips left (bal/mods). A burst hit (#burstDmg tmp = the game time of the burst\'s damage calc, set by',
+  '# items/hook/burst_dmg, cleared by char/after_hit) and a strong reaction (#rx tmp, element/react) take balance; their',
+  '# per-target windows make a multi-hit burst or a chain of reactions count once.',
   'scoreboard players set #n bal 0',
   'execute store result score #now bal run time query gametime',
-  'execute if score #burstDmg tmp matches 1 run function rlk:bal/src/burst',
+  'execute if score #burstDmg tmp = #now bal run function rlk:bal/src/burst',
   'execute if score #rx tmp matches 1.. run function rlk:bal/src/rx',
   'execute if score #n bal matches 1.. run function rlk:bal/take')
 f('src/burst',

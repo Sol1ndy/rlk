@@ -112,23 +112,23 @@ def t_hooks():
     ck(R, 'H2 mob/tick: bal/tick (every enemy but Raiden, whose own tick runs it) after the stun clock',
        has_after('mob/tick', 'execute if score @s stunT matches 0 run function rlk:mob/unstun',
                  'execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] run function rlk:bal/tick'))
-    L = lines('combat/apply')
-    hook = 'execute if score #mobHP tmp matches 1.. if score @s bal matches 1.. unless score #trueDmg tmp matches 1 run function rlk:bal/src/hit'
-    ck(R, 'H3 combat/apply: sources after the HP is taken (survivors, no true damage)',
-       hook in L and L.index(hook) > L.index('execute if score #mobHP tmp matches 1.. run scoreboard players operation @s mhpC = #mobHP tmp'))
     L = lines('combat/apply_mods')
-    amp = 'execute if score @s grgT matches 1.. run function rlk:bal/amp'
-    ck(R, 'H4 combat/apply_mods: groggy bonus before the boss incoming hooks (HP floors clip after it)',
-       amp in L and L.index(amp) < L.index('execute if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/incoming')
-       < L.index('execute if entity @s[tag=rlk_mb_body] run function rlk:mboss/d/incoming'))
-    ck(R, 'H5 burst flag: set in items/hook/burst_dmg, cleared in clear_atkflags and char/after_hit',
-       'scoreboard players set #burstDmg tmp 1' in lines('items/hook/burst_dmg')
-       and 'scoreboard players set #burstDmg tmp 0' in lines('combat/clear_atkflags')
+    hook = 'execute if score @s balMax matches 1.. run function rlk:bal/mods'
+    ck(R, 'H3 combat/apply_mods: one line for the groggy bonus and the sources, before the boss incoming hooks (HP floors)',
+       hook in L and L.index(hook) < L.index('execute if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/incoming')
+       < L.index('execute if entity @s[tag=rlk_mb_body] run function rlk:mboss/d/incoming')
+       and not [l for l in lines('combat/apply') if 'bal' in l])
+    ck(R, 'H4 bal/mods: groggy -> the bonus only; no source on a killing blow',
+       lines('bal/mods')[2] == 'execute if score @s grgT matches 1.. run return run function rlk:bal/amp'
+       and 'execute if score #dmg tmp >= @s mhpC run return 0' in lines('bal/mods'))
+    ck(R, 'H5 burst stamp: the game time in items/hook/burst_dmg, cleared in char/after_hit; clear_atkflags untouched',
+       'execute store result score #burstDmg tmp run time query gametime' in lines('items/hook/burst_dmg')
+       and not [l for l in lines('combat/clear_atkflags') if 'burst' in l]
        and lines('char/after_hit')[2] == 'scoreboard players set #burstDmg tmp 0')
     js, jh = lines('char/lumine/jav_spawn'), lines('char/lumine/jav_hit')
-    ck(R, 'H6 Lumine javelins: flag off after the stored damage, on again at the hit',
+    ck(R, 'H6 Lumine javelins: stamp off after the stored damage, on again at the hit',
        js.index('scoreboard players set #burstDmg tmp 0') == js.index('function rlk:items/hook/burst_dmg') + 2
-       and jh.index('scoreboard players set #burstDmg tmp 1') == jh.index('function rlk:combat/clear_atkflags') + 1)
+       and jh.index('execute store result score #burstDmg tmp run time query gametime') == jh.index('function rlk:combat/clear_atkflags') + 1)
     ck(R, 'H7 cm/tick: the groggy hold after the freeze cancel, before the mob ticks',
        has_after('cm/tick', 'execute if score @s frzT matches 1.. if score @s cmS matches 1.. run function rlk:cm/cancel',
                  'execute if score @s grgT matches 1.. run function rlk:bal/fam/cm_tick')
@@ -255,51 +255,68 @@ def t_pips():
 # ======================================================================= S sources
 def t_sources():
     s = sim()
-    e = mob(s)
-    s.setsc('#burstDmg', 'tmp', 1)
+    e = mob(s, mhpC=1000)
+    s.setsc('#dmg', 'tmp', 10)
+    s.setsc('#burstDmg', 'tmp', s.gametime)
     s.setsc('#rx', 'tmp', 0)
-    s.run('bal/src/hit', e)
+    s.run('bal/mods', e)
     a = s.s(e, 'bal')
     s.tick(10)
-    s.run('bal/src/hit', e)                  # the same burst's next hit
+    s.setsc('#burstDmg', 'tmp', s.gametime)
+    s.run('bal/mods', e)                  # the same burst's next hit
     b = s.s(e, 'bal')
     s.tick(30)                               # 40 t after the first: a new burst counts
-    s.run('bal/src/hit', e)
+    s.setsc('#burstDmg', 'tmp', s.gametime)
+    s.run('bal/mods', e)
     ck(R, 'S1 burst: 2 pips, once per target per 40 t', (a, b, s.s(e, 'bal')) == (2, 2, 0), (a, b, s.s(e, 'bal')))
     ck(R, 'S2 ... and the 4-pip mob is groggy after two bursts', s.s(e, 'grgT') == 60)
+    s = sim()
+    e = mob(s, mhpC=1000)
+    s.setsc('#dmg', 'tmp', 10)
+    s.setsc('#rx', 'tmp', 0)
+    s.setsc('#burstDmg', 'tmp', s.gametime - 1)
+    s.run('bal/mods', e)
+    st = s.s(e, 'bal')
+    s.setsc('#burstDmg', 'tmp', s.gametime)
+    s.setsc('#dmg', 'tmp', 1000)
+    s.run('bal/mods', e)
+    ck(R, 'S2b a stale stamp (an earlier tick) and a killing blow take no balance', (st, s.s(e, 'bal')) == (4, 4), (st, s.s(e, 'bal')))
     table = {1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 1, 7: 2, 8: 0, 9: 0, 10: 0, 11: 0, 15: 0, 16: 0, 17: 1, 18: 0, 19: 1, 20: 0, 21: 0, 22: 0, 23: 0}
     got = {}
     for rx in table:
         s = sim()
-        e = brain(s, 'kr', extra=('rlk_c2e',))
+        e = brain(s, 'kr', extra=('rlk_c2e',), mhpC=1000)
+        s.setsc('#dmg', 'tmp', 10)
         s.setsc('#burstDmg', 'tmp', 0)
         s.setsc('#rx', 'tmp', rx)
-        s.run('bal/src/hit', e)
+        s.run('bal/mods', e)
         got[rx] = 7 - s.s(e, 'bal')
     ck(R, 'S3 strong reactions: vaporize / melt / overload / superconduct / frozen 1, shatter 2, void burn / judgement 1, '
           'the rest 0', got == table, {k: v for k, v in got.items() if table[k] != v})
     s = sim()
-    e = brain(s, 'kr', extra=('rlk_c2e',))
+    e = brain(s, 'kr', extra=('rlk_c2e',), mhpC=1000)
+    s.setsc('#dmg', 'tmp', 10)
     s.setsc('#burstDmg', 'tmp', 0)
     s.setsc('#rx', 'tmp', 3)
-    s.run('bal/src/hit', e)
+    s.run('bal/mods', e)
     s.tick(29)
-    s.run('bal/src/hit', e)
+    s.run('bal/mods', e)
     a = s.s(e, 'bal')
     s.tick(1)
-    s.run('bal/src/hit', e)
+    s.run('bal/mods', e)
     ck(R, 'S4 reactions: once per target per 30 t', (a, s.s(e, 'bal')) == (6, 5), (a, s.s(e, 'bal')))
     s = sim()
-    e = brain(s, 'kr', extra=('rlk_c2e',))
-    s.setsc('#burstDmg', 'tmp', 1)
+    e = brain(s, 'kr', extra=('rlk_c2e',), mhpC=1000)
+    s.setsc('#dmg', 'tmp', 10)
+    s.setsc('#burstDmg', 'tmp', s.gametime)
     s.setsc('#rx', 'tmp', 7)
-    s.run('bal/src/hit', e)
+    s.run('bal/mods', e)
     ck(R, 'S5 a burst that shatters: 2 + 2 pips on one hit', s.s(e, 'bal') == 3)
     s.setsc('#burstDmg', 'tmp', 0)
     s.setsc('#rx', 'tmp', 0)
     n0 = s.cmd_count
-    s.run('bal/src/hit', e)
-    ck(R, 'S6 a plain hit costs one test', s.cmd_count - n0 <= 2 and s.s(e, 'bal') == 3, s.cmd_count - n0)
+    s.run('bal/mods', e)
+    ck(R, 'S6 a plain hit on a gauge costs the two tests of bal/mods', s.cmd_count - n0 <= 3 and s.s(e, 'bal') == 3, s.cmd_count - n0)
     # the flag's life: burst_dmg sets it, after_hit / clear_atkflags clear it (real functions)
     s = sim()
     pl = s.spawn('player', tags=('player',))
@@ -308,9 +325,7 @@ def t_sources():
     on = s.sc('#burstDmg', 'tmp')
     s.run('char/after_hit', pl)
     off = s.sc('#burstDmg', 'tmp')
-    s.run('items/hook/burst_dmg', pl)
-    s.run('combat/clear_atkflags', pl)
-    ck(R, 'S7 #burstDmg: on in burst_dmg, off in after_hit and clear_atkflags', (on, off, s.sc('#burstDmg', 'tmp')) == (1, 0, 0))
+    ck(R, 'S7 #burstDmg: the game time in burst_dmg, 0 after after_hit', (on, off) == (s.gametime, 0), (on, off))
 
 
 # ======================================================================= D damage bonus

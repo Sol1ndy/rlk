@@ -90,8 +90,6 @@ execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_raiden] run functio
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_mb_body] run function rlk:mboss/death_start
 execute if score #mobHP tmp matches ..0 unless entity @s[tag=rlk_raiden] unless entity @s[tag=rlk_mb_body] run kill @s
 execute if score #mobHP tmp matches 1.. run scoreboard players operation @s mhpC = #mobHP tmp
-# 균형치: 원소폭발 적중 · 강한 원소 반응이 칸을 깎음(살아남은 대상만, 진짜 피해 제외)
-execute if score #mobHP tmp matches 1.. if score @s bal matches 1.. unless score #trueDmg tmp matches 1 run function rlk:bal/src/hit
 # 빙설이 이 대상에게만 만든 치명타 표시는 되돌린다(범위 공격의 다음 대상에 번지지 않게)
 execute if score #frostC eng matches 1 run scoreboard players set #crit tmp 0
 execute if score #frostC eng matches 1 run scoreboard players set #frostC eng 0

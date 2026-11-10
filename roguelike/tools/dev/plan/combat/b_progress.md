@@ -10,16 +10,22 @@ Branch `wip/combat-bal` (from `origin/wip/combat` 6ff826f), worktree `<scratchpa
       `tools/dev/sim/bal/tests/test_bal.py` (115 checks). Gates: regen x2 identical, check_mboss_pack 0, loadcheck cb_b 0,
       test_bal 115/115, check_refs no new.
 - [x] B1 committed 740b624 and pushed.
-- [ ] B2 (commit 2): boss module adapters (`bal_ok` / `bal_on` / `bal_tick` / `bal_off`) + registry flag `bal` on all 11
-      entries, own groggies call `bal/refill`; cost refactor (no extra command per boss fight tick: the boss clock in the
-      existing mob/tick line, paused with the fight; groggy routing as `unless score @s grgT matches 1..` on the d/tick lines
-      + a last `d/bal_tick` line; the boss row = second component of the bossui bossbar name, `brow` starts with a -200 px
-      space, so `bossui/draw` / `build_bossbar.py` are back to the base); README; render `<scratchpad>/cb/b_balance_ui.jpg`.
-      Gates so far: regen x2 identical, check_mboss_pack 0, check_refs no new, loadcheck cb_b 0, test_bal 116/116,
-      test_bal_boss 129/129, az/tests_cm run_all = the baseline's step statuses (m0diff: same 40 failures, force 1 +6.48 < 6.5;
-      the others +0.5/t over their base; C draw unchanged), RP: `rp_b` = rp_base + 9 new files (font/bal.json, 8 PNGs),
-      rplint 0, atlas 12.919 M unchanged, RP hash twice b04a12f6…. Running: hr suites base vs B, ar/tests base vs B.
-- Sim copies with rewritten paths: `cb/b_sim` (base runs + az run_all), `cb/b_sim2` (lane B hr / ar runs); base tree `cb/b_base`.
+- [x] B2 committed b4bc206 (adapters for all 11 registry bosses, cost refactor, README).
+- [x] Merged origin/wip/combat 4163e8f (lanes R + P) — 34c6dae, no conflicts; regen on the merged tree = no change.
+- [x] B3 (commit 3): after the merge the m0diff budget showed +0.5/t over base2 (force 99 / 2 crossed 6.5): the damage path
+      had 3 lines per strike (apply amp, apply sources, clear_atkflags reset). Now ONE line in combat/apply_mods
+      (`if score @s balMax matches 1.. run function rlk:bal/mods`: groggy -> amp; else burst / reaction sources, not on a
+      killing blow); `#burstDmg tmp` = the game time of the burst's damage calc (stale ticks ignored), cleared by
+      char/after_hit; combat/apply and clear_atkflags are back to the base. ident_hr: group `combat overhaul B` (no gone files).
+      Gates on this tree (all done): regen x2 identical, check_mboss_pack 0, check_refs no new vs base2, loadcheck cb_b 0,
+      test_bal 117/117, test_bal_boss 129/129; az/tests_cm run_all = base2's step statuses; m0diff = base2's failures + one:
+      A force 2 commands/tick +6.51 (budget 6.5; base2 6.31; the one apply_mods line per strike = +0.2/t; force 99 6.40 and
+      force 1 5.75 pass; force 3 6.80 already failed in base2 at 6.61) -> README 0-9, lead's budget decision; 홍련 suites all
+      pass (test_scarlet, pat_p1, pat_ghost, test_special_hr, test_reward, test_moon, test_hwamu, test_arena_hr, ident_hr
+      with the B group, gen_check_hr 28/28 with an RP copy, test_kit, ev_dry; test_rig 160/161 = base2's: the user's skin
+      file is not in the sim copy); lane R's test_rm passes; ar/tests test_cm_ar 65 / test_arena_fl 46 ok, test_kit needs the
+      local branch wip/ar-s3 (same on the base; not created: no changes to the main checkout).
+- Sim copies with rewritten paths: `cb/b_sim4` (base2 = origin/wip/combat 4163e8f, tree `cb/b_base2`), `cb/b_sim3` (lane B).
 
 ## Log
 - 11-10 start: baseline `regen_all.sh --mobs` clean (32 s). RP not in the container (no `rlk_hud_resourcepack*`).

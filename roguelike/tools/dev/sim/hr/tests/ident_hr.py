@@ -33,6 +33,8 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 (lvup/pick_sub)
   combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
                 inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
+  combat B      the balance gauge / groggy (11-10, wip/combat-bal): F:bal/**, the bosses' bal_{ok,on,tick,off} hooks and their
+                own groggies' refill lines, the mob / cm / combat / burst hook lines, the cm rig ticks, Raiden's balance stun
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
 file passes only in a group named in ALLOW_GONE.
@@ -111,6 +113,20 @@ ALLOW[LANE_R] = (
                                              'rays', 'slow', 'spawn', 'sync', 'ttl_blank')]
     + [F + n for n in ('items/q/run.mcfunction', 'lvup/pick_sub.mcfunction', 'mob/tick.mcfunction', 'room/fall/mob_reward.mcfunction',
                        'room/fall/player.mcfunction', 'tick.mcfunction')])
+# 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
+# the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
+# call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's
+# balance stun, the boss bars' pip row. It removes nothing.
+LANE_B = 'combat overhaul B (11-10): balance gauge / groggy'
+ALLOW[LANE_B] = (
+    [F + r'bal/.+', F + r'(?:mboss|boss)/[a-z]+/bal_(?:ok|on|tick|off)\.mcfunction', F + r'cm/[a-z]{2}/rig/tick\.mcfunction']
+    + [F + f'{n}.mcfunction' for n in (
+        'mob/setup', 'mob/tick', 'mob/hb_cleanup', 'cm/tick', 'cm/sb/tick', 'combat/apply', 'combat/apply_mods',
+        'combat/clear_atkflags', 'char/after_hit', 'char/lumine/jav_spawn', 'char/lumine/jav_hit', 'items/hook/burst_dmg',
+        'element/frz_end', 'mboss/bars', 'mboss/guardian/groggy/begin', 'mboss/butterfly/groggy/begin',
+        'mboss/fieldgen/groggy/begin', 'boss/arlecchino/core/stun_start', 'boss/arlecchino/hud/bar_stun',
+        'boss/tachy/el/backfire', 'boss/tachy/mantle/break', 'boss/raiden/bars', 'boss/raiden/tick',
+        'boss/raiden/exhausted_start', 'boss/raiden/sg/stun_begin', 'boss/raiden/sg/stun_tick')])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
               'combat P late-game lag (11-10)'}     # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4

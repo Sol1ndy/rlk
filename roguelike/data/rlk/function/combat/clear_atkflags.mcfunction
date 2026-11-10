@@ -14,5 +14,3 @@ scoreboard players set #rnErAdd tmp 0
 scoreboard players set #sub itv 0
 # 진짜 피해(중간보스 별 파괴 등, mboss/true_hit): 원소 · 보정 · 저항 없이 그대로
 scoreboard players set #trueDmg tmp 0
-# 원소폭발 피해 표시(균형치; items/hook/burst_dmg 가 1 로 세우고 char/after_hit 가 내림)
-scoreboard players set #burstDmg tmp 0

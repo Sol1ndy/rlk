@@ -1,6 +1,6 @@
 # 원소폭발 피해 보정 지점 (@s = 플레이어). 원소폭발의 피해(#dmg)를 계산한 직후에 호출할 것 — 새 캐릭터의 원소폭발도 반드시 이 함수를 부른다
-# 균형치: 이번 피해는 원소폭발(combat/apply 의 bal/src/hit 가 봄; char/after_hit · combat/clear_atkflags 가 내림)
-scoreboard players set #burstDmg tmp 1
+# 균형치: 이번 피해는 원소폭발(이 틱의 게임 시간; combat/apply_mods 의 bal/mods 가 봄, char/after_hit 가 내림)
+execute store result score #burstDmg tmp run time query gametime
 # 초월 · 악요개안: 원소 에너지 1pt당 원소폭발 피해 +0.3% (보유 개수만큼)
 execute if score @s it_stormy_eye matches 1.. run function rlk:items/proc/eye_burst
 # 불씨의 맹약: 전의 1당 원소폭발 피해 증가
