@@ -9,7 +9,6 @@ scoreboard players operation @s vAimT = #viewAimHold tmp
 scoreboard players operation @s burstCd = #burstCdT tmp
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 execute if score #charN tmp matches 1 run function rlk:char/lumine/burst
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/burst
 execute if score #charN tmp matches 4 run function rlk:char/clorinde/burst
 execute if score #charN tmp matches 5 if entity @e[tag=rlk_pm_basis,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] run function rlk:char/arlecchino/burst
 execute if score #charN tmp matches 5 unless entity @e[tag=rlk_pm_basis,limit=1] run function rlk:char/arlecchino/burst

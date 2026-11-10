@@ -144,7 +144,7 @@ summon minecraft:text_display 93.5 198.75 15.03 {Tags:["rlk_lobby"],Rotation:[0f
 summon minecraft:text_display 93.5 198.2 15.03 {Tags:["rlk_lobby"],Rotation:[0f,0f],billboard:"fixed",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,line_width:400,text:{"text": "v0.0.1", "color": "#9A9A9A"},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.1f,1.1f,1.1f]}}
 execute positioned 93.5 195.7 15.0 run function rlk:lobby/obj/make_w {item:"minecraft:nether_star",name:"게임 시작",desc:"던전으로 출발",color:"#FFD24A",k:1,yaw:0}
 execute positioned 81.0 195.9 21.0 run function rlk:lobby/obj/make_w {item:"minecraft:writable_book",name:"튜토리얼",desc:"조작 · 반응 · 캐릭터",color:"#7FD3FF",k:3,yaw:-90}
-execute positioned 81.0 195.9 29.0 run function rlk:lobby/obj/make_w {item:"minecraft:comparator",name:"시작 전 설정",desc:"시점 · 카메라",color:"#B5E07A",k:4,yaw:-90}
+execute positioned 81.0 195.9 29.0 run function rlk:lobby/obj/make_w {item:"minecraft:comparator",name:"시작 전 설정",desc:"카메라",color:"#B5E07A",k:4,yaw:-90}
 execute positioned 106.0 195.9 21.0 run function rlk:lobby/obj/make_w {item:"minecraft:iron_sword",name:"캐릭터 · 아이템 체험",desc:"더미 · DPS 측정",color:"#FF8A6A",k:5,yaw:90}
 execute positioned 106.0 195.9 29.0 run function rlk:lobby/obj/make_w {item:"minecraft:totem_of_undying",name:"캐릭터 선택",desc:"도감 캐릭터 탭",color:"#E0B255",k:2,yaw:90}
 summon minecraft:text_display 122.5 195.3 17.05 {Tags:["rlk_lobby","rlk_tutp"],Rotation:[0f,0f],billboard:"fixed",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:1342177280,line_width:300,text:{"text": ""},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.7f,1.7f,1.7f]}}
@@ -156,7 +156,6 @@ execute positioned 134.0 196.0 30.0 run function rlk:lobby/obj/make_w {item:"min
 execute positioned 122.5 196.0 40.0 run function rlk:lobby/obj/make_w {item:"minecraft:oak_door",name:"로비로",desc:"",color:"#FFD24A",k:9,yaw:180}
 summon minecraft:text_display 98.5 200.4 39.05 {Tags:["rlk_lobby"],Rotation:[0f,0f],billboard:"fixed",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,line_width:400,text:{"text": "시작 전 설정", "color": "#B5E07A", "bold": true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[2.0f,2.0f,2.0f]}}
 summon minecraft:text_display 98.5 199.7 39.05 {Tags:["rlk_lobby"],Rotation:[0f,0f],billboard:"fixed",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,line_width:600,text:{"text": "버튼을 좌클릭할 때마다 값이 바뀝니다", "color": "#C8C8C8"},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.0f,1.0f,1.0f]}}
-execute positioned 93.0 196.0 42.0 run function rlk:lobby/obj/make_w {item:"minecraft:ender_eye",name:"시점",desc:"",color:"#7FD3FF",k:20,yaw:-90}
 execute positioned 93.0 196.0 46.0 run function rlk:lobby/obj/make_w {item:"minecraft:spyglass",name:"카메라 거리",desc:"",color:"#7FD3FF",k:21,yaw:-90}
 execute positioned 104.0 196.0 46.0 run function rlk:lobby/obj/make_w {item:"minecraft:ladder",name:"카메라 높이",desc:"",color:"#7FD3FF",k:23,yaw:90}
 execute positioned 101.5 196.0 39.0 run function rlk:lobby/obj/make_w {item:"minecraft:chest",name:"시작 아이템",desc:"",color:"#E0B255",k:26,yaw:0}
@@ -172,7 +171,7 @@ execute positioned 134.0 196.0 56.0 run function rlk:lobby/obj/make_w {item:"min
 execute positioned 122.5 196.0 45.0 run function rlk:lobby/obj/make_w {item:"minecraft:oak_door",name:"로비로",desc:"",color:"#FFD24A",k:9,yaw:0}
 # 체험 방 더미는 플레이어가 체험 방에 들어갈 때만 만든다(try/enter · try/tick). 지을 때는 남은 것만 치운다
 kill @e[tag=rlk_dummy,tag=!rlk_tutE]
-data modify storage rlk:lobby built set value 11
+data modify storage rlk:lobby built set value 12
 function rlk:lobby/set/labels
 function rlk:lobby/try/labels
 function rlk:lobby/try/board

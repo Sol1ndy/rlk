@@ -8,12 +8,8 @@ execute if score #k lob matches 9 run return run function rlk:lobby/go
 execute if score #k lob matches 10 run return run function rlk:lobby/tut/next
 execute if score #k lob matches 11 run return run function rlk:lobby/ct/enter
 execute if score #k lob matches 12 run return run function rlk:lobby/tut/basic
-execute if score #k lob matches 20 run return run function rlk:lobby/set/s20
 execute if score #k lob matches 21 run return run function rlk:lobby/set/s21
-execute if score #k lob matches 22 run return run function rlk:lobby/set/s22
 execute if score #k lob matches 23 run return run function rlk:lobby/set/s23
-execute if score #k lob matches 24 run return run function rlk:lobby/set/s24
-execute if score #k lob matches 25 run return run function rlk:lobby/set/s25
 execute if score #k lob matches 26 run return run function rlk:lobby/set/s26
 execute if score #k lob matches 30 run return run function rlk:lobby/try/codex
 execute if score #k lob matches 31 run return run function rlk:lobby/try/level

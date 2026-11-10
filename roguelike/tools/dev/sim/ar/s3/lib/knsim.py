@@ -249,8 +249,8 @@ def heal_player(s):
 KINDS = {
     'melee_na': dict(icd=1, skill=0, tfm=0, sub=0),        # combat/find_immediate (sword / scythe / spear / kick)
     'melee_extra': dict(icd=1, skill=0, tfm=0, sub=0),     # char/melee/extra, char/skirk/na_extra
-    'bow_na': dict(icd=1, skill=0, tfm=0, sub=0),          # char/bow/arrow_hit, aIcd 1 (na_shot)
-    'bow_aim': dict(icd=0, skill=0, tfm=0, sub=0),         # char/bow/arrow_hit, aIcd 0 (release: aimed / charged shot)
+    'ranged_na': dict(icd=1, skill=0, tfm=0, sub=0),       # char/ronova/proj_hit, aIcd 1 (orbs 1-3); char/clorinde/shoot
+    'ranged_icd0': dict(icd=0, skill=0, tfm=0, sub=0),     # char/ronova/proj_hit, aIcd 0 (the 4th orb)
     'skill': dict(icd=0, skill=1, tfm=0, sub=0),           # char/dmg_calc (#skillDmg 1)
     'skill_icd': dict(icd=1, skill=1, tfm=0, sub=0),       # lumine crystal / javelin (#icd 1 + #skillDmg 1)
     'reaction': dict(icd=0, skill=0, tfm=1, sub=0),        # element/aoe_hit, dot, lunar/hit

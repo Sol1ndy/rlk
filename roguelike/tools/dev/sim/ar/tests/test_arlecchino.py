@@ -321,7 +321,7 @@ def bond():
 
 
 # ------------------------------------------------------------------------------------------------------------- 4 predicate
-KIND_EXPECT = {'melee_na': 1, 'melee_extra': 1, 'bow_na': 1, 'bow_aim': 0, 'skill': 0, 'skill_icd': 0, 'reaction': 0, 'item': 0}
+KIND_EXPECT = {'melee_na': 1, 'melee_extra': 1, 'ranged_na': 1, 'ranged_icd0': 0, 'skill': 0, 'skill_icd': 0, 'reaction': 0, 'item': 0}
 
 
 def predicate():
@@ -353,8 +353,9 @@ def predicate():
         ('melee normal (all melee chars)', has('combat/find_immediate', 'scoreboard players set #icd tmp 1', 'set #skillDmg tmp 0', 'set #tfm tmp 0')),
         ('melee extra hits (clorinde / arlecchino / navia / nefer)', has('char/melee/extra', 'set #icd tmp 1', 'set #skillDmg tmp 0')),
         ('skirk 5-hit extra', has('char/skirk/na_extra', 'set #icd tmp 1', 'set #skillDmg tmp 0')),
-        ('bow normal shot aIcd 1 (yoimiya)', has('char/bow/na_shot', 'set #aIcd tmp 1')),
-        ('bow aimed / charged shot aIcd 0', has('char/bow/release', 'set #aIcd tmp 0')),
+        ('projectile hits take #icd from the projectile (char/bow/arrow_hit -> ronova/proj_hit)',
+         has('char/bow/arrow_hit', 'aKind matches 7..8 run return run function rlk:char/ronova/proj_hit')
+         and has('char/ronova/proj_hit', 'clear_atkflags', 'operation #icd tmp = @s aIcd')),
         ('clorinde pistol normal shot', has('char/clorinde/shoot', 'clear_atkflags', 'set #icd tmp 1')),
         ('ronova orbs 1-3 pIcd 1, the 4th 0', has('char/ronova/na', 'set #pIcd tmp 1', 'matches 3.. run scoreboard players set #pIcd tmp 0')),
         ('nefer phantasm self hits', has('char/nefer/ph_self', 'set #icd tmp 1')),

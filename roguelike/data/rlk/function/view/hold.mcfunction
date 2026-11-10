@@ -4,5 +4,5 @@ execute if entity @e[tag=rlk_vseat,limit=1] run scoreboard players set #xh view 
 execute if entity @e[tag=rlk_vseat,limit=1] run function rlk:view/ride_off
 execute if score #spr view matches 1 run attribute @s minecraft:movement_speed modifier remove rlk:view_sprint
 scoreboard players set #spr view 0
-# 선택 공간(레벨 업 아이템 선택·인벤토리 상세·도감 등, pkMode 1~)에서도 F5 위쪽 시점이면 3인칭이라 바닐라 조준선이 없다: 조준점을 계속 띄움
-execute if score @s pkMode matches 1.. unless score @s dead matches 1 if score #vmode view matches 2 run function rlk:view/sel_xhair
+# 선택 공간(레벨 업 아이템 선택·인벤토리 상세·도감 등, pkMode 1~)에서도 F5 위쪽 시점이라 바닐라 조준선이 없다: 조준점을 계속 띄움
+execute if score @s pkMode matches 1.. unless score @s dead matches 1 run function rlk:view/sel_xhair
