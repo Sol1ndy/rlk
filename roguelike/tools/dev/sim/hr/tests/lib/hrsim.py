@@ -886,8 +886,8 @@ def world_h1(s):
     world_sc(s)
 
 
-def setup_h1(dp, seed=11, lv=16, hp=5834, player_level=15):
-    """The H1 world: the item-less Lv15 player against her at L16 (hp 260 x LV_HP(16) / 100 = 5834), the balance gauge
+def setup_h1(dp, seed=11, lv=15, hp=5834, player_level=15):
+    """The H1 world: the item-less Lv15 player against her at L16 (lv + her lvAdd 1; hp 260 x LV_HP(16) / 100 = 5834), the balance gauge
     real (mob/setup -> bal/init, bal/load)."""
     s, pl = setup_sc(dp, seed=seed, lv=lv, hp=hp, player_level=player_level, cls=H1Sim)
     s.cache['rlk:mob/setup'] = ['tag @s add rlk_mob', 'function rlk:bal/init']
