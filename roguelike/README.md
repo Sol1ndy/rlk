@@ -934,6 +934,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 - common·rare·unique 아이템의 목록과 설명은 데이터팩 폴더의 `items.md` 에 있습니다(게임 안 설명과 같은 글. 정의 = `items/<등급>/<id>/def`, 효과 = `items/proc/`, 수치 = `load.mcfunction` 의 "아이템 수치"). 각인은 `engravings.md`.
 - 보유 아이템은 인벤토리 둘째 줄 왼쪽부터 셋째 줄로 이어서 고정됩니다(보유 칸 수 = 점수 `invCap`, 처음 9칸, 최대 18칸). 아직 열리지 않은 칸은 **방벽**(`rlk_lock`)으로 채워 두며, 나중에 인벤토리 슬롯 노드가 두 칸씩 엽니다. **인벤에서 클릭하면 발밑에 버려집니다.**
 - 인벤토리 첫 줄: 0 = 캐릭터 정보(머리), 1 = 고유 특성(종이, 캐릭터 추가 설명 포함), 2 = **◆ 인벤토리 상세** 버튼, 3~6 = 각인 칸, 7 = 나머지 각인, 8 = 스탯 정보. 다른 것을 넣으면 지워집니다(`player/inv/frame`).
+- 인벤 정리(`player/inv/manage`) · 장비 스캔(`items/equip_scan`)은 인벤이 바뀔 때만 돈다(`player/tick`: rlk 아이템 수 프로브 · `inventory_changed` 이벤트 · 10초 폴백 → `invDirty` 2). `player/tick` 안에서 우리 코드가 바꾼 것은 끝(`invEvt 0`)에서 소비되므로, 핫바 0~2번을 다시 만들면 F5 마무리(손 감싸기 · consumable)도 그 안에서 한다(`player/hotbar/wrap`; 11-10 전에는 다음 틱 `view/ride_tick` 이 고쳐 전투 중 초마다 정리 · 스캔이 두 번씩 돌았다). F 로 왼손에 온 UI 아이템의 이벤트는 정리하지 않는다. 빠른 길(결과는 전체 순회와 같음): 실물 수 = order 길이면 등록 id 전체를 훑는 `collect_loop` 생략(`player/inv/sync`), 정리 직후 몸의 rlk 아이템 = order 이면 order 의 id 만 스캔(`items/scan_fast` · `scan_held`, 지난 보유 id `rlk:scan held` 는 0 으로), 각인 정렬은 한 번 훑기(`engravings/info_build`). 측정 · 비교 틀: `tools/dev/plan/combat/perf_harness/`.
 - **인벤토리 상세** (`invd/`): 인벤토리 첫 줄 3번째 칸(inventory.2)의 **◆ 인벤토리 상세** 버튼을 누르면 아이템 선택 공간과 같은 방으로 이동합니다(인벤토리 창은 E 로 닫으세요). 전투 중에는 쓸 수 없습니다.
   - 보유 칸 18개를 인벤토리와 같은 순서로 9칸씩 두 줄에 보여 줍니다(칸 오른쪽 아래 숫자 = 순번, 잠긴 칸은 어둡게 + 방벽).
   - 아이템을 누른 뒤 다른 아이템을 누르면 두 아이템의 자리가 바뀝니다(같은 아이템을 다시 누르면 고르기 취소).
@@ -944,7 +945,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 - **강화와 너프** (`items/tune/`, 인챈트 노드):
   - 아이템마다 강화 단계 0~3(`rlk:pinv enh.<id>` · 점수 `<id> enhL`, 같은 아이템은 같은 단계, 런마다 0). 이름 뒤에 별: `[ MYTHIC ] 서리달의 은잔 ☆☆☆` → `★★☆`(`items/set_name`, 별 모양 `rlk:items stars`). 실물 아이템의 custom_data `rlk:{id,v,e}` 의 `e` 가 단계라, 단계가 바뀌면 인벤토리 정리 때 새 이름으로 다시 놓입니다.
   - **0단계 = 크게 너프된 기본값, 3단계 = 예전(너프 전) 값.** 배율(‰, `rlk:tune fac`): 효과량 500 / 667 / 833 / 1000, 지속 시간 700 / 800 / 900 / 1000, 재사용 대기 · 반복 간격 1300 / 1200 / 1100 / 1000.
-  - 능력치(def `stats`)는 효과량 배율로 자동(합산 `items/scan_add`, 표시 `items/tune/stats_scale`, 반올림).
+  - 능력치(def `stats`)는 효과량 배율로 자동(합산 `items/scan_add_prep` → `items/scan_s/<키>`, 표시 `items/tune/stats_scale`, 반올림).
   - 효과 수치: 아이템마다 조정 상수 표 `rlk:tune t.<id> = [{n:"#상수",m:"a|d|c"}]`(묶음 파일 `items/tune/b1~b10`, function tag `#rlk:tune_tables`). load 가 넣은 값을 기준값으로 잡고 단계에 맞춰 상수를 다시 계산합니다(`items/tune/register` → `capture` → `apply`). **조정 상수는 load 또는 묶음 파일에서 매번 무조건 설정돼야 합니다**(기준값을 다시 읽기 때문). 강화하면 그 아이템만 다시 계산(`items/enh_add`).
   - 지금 조정 표: 94개 아이템 중 효과가 있는 아이템의 상수 약 190개(묶음 `b1~b10`). 작은 정수 값(회복 2% 등)은 단계마다 달라지도록 ‰ 단위로 바꿨고(load 의 해당 줄에 표시), 공용 상수(`#st20`, `#100` 등)를 쓰던 반복 간격 · 계수는 아이템 전용 상수로 나눴습니다. 동전 주머니(+1 골드)는 정수라 강화와 상관없습니다.
   - `items.md` 의 수치는 3단계(★★★, 너프 전) 기준입니다. 게임 안 설명은 지금 단계의 값으로 나옵니다.
