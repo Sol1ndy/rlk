@@ -88,7 +88,7 @@ before, `b_*` = after.
 | ev_dry / test_flow / test_vi | 82 / 82, 40 / 40, 208 / 208 |
 | test_cine / test_contact / test_actor / test_rig | 172 / 172 (drinks), 102 / 102 (gap), 157 / 157, 162 / 162 |
 | ident_hr / test_scarlet | ALL / 48 / 48 |
-| gen_check_hr | see the commit after this one |
+| gen_check_hr | 28 / 28 (1466 s) |
 | check_mboss_pack | 0 problems |
 | loadcheck (26.3 server) | `wc_a` (checkpoint) and `wc_b` (final): 0 function load failures, `Done (` |
 | rplint `rp_wc` / atlas_px | 0 problems / 13 107 904 px (13.108 M, unchanged) |
