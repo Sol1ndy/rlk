@@ -252,7 +252,10 @@ def variant(dp, edit, label='v', gens=('build_mboss_core', 'build_mboss_arena', 
     SCRATCH.mkdir(exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix=f'cm_{label}_', dir=SCRATCH)) / 'roguelike'
     src = Path(dp).resolve()
-    real = ('data/rlk/function/mboss', 'data/rlk/function/room/cboss', 'data/rlk/function/boss/test', 'tools')
+    # round V integration (11-12): + data/rlk/advancement/mboss (build_mboss_core.py writes FN-cam's tick advancement
+    # cam_post.json there since lane VC; as a hard link the core run in the copy rewrote the tested tree's file in place)
+    real = ('data/rlk/function/mboss', 'data/rlk/function/room/cboss', 'data/rlk/function/boss/test', 'data/rlk/advancement/mboss',
+            'tools')
     for d, dirs, files in os.walk(src):
         rel = Path(d).relative_to(src)
         dirs[:] = [x for x in dirs if x not in ('__pycache__', '.git') and not (rel == Path('tools') and x == 'dev')]

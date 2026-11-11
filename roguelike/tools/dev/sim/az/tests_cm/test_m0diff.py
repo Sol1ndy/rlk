@@ -60,6 +60,10 @@ LANE_C_CMD = 1.2
 # round V, lane VP (11-11): the perfect parry / dodge beat's hold test, the first line of mboss/main (one command per boss tick;
 # tools/dev/plan/combat/vp_progress.md "Cost"). The effect kits' two clock lines (나비, 역장) come on top and are not budgeted.
 LANE_VP_CMD = 1.0
+# round V, lane VB (11-11; found at the integration, 11-12: the draw stood exactly at its budget): the under bar's segment
+# option #buSubSeg bu (홍련's 5-segment gauge) costs every boss bar draw its reset in bossui/draw (1) and, with an under bar,
+# the gated divider line of bossui/sub (1). Named apart, so the older allowance stays visible (README 0-9).
+LANE_VB_DRAW = 2
 DRAW_BUDGET = 6         # extra commands per bossui/draw with the options unset (sim count: the colour test, the nums
                         # call, the two resets; measured +6, was +15 before the fix round)
 # chapter-mode names a mid-boss fight may hold on the tree only (cm.md 4.1 / 4.2 / 11 / 13, and their internal temporaries)
@@ -307,8 +311,8 @@ def main():
             for opts in ({}, {'#buHpCol': 0, '#buNoNum': 0}):
                 a, na = bu_draw(m0, *c, {})
                 b, nb = bu_draw(dp, *c, opts)
-                check(f'C draw {c} {opts or "unset"}: the line equals M0\'s; commands {na} -> {nb} (budget +{DRAW_BUDGET})',
-                      a == b and nb - na <= DRAW_BUDGET, (a == b, nb - na))
+                check(f'C draw {c} {opts or "unset"}: the line equals M0\'s; commands {na} -> {nb} (budget +{DRAW_BUDGET} + lane VB {LANE_VB_DRAW})',
+                      a == b and nb - na <= DRAW_BUDGET + LANE_VB_DRAW, (a == b, nb - na))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f'({time.time() - t0:.0f} s)')

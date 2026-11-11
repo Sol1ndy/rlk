@@ -1,0 +1,89 @@
+--- rp/README.md
++++ rp/README.md
+@@ -30,19 +30,20 @@
+ ## 2. 폴더 지도 (`assets/`)
+ | 경로 | 내용 |
+ |---|---|
+-| `minecraft/atlases/items.json` | 아이템 아틀라스의 소스 목록(11-03: 1 377개, 모두 `minecraft:single`). 30개는 바닐라 블록 텍스처에 별칭 `sprite`(`rlk:cm/<몹>/…`, `rlk:player_motion/<블록>`) |
++| `minecraft/atlases/items.json` | 아이템 아틀라스의 소스 목록(11-03: 1 377개, 11-12 라운드 V: 1 505개; 모두 `minecraft:single`). 30개는 바닐라 블록 텍스처에 별칭 `sprite`(`rlk:cm/<몹>/…`, `rlk:player_motion/<블록>`) |
+ | `minecraft/textures/gui/sprites/boss_bar/white_{background,progress}.png` | 투명: 흰 바닐라 보스바 막대를 지워 이름 줄(글꼴로 그린 보스바 · 미니맵)만 보이게 |
+ | `minecraft/textures/gui/sprites/hud/**`(56장) | 투명: 바닐라 하트 · 배고픔 · 갑옷 칸 숨기기(체력은 데이터팩의 액션바 HP 바) |
++| `minecraft/textures/entity/zombie/{husk,husk_baby}.png` | 투명(64 × 64, 알파 0; 11-12 라운드 V 레인 VC): 이 팩에서 허스크는 늘 보이지 않는 판정 몸(보스 틀의 몸 · 커스텀 몹의 두뇌 · 프록시)이고, 관전 시점(컷신 카메라)은 투명 생물을 15 % 유령으로 그리므로 그릴 것을 없앤다 — `build_blank_tex.py`. **이 텍스처가 없는 옛 팩으로는 컷신에 갈색 허스크 유령이 보인다** |
+ | `rlk/font/*.json` + `rlk/textures/font/<글꼴>/*.png` | 글꼴 13개(아래 표) |
+ | `rlk/items/<…>.json` · `rlk/models/item/<…>.json` · `rlk/textures/<…>.png` | 같은 하위 경로끼리 짝: `items/` 는 아이템 정의(`custom_model_data` 색 · 모습 고르기), `models/item/` 은 블록식 모델, `textures/` 는 그림 |
+ | `…/cm/` | 잡몹 리그: 1챕터 `sw ar fm im sh cn`, 2챕터 `c2/{ns,slime,sp,dr,fx}` · `kr nj cc ci`, 3챕터 `c3/{fu,fp,em,sb,cw}` · `cs rv pc`; 팔레트 · 소품 `textures/cm/{c2,c2e,c3,c3e}` |
+ | `…/mboss/<id>/` · `…/mboss/<킷>/` | 보스 리그(`guardian` `butterfly` `fieldgen` `azhdaha` `apep` `apep_om`(아펩 생명체 · 심장 · 돔) `tachy` `arlecchino` `scarlet`(홍련: **몸은 플레이어 아바타와 같은 상자**(머리 8 × 8 × 8, 몸 8 × 12 × 4 를 상체 · 골반으로 나눔, 아바타와 같은 슬림 3픽셀 팔 · 4픽셀 다리, 스킨 1픽셀 = 1/16칸, 크기 1)에 **사용자의 마인크래프트 스킨** `textures/mboss/scarlet/skin.png`(64 × 64, 사용자가 준 파일 그대로)를 바닐라 배치로 입힘; 갓 · 갓끈 · 띠 꼬리 · 칼 · 칼집 · 잔 · 병은 우리 그림(S2c 색, 몸에 맞게 줄인 크기), 손 셋, 얼굴 겹침 `face_fx`, 단계 둘의 갓 매듭 / 띠, 칼 빛 넷, 모든 모델의 유령 쌍둥이 `<model>_g`, 아이템 `item_sword`))와 효과 킷(`bf_kit` `fg_kit` `az_kit` `ap_kit` `tk_kit` `kn_kit` `hr_kit`) |
+ | `…/raiden/` | 나루카미: 파트 모델은 `items/raiden/*.json` · `models/item/raiden/*.json` 바로 아래(그림 `textures/raiden/rig/`) · `fx/` 색 견본 · `fxg/` 번개 그림(둘 다 `textures/` 에만) · `arena/` 일심정토 배경 패널 · `judgment/` 만겁의 팔 · `clone/` 분신 · `prop/` 소품(만겁 보호막 돔 · 박수 손 · 추모의 꽃 · 씨앗 · 금강저 · 구슬 · 꽂힌 나기나타 등) · `fx_*` 효과 · `skin.png` |
+-| `…/player_motion/` | 플레이어 아바타(`arle` `skirk` `navia` 의 몸 파트)와 무기(`weapons/`); 홍련 컷신 배우(11-11 레인 H3: `lumine` `clorinde` `ronova` `nefer` 의 10파트 — 다른 셋은 아바타의 것을 그대로 씀 — 와 칼 하나 `weapons/cine_sword` = 아바타 리그의 `sword` 모델) |
++| `…/player_motion/` | 플레이어 아바타(`arle` `skirk` `navia` 의 몸 파트)와 무기(`weapons/`); 홍련 컷신 배우(11-11 레인 H3: `lumine` `clorinde` `ronova` `nefer` 의 10파트 — 다른 셋은 아바타의 것을 그대로 씀 — 와 칼 하나 `weapons/cine_sword` = 아바타 리그의 `sword` 모델); 11-12 라운드 V 레인 VP: 퍼펙트 패링의 **무기 빛** — 리그 무기 다섯의 `weapons/<spear,scythe,sword,cryo_sword,navia_halberd>_glow`(제 요소 + 같은 요소의 발광 껍질, 그림은 `textures/player_motion/weapons/<31장>_hot.png` 절반 해상도의 노란 흰색), 마네킹 캐릭터의 바닐라 검 · 법구용 `wg/{iron_sword,diamond_sword,netherite_sword,orb}`(모델 `wg/{blade,orb}`, 그림 `weapons/wglow_blade.png` · `wglow_orb.png`), 그리고 일곱 캐릭터의 몸 파트 모델 전부에 `tintindex 0`(닷지의 붉은 분홍 몸빛 = `custom_model_data` 색) |
+ | `…/navia_fx/` · `…/rift/` | 나비아 금빛 카드 · 방 균열 |
+ | `rlk/items/h/*` | 3인칭에서 손의 바닐라 무기를 감추는 감싸기(`view/av_unwrap` 가 되돌림) |
+ | `rlk/items/{claymore,dice,empty,map_button}.json`, `models/item/{claymore,dice}.json`, `textures/item/dice_1..6.png` | 대검 · 주사위 · 빈 모델 · 지도 버튼 |
+-| `rlk/textures/skin/*.png` | 캐릭터 스킨(`arlecchino clorinde lumine navia nefer ronova skirk`; `lumine` 은 11-11 레인 H3 이 그녀의 프로필 텍스처에서 받아 `tools/player_motion/cine/skin/lumine.png` 에 둔 것을 배우 생성기가 복사; 배우의 스킨 넷 `rlk:skin/{lumine,clorinde,ronova,nefer}` 은 아틀라스 항목; 요이미야 · 활 모델은 11-11 에 지움)과 몹 스킨(`mob_*`) |
++| `rlk/textures/skin/*.png` | 캐릭터 스킨(`arlecchino clorinde lumine navia nefer ronova skirk`; `lumine` 은 11-11 레인 H3 이 그녀의 프로필 텍스처에서 받아 `tools/player_motion/cine/skin/lumine.png` 에 둔 것을 배우 생성기가 복사; 배우의 스킨 넷 `rlk:skin/{lumine,clorinde,ronova,nefer}` 은 아틀라스 항목; 요이미야 · 활 모델은 11-11 에 지움)과 몹 스킨(`mob_*`); `blank.png`(64 × 64, 알파 0; 11-12 라운드 V 레인 VC: 컷신 동안 숨긴 아바타 · 몹 미끼 마네킹의 스킨 `rlk:skin/blank`) |
+ | `rlk/sounds.json` | `{}` |
+ 
+ 글꼴(글리프 뿌리 텍스트는 늘 비우고 꾸미지 않는다; 킷 글꼴은 끝에 `minecraft:default` 참조가 있어 글자가 기본 글꼴로 나온다):
+@@ -51,12 +52,12 @@
+ |---|---|---|
+ | `rlk:hud` | U+E100–E101 | F5 조준점(제목으로 띄움; 숄더뷰는 11-11 에 없앰) — 생성기 없음 |
+ | `rlk:minimap` | U+E300–E3F2 | 미니맵(보이지 않는 보스바 이름) — `build_minimap.py` |
+-| `rlk:bossbar` | U+E400–E438 | 보스바 HP 막대 · 숫자 자리 · 흰 피해 자국 · 아랫줄 — `build_bossbar.py` |
++| `rlk:bossbar` | U+E400–E438, E440 | 보스바 HP 막대 · 숫자 자리 · 흰 피해 자국 · 아랫줄 · 아랫줄의 칸 구분선 U+E440(`textures/font/bossbar/seg.png` 3 × 7; 11-12 라운드 V 레인 VB: 홍련의 5칸 게이지) — `build_bossbar.py` |
+ | `rlk:mboss_gd` | U+E500–E5F1 | 파수꾼 P4 화면 — `build_mboss_guardian_rig.mjs`(`guardian_screen.mjs`) |
+ | `rlk:mboss_bf` · `_fg` · `_az` · `_ap` · `_tk` · `_kn` | U+E600 · E700 · E800 · E900 · EA00 · EB00 대 | 보스별 배지 · 계기 · 화면 번쩍임 — 각 효과 킷 |
+ | `rlk:mboss_hr` | U+EC10–EC18, EC1F, EC20–EC3F | 홍련의 전체 화면 덮개 여덟(검정 · 반전 · 분홍빛 흰색 · 붉은 기 · 자홍 · 흰색, 144 × 81; 11-11: 금빛 `gold` U+EC17 = 튕겨내기 · 칼 맞댐의 섬광(레인 H2c), 깨진 유리 `web` U+EC18 = 공간 참(레인 H1c, 256 × 144)) · 가장자리 비네트 `vig` U+EC16(가운데 투명; SR 아이템 화무십일홍) · −1 칸 띄우개 U+EC1F · 대사가 떠 있는 동안의 덮개 사라짐 단계 U+EC20–EC3F(덮개마다 20 / 40 / 60 / 80 % 넷, `textures/font/mboss_hr/<덮개>_<1-4>.png`; F2 HR-30) — `build_mboss_hr_fx.py`(글리프 41개) |
+ | `rlk:bal` | U+ED00–ED22 | 균형치 마름모(노랑 · 빈 칸 · 흰 번쩍임 · 그로기 주황, 몹 머리 밑 줄과 보스바 줄; 11-11 전투 개편 B) — `build_balance.py` |
+-| `rlk:cb` | U+EE00–EE04, EE0F | 패링 · 닷지 효과(퍼펙트 패링 금빛 줄 · 작은 줄 · 퍼펙트 닷지 붉은 화면 · 별 · 패링 불가 경고 섬광, 칸 맞춤; 11-11 전투 개편 C) — `build_combat_fx.py` |
++| `rlk:cb` | U+EE00–EE0D, EE1E, EE1F | 패링 · 닷지 효과(11-12 라운드 V 레인 VP 가 다시 만듦; **모든 셀 ≤ 256 × 256 px** — 넘으면 그 글리프가 네모 상자가 된다, 11-11b 의 512 × 288 금빛 줄): 퍼펙트 패링의 가로 금빛 줄 네 조각 `streak_0..3` U+EE00–EE03(256 × 64 넷을 이어 한 줄) · 따뜻한 화면 색조 `tint` EE04 · 퍼펙트 닷지의 어두운 비네트 `vig` EE05 · 접점의 별 `star` EE06 · 2 / 1단계 패링의 작은 불꽃 `spark` EE07 · 공격자 위의 번개 `bolt_1..3` EE08–EE0A · 닷지의 분홍 터짐 `burst` EE0B · 패링 불가 경고 섬광 두 쪽 `glint_l` · `glint_r` EE0C · EE0D(160 × 64 둘) · 칸 맞춤 EE1E(−1) · EE1F(−257) — `build_combat_fx.py` |
+ 
+ ## 3. 어떤 생성기가 어디를 쓰나 (저장소 `roguelike/tools/`)
+ 모든 생성기는 자기 몫 경로에만 쓰고, 아틀라스는 통째로 바꾸지 않고 id 로 합친다.
+@@ -82,7 +83,7 @@
+ 
+ | 생성기 | 리소스팩에 쓰는 곳 | 데이터팩 쪽 |
+ |---|---|---|
+-| `node build_player_rig.mjs --datapack . --resourcepack <RP>` (+ `weapon_paint.mjs` 등; 11-11 부터 홍련 컷신 배우 `build_player_cine.mjs` 도 부름) | `models/item/player_motion/**` · `items/player_motion/**`(배우의 `{lumine,clorinde,ronova,nefer}/*` · `weapons/cine_sword` 포함), `textures/player_motion/weapons/*`, `textures/skin/lumine.png`, 아틀라스 `rlk:player_motion/*`(블록 별칭) · 스킨 항목(배우의 `rlk:skin/{lumine,clorinde,ronova,nefer}`) | `char/motion/**`(평타 시간표 `char/motion/combat/config/<캐릭터>/<클립>` 포함), `char/cine/**`(배우) |
++| `node build_player_rig.mjs --datapack . --resourcepack <RP>` (+ `weapon_paint.mjs` 등; 11-11 부터 홍련 컷신 배우 `build_player_cine.mjs`, 11-12 부터 박자 동작 · 대역 리그 · 무기 빛 `build_player_beat.mjs` 도 부름: `weapons/*_glow` · `*_hot.png` · `wg/**` · 몸 파트의 `tintindex`) | `models/item/player_motion/**` · `items/player_motion/**`(배우의 `{lumine,clorinde,ronova,nefer}/*` · `weapons/cine_sword` 포함), `textures/player_motion/weapons/*`, `textures/skin/lumine.png`, 아틀라스 `rlk:player_motion/*`(블록 별칭) · 스킨 항목(배우의 `rlk:skin/{lumine,clorinde,ronova,nefer}`) | `char/motion/**`(평타 시간표 `char/motion/combat/config/<캐릭터>/<클립>` 포함), `char/cine/**`(배우) |
+ | `python3 build_navia_fx_cards.py --resourcepack <RP>` | `navia_fx/` | `fx/nv/**` |
+ | `node build_mobs.mjs --datapack . --resourcepack <RP>`(= `build_shield` · `build_casters_archer` · `build_cannon.mjs`) + `node build_swordsman.mjs`(같은 인자) | `models/item/cm/{sw,sh,fm,im,ar,cn}` · `items/cm/…`, 아틀라스 별칭 `rlk:cm/<몹>/*` | `cm/<몹>/` 포즈 |
+ | `node build_ch2_swarm_rigs.mjs --resourcepack <RP>` · `node build_ch2_elite_rigs.mjs --resourcepack <RP>` | `cm/c2/**`, `cm/{kr,nj,cc,ci}`, `textures/skin/mob_c2_*` · `mob_{kr,nj,cc}`, `textures/cm/c2*` | `tools/ch2_elite_poses.json`(→ `build_ch2_mobs.py`) |
+@@ -95,11 +96,12 @@
+ | `python3 build_rift.py --resourcepack <RP>` | `rift/` | `room/rift/**` · `room/obj/k_rift` |
+ | `python3 build_mboss_tk_fx.py --resourcepack <RP>` + `node build_tachy_rig.mjs --resourcepack <RP>` | `mboss/tk_kit/**` · `mboss/tachy/**`, 글꼴 `mboss_tk` | `boss/tachy/{fx,rig}/**` |
+ | `python3 build_mboss_kn_fx.py --resourcepack <RP>` + `node build_arlecchino_rig.mjs --resourcepack <RP>` | `mboss/kn_kit/**`(11-03: 그림 45장 — 이번에 `veil` 추가: 2페이즈 변신을 가리는 진홍 불꽃 고치; 프리셋 `cross_thorns` · `shroud` · `shroud_burst` 추가) · `mboss/arlecchino/**`(1페이즈 몸과 낫은 아바타 모델 `player_motion/arle` · `weapons/scythe` 를 참조만 하고 쓰지 않음), 글꼴 `mboss_kn` | `boss/arlecchino/{fx,rig}/**` |
+-| `python3 build_mboss_hr_fx.py --resourcepack <RP>`(`build_rift.py` 다음) + `node build_scarlet_rig.mjs --resourcepack <RP>`(영상 클립 `scarlet_cine.mjs` 를 가져옴) | `mboss/hr_kit/**`(그림 54장 0.246 M px: 스프라이트 241 664(11-11b: 패링 신호 `cue_0` 64 × 64, 검토 H-A HA-07) + 게이트 아이콘 64 × 64 `rlk:mboss/hr_kit/gate_icon`; 도착 균열 `rift_*` 은 `build_rift.py` 의 `rlk:item/rift/*` 모델을 참조만 함, 없으면 유령 번쩍임 카드; 달무리 `p1b` · `p2b` 는 같은 그림의 색조만 달라 그림이 늘지 않음), 글꼴 `mboss_hr` · `mboss/scarlet/**`(그린 그림 27장 + 사용자 스킨 `skin.png` = 47 872 px; 모델 63개(유령 쌍둥이 포함) + `item_sword` + 슬롯 아이콘 `item_sword_icon`(F-I HR-03: `items/mboss/scarlet/item_sword.json` 이 `display_context` 로 gui · fixed · ground 에서 아이콘, 그 밖에서 `item_sword`); 킷의 면 모양 `hr_kit/qi_arcf_0..3` · `qi_wedgef`(F2 HR-12: 그림 없이 `qi_arc_*` · `qi_wedge` 그림을 다시 씀); 갓 두 개의 아이템 정의에 `minecraft:constant` 색조 — 테 아랫면 그늘; 유령 쌍둥이는 `rlk:mboss/scarlet/ghost` 한 장만 씀), 아틀라스 항목은 id 로 합침 | `boss/scarlet/{fx,rig}/**` + 매니페스트 둘 |
+-| `python3 build_bossbar.py --resourcepack <RP>` | 글꼴 `bossbar`, `gui/sprites/boss_bar/*` | `bossui/*` |
++| `python3 build_mboss_hr_fx.py --resourcepack <RP>`(`build_rift.py` 다음) + `node build_scarlet_rig.mjs --resourcepack <RP>`(영상 클립 `scarlet_cine.mjs` 를 가져옴) | `mboss/hr_kit/**`(그림 54장 0.246 M px: 스프라이트 241 664(11-11b: 패링 신호 `cue_0` 64 × 64, 검토 H-A HA-07) + 게이트 아이콘 64 × 64 `rlk:mboss/hr_kit/gate_icon`; 도착 균열 `rift_*` 은 `build_rift.py` 의 `rlk:item/rift/*` 모델을 참조만 함, 없으면 유령 번쩍임 카드; 달무리 `p1b` · `p2b` 는 같은 그림의 색조만 달라 그림이 늘지 않음), 글꼴 `mboss_hr` · `mboss/scarlet/**`(그린 그림 27장 + 사용자 스킨 `skin.png` = 47 872 px; 모델 63개(유령 쌍둥이 포함) + `item_sword` + 슬롯 아이콘 `item_sword_icon`(F-I HR-03: `items/mboss/scarlet/item_sword.json` 이 `display_context` 로 gui · fixed · ground 에서 아이콘, 그 밖에서 `item_sword`); 킷의 면 모양 `hr_kit/qi_arcf_0..3` · `qi_wedgef`(F2 HR-12: 그림 없이 `qi_arc_*` · `qi_wedge` 그림을 다시 씀); 갓 두 개의 아이템 정의에 `minecraft:constant` 색조 — 테 아랫면 그늘; 유령 쌍둥이는 `rlk:mboss/scarlet/ghost` 한 장만 씀), 아틀라스 항목은 id 로 합침; 11-12 라운드 V 레인 VB: 킷 그림 `sw_path`(칼끝의 길) · `sw_head`(길의 별 머리) · `sw_arc_0..2`(베기 조각 세 장면) + 모델 · 아이템 정의, `cue_0` 에 어두운 테; 리그 `glow_edge`(싸움의 흰 칼날 테) 그림 · 모델 · 아이템 정의, `glow_{lilac,pink,violet,gold}` 모델은 십자로 겹친 꼴 | `boss/scarlet/{fx,rig}/**` + 매니페스트 둘 |
++| `python3 build_bossbar.py --resourcepack <RP>` | 글꼴 `bossbar`(+ 구분선 `textures/font/bossbar/seg.png`), `gui/sprites/boss_bar/*` | `bossui/*` |
+ | `python3 build_minimap.py --resourcepack <RP>` | 글꼴 `minimap`, `gui/sprites/boss_bar/*` | `minimap/*` |
+ | `python3 build_balance.py --resourcepack <RP>` | 글꼴 `bal`, `textures/font/bal/*`(9장) | `bal/**` |
+-| `python3 build_combat_fx.py --resourcepack <RP>` | 글꼴 `cb`, `textures/font/cb/{streak,streak_s,wash,star,glint}.png` | `player/def/fx/g/**` |
++| `python3 build_combat_fx.py --resourcepack <RP>` | 글꼴 `cb`, `textures/font/cb/{streak_0,streak_1,streak_2,streak_3,tint,vig,star,spark,bolt_1,bolt_2,bolt_3,burst,glint_l,glint_r}.png`(14장; 옛 `streak` · `streak_s` · `wash` · `glint` 는 지움) | `player/def/fx/g/**` |
++| `python3 build_blank_tex.py --resourcepack <RP>`(11-12 라운드 V) | `minecraft/textures/entity/zombie/{husk,husk_baby}.png` · `rlk/textures/skin/blank.png`(셋 다 64 × 64 완전 투명; 아틀라스 항목 없음) | 없음(데이터팩은 `char/cine/blank` · `cm/lure_new` 가 `rlk:skin/blank` 를 가리킴) |
+ | `python3 build_raiden_all.py --resourcepack <RP>`(재료 · 번개 그림 · 배경 · 위험 효과 · 물체 · 구슬 · 서명 효과 · 환영 · 리그 · 순간이동 · 만겁 팔 · 분신, 끝에 `check_raiden_pack.py`) | `raiden/**` | `boss/raiden/**`, `room/raiden/**` |
+ | **생성기 없음**(손으로 만든 것 · 저장소 밖의 옛 빌드) | 글꼴 `hud` + `textures/font/crosshair.png`, `items/h/*`, `claymore` · `dice` · `empty` · `map_button`, `textures/item/dice_*`, 캐릭터 스킨 · 1챕터 몹 스킨(`mob_{sw,sh,fm,im,ar,cn}`), `raiden/skin.png`(`--skin` 으로 넣음), `gui/sprites/hud/**` | — |
+ 
+@@ -131,6 +133,8 @@
+   파일을 통째로 새로 쓰거나 남의 항목을 지우지 않는다(손으로도 고치지 않는다). 새 생성기도 이렇게 만든다.
+ - 텍스트 컴포넌트가 글리프 글꼴을 상속하지 않게 한다: 컴포넌트마다 `font` 를 적고, 글리프 뿌리 텍스트는 비우고 꾸미지 않으며,
+   킷 글꼴 끝에 `minecraft:default` 참조(10-14 보스바 숫자, 10-21 배너 글자가 네모로 보였던 문제).
++- 글꼴 비트맵의 셀(이미지 ÷ 글자 수)은 **256 × 256 px 이하**, `ascent` ≤ `height`: 넘으면 그 글리프만 말없이 네모 상자가 된다(11-11b 퍼펙트 패링의
++  금빛 줄). `rplint.py` 가 모든 글꼴에서 잡는다(11-12 라운드 V).
+ - 소리는 바닐라만(`sounds.json` 은 `{}` 그대로).
+ - 모델 요소는 -16..32 안, 회전은 한 축만 −45 · −22.5 · 0 · 22.5 · 45 중 하나, UV 는 0..16(어기면 그 모델이 검정 · 자주 상자로
+   보임; 리그 생성기와 `check_raiden_pack.py` 가 막는다).
+@@ -140,9 +144,12 @@
+   야타용왕 1.69(+ `az_kit` 0.60) · 역장 1.38(`fieldgen` 0.45 + `fg_kit` 0.93) · 아펩 1.27(`apep` 0.87 + `apep_om` 0.14 + `ap_kit` 0.26) ·
+   파수꾼 1.05 · 타키 0.48 · 아를레키노 0.47 · 홍련 0.29 M(`scarlet` 0.048 + `hr_kit` 0.246; 홍련 계획 ≤ 0.43 M: 리그 ≤ 0.15 · 킷 ≤ 0.26 ·
+   게이트 아이콘 ≤ 0.005 M; 11-05 I1 에서 합계 12.955 M, I2(플레이어 크기 몸 · 사용자 스킨) 뒤 12.919 M).
++  11-12 라운드 V 통합: 합계 **13.108 M**(13 107 904 px, 소스 1 505개; 11-11b 12.940 M + 레인 VP 의 무기 빛 0.149 M(`_hot` 31장 + 빛 카드 둘)
++  + 레인 VB 0.019 M(킷 `sw_*` 16 640 + 리그 `glow_edge` 2 048)); 한도까지 0.092 M 남음 — 다음에 넘치면 `_hot` 그림(절반 해상도)을 더 줄이거나
++  무기끼리 나눠 쓰는 것이 가장 싸다.
+ 
+ ## 5. 검사와 다시 만들기
+-- 린트: `python3 -I roguelike/tools/dev/rplint.py <RP>` → `rplint: 0 problem(s)`(경로 글자, 아틀라스 id · 없는 텍스처, 깨진 JSON).
++- 린트: `python3 -I roguelike/tools/dev/rplint.py <RP>` → `rplint: 0 problem(s)`(경로 글자, 아틀라스 id · 없는 텍스처, 깨진 JSON, 글꼴 셀 256 px · `ascent` · 없는 비트맵 · 줄 길이가 다른 `chars`).
+ - 아틀라스 크기: `python3 -I roguelike/tools/dev/atlas_px.py <RP>`.
+ - 두 번 만들기: 바꾼 생성기를 두 번 돌려 해시가 같은지 — `(cd <RP> && find . -type f -print0 | sort -z | xargs -0 sha1sum) | sha1sum`
+   (같은 순서로 돌릴 때만 비교한다: 위 순서 문제).

@@ -47,8 +47,10 @@ ORDER = ['core', 'arena', 'rooms', 'proto', 'cproto', 'guardian', 'kit', 'butter
 FAIL = []
 # 11-03: + boss/test/ (build_mboss_core.py writes it; as a hard link the core run in the copy rewrote the tested tree's
 # 13 boss/test/*.mcfunction in place, the cause of the old check-9 failure)
+# round V integration (11-12): + data/rlk/advancement/mboss/ (lane VC: build_mboss_core.py writes FN-cam's tick advancement
+# cam_post.json; hard-linked, check 9 failed on the merged tree and the tested tree's file was rewritten in place)
 REAL_DP = ('data/rlk/function/mboss/', 'data/rlk/function/room/cboss/', 'data/rlk/function/bossui/',
-           'data/rlk/function/boss/test/', 'tools/')
+           'data/rlk/function/boss/test/', 'data/rlk/advancement/mboss/', 'tools/')
 TMP = Path(__file__).resolve().parent / 'tmp'
 REAL_RP = ('assets/rlk/textures/mboss/bf_kit/', 'assets/rlk/models/item/mboss/bf_kit/', 'assets/rlk/items/mboss/bf_kit/',
            'assets/rlk/textures/mboss/fg_kit/', 'assets/rlk/models/item/mboss/fg_kit/', 'assets/rlk/items/mboss/fg_kit/',

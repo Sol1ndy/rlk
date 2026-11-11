@@ -156,7 +156,15 @@ uv = lambda m: m['elements'][0]['faces']['north']['uv']
 check('models: P2 right arm classic UV (north face x 44..48 / 4), left arm (36..40 / 4)',
       uv(p2['right_arm'])[0] * 4 == 44 and uv(p2['right_arm'])[2] * 4 == 48 and uv(p2['left_arm'])[0] * 4 == 36 and uv(p2['left_arm'])[2] * 4 == 40,
       str((uv(p2['right_arm']), uv(p2['left_arm']))))
-check('models: P2 legs / body / head boxes identical to the avatar\'s', all(p2[p]['elements'] == av[p]['elements'] for p in api.BODY if 'arm' not in p))
+# round V (11-12): the avatar's part models carry `tintindex 0` on every face since lane VP (the perfect dodge's body glow; the
+# item definition's tint defaults to white, so her P1 body, which names those models, looks as before): the boxes are compared
+# without that key
+def _boxes(m):
+    return [dict(e, faces={k: {x: y for x, y in f.items() if x != 'tintindex'} for k, f in e['faces'].items()}) for e in m['elements']]
+
+
+check('models: P2 legs / body / head boxes identical to the avatar\'s (tintindex aside)',
+      all(_boxes(p2[p]) == _boxes(av[p]) for p in api.BODY if 'arm' not in p))
 check('models: P2 parts textured rlk:mboss/arlecchino/skin_p2', all(m['textures']['skin'] == 'rlk:mboss/arlecchino/skin_p2' for m in p2.values()))
 src = (S / 'ar/src/skin_33.png').read_bytes()
 emb = re.search(r'SKIN_P2_B64 =\s*((?:\s*\'[A-Za-z0-9+/=]+\'\s*\+?)+);', (DP / 'tools/arlecchino_skin_p2.mjs').read_text())
