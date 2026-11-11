@@ -1,7 +1,7 @@
 # lane H2 (홍련 rebuild: cutscenes, camera, control lock) — progress
 
 Branch `wip/combat-hr2` (from `origin/wip/combat` c7dcc4fbf; merged: H1 interface 15fad96a9, H3 0c762626b, H1 final
-c1e53b116 which holds `origin/wip/combat` 6522feef5), worktree `<S>/cb/wt_hr2`, pack copy `<S>/rp_hr2`
+c1e53b116, `origin/wip/combat` 8fe44f516 = fix lane FB + the Opus 5.5 trailer), worktree `<S>/cb/wt_hr2`, pack copy `<S>/rp_hr2`
 (`<S>` = the scratchpad of `h_common.md`). Contract: `hr_design.md` (§8 wins), `hr_brief.md` 「조작 잠금 · 카메라」.
 Owner of FN-cam (`build_mboss_core.py`, `mboss_lib.py`), the RIGLIB look target (`mboss_rig_compile.mjs`),
 `tools/mboss_scarlet/{seq,cam}.py`, the hand-file lines in `tick` / `view/tick` / `lvup/tick`, the suites
@@ -13,6 +13,7 @@ Owner of FN-cam (`build_mboss_core.py`, `mboss_lib.py`), the RIGLIB look target 
 - [x] **`cam.py` + `seq.py`** (`CONTRACT = 2`, §3): all eight sequences with their cameras (fed31119c).
 - [x] **the actor wired** (H3 merged, 0a0633b83) and H3's six points taken in.
 - [x] **H1's final core merged**; its six points taken in (`ev_dry` rebased).
+- [x] `origin/wip/combat` (fix lane FB) merged: `bal/boss/may` keeps H1's `#mbBalOff` and FB's `rlk_mb_inv` refusals.
 - [x] suites, shot sheets on five stage placements, gates (below).
 - [ ] waits for H2c: her 8 cinematic clips are placeholders (static poses of the contract length); the sheets' stand-in
       for her is a box figure with the design's postures. Everything timed is in place.
@@ -104,7 +105,7 @@ the walk disc (`mboss/ar/clampw`), a low eye (< 1.05 b) is lifted out of a floor
 | gate | result |
 |---|---|
 | `regen_all.sh` twice | identical; `check_mboss_pack` 0 problems |
-| loadcheck (26.3 server) | `h2a` 0, `h2b` 0, `h2c` 0, `h2d` 0 (the final tree) |
+| loadcheck (26.3 server) | `h2a` 0, `h2b` 0, `h2c` 0, `h2d` 0, `h2e` 0 (the final tree, after the FB merge) |
 | rplint / atlas | 0 problems / 12 935 424 px (= H3's number; `rp_hr2` = `rp_base` + H3's actor files only) |
 | `test_cam.py` | 110 / 110 |
 | `test_seq.py` | 392 / 392 (static 34, run 96, stages 60, skip 45, life 118, actor 34, frames 5), 14 min |
