@@ -10,7 +10,7 @@ scoreboard players set #hits hr 0
 scoreboard players operation #last2 hr = #last hr
 scoreboard players set #last hr 7
 execute if score #ph hr matches 1 run scoreboard players operation #cd_a10 hr = #clk hr
-execute if score #ph hr matches 1 run scoreboard players add #cd_a10 hr 120
+execute if score #ph hr matches 1 run scoreboard players add #cd_a10 hr 170
 execute if score #ph hr matches 7 run scoreboard players operation #cd_a10 hr = #clk hr
 execute if score #ph hr matches 7 run scoreboard players add #cd_a10 hr 100
 function rlk:boss/scarlet/p/a10/start

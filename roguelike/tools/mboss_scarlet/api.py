@@ -146,7 +146,11 @@ def xyz(p, nd=4):
 
 # =============================================================================================
 # 2. Damage, shapes, hits, telegraph constants (PLAN §4.1-4.5)
-DMG = {'T1': 29, 'T2': 42, 'T3': 62, 'T4': 71}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
+DMG = {'T1': 31, 'T2': 42, 'T3': 54, 'T4': 61}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
+# HB (11-11, the balance pass, hr_design §6.4's tier knob +-20 %; mboss/hurt floors 12 x coef x 135 / 10000, so a tier moves in
+# whole raw steps): T1 29 -> 31 (raw 4 -> 5, the chain hits; 31 is the smallest coefficient of raw 5): with fewer ultimates
+# (GAUGE['hit']) the walker's P1 intake fell under 타키's (T1) and the P hits' share of it under T1b's need; T3 62 -> 54 (raw 10
+# -> 8) and T4 71 -> 61 (raw 11 -> 9): the unparriable hits are most of what an average parrier (T1b) still takes.
 # S5 (11-06, the balance pass; PLAN §4.8's tier knob +-20 %): T3 56 -> 62 (+10.7 %: mboss/hurt's raw hit 9 -> 10, 23 -> 25 HP
 # on the item-less Lv15 player) - the tier of A4's dive, A9, A10, R1's third and R3's second cut; T1 / T2 / T4 as 타키.
 # F1 (HR-19, lead decision 11-05): the counting cuts of A8 / A13 on a tier of their own (raw 5 = 12 HP on the item-less
@@ -262,7 +266,8 @@ WALK_SPEED, GLIDE_SPEED = 0.12, 0.18                      # recovery walk / stra
 # 2b. HR rebuild (hr_design §1.2-1.5, §2.1; lane H1): the 5-segment gauge, balance, the parry cue, the unparriable flashes
 # hrfair 2.0, first pass (H1, 11-11): hit 5 -> 2. With the design's start value a player who is hit by everything filled it
 # every ~16 s (U 3.2 / min, T11's band 0.8-1.5); 2 keeps "full after ~60 s of clean play, ~35 s when hit every 6 s".
-GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 2}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
+# HB (11-11): hit 2 -> 1: the walker still had 2.06 ultimates / min (T11 0.8-1.5); 1 gives 1.33-1.5, the mixed agent's 0.67 stays.
+GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 1}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
 #                                                      +hit per hit of hers that lands (tier 1-2 parries land; PP / PD do not),
 #                                                      -seg per perfect-parried gauntlet cut; U is armed at max
 GAUGE_FP = '#gau'                                    # objective OBJ; the under bar #buSub = #gau / seg, #buSubMax 5, BU_SHIELD
@@ -415,28 +420,37 @@ MID_MAX = {'a3': 8.0, 'a3s': 8.0, 'a9': 7.0, 'tri': 10.0, 'blue': 7.0, 'kcut': 8
 MID_MIN = {'hcut': 8.0}                          # its mid weight only from this distance
 # WEIGHTS[key][fight phase 1 = P1 / 2 = P2] = (near, mid, far); renormalised over the entries off cooldown and allowed.
 # hr_design §2.2 *start* values (hrfair 2.0 tunes them, §6.4); a1 / a2 are trigger-only in P2; ult is never weighted.
+# HB (11-11, hrfair2 per seed; hb_progress.md): an average parrier (sigma 1.5) broke her 1.56 times / min (T10 0.8-1.3): about
+# 20 perfect parries / min of ~32 parryable hits. P1's mix is pinned by T1 (the walker's intake >= 타키's) and T1b (the
+# sigma-3 parrier <= 0.60 of it: every P1 weight moved to the unparriable singles raised T1b over 0.60), so P1 only loses
+# the free rings (near 20 -> 5; the gauge still forces them) and a little of its unparriable weight (a9 25 -> 20, a10 / kcut
+# 20 -> 16), and P2 carries the reduction: its near band moves from the parried chains (a3 25 -> 5, a3s 30 -> 10, d4 20 ->
+# 4, free rings 20 -> 0) to the flashed attacks (a9 15 -> 35, blue 15 -> 30, kcut 20 -> 35, mx 20 -> 35). P1 groggies of the
+# sigma-1.5 parrier ~1.5 / min, P2 ~0.67, together 1.0-1.17 per seed. COOLDOWN (P1): the counter A1 / A2 100 -> 200 (its
+# single parried hits) and the near band x ~1.4 (a3 / d4 140 -> 200, a3s 80 -> 110, rings 160 -> 220, a9 160 -> 220, a10
+# 120 -> 170, blue 180 -> 250, kcut 200 -> 280).
 WEIGHTS = {
     'a1': {1: (8, 0, 0)},
     'a2': {1: (8, 0, 0)},
-    'a3': {1: (30, 10, 0), 2: (25, 10, 0)},
-    'a3s': {1: (30, 15, 0), 2: (30, 15, 0)},
-    'd4': {1: (25, 0, 0), 2: (20, 0, 0)},
+    'a3': {1: (30, 10, 0), 2: (5, 10, 0)},
+    'a3s': {1: (30, 15, 0), 2: (10, 15, 0)},
+    'd4': {1: (25, 0, 0), 2: (4, 0, 0)},
     'tri': {1: (0, 30, 0), 2: (0, 20, 0)},
     'a4': {1: (0, 20, 25), 2: (0, 15, 15)},
-    'rings': {1: (20, 0, 0), 2: (20, 0, 0)},
-    'a9': {1: (25, 10, 0), 2: (15, 10, 0)},
-    'a10': {1: (20, 20, 25), 2: (0, 15, 20)},
+    'rings': {1: (5, 0, 0), 2: (0, 0, 0)},
+    'a9': {1: (20, 10, 0), 2: (35, 10, 0)},
+    'a10': {1: (16, 20, 25), 2: (0, 15, 20)},
     'hcut': {1: (0, 10, 40), 2: (0, 10, 30)},
-    'blue': {1: (15, 15, 0), 2: (15, 15, 0)},
-    'kcut': {1: (20, 15, 0), 2: (20, 15, 0)},
-    'mx': {2: (20, 25, 20)},
+    'blue': {1: (15, 15, 0), 2: (30, 15, 0)},
+    'kcut': {1: (16, 15, 0), 2: (35, 15, 0)},
+    'mx': {2: (35, 25, 20)},
     'nb': {2: (0, 20, 25)},
     'q': {2: (0, 20, 30)},
 }
-COOLDOWN = {'a1': {1: 100, 2: 85}, 'a2': {1: 100, 2: 85}, 'a3': {1: 140, 2: 120}, 'a3s': {1: 80, 2: 70},
-            'd4': {1: 140, 2: 120}, 'tri': {1: 140, 2: 120}, 'a4': {1: 160, 2: 140}, 'rings': {1: 160, 2: 140},
-            'a6': {1: 400, 2: 400}, 'a9': {1: 160, 2: 140}, 'a10': {1: 120, 2: 100}, 'hcut': {1: 160, 2: 140},
-            'blue': {1: 180, 2: 150}, 'kcut': {1: 200, 2: 170}, 'mx': {2: 150}, 'nb': {2: 180}, 'q': {2: 300}}
+COOLDOWN = {'a1': {1: 200, 2: 85}, 'a2': {1: 200, 2: 85}, 'a3': {1: 200, 2: 120}, 'a3s': {1: 110, 2: 70},
+            'd4': {1: 200, 2: 120}, 'tri': {1: 140, 2: 120}, 'a4': {1: 160, 2: 140}, 'rings': {1: 220, 2: 140},
+            'a6': {1: 400, 2: 400}, 'a9': {1: 220, 2: 140}, 'a10': {1: 170, 2: 100}, 'hcut': {1: 160, 2: 140},
+            'blue': {1: 250, 2: 150}, 'kcut': {1: 280, 2: 170}, 'mx': {2: 150}, 'nb': {2: 180}, 'q': {2: 300}}
 TRIGGER_ONLY = ('a6', 'ult')                     # never picked by weight: the skill trigger; ult only after rings at a full
 #                                                  gauge (A1 / A2: the counter trigger, the rear rule, small P1 near weights)
 FAR_RULE = {'dist': 8.0, 'dwell': 30, 1: {'hcut': 45, 'a4': 30, 'a10': 25}, 2: {'nb': 40, 'q': 30, 'hcut': 30},

@@ -6,7 +6,7 @@
 
 World: tests/lib/hrsim.py H1Sim (the REAL player/def judge, mboss framework, bal/**; the F lock and dodge cooldown as ruled
 on 11-11, review A-01 / A-12: constants from the loaded pack where they exist). The item-less Lv15 player (268 HP) against
-her at L16 (5834 HP); seeds 11 / 22 / 33; 3 600 t per fight phase. The sequences are the core stand-ins until lane H2 lands
+her at L16 (registry hp x LV_HP(16) / 100: 5049 at hp 225); seeds 11 / 22 / 33; 3 600 t per fight phase. The sequences are the core stand-ins until lane H2 lands
 (their lengths are the contract's; no cutscene tick is counted as fighting time).
 
 Agents (all but `stand` walk to 2.5 b at 0.216 b/t and hit her every 10 t within 3.5 b with atk x 1.1, a skill hit every
@@ -15,6 +15,7 @@ Agents (all but `stand` walk to 2.5 b at 0.216 b/t and hit her every 10 t within
   parrier s   F for every parryable hit, aimed at h - 1 with a normal timing error s (ticks); dodges nothing
   mixed s     parries P hits, perfect-dodges N hits with the same error
   dodger s    a dodge at h - 1 +- s for every hit                   masher   F every 4 t
+  (HB: an input whose cue never showed - its pattern ended or was cancelled first - is withdrawn)
   sloppy      F at h - 1 +- 6 t (uniform) for every hit
   metro p/k   (gauntlets, HB) F every p ticks from the gauntlet's tick k (0 <= k < p), reading no cue: every p 8..30, every k
 Gauntlet agents stand, or walk 0.22 b/t outward / sideways / inward, and act on every cut.
@@ -71,6 +72,7 @@ class Agent:
         self.acted = {}               # world tick of a hit -> ('F' | 'D', the input tick)
         self.gt0 = None
         self.m0, self.period, self.phase = s.t, 1, 0      # the metronome: F at m0 + phase + n x period
+        self.cur = []                 # (hit tick, input, input tick) planned for the running pattern
 
     def err(self):
         if self.kind == 'sloppy':
@@ -87,7 +89,19 @@ class Agent:
             return
         t = max(s.t + 1, h - 1 + self.err())
         self.acted[h] = (act, t)
+        self.cur.append((h, act, t))
         (s.press if act == 'F' else s.dodge)(at=t)
+
+    def withdraw(self):
+        """HB (11-11): the running pattern ended or was cancelled (a groggy, A6, a floor, a perfect-parry flinch): the inputs
+        planned for its hits whose cue never showed (cue at h - CUE_LEAD) are not pressed. Before, they were: a press for a hit
+        that never came is a whiff, and the whiff streak then refused the presses for the next pattern's real cues."""
+        now = self.s.t
+        for h, act, ti in self.cur:
+            if h - self.api.CUE_LEAD > now and self.acted.get(h) == (act, ti):
+                (self.s.f_at if act == 'F' else self.s.d_at).discard(ti)
+                del self.acted[h]
+        self.cur = []
 
     def rows(self, key, ph):
         api = self.api
@@ -116,10 +130,13 @@ class Agent:
             return
         self.gt0 = None
         if not key or pt < 1:
+            if self.cur:
+                self.withdraw()
             self.pat = pat if pt >= 1 else 0
             return
         t_start = s.t - pt
         if pat != self.pat or self.t_start is None or abs(t_start - self.t_start) > 0:
+            self.withdraw()
             self.pat, self.t_start, self.q_air = pat, t_start, False
             for (t, air), pars in self.rows(key, ph).items():
                 if not air and t > pt:
@@ -540,8 +557,10 @@ def rows_of(res, seed, base):
     if mt or any(r.get('kind') == 'metro' for r in res):
         cl = {g: sorted({r['period'] for r in mt if r['g'] == g and r['cleared']}) for g in ('a8', 'a13')}
         n = {g: (sum(r['cleared'] for r in mt if r['g'] == g), sum(1 for r in mt if r['g'] == g)) for g in ('a8', 'a13')}
-        row('T7m', 'metronome F (p 8-30, every phase) clears G1; G2 (periods that clear)',
-            f'{n["a8"][0]}/{n["a8"][1]} {cl["a8"]}; {n["a13"][0]}/{n["a13"][1]} {cl["a13"]}', '0; 0', n['a8'][0] == 0 and n['a13'][0] == 0)
+        mx = {g: max([r['segs'] for r in mt if r['g'] == g] or [0]) for g in ('a8', 'a13')}
+        row('T7m', 'metronome F (p 8-30, every phase) clears G1; G2 (periods that clear; most segments taken)',
+            f'{n["a8"][0]}/{n["a8"][1]} {cl["a8"]} ({mx["a8"]}); {n["a13"][0]}/{n["a13"][1]} {cl["a13"]} ({mx["a13"]})', '0; 0',
+            n['a8'][0] == 0 and n['a13'][0] == 0)
     a6 = max([r['a6max'] for r in R if r['mode'] == 'phase'] or [0])
     row('T8', 'A6 starts in any 400 t (all phase runs)', str(a6), '<= 1', a6 <= 1)
     ks = {lv: mean(r['fight_s'] for r in kl('walker', lv) if r['killed']) for lv in (5, 10, 15)}

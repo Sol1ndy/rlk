@@ -10,7 +10,7 @@ scoreboard players set #hits hr 0
 scoreboard players operation #last2 hr = #last hr
 scoreboard players set #last hr 15
 execute if score #ph hr matches 1 run scoreboard players operation #cd_kcut hr = #clk hr
-execute if score #ph hr matches 1 run scoreboard players add #cd_kcut hr 200
+execute if score #ph hr matches 1 run scoreboard players add #cd_kcut hr 280
 execute if score #ph hr matches 7 run scoreboard players operation #cd_kcut hr = #clk hr
 execute if score #ph hr matches 7 run scoreboard players add #cd_kcut hr 170
 function rlk:boss/scarlet/p/kcut/start

@@ -10,7 +10,7 @@ scoreboard players set #hits hr 0
 scoreboard players operation #last2 hr = #last hr
 scoreboard players set #last hr 11
 execute if score #ph hr matches 1 run scoreboard players operation #cd_rings hr = #clk hr
-execute if score #ph hr matches 1 run scoreboard players add #cd_rings hr 160
+execute if score #ph hr matches 1 run scoreboard players add #cd_rings hr 220
 execute if score #ph hr matches 7 run scoreboard players operation #cd_rings hr = #clk hr
 execute if score #ph hr matches 7 run scoreboard players add #cd_rings hr 140
 function rlk:boss/scarlet/p/rings/start

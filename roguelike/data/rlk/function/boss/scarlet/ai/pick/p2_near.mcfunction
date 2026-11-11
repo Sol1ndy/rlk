@@ -1,34 +1,30 @@
 # Weighted pick, P2, near (api.WEIGHTS; zeroed while cooling down / repeating / beyond MID_MAX).
 scoreboard players set #ai_sum hr 0
-scoreboard players set #ai_wa3 hr 25
+scoreboard players set #ai_wa3 hr 5
 execute if score #cd_a3 hr > #clk hr run scoreboard players set #ai_wa3 hr 0
 execute if score #last hr matches 3 run scoreboard players set #ai_wa3 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3 hr
-scoreboard players set #ai_wa3s hr 30
+scoreboard players set #ai_wa3s hr 10
 execute if score #cd_a3s hr > #clk hr run scoreboard players set #ai_wa3s hr 0
 execute if score #last hr matches 8 run scoreboard players set #ai_wa3s hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3s hr
-scoreboard players set #ai_wd4 hr 20
+scoreboard players set #ai_wd4 hr 4
 execute if score #cd_d4 hr > #clk hr run scoreboard players set #ai_wd4 hr 0
 execute if score #last hr matches 9 run scoreboard players set #ai_wd4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wd4 hr
-scoreboard players set #ai_wrings hr 20
-execute if score #cd_rings hr > #clk hr run scoreboard players set #ai_wrings hr 0
-execute if score #last hr matches 11 run scoreboard players set #ai_wrings hr 0
-scoreboard players operation #ai_sum hr += #ai_wrings hr
-scoreboard players set #ai_wa9 hr 15
+scoreboard players set #ai_wa9 hr 35
 execute if score #cd_a9 hr > #clk hr run scoreboard players set #ai_wa9 hr 0
 execute if score #last hr matches 6 run scoreboard players set #ai_wa9 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa9 hr
-scoreboard players set #ai_wblue hr 15
+scoreboard players set #ai_wblue hr 30
 execute if score #cd_blue hr > #clk hr run scoreboard players set #ai_wblue hr 0
 execute if score #last hr matches 14 run scoreboard players set #ai_wblue hr 0
 scoreboard players operation #ai_sum hr += #ai_wblue hr
-scoreboard players set #ai_wkcut hr 20
+scoreboard players set #ai_wkcut hr 35
 execute if score #cd_kcut hr > #clk hr run scoreboard players set #ai_wkcut hr 0
 execute if score #last hr matches 15 run scoreboard players set #ai_wkcut hr 0
 scoreboard players operation #ai_sum hr += #ai_wkcut hr
-scoreboard players set #ai_wmx hr 20
+scoreboard players set #ai_wmx hr 35
 execute if score #cd_mx hr > #clk hr run scoreboard players set #ai_wmx hr 0
 execute if score #last hr matches 16 run scoreboard players set #ai_wmx hr 0
 scoreboard players operation #ai_sum hr += #ai_wmx hr
@@ -42,8 +38,6 @@ execute if score #ai_r hr < #ai_wa3s hr run return run function rlk:boss/scarlet
 scoreboard players operation #ai_r hr -= #ai_wa3s hr
 execute if score #ai_r hr < #ai_wd4 hr run return run function rlk:boss/scarlet/core/start/d4
 scoreboard players operation #ai_r hr -= #ai_wd4 hr
-execute if score #ai_r hr < #ai_wrings hr run return run function rlk:boss/scarlet/core/start/rings
-scoreboard players operation #ai_r hr -= #ai_wrings hr
 execute if score #ai_r hr < #ai_wa9 hr run return run function rlk:boss/scarlet/core/start/a9
 scoreboard players operation #ai_r hr -= #ai_wa9 hr
 execute if score #ai_r hr < #ai_wblue hr run return run function rlk:boss/scarlet/core/start/blue

@@ -12,5 +12,5 @@ execute as @e[type=minecraft:marker,tag=rlk_hr_dp,limit=1] at @s run function rl
 scoreboard players operation #kcut_n hr = #t2 hr
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_dp,limit=1] run function rlk:mboss/mv/glide {t:2}
 kill @e[type=minecraft:marker,tag=rlk_hr_dp]
-data modify storage rlk:hr core.dash set value {len:0,w:30,tell:1,dmg:71}
+data modify storage rlk:hr core.dash set value {len:0,w:30,tell:1,dmg:61}
 execute store result storage rlk:hr core.dash.len int 5 run scoreboard players get #kcut_n hr
