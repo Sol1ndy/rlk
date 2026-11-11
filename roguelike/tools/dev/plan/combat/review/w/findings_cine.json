@@ -1,0 +1,574 @@
+[
+ {
+  "id": "T3-DRINK-1",
+  "t_start": 130.72,
+  "t_end": 132.42,
+  "category": "staging_prop",
+  "severity": "high",
+  "what": "Complaint 1 (most likely meant: CS1 = the 'second cutscene', shot S9 'offer, drink', the only drink that is actually visible on screen). 126.9-129.4 s she holds the bottle low at her right hip; 129.9-130.4 s she bows so the hat crown fills the top of the frame; 130.72 s the right forearm swings up; 130.82-130.92 s the bottle is tilted ~45-90 deg at chin height, its centre 160-175 px to screen-right of her mouth; 131.02 s her head tips back (face moves ~25-30 px up) while the bottle turns UPRIGHT (cap up) beside her right cheek; 131.12-132.22 s (66 frames, 1.1 s) the pose is frozen: bottle upright, opening pointing at the sky, centre ~110 px right and ~25 px above the mouth, just outside the edge of the face (face spans x 857-1070), never touching the lips, no swallow/bob; 132.32-132.42 s the arm drops back to the hip. The prop stays in the hand throughout (no detachment). It reads as holding a bottle against the ear/cheek, not drinking: the bottle never tips toward the mouth, the head tilts instead of the bottle, and the hold is motionless.",
+  "evidence": [
+   "s9_drink_grid.jpg",
+   "s9_overview.jpg",
+   "s9_drink_zoom.jpg"
+  ],
+  "measured": {
+   "frames": "7843-7945",
+   "hold_frames": "7867-7933 (66)",
+   "bottle_to_mouth_px": {
+    "130.82": [
+     162,
+     32
+    ],
+    "130.92": [
+     175,
+     -20
+    ],
+    "131.02": [
+     160,
+     -28
+    ],
+    "131.12-132.22": [
+     110,
+     -25
+    ]
+   },
+   "bottle_axis": "upright (cap up) during the hold",
+   "face_rise_px": 28,
+   "camera": "static (S9, HR(-0.3,1.5,1.5))"
+  },
+  "likely_cause": "clip 'drink' in tools/scarlet_clips.mjs (cs1 ~464-478): the hand_r anchor is placed beside the head instead of at the mouth and the bottle's own pitch is not driven (guess)"
+ },
+ {
+  "id": "T3-DRINK-2",
+  "t_start": 16.05,
+  "t_end": 35.1,
+  "category": "staging_prop",
+  "severity": "medium",
+  "what": "Every other drinking moment in the intro is invisible or unreadable: I6 (16.05-20.55 s, the pour at ~17.9 s) is shot from behind her left shoulder; her body hides both hands and the bottle; I7 cup shot (20.55-23.07 s) is interrupted by two wrong pictures (see T3-CAM-WRONG); I8 'cup to the moon' (23.07-26.87 s): the lens is ~0.6 b from her head, the back of her head/hat fills the left ~45 % of the frame and is cut off at the top, the arm with the cup only enters at the right edge 24.3-24.7 s and the cup is never against the moon; I9 (26.87-33.37 s): the drink (tick 612 = 30.6 s) is seen from behind her: frames 1830-1914 are practically identical, the cup is a ~15 px white speck at (1120,610); I10b 34.6-35.1 s the cup is set down (visible).",
+  "evidence": [
+   "i6_i7_overview.jpg",
+   "i8_raise.jpg",
+   "i9_drink_grid.jpg",
+   "i10b.jpg"
+  ],
+  "measured": {
+   "I9_drink_t": 30.6,
+   "I9_visible_change": "none",
+   "I8_head_fraction": 0.45
+  },
+  "likely_cause": "camera placements: I6/I9 are over-the-shoulder from behind, so the action happens on the far side of her body"
+ },
+ {
+  "id": "T3-PETAL-1",
+  "t_start": 138.42,
+  "t_end": 140.57,
+  "category": "staging",
+  "severity": "high",
+  "what": "Complaint 2 (CS1 S11, 'the petal, her iai'): the petal pops in at full size at 138.42 s (frame 8305) 1.5 b before the lens at her waist and then hangs MOTIONLESS: bbox x 856-1035, y 522-733 (~175 x >=211 px; the bottom is hidden behind the dialogue box whose top edge is y 734), centroid (938.7, 638.5) moves < 1 px over 8305-8333; no fall, no drift, no rotation. At 139.08 s (frame ~8345, tick 624, 0.9 s BEFORE the draw) the 'cut' look already puts a dark line across its upper third and a white glint. 139.92 s her leaning hat brim covers the top half. 139.98 s the draw: negative flash 8399-8403 (5 frames), the only clean frames 8404-8406 show the blade running diagonally from (~700,780) to (~1070,560) through the middle of the intact petal, pink-white flash 8407-8413 fading to 8422; the two halves are on screen 8419-8433 (15 frames, 0.25 s), drift < 30 px, mostly under the fade and the red tint, then the cut to S13 at 140.57 s. Total visible ~2.15 s, of which ~1.6 s static. So it reads as a card held in the air that gets a line drawn on it, not a falling petal being cut; it is ~9 % of the frame width (her hat brim is ~400 px wide), partly covered by the line box.",
+  "evidence": [
+   "s11_zoom.jpg",
+   "s11_blade.jpg",
+   "s11_cut_2.jpg"
+  ],
+  "measured": {
+   "size_px": [
+    175,
+    211
+   ],
+   "bottom_hidden_by_box_px": "unknown (box top y 734)",
+   "velocity_px_per_frame_before_cut": 0.0,
+   "visible_frames": "8305-8433",
+   "cut_line_shown_before_draw_s": 0.9,
+   "halves_visible_frames": 15,
+   "blade_path": "(700,780)->(1070,560) at 8404-8406"
+  },
+  "likely_cause": "seq.py build_cs1: S11_PETAL is a fixed point HR(-0.1,1.0,0.62) (petal_summon at 610, look 'cut' at 624, 'split' at 649, halves moved 650-663); nothing moves it before the cut"
+ },
+ {
+  "id": "T3-TOPDOWN-1",
+  "t_start": 116.88,
+  "t_end": 118.87,
+  "category": "staging_framing",
+  "severity": "high",
+  "what": "Complaint 3 (CS1 S5 'the grass', straight down from 5 b, screen-up = stage forward): at FOV 90 neither figure is in the frame. Top edge: only her lower legs/boots, ~80 x 70 px at x 927-1010, y 17-87 (cut by the frame top at the waist). Bottom edge: the actor's dark head/shoulder ~55 x 60 px at x 925-980, y 983-1043 and his blue winged sword ~190 px long (x ~1000-1010, y 855-1043) pointing up into the frame. Everything else is ground (dirt, stone, dry grass, a few pink petal particles), the skip hint at y ~817, and the client's 'Dynamic FPS Disabled' toast. Geometry (eye 5 b over the floor, both 4.5 b off the look point): feet at 42 deg off-axis (= 0.89 of the half-height), heads at 54 deg -> her head ~170 px above the top edge, the actor's ~185 px below the bottom edge (~0.17-0.18 frame heights outside); ~65-75 % of each figure is outside. 2.0 s, static.",
+  "evidence": [
+   "s5_full_7070.jpg",
+   "s5_edges_7070.jpg"
+  ],
+  "measured": {
+   "her_visible_px": [
+    80,
+    70
+   ],
+   "actor_visible_px": "head 55x60 + sword 190 long",
+   "her_head_outside_px": 170,
+   "actor_head_outside_px": 185,
+   "block_size_px": "~97-100 per block on the floor -> eye ~5.4 b (scripted 5.0)",
+   "duration_s": 2.0
+  },
+  "likely_cause": "seq.py S5: eye ST(0,5.0,4.5) looking straight down with the stage axis on the SHORT (vertical) screen axis; fits only if the axis lies along the 16:9 width (horizontal half-FOV 60.6 deg > 54 deg) or the eye is >= ~7.5 b up"
+ },
+ {
+  "id": "T3-TEXT-STRAY",
+  "t_start": 138.27,
+  "t_end": 140.55,
+  "category": "dialogue_stray_line",
+  "severity": "high",
+  "what": "A second copy of the dialogue line, small and far, floats at her upper right in CS1 S11: dark-backed box at x 1326-1416, y 239-248 (~90 x 10 px, glyph ~7 px = rows 241-247) showing line 15 '천지만물을 벤다는 건...' 138.27-138.61 s (from the first frame of the shot, 8296), cleared 138.63-138.78 s together with the main box, then line 16 '이런 것일세.' typed in sync with the main box from 138.80 s (box x 1350-1389) and held to 140.55 s (last S11 frame 8432); under the slash flashes 139.98-140.37 s it is hidden. Same text, same moment as the proper lower-third box. Right before: the cut S10 -> S11 at 138.27 s (no skip, no sequence start).",
+  "evidence": [
+   "far_text_8350.jpg",
+   "full_8350.jpg"
+  ],
+  "measured": {
+   "frames": "8296-8317, 8328-8432",
+   "box_px": [
+    90,
+    10
+   ],
+   "glyph_px": 7,
+   "position": "x1326-1416 y239-248 (~430 px right of and ~140 px above her hat crown)",
+   "main_box_same_line": true,
+   "preceded_by": "hard cut S10->S11"
+  },
+  "likely_cause": "VERIFIED in code: mboss_lib.cam_line()/_cam_text() writes the text to EVERY text_display tagged rlk_mb_camt, i.e. also to the line display riding the idle camera; the idle camera A is still parked at S10's viewpoint HR(0.1,1.38,0.95), 1.27 b in front of the S11 lens, so its copy (0.3 b before that viewpoint, billboard) is in shot; glyph size 7 vs 24 px matches the 0.3 vs ~1.1 b distance"
+ },
+ {
+  "id": "T4-TEXT-STRAY",
+  "t_start": 113.0,
+  "t_end": 117.25,
+  "category": "dialogue_stray_line",
+  "severity": "high",
+  "what": "Same fault in t4, ending shot E16 'the greeting' (line 22 '낭자네에선 이렇게 인사한다고 들었는데...' in the main box): a tiny boxed text (glyph ~2-4 px, box ~5 px tall, 100 -> 45 px wide) enters from the top edge at ~113.0 s (frame ~6780, x ~1537-1637, y ~101) while the lens walks back, slides down-left ~360 px in 1.4 s and then sits at x 1285-1335, y ~330, right of and level with her hat crown, until the cut to E17 at 117.27 s (~4.3 s). Right before: the cut E15 -> E16 at 110.25 s, then the scripted walk-back 111.5-114.4 s. Too small to read; by the mechanism it is the same line. No other copy found in t3 or t4 (scan of all cutscene frames at 10 Hz for dark-backed text boxes outside the lower third + visual check of 40 candidates; a box smaller than ~4 px or over a busy patch could still be missed).",
+  "evidence": [
+   "t4/e16_far.jpg",
+   "t4/e16_far_b.jpg",
+   "t4/lines_b.jpg"
+  ],
+  "measured": {
+   "first_frame": 6780,
+   "last_frame": 7035,
+   "glyph_px": "2-4",
+   "width_px": "100->45",
+   "end_position": [
+    1285,
+    1335,
+    330
+   ],
+   "main_box_same_line": "yes (same tick)"
+  },
+  "likely_cause": "as T3-TEXT-STRAY: the idle camera (A) parked at E15's viewpoint (behind her right shoulder toward the moon) carries its own copy of line 22; seen from E16 it lies between her head and the moon"
+ },
+ {
+  "id": "T3-CAM-WRONG",
+  "t_start": 20.92,
+  "t_end": 22.12,
+  "category": "camera_wrong_picture",
+  "severity": "high",
+  "what": "Inside I7 (cup shot 20.55-23.07 s) the picture leaves the scripted shot twice with hard switches: 20.92-21.55 s (frames 1255-1293, 39 frames) a static wide view from about the actor's place: moon upper left, she a ~20-40 px figure on the far rock; 21.57-22.10 s (frames 1294-1326, 33 frames) a static low view along the ground with the actor's head at the left edge; at 22.12 s (frame 1327) the scripted cup shot returns. No shaking (the t2 Shift shake is gone), but 1.2 s of wrong pictures.",
+  "evidence": [
+   "i6_i7_overview.jpg",
+   "i7_jump_a.jpg",
+   "i7_jump_b.jpg"
+  ],
+  "measured": {
+   "frames": "1255-1326",
+   "durations_frames": [
+    39,
+    33
+   ],
+   "switches": 3
+  },
+  "likely_cause": "guess: the player released the hold (Shift?) and saw their own third-person camera, which does not coincide with the shot (the round-V 'player placed so their own F5 view equals the shot' did not take); input not visible in the video"
+ },
+ {
+  "id": "T3-PETAL-I4",
+  "t_start": 8.98,
+  "t_end": 10.87,
+  "category": "staging_prop",
+  "severity": "medium",
+  "what": "The 'big dark-red blob' at 8-10 s is the petal_big prop of I4 'petal on her hand': a flat, untextured crimson card (RGB ~150,38,58) with a jagged top, drops in from the top edge at 8.98 s, sits on her bent right arm/hand 9.4-10.4 s at ~330 x 510 px (x ~700-1030, y ~126-635; ~3 % of the frame), rolls off toward the lens 10.4-10.85 s growing to ~530 x 570 px (half the frame height) and vanishes in ONE frame at 10.87 s (frame 652) while at its biggest. Her head is out of frame (top) during this, so the blob is the main subject.",
+  "evidence": [
+   "i4_petal_blob.jpg"
+  ],
+  "measured": {
+   "size_px": {
+    "9.6-10.4": [
+     330,
+     510
+    ],
+    "10.78": [
+     530,
+     570
+    ]
+   },
+   "pop_out_frame": 652,
+   "rgb": [
+    150,
+    38,
+    58
+   ]
+  },
+  "likely_cause": "seq.py build_intro: petal_summon at tick 176 0.8 b over hand_r, petal_move to 216, petal_kill(p1) at 216 without fade; the card has no shading"
+ },
+ {
+  "id": "T3-PETAL-I3",
+  "t_start": 7.63,
+  "t_end": 8.58,
+  "category": "staging_prop",
+  "severity": "low",
+  "what": "I3 moon shot: the falling petal pops in at full size mid-frame at 7.63 s (y ~164, ~170 x 190 px), then falls ~7.6 px/frame down and ~3 px/frame left until the cut at 8.58 s; S10 (137.4-138.2 s) the drifting petal behind her head is not visible at all.",
+  "evidence": [
+   "shots_intro.jpg",
+   "s10_petal.jpg"
+  ],
+  "measured": {
+   "I3_fall_px_per_frame": 7.6
+  },
+  "likely_cause": "petal_summon at 150 inside the frame instead of above it"
+ },
+ {
+  "id": "T3-HAND-1",
+  "t_start": 72.08,
+  "t_end": 144.12,
+  "category": "hand_back",
+  "severity": "medium",
+  "what": "Both hand-backs are unmasked and the player's own camera visibly settles: CS0 72.08 s (frame 4325): I20 ends with the actor ~70 px tall at the centre, the next frame is the fight view with the avatar ~200 px tall, then 49.8 px vertical + 9 px horizontal jumps over 4327-4331 (6 frames); CS1 144.00 s (frame 8640): from S13 to the fight view, then 165 px and 35 px vertical jumps (8641-8642) settling by 8644. HUD (hotbar, bars) appears in the same frame (correct); no 'Press Left Shift to Dismount'.",
+  "evidence": [
+   "hand_cs0_b.jpg",
+   "hand_cs1_b.jpg",
+   "handback_hud.jpg"
+  ],
+  "measured": {
+   "CS0_jumps_px": [
+    49.8,
+    10.1,
+    4.3
+   ],
+   "CS1_jumps_px": [
+    165.3,
+    34.9,
+    6.0
+   ],
+   "settle_frames": {
+    "CS0": 6,
+    "CS1": 4
+   }
+  },
+  "likely_cause": "the client's eye-height glide / own camera interpolation after the game-mode switch; v_brief VC 2 wanted it under a mask (the t1 CS1 hand-back had a red flash)"
+ },
+ {
+  "id": "T3-CHASE-1",
+  "t_start": 61.57,
+  "t_end": 63.08,
+  "category": "camera_stutter",
+  "severity": "medium",
+  "what": "I16 leap chase is jerky: per-frame shifts of 4-39 px with zero-frames in between and direction reversals (e.g. -8, -7, 0, +5, 0, +4, 0, +4, then -12; later -13.5, 0, +2.5 ... +13.8, -2, -10, -14 ...); deviation from a 21-frame smooth path 29 px (x) / 46 px (y). She is now ~80-100 px tall (t1: 40 px). Same pattern in t4 E7 chase 72.37-73.57 s (steps up to 38 px, dev 15-18 px).",
+  "evidence": [
+   "shots_intro.jpg"
+  ],
+  "measured": {
+   "max_step_px": 38.8,
+   "dev_px": [
+    29.3,
+    45.6
+   ],
+   "t4_E7_dev_px": [
+    15.5,
+    18.4
+   ]
+  },
+  "likely_cause": "per-tick re-aim (cam.Track chase) arriving as 1-tick segments while the client renders <60 fps (zero frames) (guess)"
+ },
+ {
+  "id": "T3-PERF-1",
+  "t_start": 11.05,
+  "t_end": 12.53,
+  "category": "camera_stutter",
+  "severity": "low",
+  "what": "Fast moves show duplicated frames: I4 tilt (11.05-12.53 s, +369 px) runs 2-6 px/frame, then 10-16 px/frame with exact repeats in between (9 of the last 30 frames are repeats); I2 side track alternates ~1.5 px and 0 px per frame. The frame clock of the recording is a clean 60 fps, so the game itself rendered below 60 fps here.",
+  "evidence": [],
+  "measured": {
+   "I4_repeat_frames": "9/30",
+   "I2_pattern": "1.4,0,1.5,0,..."
+  },
+  "likely_cause": "client frame rate below 60 during these shots (not the pack)"
+ },
+ {
+  "id": "T3-TEAR-1",
+  "t_start": 48.05,
+  "t_end": 48.05,
+  "category": "capture",
+  "severity": "low",
+  "what": "One torn frame at the I13 -> I14 cut (48.050 s, frame 2883): upper ~2/3 already the field shot, lower ~1/3 still I13 (her skirt and legs). Recording/vsync artifact, not the pack.",
+  "evidence": [
+   "cut_i14_i17.jpg"
+  ],
+  "measured": {
+   "frame": 2883
+  },
+  "likely_cause": "vsync off in the client / capture"
+ },
+ {
+  "id": "T3-STAGE-BRIM",
+  "t_start": 23.07,
+  "t_end": 140.0,
+  "category": "staging",
+  "severity": "low",
+  "what": "Seen from below, her hat brim draws as a dark translucent disc through which the background shows (I8, S9, S11, t4 E10-E17). Not an entity ghost (it moves with the hat), but in close low shots it reads like one.",
+  "evidence": [
+   "s9_overview.jpg",
+   "t4/lines_b.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "the brim texture's alpha (probably intended, 'sheer' brim)"
+ },
+ {
+  "id": "T3-V-PANS",
+  "t_start": 3.87,
+  "t_end": 114.4,
+  "category": "camera_smoothness",
+  "severity": "low",
+  "what": "CONFIRMED FIXED for slow moves: phase correlation between consecutive frames (960x508, text area masked): I3 moon pan 5.57-8.53 s: 99.4 % of frames move, median 0.25 px, max 1.37 px, deviation from a 21-frame moving average 0.58 px (t1: 6 bursts of 13-16 px, 42 % repeats); I5 dolly 0.12 px/frame, dev 0.20 px; I9 push dev 0.04 px; I15 walk-back dev 0.27/0.33 px (t1: 8-13 px ground jitter); I19 pull-back dev 0.13 px; CS1 S2 push dev 0.21 px; t4 E14b drift dev 2.2 px (1.6 px steps), E16 walk-back dev 0.45 px. Static shots: inter-frame motion <= 0.1 px.",
+  "evidence": [
+   "cuts_intro_0.jpg"
+  ],
+  "measured": {
+   "I3": {
+    "median": 0.25,
+    "max": 1.37,
+    "dev": 0.58
+   },
+   "I5_dev": 0.2,
+   "I9_dev": 0.04,
+   "I15_dev": [
+    0.27,
+    0.33
+   ],
+   "I19_dev": 0.13,
+   "S2_dev": 0.21,
+   "E14b_dev": 2.17,
+   "E16_dev": 0.45
+  },
+  "likely_cause": "-"
+ },
+ {
+  "id": "T3-V-CUTS",
+  "t_start": 3.87,
+  "t_end": 144.0,
+  "category": "hard_cut",
+  "severity": "low",
+  "what": "CONFIRMED FIXED in t3: all 34 scripted cuts (22 in CS0, 12 in CS1) land on the new framing in the first frame: no sliding/zooming background after the cut (mean abs frame difference in the 4 frames after each cut stays at the shot's own level; the flagged cuts I14, I17, S11 checked frame by frame: actors moving / typing), no frame inside a model; only the 1-frame tear T3-TEAR-1. t4: 31 cuts; E2 checked frame by frame (background static, the change is the lunge); R4-R7, E3, E5, C3 have fast action right after the cut and were not checked frame by frame.",
+  "evidence": [
+   "cuts_intro_0.jpg",
+   "cuts_intro_1.jpg",
+   "cuts_cs1_0.jpg",
+   "t4/cut_e2.jpg"
+  ],
+  "measured": {
+   "cuts_t3": 34,
+   "cuts_t4": 31,
+   "sliding_cuts_t3": 0
+  },
+  "likely_cause": "-"
+ },
+ {
+  "id": "T3-V-GHOST",
+  "t_start": 0,
+  "t_end": 145,
+  "category": "translucent_ghost",
+  "severity": "low",
+  "what": "CONFIRMED FIXED: no translucent entity shapes (husk, armour stand, slabs) in any t3/t4 cutscene shot (2-fps sheets of all shots, full frames of 25 shots); the arrival (1.77-3.87 s) shows the actor walking with no slabs.",
+  "evidence": [
+   "arrival.jpg",
+   "shots_intro.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "-"
+ },
+ {
+  "id": "T3-V-HUD",
+  "t_start": 2.0,
+  "t_end": 144.0,
+  "category": "hud",
+  "severity": "low",
+  "what": "CONFIRMED FIXED: during cutscenes no crosshair, no sidebar (스택 / 붉은 죽음의 가면), no loot text, no hotbar; in the fight right after, the crosshair and sidebar return. No 'Press Left Shift to Dismount' at either hand-back. Remaining overlays are the user's client: 'Dynamic FPS Disabled' toast (top centre, all of t3/t4 after 2 s) and the chat box of the test command over the black opening 0-2.3 s. t4 repel keeps the boss bar (by design).",
+  "evidence": [
+   "hud_check.jpg",
+   "handback_hud.jpg",
+   "arrival.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "-"
+ },
+ {
+  "id": "T3-V-TEXT",
+  "t_start": 12.6,
+  "t_end": 144.0,
+  "category": "dialogue",
+  "severity": "medium",
+  "what": "MOSTLY FIXED: lines sit in a dark box in the lower third: box rows y 734-769 (35 px) centred at y 751 (71 % down the 1026-px game picture), backdrop ~72 % black (box median 31 over a 140 background), Hangul glyph rows 741-765 = ~24-25 px (the brief asked >= 28 px; the window is 1026 px tall, so ~26 px at 1080); widest line ~710 px, nothing cut at the edges; the box crosses her chest/waist in close shots, never her face in the frames checked. Faults: the duplicate far copy (T3-TEXT-STRAY / T4-TEXT-STRAY), and the box covers the lower part of the S11 petal (T3-PETAL-1). Text size agrees with a 4.0 b F5 distance (a camera 4 b off would change it several-fold), so the 'camera 4 b too close/far' case is excluded; the S5 floor scale (~100 px/block at 5 b) agrees too.",
+  "evidence": [
+   "crop_1740.jpg",
+   "t4/lines_a.jpg"
+  ],
+  "measured": {
+   "box_rows": [
+    734,
+    769
+   ],
+   "glyph_px": "24-25",
+   "backdrop_alpha": 0.72,
+   "widest_line_px": 710,
+   "hint_box_rows": [
+    807,
+    826
+   ],
+   "hint_glyph_px": "14-16"
+  },
+  "likely_cause": "cam_line k=0.0858 at FOV 90 in a 1026-px window"
+ },
+ {
+  "id": "T3-V-SKIP",
+  "t_start": 2.0,
+  "t_end": 140.0,
+  "category": "skip",
+  "severity": "low",
+  "what": "Skip hint '◦ 건너뛰기 · Space 길게' shown in a 20-px dark box (rows 807-826, glyphs ~14-16 px) under the line during CS0 and CS1. The skip itself was not used in t3/t4 (both cutscenes play to the end), so the skip landing cannot be judged; no line was drawn over black anywhere.",
+  "evidence": [
+   "s5_full_7070.jpg"
+  ],
+  "measured": {
+   "hint_box_px": 20,
+   "hint_glyph_px": "14-16"
+  },
+  "likely_cause": "-"
+ },
+ {
+  "id": "T3-V-ARRIVAL",
+  "t_start": 0,
+  "t_end": 3.87,
+  "category": "staging",
+  "severity": "low",
+  "what": "Arrival: black 0-1.77 s (frames 3-106; the test command's chat box shows over it), fade 1.77-2.1 s, I1 push behind the walking actor from 1.87 s, cut to I2 at 3.87 s. No pale fog, no ghosts, no wrong sky (t1 issue fixed).",
+  "evidence": [
+   "arrival.jpg"
+  ],
+  "measured": {
+   "black_s": 1.77
+  },
+  "likely_cause": "-"
+ },
+ {
+  "id": "T4-OVERLAP-1",
+  "t_start": 50.23,
+  "t_end": 66.87,
+  "category": "staging_bodies",
+  "severity": "high",
+  "what": "Complaint (a), every lock/clash (all static cameras within ~1.2-2.5 b): R0/R1 deflect+blade lock 50.23-51.53 s (78 frames, lens low on her left): she fills x 0-960, the actor x 840-1350; her right forearm lies across the actor's chest (overlap ~120 px wide), the blades cross at ~(945-1020, 495-630) between their faces under gold/purple sparks that cover the actor's face. R2/R3 grab + hilt on her hat 51.53-52.83 s (78 frames): ONE merged silhouette x ~810-1140: the actor (dark coat) covers ~60 % of her width, his head touches hers (0-30 px gap), his left arm crosses her chest; her blade sticks out horizontally at neck height to the right, his vertical to the upper left. R5 back to back 53.62-54.12 s: bodies fully overlapped. E2 lock 59.17-60.83 s (~100 frames, then the shove/pull-back): heads ~255 px apart (actor head x 300-840, hers 1095-1440), his sword hand presses on her raised left forearm at chest level, blades cross between the faces with sparks; E5 66.18-66.87 s (41 frames): heads ~195 px apart, her left hand on his sword arm. In both locks the torsos are about one head-width apart and hands/forearms are intertwined in the middle, which reads as an embrace/argument rather than swords meeting at reach. Script distances: repel lock 1.3 b centre-to-centre, the grab 0.6 b (actor steps in to f 0.5, she at f 1.1), back-to-back 1.2 b, E2 lock 1.6 b, E5 ~1.5 b; player models are 0.6 b wide with ~0.7 b arms.",
+  "evidence": [
+   "t4/full_3051.jpg",
+   "t4/full_3135.jpg",
+   "t4/full_3606.jpg",
+   "t4/full_3992.jpg",
+   "t4/lock_r23.jpg",
+   "t4/lock_e2.jpg"
+  ],
+  "measured": {
+   "locks": {
+    "R0/R1": [
+     50.23,
+     51.53
+    ],
+    "R2/R3": [
+     51.53,
+     52.83
+    ],
+    "R5": [
+     53.62,
+     54.12
+    ],
+    "E2": [
+     59.17,
+     60.83
+    ],
+    "E5": [
+     66.18,
+     66.87
+    ]
+   },
+   "head_gap_px": {
+    "R2/R3": "0-30",
+    "E2": 255,
+    "E5": 195
+   },
+   "centre_distance_b": {
+    "repel lock": 1.3,
+    "grab": 0.6,
+    "back to back": 1.2,
+    "E2": 1.6,
+    "E5": 1.5
+   }
+  },
+  "likely_cause": "STAGED marks in seq.py (repel f 1.3/1.1, the actor at 0-0.5; ending KE2/KE5) and the clips' contact points; a lock at the blades' middles needs ~2.2-2.6 b"
+ },
+ {
+  "id": "T4-AIR-1",
+  "t_start": 66.87,
+  "t_end": 73.57,
+  "category": "staging_aerial",
+  "severity": "high",
+  "what": "Complaint (b): airborne ~5.9 s (66.9 -> ~72.8 s). Spring 66.87-67.47 s (12 ticks, ~6 b straight up, ~10 b/s); then both HANG at constant height (~6 b) for 4.4 s (ticks 216-304) while trading four cuts (a1 68.07, a2 69.77, a3 70.97, a4/lock 71.57-71.87 s): bodies do not rise or sink (screen positions constant within ~10-30 px in static shots), only arms/blades move; fall 71.87-72.73 s, her arc back to the mark until ~72.9 s. Camera: E6a from below 66.87-68.67 s (tilt-up 0.6 s with a 20-34 px stepped motion and a ~70 px reversal at 67.2 s, then static): two figures ~100-170 px tall high in the frame, 80 % of the frame is the dark dome wall; E6b level 68.67-70.48 s: ~380 px tall, the two bodies overlap almost completely (she in front covers the actor); E6c behind the actor 70.48-72.37 s: his back 300-400 px, she small at left; E7 apart 72.37-73.57 s from ~16 b: 30-45 px figures in an empty dome (chase jerky, T3-CHASE-1). No close shot of faces/blades with sparks in the air.",
+  "evidence": [
+   "t4/air_below.jpg",
+   "t4/full_4070.jpg",
+   "t4/air_level.jpg",
+   "t4/full_4170.jpg",
+   "t4/air_behind.jpg",
+   "t4/full_4380.jpg"
+  ],
+  "measured": {
+   "airborne_s": 5.9,
+   "hover_s": 4.4,
+   "rise_s": 0.6,
+   "fall_s": 0.9,
+   "height_b": 6,
+   "fig_px": {
+    "E6a": "100-170",
+    "E6b": 380,
+    "E6c": "300-400",
+    "E7": "30-45"
+   }
+  },
+  "likely_cause": "ending clip: 'up (0, 6.0, 1.5) 204-216 ... 304' held as a level root track; the four exchanges are arm motion only"
+ },
+ {
+  "id": "T4-REPEL-KICK",
+  "t_start": 56.62,
+  "t_end": 56.67,
+  "category": "staging",
+  "severity": "medium",
+  "what": "R8 'the kick' is on screen for 3 frames (56.62-56.67 s) before the white seam into the ending: the lethal kick itself is not seen.",
+  "evidence": [
+   "t4/r6_r8.jpg"
+  ],
+  "measured": {
+   "frames": 3
+  },
+  "likely_cause": "repel R8 cut at tick 128, kick (and her death -> ending start) at 129"
+ },
+ {
+  "id": "T4-LIGHTBAR",
+  "t_start": 51.53,
+  "t_end": 56.62,
+  "category": "staging_prop",
+  "severity": "low",
+  "what": "A long straight white bar (~20-80 px thick, several hundred px long) stands slanted in every repel shot after R0 (R2-R7, 51.5-56.6 s); in R7 it crosses the foreground like a giant blade. Guess: the light_column card spawned at KR at tick 0, left standing.",
+  "evidence": [
+   "t4/full_3135.jpg",
+   "t4/r6_r8.jpg",
+   "t4/a_00.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "K.p('light_column') at R0 without its removal / shown from the side (guess)"
+ }
+]
