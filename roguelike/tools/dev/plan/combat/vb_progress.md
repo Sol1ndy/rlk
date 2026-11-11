@@ -2,7 +2,7 @@
 
 Branch `wip/v-boss` (from `origin/wip/v` d7e7cf013), worktree `<S>/cb/wt_vb`, pack copy `<S>/rp_vb` (from `<S>/rp_fin`).
 Contract: `v_brief.md` §3 "VB" (1-6) + §4. Scratch `<S>/vb/`: `before/` + `after/` (strips), `dbg/` (the rig's debug frames),
-`sim/` (the suites' copy), `measure_{4,7,10}.json`, `gates.out`, `suite_logs/`.
+`sim/` (the suites' copy: deleted at the end, `simcopy.sh` makes it again), `measure_{4,7,10}.json`, `gates.out`, `suite_logs/`.
 
 ## How to build / run
 ```bash
@@ -180,8 +180,7 @@ Suites touched: `test_kit.py` (the pins of the hand-placed effects / sizes rebas
   the 11-11b poses from the same virtual lens: `<S>/vb/before/pose_a1_D5.jpg`, `pose_a3h1_D5.jpg`
 - after: `<S>/vb/after/pose_a1_D5.jpg`, `pose_a3h1_D5.jpg` (C1 / S1: the wind-up, the path, the cue star, the slash), `a3_D5.jpg` (the
   whole chain), `a4_leap.jpg`, `a10_leap.jpg` (C4: in frame, the line from her blade to the player), `blue_D6.jpg`, `flash_blue_D5.jpg`
-  (C5), `g1_cuts_16-50.jpg` (G1: the station's path while she is still far away), `g1_plunge_196-222.jpg` (G2: the dive; rendered
-  before the fix that keeps her shown through the dive's wind-up); side by side: `<S>/vb/cmp_pose_a1_D5.jpg`
+  (C5), `g1_cuts_16-50.jpg` (G1: the station's path while she is still far away), `g1_plunge_196-222.jpg` (G2: the dive in view, the line from her blade to the player, the thin fail column); side by side: `<S>/vb/cmp_pose_a1_D5.jpg`
 
 ## Next (open)
 - hrfair 2.0 in full (three seeds, the gauntlet rows T5-T7; ~50 min): only the quick run above was made. The gauntlet rows depend
