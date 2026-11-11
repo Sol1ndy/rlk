@@ -697,7 +697,7 @@ def build_kcut(W):
     sparkle, glow, lock, go, cut = (E(key, k) for k in ('sparkle', 'glow', 'lock', 'go', 'cut'))
     end = api.PAT_END[key]
     assert lock == cut - S.LOCK
-    pb.flash_args['yellow'] = {'t': 10}            # the big yellow: the kit's tell held longer (its size is the kit's)
+    pb.flash_args['yellow'] = {'t': 110}           # the big yellow: the kit reads t >= 100 as the Ø 2.0 b tell for t - 100 t (HI)
     pb.at(0, FACE, api.play(key))
     pb.track(1, lock - 1, TRK['deg'])
     pb.at(sparkle, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['white'], 0.08, 0.08, 0.08, 0, 6)], c=api.C_WHITE)))

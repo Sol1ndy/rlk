@@ -58,4 +58,20 @@ H.start_pattern(s, S.TID['rings'])
 seen = set()
 H.until_h1(s, lambda s: (H.hr(s, '#pat') or 0) == 0, 120, each=lambda s: (H.heal(s), seen.add(H.hr(s, '#pat'))))
 ck('rings below a full gauge: no ult follows', S.TID['ult'] not in seen and (H.hr(s, '#ultq') or 0) == 0, seen)
+# (HI, hi_todo 2) P1 has four rings, the clip a fifth turn from 49: the rings clip must be replaced before that turn starts
+# (no ult: the kept tail's move clip at r4 + TAIL_MOVE; ult: `ult` at r4 + ULT_AFTER, and clip tick 49 = the coil of 48)
+r5_turn = api.ev('rings', 'r5') - 5
+for ult in (0, 1):
+    s, pl = H.setup_h1(DP, seed=3)
+    H.fight_sc(s)
+    H.facing_setup(s, 2.4)
+    H.test_id(s, 12) if ult else H.start_pattern(s, S.TID['rings'])
+    if ult:
+        H.hold(s)
+    t0, n0 = s.t, len(s.rigl)
+    H.until_h1(s, lambda s: (H.hr(s, '#pat') or 0) != S.TID['rings'], 120, each=lambda s: H.heal(s))
+    plays = [(t - t0, c) for t, c in s.rigl[n0:] if c.startswith('play/')]
+    first = plays[0][0] if plays else None
+    ck(f'P1 rings ({"ult follows" if ult else "no ult"}): the next clip plays by tick {r5_turn + (1 if ult else 0)} '
+       f'(the ring-less fifth turn starts at {r5_turn})', first is not None and first <= r5_turn + ult, plays[:3])
 sys.exit(P.summary('pat_p1'))

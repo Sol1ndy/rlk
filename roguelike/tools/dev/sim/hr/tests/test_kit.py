@@ -1168,8 +1168,11 @@ if MERGED:
             else:
                 check(max(px) >= need, f'view: {key[:110]}: {max(px)} card px in {view} (>= {need})')
     check(n_a1 == 2, f'view: A1\'s two contact effects (the fan, the crescent) found ({n_a1})')
-    # HR-45: the player-anchored effects (the 홍련일섬 line of CS1 C8 and of the instant deaths, the deflect's gold starburst
-    # and light column) from the F5 camera and in first person (no avatar: the camera on the player's own axis)
+    # HR-45: the player-anchored effects from the F5 camera. (HI, hi_todo 3: the rebuilt fight) first person exists only in
+    # developer mode now (11-10), so the first-person pins are gone (the old judge drew the deflect a second time 1.8 b before
+    # the eyes; the dev-mode forms the module still writes are not pinned). What stays anchored at the player is the 홍련일섬
+    # line of the instant death (a13's fail); CS1's line and the deflect are drawn at the stage by lane H2's sequences (their
+    # cutscene cameras frame them: test_seq / the shot sheets), checked below by where they are called.
     anchored = {}
     for p in sorted(MOD.rglob('*.mcfunction')):
         rel = p.relative_to(MOD).as_posix()
@@ -1179,31 +1182,19 @@ if MERGED:
             m = re.search(r'fx/p/(scarlet_line|clash_gold|light_column)\b', ln)
             if m and 'at @e[tag=rlk_body,limit=1]' in ln and not ln.startswith('#'):
                 anchored.setdefault((rel, m.group(1)), []).append(ln)
-    # (the rebuilt fight: the 홍련일섬 line of the instant death + the deflect's starburst and column, which moved from the
-    # judge to the repel sequence's start; found by what the file calls, wherever lane H2's sequence puts it)
-    DEFLECT = {r for (r, n_) in anchored if n_ == 'clash_gold'} & {r for (r, n_) in anchored if n_ == 'light_column'}
-    check(len(anchored) >= 3, f'view: {len(anchored)} player-anchored effects')
+    check(len(anchored) >= 1 and all(n_ == 'scarlet_line' for (_r, n_) in anchored),
+          f'view: the player-anchored effects are the instant death\'s 홍련일섬 line ({sorted(anchored)})')
     FULL = 0.9 * VW * VH                # a card sheet over the camera that fills the screen is not a visible effect
     for (rel, name), lines in sorted(anchored.items()):
-        judge = rel in DEFLECT
-        for view, need in (('F5', 300), ('FP', VIEW_MIN)):
-            if judge and view == 'FP':
-                continue                 # the judge: first person in its own scene below
-            px = view_of(lines, view)
-            check(need <= px < FULL, f'view: {rel} {name}: {px} card px in {view} (>= {need}, < 90 % of the frame; HR-45: '
-                                     f'first person)')
-        # VF2-1-03: the judge's starburst / column in first person where the judge happens: she 1 b over the player's spot,
-        # the player looking up at her (base: 0 px at every look <= 0, or the whole screen under the leaned column)
-        seen = []
-        for look in (JUDGE_LOOKS if judge else ()):
-            px = view_of(lines, 'FP', look)
-            seen.append(f'{-look:.0f} deg {px}')
-            check(VIEW_MIN <= px < FULL, f'view: {rel} {name}: {px} card px in first person at the judge, looking up '
-                                         f'{-look:.0f} deg (>= {VIEW_MIN}, < 90 % of the frame)')
-        if seen:
-            print(f'view: the judge in first person, {name} looking up: ' + ', '.join(seen) + ' px')
-    check(len(DEFLECT) == 1 and sum(1 for (rel, _n) in anchored if rel in DEFLECT) == 2,
-          f'view: the deflect\'s starburst and column ({sorted(DEFLECT)})')
+        px = view_of(lines, 'F5')
+        check(300 <= px < FULL, f'view: {rel} {name}: {px} card px in F5 (>= 300, < 90 % of the frame; HR-45)')
+    # the deflect (hr_design §3.4 R0): the gold starburst and the light column at KR, in the repel sequence's first tick, at the
+    # stage marker (the actor's feet; in developer mode the player's)
+    kr = api.CONTACT['KR'][2]
+    pos = f'at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^{api.L.num(kr[0], 2)} ^{api.L.num(kr[1], 2)} ^{api.L.num(kr[2], 2)} run'
+    rs = (MOD / 'seq/repel/start.mcfunction').read_text(encoding='utf-8').split('\n') if (MOD / 'seq/repel/start.mcfunction').exists() else []
+    dfl = sorted(n_ for ln in rs for n_ in ('clash_gold', 'light_column') if f'fx/p/{n_}' in ln and pos in ln)
+    check(dfl == ['clash_gold', 'light_column'], f'view: the deflect\'s starburst and column at KR in seq/repel/start ({dfl})')
 
 # ============================================================== H1 block (lane H1c; hr_design §2.1-§2.2, §5.1, §5.4)
 def end_scale(s_, e_):

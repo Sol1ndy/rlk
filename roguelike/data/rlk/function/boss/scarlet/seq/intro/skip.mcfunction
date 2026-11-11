@@ -15,4 +15,4 @@ function rlk:boss/scarlet/rig/look/props/none
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^0 ^0 ^6.5 run tp @s ~ ~ ~
 execute rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @s ~180 0
 execute unless score #sq_cx hr matches 1 run function rlk:mboss/cam/spawn
-execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] ^-0.15 ^1.35 ^1 facing ^0 ^1.62 ^0
+execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] ^-0.15 ^1.2 ^1.5 facing ^0 ^1.62 ^0

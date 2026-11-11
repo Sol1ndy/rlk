@@ -1,0 +1,3 @@
+# intro: the camera, the ticks 1296..1297.
+execute if score #sq hr matches 1296 run return run function rlk:boss/scarlet/seq/intro/c/1296
+execute if score #sq hr matches 1297 run return run function rlk:boss/scarlet/seq/intro/c/1297

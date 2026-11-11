@@ -472,8 +472,8 @@ def raw(event, vol, pitch=1.0):
 
 
 def gold(t_in, hold, t_out):
-    """The deflect's gold wash. STAND-IN (H2c): the `gold` overlay glyph is lane H2c's kit block; until the kit declares it
-    api.K returns '' for it and the mask is `white`."""
+    """The deflect's gold wash: lane H2c's `gold` overlay glyph (live since the HI merge). The `white` fallback only shows
+    if the kit is ever built without the H2c block (api.K returns '' for an undeclared overlay)."""
     return K.ovl('gold', t_in, hold, t_out) or K.ovl('white', t_in, hold, t_out)
 
 
@@ -558,7 +558,11 @@ def build_intro(W):
     # (the design's r 0.8 is a dry-grass cell of the fixed stage: its mirror r -0.8 is free)
     tr.cut(1230, B, ST(-0.8, 0.3, 8.5), ENT(BODY, 'eyes'), 'I16 leap', ('her',))
     tr.cut(1260, A, ST(1.6, 0.5, 4.2), HR(0, 0.9, 0), 'I17 landing', ('her',))
-    tr.cut(1290, B, HR(0.15, 1.35, 1.0), HR(0, 1.62, 0), 'I18 under the brim', ('her',))
+    # (HI, hi_todo 9) the design's eye HR(0.15, 1.35, 1.0) from the cut: her low brim, still rising out of the landing's
+    # crouch (intro_end 0-10), sweeps 0.04 b past the lens at 1296. The shot opens lower and 0.5 b further out and pushes in
+    # to the design's eye by 1310 as she rises: the brim stays >= 0.32 b from the lens over the whole shot (her_tracks.json)
+    tr.cut(1290, B, HR(0.15, 1.2, 1.5), HR(0, 1.62, 0), 'I18 under the brim', ('her',))
+    tr.move(1290, 1310, eye=HR(0.15, 1.35, 1.0), ease='io')
     tr.cut(1350, A, HR(0.4, 1.4, 1.6), HR(0, 1.3, 0), 'I19 draw, stance', ('her',))
     tr.move(1350, 1400, eye=HR(0.6, 1.3, 3.2))
     tr.cut(1406, B, ST(0.6, 1.8, 3.0), ST(0, 1.5, 6.5), 'I20 back to the player', ('her', 'actor'))
@@ -727,7 +731,7 @@ def build_cs1(W):
     s.st(186, ST(0, 4.0, 4.5), K.p('leaves_dark', n=8))
     # ---- S6: the hat swept off and back on (240 / 260); S9: she drinks from the bottle (464, 478); S10: the props gone 500
     s.at(e('hat_off'), snd('hat_swing')).at(e('hat_on', 2), snd('hat_swing'))
-    s.at(e('drink', 6), raw('entity.generic.drink', 0.35, 1.2)).at(e('drink', 20), raw('entity.generic.drink', 0.35, 1.2))
+    s.at(e('drink', 6), snd('cs0_sip')).at(e('drink', 20), snd('cs0_sip'))     # (HI) the kit's sip, was a raw stand-in
     s.at(e('props_off'), api.rig('look/props/none'))
     # ---- S10: a big petal drifts across her face from frame-left (590-606, 0.6 b before it)
     p1, p2 = PETAL[1], PETAL[2]
@@ -752,7 +756,7 @@ def build_cs1(W):
         s.at(t, petal_move(p2, at_pt(ST(0.3 + 0.9 * u, 1.5 - 1.1 * u * u, 2.9 + 0.6 * u)), B))
     s.at(664, petal_kill(p2))
     s.st(e('slash'), ST(0, 1.3, 0), K.p('scarlet_line', len=600, yaw=90, roll=13))
-    s.at(e('slash'), K.ovl('red_tint', 0, 4, 20), raw('item.trident.thunder', 0.5, 1.4), raw('block.glass.break', 0.5, 0.6))
+    s.at(e('slash'), K.ovl('red_tint', 0, 4, 20), snd('iai_slash'))      # (HI) the kit's 홍련일섬 recipe, was a raw stand-in
     s.me(e('slash'), K.p('petal_burst', r=20))
     s.me(e('slash', 6), K.p('leaves_dark', n=20), y=6).me(e('slash', 7), K.p('leaves_dark', n=-20), y=6)
     s.at(e('recolour'), api.arena_look('crimson'), api.rig('look/phase/p2'))
@@ -920,7 +924,7 @@ def build_repel(W):
     # ---- R9 (60 % only): she rolls to her feet and stands at f 9.0 (135-140), the actor lands 139
     up = mv.add('up', [cand(floor_pt(d), glide(5), ok) for d, ok in ((HER_F, OK), (HER_F, OKW), (8.0, OKW))],
                 'R9 to her feet at f 9.0 (135-140)')
-    s.at(135, up).st(139, ST(0, 0, 0), raw('block.grass.step', 0.5, 1.0)).at(e('end'), FACE_ACTOR)
+    s.at(135, up).st(139, ST(0, 0, 0), snd('land_grass')).at(e('end'), FACE_ACTOR)     # (HI) the kit's landing, was raw
     mv.stage(api.STAGE_FMAX['repel'])
     mv.write(W)
     head = ('repel {at:60|5} (hr_design §3.4): the deflect, the blade lock, the grab, the hilt on her hat, two cuts, back to back, '
@@ -984,7 +988,7 @@ def build_ending(W):
     # shoved back to f 6.0 (80-86)
     s.at(e('lunge'), mv.add('lunge', [cand(floor_pt(d), glide(4)) for d in (2.9, 3.4)], 'E2 the lunge to f 2.9'))
     s.fx(e('graze'), 'hat_crown', K.p('clash_spark'))
-    s.at(e('lock'), raw('block.anvil.land', 0.4, 1.5))
+    s.at(e('lock'), snd('blade_lock'))       # (HI) the kit's blade lock (as CS1's K1), was a raw stand-in
     for t in range(e('lock'), e('shove'), 3):
         s.st(t, KE2, K.p('clash_spark'))
     s.at(e('burst'), gold(0, 1, 2), snd('bolt_crackle')).st(e('burst'), KE2, K.p('clash_gold'))

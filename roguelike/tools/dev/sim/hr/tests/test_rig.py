@@ -340,7 +340,12 @@ if SK:
     PART = {p['name']: p for p in MAN['parts']}
     USER_SKIN = S / 'hr/skin/scarlet_skin_64.png'
     sk_rp = (ASSETS / 'textures/mboss/scarlet/skin.png').read_bytes()
-    check('skin: the RP skin.png is byte-identical to the user\'s file (HR/skin/scarlet_skin_64.png)', USER_SKIN.exists() and sk_rp == USER_SKIN.read_bytes())
+    # (HI) the user's file lived in the 11-06 scratchpad only (not in git, not in a new container): where it is missing the
+    # embedded copy (tools/scarlet_skin.mjs, its sha1 in the manifest) is the reference, checked on the next row
+    if USER_SKIN.exists():
+        check('skin: the RP skin.png is byte-identical to the user\'s file (HR/skin/scarlet_skin_64.png)', sk_rp == USER_SKIN.read_bytes())
+    else:
+        print('     (info) skin: the user\'s file HR/skin/scarlet_skin_64.png is not in this container: the embedded copy is the reference')
     check('skin: ... and to the embedded tools/scarlet_skin.mjs (bytes, sha1)', len(sk_rp) == SK['bytes'] and _hl.sha1(sk_rp).hexdigest() == SK['sha1']
           and SK['sha1'] in (DP / 'tools/scarlet_skin.mjs').read_text())
     _sim = Image.open(ASSETS / 'textures/mboss/scarlet/skin.png')
@@ -798,7 +803,10 @@ ev = api.CLIPS['kipup'][2]
 check('hats: kipup goes world -> hand (crouch) -> worn', seq_h[0] == HATS.index('world') and seq_h[ev['crouch']] == HATS.index('hand') and seq_h[-1] == HATS.index('worn'), str(seq_h))
 
 
-# ================================================================ cine (S2b: the 8 cinematic clips of tools/scarlet_cine.mjs)
+# ================================================================ cine (lane H2c: the 8 cinematic clips of tools/scarlet_cine.mjs)
+# (HI, hi_todo 5 / 10: the 11-06 rows - sq1 / lead_down / lead_stand, the 11-06 events, the CS3 -> CS4 seam at repel 102, the
+# old big-swing spans - are replaced by the §4.1 versions lane H2c's test_cine.py checks: the same states, hand-overs and seam on
+# this suite's own replay of the shipped key files)
 CINE = list(api.CINE_CLIPS)
 STATE_RX = re.compile(r'scoreboard players set @s hrRig(Hat|Sw|Sc|Cu|Bo) (\d)$')
 FACE_RX = re.compile(r'function ' + re.escape(NS) + r'/m/face/(\w+)$')
@@ -823,48 +831,43 @@ def states(clip):
     return out
 
 
+def span_of(st, key, val):
+    ts = [t for t, s_ in enumerate(st) if s_.get(key) == val]
+    return (ts[0], ts[-1]) if ts else None
+
+
 cs_ok = MAN.get('cine_source') == 'tools/scarlet_cine.mjs' and all(MAN['clips'][c]['authored'] for c in CINE)
 check('cine: the 8 cinematic clips come from tools/scarlet_cine.mjs, authored (not the placeholder)', cs_ok, MAN.get('cine_source'))
+check('cine: no placeholder clip in the manifest', not [c for c, v in MAN['clips'].items() if v.get('placeholder')],
+      [c for c, v in MAN['clips'].items() if v.get('placeholder')])
+check('cine: the 11-06 cinematic clips are gone (sq1, lead_down, lead_stand)', not {'sq1', 'lead_down', 'lead_stand'} & set(MAN['clips']))
 src_bad = [c for c in CINE if not MAN['clips'][c]['source']]
 check('cine: every cinematic clip names its footage / plan source', not src_bad, src_bad)
 thin = {c: MAN['clips'][c]['key_files'] for c in CINE if MAN['clips'][c]['key_files'] < 12}
 check('cine: every cinematic clip is animated (>= 12 key files each)', not thin, thin)
-ST_ = {c: states(c) for c in CINE + ['ev_give', 'ev_toast', 'g_deflect', 'down', 'g_tell']}
-E_ = lambda c, e: api.ev(c, e)
-# the hat / sword / scabbard / prop / face states at the contract events (PLAN §3.1-§3.7)
-WANT = [
-    ('intro', 0, {'Hat': 'worn', 'Sw': 'sheathed', 'Sc': 'hip', 'Cu': 'hand', 'Bo': 'none'}),
-    ('intro', E_('intro', 'pour') - 6, {'Bo': 'hand'}), ('intro', E_('intro', 'pour') + 22, {'Bo': 'none'}),
-    ('intro', E_('intro', 'cup_down'), {'Cu': 'none'}), ('intro', E_('intro', 'scab_hand'), {'Sc': 'hand', 'Sw': 'sheathed'}),
-    ('intro', 554, {'Hat': 'worn', 'Sc': 'hand', 'Cu': 'none', 'Bo': 'none'}),
-    ('intro_end', 0, {'Hat': 'worn', 'Sw': 'sheathed', 'Sc': 'hand', 'Cu': 'none', 'Bo': 'none'}),
-    ('intro_end', E_('intro_end', 'smile'), {'face': 'smile'}), ('intro_end', E_('intro_end', 'head_down'), {'face': 'calm'}),
-    ('intro_end', E_('intro_end', 'draw') - 1, {'Sw': 'sheathed'}), ('intro_end', E_('intro_end', 'draw'), {'Sw': 'hand'}),
-    ('intro_end', E_('intro_end', 'tuck') - 1, {'Sc': 'hand'}), ('intro_end', E_('intro_end', 'tuck'), {'Sc': 'hip'}),
-    ('intro_end', 86, {'Hat': 'worn', 'Sw': 'hand', 'Sc': 'hip'}),
-    ('cs1', 0, {'Hat': 'worn', 'Sw': 'hand', 'Sc': 'hip'}), ('cs1', E_('cs1', 'hat_back') - 1, {'Hat': 'worn'}),
-    ('cs1', E_('cs1', 'hat_back'), {'Hat': 'back'}), ('cs1', E_('cs1', 'sheathe'), {'Hat': 'worn', 'Sw': 'sheathed'}),
-    ('cs1', E_('cs1', 'slash'), {'Sw': 'hand'}), ('cs1', E_('cs1', 'hat_back2') - 1, {'Hat': 'worn'}),
-    ('cs1', E_('cs1', 'hat_back2'), {'Hat': 'back'}), ('cs1', 213, {'Hat': 'back', 'Sw': 'hand'}),
-    ('sq1', 0, {'Hat': 'back'}), ('sq1', E_('sq1', 'hat_hand'), {'Hat': 'hand'}), ('sq1', E_('sq1', 'hat_on') - 1, {'Hat': 'hand'}),
-    ('sq1', E_('sq1', 'hat_on'), {'Hat': 'worn'}), ('sq1', 60, {'Hat': 'worn', 'Sw': 'hand', 'Sc': 'hip'}),
-    ('repel', 0, {'Hat': 'worn'}), ('repel', E_('repel', 'hat_back'), {'Hat': 'back'}), ('repel', E_('repel', 'hat_off') - 1, {'Hat': 'back'}),
-    ('repel', E_('repel', 'hat_off'), {'Hat': 'world'}), ('repel', 104, {'Hat': 'world', 'Sw': 'hand', 'Sc': 'hip'}),
-    ('lead_down', 0, {'Hat': 'world'}), ('lead_down', E_('lead_down', 'hat_hand'), {'Hat': 'hand'}),
-    ('lead_down', E_('lead_down', 'hat_on') - 1, {'Hat': 'hand'}), ('lead_down', E_('lead_down', 'hat_on'), {'Hat': 'worn'}),
-    ('lead_down', 82, {'Hat': 'worn', 'Sw': 'hand', 'Sc': 'hip'}),
-    ('lead_stand', 0, {'Hat': 'worn'}), ('lead_stand', E_('lead_stand', 'hat_hand'), {'Hat': 'hand'}),
-    ('lead_stand', E_('lead_stand', 'hat_on') - 1, {'Hat': 'hand'}), ('lead_stand', E_('lead_stand', 'hat_on'), {'Hat': 'worn'}),
-    ('lead_stand', 70, {'Hat': 'worn', 'Sw': 'hand', 'Sc': 'hip'}),
-    ('ending', 0, {'Hat': 'world'}), ('ending', E_('ending', 'hat_on') - 1, {'Hat': 'hand'}), ('ending', E_('ending', 'hat_on'), {'Hat': 'worn'}),
-    ('ending', E_('ending', 'scab_up'), {'Sc': 'hand'}), ('ending', E_('ending', 'seated') - 1, {'Sw': 'hand'}),
-    ('ending', E_('ending', 'seated'), {'Sw': 'sheathed'}), ('ending', E_('ending', 'smile') + 2, {'face': 'smile'}),
-    ('ending', E_('ending', 'l23'), {'face': 'closed'}), ('ending', E_('ending', 'eyes'), {'face': 'calm'}),
-    ('ending', 1042, {'Hat': 'worn', 'Sw': 'sheathed', 'Sc': 'hand', 'face': 'calm'}),
+ST_ = {c: states(c) for c in CINE + ['ev_give', 'ev_toast', 'idle', 'idle2']}
+# the hat / sword / scabbard / prop states the clips key at the contract's ticks (hr_design §4.1; test_cine.py `states`)
+SC_ = ST_
+st_rows = [
+    ('cs1 sheathed 200-641, drawn at 642', span_of(SC_['cs1'], 'Sw', 'sheathed') == (200, 641) and SC_['cs1'][642].get('Sw') == 'hand'),
+    ('cs1 the bottle in hand 216-499', span_of(SC_['cs1'], 'Bo', 'hand') == (216, 499)),
+    ('cs1 the hat off 240, on 258', span_of(SC_['cs1'], 'Hat', 'hand') == (240, 257) and SC_['cs1'][258].get('Hat') == 'worn'),
+    ('the scabbard at the hip outside the ending', all(s_.get('Sc') == 'hip' for c in ('intro', 'intro_end', 'cs1', 'repel', 'lead60', 'lead5', 'lead_re')
+                                                       for s_ in SC_[c])),
+    ('repel hat off 84, taken up 131, on 139', span_of(SC_['repel'], 'Hat', 'world') == (84, 130) and span_of(SC_['repel'], 'Hat', 'hand') == (131, 138)
+     and SC_['repel'][139].get('Hat') == 'worn'),
+    ('intro the bottle 326-423, the cup to 711', span_of(SC_['intro'], 'Bo', 'hand') == (326, 423) and span_of(SC_['intro'], 'Cu', 'hand') == (0, 711)),
+    ('the sword sheathed through the intro (a hand\'s width out 764-786), drawn at intro_end 66',
+     all(s_.get('Sw') == 'sheathed' for i, s_ in enumerate(SC_['intro']) if not 764 <= i <= 786) and SC_['intro_end'][66].get('Sw') == 'hand'
+     and SC_['intro_end'][65].get('Sw') == 'sheathed'),
+    ('ending hat on at 20', SC_['ending'][0].get('Hat') == 'world' and SC_['ending'][19].get('Hat') == 'hand' and SC_['ending'][20].get('Hat') == 'worn'),
+    ('ending sheathed at 452, the scabbard in hand from 388', SC_['ending'][451].get('Sw') == 'hand' and SC_['ending'][452].get('Sw') == 'sheathed'
+     and span_of(SC_['ending'], 'Sc', 'hand') == (388, MAN['clips']['ending']['len'])),
+    ('every cinematic clip ends with the hat worn', all(SC_[c][-1].get('Hat') == 'worn' for c in CINE)),
 ]
-st_bad = [(c, t, {k: ST_[c][t].get(k) for k in w}, w) for c, t, w in WANT if any(ST_[c][t].get(k) != v for k, v in w.items())]
-check(f'cine: the hat / sword / scabbard / cup / bottle / face states at their events ({len(WANT)} points, PLAN §3.1-§3.7)', not st_bad, st_bad[:4])
-# hand-overs: the anchor table (the solver's per-tick points) of the clip that hands over == the next clip's tick 0
+st_bad = [n_ for n_, ok_ in st_rows if not ok_]
+check(f'cine: the hat / sword / scabbard / cup / bottle states at the §4.1 ticks ({len(st_rows)} rows)', not st_bad, st_bad)
+# hand-overs (hr_design §4.1): the anchor table (the solver's per-tick points) of the clip that hands over == the next clip's tick
 AN = {}
 for line in allfn['an/load'].splitlines():
     m = re.match(r'data modify storage rlk:hr rig\.an\[(\d+)\]\.(\w+) set value (\[.*\])$', line)
@@ -877,38 +880,45 @@ def anchors_at(c, t):
     return {a: AN[(cid(c), a)][t] for a in api.ANCHORS}
 
 
-TOL = {'head': .06, 'chest': .06, 'hat_crown': .12, 'hand_l': .12, 'hand_r': .12, 'scabbard_mouth': .14, 'blade_mid': .2, 'blade_tip': .25}
-HANDOVER = [('intro', 554, 'intro_end', 0), ('cs1', 213, 'sq1', 0), ('g_deflect', 12, 'repel', 0), ('repel', 104, 'down', 0),
-            ('down', 0, 'lead_down', 0), ('sq1', 60, 'g_tell', 0), ('lead_down', 82, 'g_tell', 0), ('lead_stand', 70, 'g_tell', 0),
-            ('ending', 1042, 'ev_give', 0), ('ending', 1042, 'ev_toast', 0)]
+def an_gap(a, ta, b, tb, names=None):
+    A_, B_ = anchors_at(a, ta), anchors_at(b, tb)
+    return max(math.dist(A_[k], B_[k]) for k in (names or api.ANCHORS))
+
+
+L_ = lambda c: MAN['clips'][c]['len']      # noqa: E731
+HANDOVER = [('intro', L_('intro'), 'intro_end', 0, None, .03), ('intro_end', L_('intro_end'), 'idle', 0, None, .03),
+            ('cs1', L_('cs1'), 'lead60', 0, None, .03), ('lead60', L_('lead60'), 'g_brim', 14, None, .03),
+            ('lead5', L_('lead5'), 'g_brim', 14, None, .03), ('lead_re', L_('lead_re'), 'g_brim', 14, None, .03),
+            ('ending', L_('ending'), 'ev_give', 0, None, .03), ('ending', L_('ending'), 'ev_toast', 0, None, .03),
+            # the lethal kick (repel 129 -> ending 0) and repel 140 -> idle2: the body; the right hand is reported below
+            ('repel', api.ev('repel', 'kick'), 'ending', 0, [a for a in api.ANCHORS if a != 'hand_r'], .03),
+            ('repel', L_('repel'), 'idle2', 0, [a for a in api.ANCHORS if a != 'hand_r'], .03),
+            # repel 0 against g_dive's last pose: the head, the chest and the crown (the sword is re-gripped on the dive's line)
+            ('repel', 0, 'g_dive', L_('g_dive'), ['head', 'chest', 'hat_crown'], .25)]
 ho_bad = []
-for a, ta, b, tb in HANDOVER:
-    A_, B_ = anchors_at(a, ta), anchors_at(b, tb)
-    d = {k: round(math.dist(A_[k], B_[k]), 3) for k in api.ANCHORS}
-    over_ = {k: v for k, v in d.items() if v > TOL[k]}
-    if over_:
-        ho_bad.append((f'{a}[{ta}] -> {b}[{tb}]', over_))
-check(f'cine: the hand-over poses meet (anchors within 0.06-0.25 b: {", ".join(f"{a}->{b}" for a, _, b, _ in HANDOVER)})', not ho_bad, ho_bad)
-# F-I (HR-31, lead decision 11-05): CS3 at 5 % -> CS4 (the lethal kick at repel 102 starts the ending in the same tick). Her
-# body meets; the hat goes from beside her (the repel's DOWN) over her face only under CS4's opening hard cut (seq.SEAM_CUT:
-# a full-screen flash from the ending's tick 0, fully on while the hat's 1-t interpolation runs); under it the head settles
-# 0.15 b into LY's chin-up rest (allowed up to 0.25 b there: a settle, not a jump), every other anchor within its TOL
-SEAM = {('repel', 102, 'ending', 0): {'hat_crown': None, 'head': .25}}
-for (a, ta, b, tb), cut in SEAM.items():
-    A_, B_ = anchors_at(a, ta), anchors_at(b, tb)
-    d = {k: round(math.dist(A_[k], B_[k]), 3) for k in api.ANCHORS}
-    over_ = {k: v for k, v in d.items() if v > (cut[k] if k in cut and cut[k] is not None else 9e9 if k in cut else TOL[k])}
-    st = (DP / f'data/rlk/function/boss/scarlet/seq/{b}/start.mcfunction')
-    m_ = re.search(r'fx/hud/ovl \{g:"(white|black)",in:0,hold:(\d+),out:\d+\}', st.read_text() if st.exists() else '')
-    check(f'cine: the seam {a}[{ta}] -> {b}[{tb}]: the body meets (anchors within 0.06-0.25 b, the head <= 0.25), the hat '
-          f'({", ".join(f"{k} {d[k]} b" for k in cut)}) moves under a hard cut at {b} tick 0 (ovl white / black in 0, hold >= 2: '
-          f'{m_.group(0) if m_ else None})', not over_ and m_ is not None and int(m_.group(2)) >= 2, over_)
-# the ending ends in H_POSE's states (= ev_give / ev_toast tick 0) and the sq1 / lead-in ends in g_brim's hold (the right hand at the brim)
-h_bad = [k for k in ('Hat', 'Sw', 'Sc', 'face') if ST_['ending'][1042].get(k) != ST_['ev_give'][0].get(k)]
-check('cine: ending 1042 = ev_give / ev_toast 0 states (hat worn, sword sheathed, scabbard in hand, face calm)', not h_bad, h_bad)
-# big swings keyed every tick (the spins, the draws, the slash, the flips, the throw, the cuts, the scabbard swings)
-SWING = {'intro_end': [(44, 62)], 'cs1': [(6, 9), (162, 169)], 'repel': [(29, 43), (59, 75)],
-         'ending': [(19, 26), (140, 146), (172, 174), (202, 204), (214, 216), (226, 228), (297, 304), (802, 810)]}
+for a, ta, b, tb, names, tol in HANDOVER:
+    d = an_gap(a, ta, b, tb, names)
+    if d > tol:
+        ho_bad.append((f'{a}[{ta}] -> {b}[{tb}]', round(d, 3), tol))
+check(f'cine: the §4.1 hand-over poses meet ({len(HANDOVER)} pairs, the 8 anchors within 0.03 b; repel 0 / g_dive 0.25)', not ho_bad, ho_bad)
+d_k = an_gap('repel', api.ev('repel', 'kick'), 'ending', 0, ['hand_r'])
+d_e = an_gap('repel', L_('repel'), 'idle2', 0, ['hand_r'])
+check(f'cine: the right hand at the hand-overs (repel kick -> ending 0 {d_k:.3f} b <= 0.06: the hat pick-up\'s pre-roll; repel 140 -> idle2 '
+      f'{d_e:.2f} b <= 0.7: leaving the brim)', d_k <= .06 and d_e <= .7)
+# the lethal kick's seam (lane H2: repel {at:5} -> the ending in the same tick, her place jumps 3.0 -> 4.2): the ending opens under a
+# full-screen hard cut (ovl white / black / gold in 0, hold >= 2) that covers the jump and the hat's 1-t move
+st = DP / 'data/rlk/function/boss/scarlet/seq/ending/start.mcfunction'
+m_ = re.search(r'fx/hud/ovl \{g:"(white|black|gold)",in:0,hold:(\d+),out:\d+\}', st.read_text() if st.exists() else '')
+check(f'cine: the seam repel {api.ev("repel", "kick")} -> ending 0 opens under a hard cut (ovl in 0, hold >= 2: {m_.group(0) if m_ else None})',
+      m_ is not None and int(m_.group(2)) >= 2)
+# the ending ends in H_POSE's states (= ev_give / ev_toast tick 0)
+h_bad = [k for k in ('Hat', 'Sw', 'Sc', 'face') if ST_['ending'][L_('ending')].get(k) != ST_['ev_give'][0].get(k)]
+check(f'cine: ending {L_("ending")} = ev_give / ev_toast 0 states (hat worn, sword sheathed, scabbard in hand)', not h_bad, h_bad)
+# big swings keyed every tick (README 0-6: the short-way interpolation turns a sparse swing into a stab): the spans lane H2c
+# authors "every tick" in tools/scarlet_cine.mjs - the draws, the hat swing, the slash, the beaten blade, the throw, the kip-ups,
+# the aerial duel, the scabbard swing
+SWING = {'intro_end': [(66, 72), (90, 100)], 'cs1': [(6, 9), (240, 252), (642, 650)], 'repel': [(26, 30), (78, 101), (133, 137)],
+         'ending': [(6, 16), (204, 298), (398, 418)]}
 sw_bad = [(c, t) for c, spans in SWING.items() for a, b in spans for t in range(a, b + 1) if not (RIG / 'c' / c / 'k' / f'{t}.mcfunction').exists()]
 check(f'cine: big swings keyed every tick ({sum(b - a + 1 for v in SWING.values() for a, b in v)} ticks in {sum(len(v) for v in SWING.values())} spans)', not sw_bad, str(sw_bad[:6]))
 # per-clip numbers of the shipped replay (the gates above cover every clip; these are the cinematic clips' own)
@@ -1353,6 +1363,8 @@ if SUPT and DIMS and SKEL:
             if lo > .012:
                 bad['touch'].append(f'{clip} t{t} core {lo:.3f}')
         for t in ticks(sp['air']):
+            if t in ghost:              # (HI) ghost ticks and a one-shot clip's blend-in (repel 0-2: in game the blend from
+                continue                # g_dive's airborne end; this replay has no previous clip) are exempt, as the doc says
             fr, mdl, _ = frames[t]
             # (a partial lying / kneeling root keeps her share on its support: the support pass's airborne height x (1 - w_root))
             lo, need = low_of(fr, mdl, CORE_P), min(.5 * S_LEG * sp['low_ref'][t], .05) * (1 - (sp.get('w_root') or [0] * (t + 1))[t])
@@ -1823,45 +1835,25 @@ if RET and DIMS:
     import importlib
     from mboss_scarlet import seq as _sq
     _sq = importlib.reload(_sq)
-    H = AN[(cid('cs1'), 'head')][114][1]
-    E_P = api.ev('cs1', 'petal')
+    # (HI: the rebuilt CS1, hr_design §3.2 S10) the big petal drifts across her face 590-606, 0.6 b before her body's axis
+    # (seq.py petal_summon / petal_move at HR(r, u, 0.6)): its height follows the built head anchor (within 0.2 b) and it passes
+    # in front of her head (the anchor's forward + 0.3 b or more)
+    P_T0, P_T1 = 590, 605
     PET = re.compile(r'positioned \^(-?[\d.]*) \^(-?[\d.]*) \^(-?[\d.]*)')
-
-    def petal_ys(lines_at):
-        """{tick: the petal's ^up} from the per-tick lines of seq/cs1 (k/<t>)."""
-        out = {}
-        for t, lines in lines_at.items():
-            for ln in lines:
-                if _sq.PETAL1 in ln and 'positioned ^' in ln:
-                    m = PET.search(ln)
-                    if m:
-                        out[t] = float(m.group(2) or 0)
-        return out
-    # the built seq/cs1 carries the petal only with the kit (its prop): parse it there, else build cs1 with a stand-in prop
-    built = {int(f.stem): f.read_text().splitlines() for f in (DP / 'data/rlk/function/boss/scarlet/seq/cs1/k').glob('*.mcfunction')}
-    ys = petal_ys(built)
-    src = 'the built seq/cs1'
-    if not ys:
-        _prop = _sq.K.prop
-        _sq.K.prop = lambda *a, **k: 'function rlk:test/petal'
-        try:
-            class _CW:
-                def __init__(self):
-                    self.files = {}
-
-                def w(self, rel, body):
-                    self.files[rel] = body if isinstance(body, list) else str(body).splitlines()
-            _cw = _CW()
-            next(s_ for s_ in _sq.SERVICES if s_.name == 'cs1').build(_cw)
-        finally:
-            _sq.K.prop = _prop
-        ys = petal_ys({int(rel.rsplit('/', 1)[1]): body for rel, body in _cw.files.items() if rel.startswith('seq/cs1/k/')})
-        src = 'seq.py built with a stand-in petal prop (the kit is not in this tree)'
-    want_y = {E_P: H + .25, E_P + 12: H + .125, E_P + 20: H - .375}
-    got_y = {t: ys.get(t) for t in want_y}
-    check(f'couplings: the cs1 petal path follows the built head anchor (H {H:.2f} at cs1 114; y at {", ".join(map(str, want_y))} = '
-          f'{", ".join(str(v) for v in got_y.values())} vs H + 0.25 / + 0.125 / - 0.375; {src})',
-          all(got_y[t] is not None and abs(got_y[t] - w) <= .03 for t, w in want_y.items()), str(sorted(ys.items())[:24]))
+    tag = _sq.PETAL[1]
+    ys = {}
+    for t in range(P_T0, P_T1 + 1):
+        f = DP / f'data/rlk/function/boss/scarlet/seq/cs1/k/{t}.mcfunction'
+        for ln in (f.read_text().splitlines() if f.exists() else []):
+            if tag in ln:
+                m = PET.search(ln)
+                if m:
+                    ys[t] = (float(m.group(2) or 0), float(m.group(3) or 0))
+    hd = {t: AN[(cid('cs1'), 'head')][t] for t in range(P_T0, P_T1 + 1)}
+    bad_p = [(t, ys.get(t), hd[t][1]) for t in range(P_T0, P_T1 + 1)
+             if t not in ys or abs(ys[t][0] - hd[t][1]) > .2 or ys[t][1] < hd[t][2] + .3]
+    check(f'couplings: the cs1 petal (S10, {P_T0}-{P_T1}) passes before her face at the built head anchor\'s height (within 0.2 b; '
+          f'{len(ys)} ticks found)', len(ys) == P_T1 - P_T0 + 1 and not bad_p, bad_p[:4])
     check(f'couplings: seq.S0 {_sq.S0} == api.ITEM_SWORD_SCALE == the manifest item_sword display scale',
           _sq.S0 == api.ITEM_SWORD_SCALE == MAN['item_sword']['display_scale'])
     check(f'couplings: seq.SWORD_R {_sq.SWORD_R} == ITEM_SWORD_LEN / 2 / ITEM_SWORD_SCALE', abs(_sq.SWORD_R - api.ITEM_SWORD_LEN / 2 / api.ITEM_SWORD_SCALE) <= .001)
