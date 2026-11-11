@@ -12,7 +12,7 @@ azBrE = the brand element (#elem), azBrS = Cryo stacks 1..3, azBrC = ticks to th
    Cryo stacks, non-lethal; each Cryo strike +1 stack (max 3); a DoT tick without a new Cryo strike since the
    previous tick drops one stack (3 -> 2 -> 1).
 3. Cleanse: healing (#mbHealAmt, the framework's cumulative heal amount, read and cleared here) reaching 6 % max HP
-   while branded; a perfect dodge (#mbDodgeEv with #mbDodgeOk 1: a one-shot strike >= 12 t, not nododge, or a pj) at
+   while branded; a perfect dodge or a perfect parry (#mbDodgeEv with #mbDodgeOk 1: of a real attack, not a lingering hazard) at
    most once per 40 t; shields absorb the ticks (pl_dot).
 4. Shards: a strike brand on a player with no shield (#mbHitSh 0) sheds one 응결 결정 (cooldown 300 t, at most 1, life
    200 t of the module clock: frozen by pause), placed 4-6 b from the player away from the anchor when the player is
@@ -123,7 +123,7 @@ def emit(core):
         'scoreboard players operation #azY mb = #azHeal mb', 'scoreboard players operation #azY mb *= #c100 mb',
         f'execute if score #azY mb >= #azX mb run {F("brand/cleanse")}'])
     w('brand/dodge', [
-        f'# @s = body: a perfect dodge (#mbDodgeOk 1: one-shot strike >= 12 t, not nododge, or a pj) cleanses, once per {DODGE_GAP} t.',
+        f'# @s = body: a perfect dodge or a perfect parry (#mbDodgeOk 1: of a real attack, not a lingering hazard) cleanses, once per {DODGE_GAP} t.',
         'execute unless score #mbDodgeOk mb matches 1 run return 0',
         f'execute unless entity {BRANDED} run return 0',
         'scoreboard players operation #azX mb = #azClk mb', 'scoreboard players operation #azX mb -= #azDgClk mb',
