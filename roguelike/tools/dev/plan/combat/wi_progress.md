@@ -170,7 +170,7 @@ the half petals, the trail kit, `tint` / `_hot`, the atlas total; diff `wi_rp_re
 
 ## Open (for the lead)
 - **T1 on seed 33 is 0.97** on the final tree, as on the 11-12 release tree (pooled 1.01): no balance value changed.
-- **A direction-less double dodge goes along the view** (lane WP's `dash_dir`): facing her, the cartwheel goes into her (0.58 b in
+- **(Resolved by the lead, `wip/w-fix` 9bf091333: sideways-and-back, alternating sides; a held direction stops short of an enemy.)** Was: a direction-less double dodge goes along the view (lane WP's `dash_dir`): facing her, the cartwheel goes into her (0.58 b in
   `dodgecam`). The reference's double dodge is a sideways cartwheel; whether to send it sideways / back when no direction is held is a
   design call (README 0-9 「홍련 — 남긴 것」).
 - **T3-09's rest**: the skills' smoke / flames / pillars over her are each character's own effects: not touched.
