@@ -380,7 +380,7 @@ kill at 5 % (the sequence stops at 129 there: `death_start` → the ending's tic
 | R3 hat strike | 48-52 | B held | reels from the blow on her hat | the hilt comes down on her hat crown at **49** | `clash_gold` at her `hat_crown` at 49; **hp1**; `entity.player.attack.crit` 0.7 + `block.anvil.place` 0.3 p 1.6 |
 | R4 two cuts | 52-68 | A: `ST(−2.2, 1.2, 2.4)`, look `ST(0, 1.2, 0.8)` | staggers under the cuts to f 1.2, still facing the stage origin | rising cut 56, level cut 62 that carries the actor past her right side (shift f 0.5 → 1.8, 62-68) | `qi_arc {r:22,c:5}` at 56, 62 (white: the player's cuts are never lilac); `entity.player.attack.sweep` 0.7 p 1.2 / 1.4 |
 | R5 back to back | 68-78 | B: `ST(0, 1.6, 3.6)`, look `ST(0, 1.3, 1.4)` | pressed against the actor's back at f 1.2, tipped backward over its shoulder | at shift f 1.8, back to her, reaches over the right shoulder and hooks her sword arm 70-76 | `block.grass.step` 0.4 at 68 |
-| R6 the throw | 78-102 | A: `ST(−2.8, 0.7, 1.8)`, look `ST(0, 1.2, 2.0)` | pulled over the actor's shoulder: over the top at 88 (+2.2 b), the hat comes off 84 (`hat world`, lands at `ST(1.2, 0, 3.4)`), slams onto her back at f 3.0 at **101** | bends and throws forward 78-96, straightens 96-102 | `entity.player.attack.knockback` 0.6 at 78; `dust_ring {r:15}` + `entity.generic.big_fall` 0.6 + `block.grass.break` 0.5 at 101; **hp2** |
+| R6 the throw | 78-102 | A: `ST(−2.8, 0.7, 1.8)`, look `ST(0, 1.2, 2.0)` | (HF-B) levered onto the actor's back and rolled over its right shoulder, head first, low: her pelvis 0.34 b over that shoulder at 88 (root arc 0.6 b), the hat comes off 84 (`hat world`), slams onto her back at f 3.0 at **101** | its right fist hooked over her sword forearm 78-96, the left hand round her wrist 86-91; the hips back under her, bowed, the head ducked to the left of her body; lets go 96, straightens 96-102 | `entity.player.attack.knockback` 0.6 at 78; `dust_ring {r:15}` + `entity.generic.big_fall` 0.6 + `block.grass.break` 0.5 at 101; **hp2** |
 | R7 over her | 102-128 | B: `ST(1.6, 1.2, 4.6)`, look `ST(0, 0.6, 2.6)` | lies on her back, one hand lifts weakly 112-124 | stands over her at shift f 1.8, the blade pointed down 104-118, draws the leg back 120-128 | `at:5`: `petal_burst {r:10}` 110 |
 | R8 the kick | 128-132 | A: `ST(−2.4, 0.8, 2.6)`, look `ST(0, 0.5, 2.8)` | kicked at **129**: slides away (60 %: f 3.0 → 8.0 by 135; 5 %: → 4.2 by 133, inside the ending) | the kick lands at 129 | `kick_flash` at her (kept cards); **hp3** / the kill; `entity.player.attack.strong` 0.8 + `block.anvil.land` 0.4 p 1.2 |
 | R9 apart (60 % only) | 132-140 | B: `ST(−5.0, 2.4, −2.0)`, look `ST(0, 1.0, 4.0)` | rolls to her feet 133-140, snatches the hat (`hat worn` 139), stands in her stance at f 9.0 | back-flips to shift 0 (132-139), lands ready | `block.grass.step` 0.5 at 139 |
@@ -460,7 +460,7 @@ swing and every cut are keyed every tick.
 |---|---|---|---|---|
 | `cs0` | 1440 | right hand, the point down until 1262 | −6.0 → 0 (20-100); −0.3 (1250-1390); 0 from 1400 | 0-20 stands at −6.0 (under the blindness); walk cycle 20-100 (24-t cycle, 0.075 b/t, feet planted: no sliding); 100-110 stops, looks ahead; idle (breathing, key every 40 t) to 666; head up toward her 670-690, weight forward 690-700; idle to 1230; head follows her leap 1236-1250, half step back 1250-1258; raises the sword into a middle guard 1262-1284; steps forward to 0 (1390-1400); guard to 1430; lowers into the avatar's idle 1430-1440 |
 | `cs1` | 720 | right hand; **two hands 6-34** | 0; −1.2 (34-44) → 0 (60-80); −0.5 (652-664) → 0 (694-716) | ready 0-6; guard up 6-10; takes the cut at K1 at 10 (elbows give 10-14); lock 10-30, pushes 24-30; shoved back, sliding 34-44; recovers, steps forward 60-80; sword lowered 84-340; half guard 350-370, held; **hit** at 652 (chest back, sword arm flung), stagger 652-664, down on the right knee with the sword planted point-down 664-694 (head lowered), pushes up 694-716, ready 716-720 |
-| `repel` | 140 | **two hands 0-30**; left hand free 30-100 | 0 → +0.5 (30-36) → +1.8 (62-68), held; back-flip to 0 (132-139) | high guard at KR 0-4, knees bent; holds 4-22, heaves up 22-26; beats her blade aside 26-30; steps in, left hand to her wrist 36, holds it high 36-48; hilt strike down on her hat 49; rising cut 56, level cut 62 carrying past her right side; back to her 68, right arm reaches back over the right shoulder 70-76; bends and throws 78-96 (hips under her, both arms pull), straightens 96-102; looks down at her, the blade pointed at her 104-118; right leg back 120-128, kick 129; back-flip 132-139, lands ready 140. `{at:5}` shows ticks 0-129 only |
+| `repel` | 140 | **two hands 0-30**; left hand free 30-100 | 0 → +0.5 (30-36) → +1.8 (62-68), held; back-flip to 0 (132-139) | high guard at KR 0-4, knees bent; holds 4-22, heaves up 22-26; beats her blade aside 26-30; steps in, left hand to her wrist 36, holds it high 36-48; hilt strike down on her hat 49; rising cut 56, level cut 62 carrying past her right side; back to her 68, right arm reaches back over the right shoulder 70-76; the throw 78-96 (HF-B: the right fist on her sword forearm 78-96, the left hand round her wrist 86-91, the hips back under her, bowed, the head ducked left of her; she goes over the right shoulder), straightens 96-102; looks down at her, the blade pointed at her 104-118; right leg back 120-128, kick 129; back-flip 132-139, lands ready 140. `{at:5}` shows ticks 0-129 only |
 | `ending` | 1372 | right hand; two hands at 56-80, 190-204, 262, 298-304; left hand free 556-616 | starts +1.8; +0.8 (4-16); +1.3 (50-54); −0.6 (80-90); −1.5 (94-104); +1.0 (118-124); +2.5 (150-188); up (0, 6.0, 1.5) 204-216 … 304; (0, 0, 0) at 330 and to the end | ready; lunge and the brim graze 50-52; lock at KE2 56-80; shoved back 80-90; skid 94-104; crouch 104-116; dash-cut 118-124, follow-through; run 150-188; clash at KE5 190, lock to 204; springs up 204-216; cuts met at KA1 228, KA2 262 (horizontal guard overhead), KA3 286, lock KA4 298-304; pushed off, falls 304-330, lands in a crouch, rises; turned to ST2 338-350 (by `face`), sword lowered 380-400; left hand half raised 566-584, lowered 590-606; a nod 860; stands to 1372 |
 | `coda` | 120 | right hand, sword low | 0 | idle; the right forearm lifts a little 44-56 (the gift arrives), back by 70 |
 Rules for H3: scale 1.0 and the same skeleton for all 7 characters (the 3 rig characters reuse their part models, the
@@ -478,7 +478,7 @@ back-flip, the aerial duel) leave it.
 | KW | `repel` 36-48 | `ST(0.15, 1.95, 0.85)` | the actor's left hand on her sword wrist (her anchor `hand_l` is there) |
 | KH | `repel` 49 | `ST(0, 2.20, 1.10)` | the actor's hilt on her hat crown (her anchor `hat_crown` is there) |
 | KS | `repel` 70-78 | `ST(0.20, 1.50, 1.60)` | her sword forearm over the actor's right shoulder |
-| KT | `repel` 88 / 101 | `ST(0, 2.95, 1.9)` / `ST(0, 0.25, 3.0)` | her pelvis over the top / on the ground (head toward +f) |
+| KT | `repel` 88 / 101 | `ST(0.28, 1.4, 2.0)` / `ST(0, 0.25, 3.0)` | her pelvis over the actor's right shoulder (HF-B: 0.3-0.6 b over it, the actor's hands on her sword forearm) / on the ground (head toward +f) |
 | KK | `repel` 129 | `ST(0, 0.35, 2.7)` | the actor's right foot on her flank |
 | KG | `ending` 52 | `ST(0, 2.05, 2.35)` | the actor's blade tip on the near edge of her brim |
 | KE2 | `ending` 56-80 | `ST(0, 1.5, 2.1)` | blade lock (X) |
@@ -489,6 +489,27 @@ back-flip, the aerial duel) leave it.
 | KA4 | `ending` 298-304 | `ST(0, 6.9, 2.6)` | blade lock (X), then both push off |
 `test_contact.py` (HI, after H2 and H3 land): at each row's ticks the distance from the point to her blade's centre line
 (from her rig manifest's `hand_l` / `blade_tip` anchors) and to the actor's (from H3's manifest) is within tolerance.
+
+**Mutual rows** (fix lane HF-B, HB-01: each side met its own stage point while the two bodies were 1-2 b apart in the throw).
+Both figures' points, her side from `her_tracks.json`, the actor's from its manifest; gates of both builders
+(`scarlet_cine.mjs` / `clips.mjs` `MUTUAL`; the rig builder's `--mutual-allow` while one side is being re-authored) and
+`test_contact.py`:
+
+| id | `repel` ticks | her | the actor | within |
+|---|---|---|---|---|
+| KW.grip | 36-48 | sword grip `hand_l` | `hand_l` | 0.20 b |
+| KH.hilt | 49 | `hat_crown` | `pommel` / `hilt` | 0.20 b |
+| KS.hook | 70-78 | sword forearm (`elbow_l` → `hand_l`) | `shoulder_r` | 0.30 b |
+| KT.grip_r | 78-96 | sword forearm | `hand_r` (the fist with the sword hooked over it) | 0.15 b |
+| KT.grip_l | 86-91 | sword forearm | `hand_l` (round her wrist; 79-85 it reaches for it, 92-97 it lets go) | 0.15 b |
+| KT.over | 84-92, at her highest pelvis | `pelvis` | `shoulder_r` | 0-0.6 b over it, ≤ 0.5 b off it on the floor plane |
+| KK.kick | 129 | `pelvis` | `foot_r` | 0.50 b |
+
+The throw (78-101, HF-B): her root arcs only 0.6 b (`seq.py` `toss`); her pelvis rides its own path onto the actor's back and
+over its right shoulder, low (0.34 b over it at 88), head first, face up; the actor bends forward with the hips back under
+her, rolled left with the head ducked left of her body (≥ 0.38 b off her torso), its right fist hooked over her sword
+forearm from the hook to 96 and its left hand round her wrist 86-91, pulling down in front; let go, she drops onto her back
+at f 3.0 (101).
 
 ---------------------------------------------------------------------------------------------------------------------
 

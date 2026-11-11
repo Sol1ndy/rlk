@@ -9,7 +9,7 @@
 // mboss_shape_lib.mjs, mboss_paint_lib.mjs, mboss_rig_math.mjs, all unchanged). API note: tools/scarlet_rig_api.md.
 //
 // node tools/build_scarlet_rig.mjs --resourcepack <unpacked RP> [--datapack <dp>] [--no-paint] [--allow-steps] [--allow-missing]
-//                                  [--debug-dp <scratch dir> [--debug-clips a,b | all] [--debug-step N]]
+//                                  [--debug-dp <scratch dir> [--debug-clips a,b | all] [--debug-step N]] [--mutual-allow]
 //
 // Writes (owned, rebuilt from scratch on every run)
 //   DP  data/rlk/function/boss/scarlet/rig/**
@@ -839,7 +839,7 @@ fail('culling box overhang', cullWarn);
 const toStage = (R, P) => { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a); return [R.p[0] - P[0] * c - P[2] * s_, R.p[1] + P[1], R.p[2] + P[0] * s_ - P[2] * c]; };
 const toStageDir = (R, P) => toStage({p: [0, 0, 0], yaw: R.yaw}, P);
 const segDist = (P, A, B) => { const ab = sub(B, A), u = Math.max(0, Math.min(1, dot(sub(P, A), ab) / Math.max(1e-9, dot(ab, ab)))); return len(sub(P, add(A, times(ab, u)))); };
-const contactErrors = [], contactReport = {};
+const contactErrors = [], contactReport = {}, mutualErrors = [];
 if (cineMod && cineMod.rootAt) {
   const r3 = v => v.map(x => +x.toFixed(3));
   const out = {schema: 1, source: 'tools/build_scarlet_rig.mjs (clips tools/scarlet_cine.mjs)',
@@ -873,11 +873,40 @@ if (cineMod && cineMod.rootAt) {
       if (worst > K.tol) contactErrors.push(`${K.id} (${n} ${K.t0}-${K.t1}, ${K.kind}): ${worst.toFixed(3)} b from ST(${K.p}) at t${at} > ${K.tol}`);
     }
   }
+  // (HF-B, HB-01) the mutual rows (scarlet_cine.mjs MUTUAL): her points against the actor's (lane H3's manifest, the last player
+  // rig build), so that a grab / hold / throw meets on both bodies, not each side on its own stage point. A change that moves
+  // her side of one: build with --mutual-allow (a warning), then the player rig (its actor follows her tracks), then this again.
+  const mf = path.join(here, 'player_motion/cine/manifest.json');
+  if (cineMod.MUTUAL && fs.existsSync(mf)) {
+    const AM = JSON.parse(fs.readFileSync(mf, 'utf8'));
+    for (const m of cineMod.MUTUAL) {
+      const H = out.clips[m.clip], A_ = AM.clips[m.clip]?.tick;
+      if (!H && ONLY) { console.log(`mutual ${m.id}: ${m.clip} is not in this --only build (not measured)`); continue; }
+      if (!H?.staged || !A_) { mutualErrors.push(`${m.id}: no track of ${m.clip}`); continue; }
+      if (m.over) {
+        let top = m.t0;
+        for (let t = m.t0; t <= m.t1; t++) if (H.pelvis[t][1] > H.pelvis[top][1]) top = t;
+        const P = H.pelvis[top], Sh = A_.shoulder_r[top], du = P[1] - Sh[1], dxz = Math.hypot(P[0] - Sh[0], P[2] - Sh[2]);
+        console.log(`mutual ${m.id}: her pelvis ${du.toFixed(3)} b over the actor's right shoulder, ${dxz.toFixed(3)} b off it at t${top}`);
+        if (du < 0 || du > m.up || dxz > m.r) mutualErrors.push(`${m.id} (${m.clip} ${m.t0}-${m.t1}): her pelvis ${du.toFixed(3)} b over the actor's right shoulder (0..${m.up}), ${dxz.toFixed(3)} b off it (<= ${m.r}) at t${top}`);
+        continue;
+      }
+      let worst = 0, at = m.t0;
+      for (let t = m.t0; t <= m.t1; t++) {
+        const d = Math.min(...[m.actor].flat().map(k => (Array.isArray(m.her) ? segDist(A_[k][t], H[m.her[0]][t], H[m.her[1]][t]) : len(sub(A_[k][t], H[m.her][t])))));
+        if (d > worst) { worst = d; at = t; }
+      }
+      console.log(`mutual ${m.id}: worst ${worst.toFixed(3)} at t${at} (tol ${m.tol})`);
+      if (worst > m.tol) mutualErrors.push(`${m.id} (${m.clip} ${m.t0}-${m.t1}): her ${[m.her].flat().join('-')} ${worst.toFixed(3)} b from the actor's ${[m.actor].flat().join(' / ')} at t${at} > ${m.tol}`);
+    }
+  }
   if (!ONLY) json(path.join(here, 'dev/sim/hr/cine/her_tracks.json'), out);
   else { const pf = path.join(dp, 'her_tracks.json'), prevT = fs.existsSync(pf) ? JSON.parse(fs.readFileSync(pf, 'utf8')) : {clips: {}}; out.clips = {...prevT.clips, ...out.clips}; json(pf, out); for (const [id, c] of Object.entries(contactReport)) console.log(`contact ${id}: worst ${c.worst} at t${c.at} (tol ${c.tol})`); }
 }
 function toRig(R, S) { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a), dr = S[0] - R.p[0], df = S[2] - R.p[2]; return [-dr * c + df * s_, S[1] - R.p[1], -dr * s_ - df * c]; }
 fail('a cutscene contact off its stage point (hr_design.md §4.3, her side)', contactErrors);
+if (mutualErrors.length && flag('--mutual-allow')) console.warn(`mutual rows (--mutual-allow):\n  ${mutualErrors.join('\n  ')}`);
+else fail('a mutual contact row: her side and the actor\'s (tools/player_motion/cine/manifest.json) apart (hr_design.md §4.3)', mutualErrors);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
 
 // ---- follow, init, spawn, tick, kill, uninstall, state, flash, face -----------------------------------------------------------

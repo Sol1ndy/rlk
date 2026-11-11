@@ -16,6 +16,7 @@ Everything is drawn in that frame (origin 0 0 0, f = +Z, r = -X, u = +Y): no are
   --ticks   the #sq ticks to draw;  --lines: the first, middle and last tick of every line this sequence plays (api.LINE_AT);
   --shots   every shot's cut tick and middle tick
   --ortho   instead of the shot camera an orthographic view "az,el,extent" centred between her and the actor (a side view)
+  --cam     instead of the shot camera a fixed one "r,u,f,lr,lu,lf" (eye, look point; the actor's stage frame)
   --rec     cache of the sequence run (the records this tool needs), re-used when it exists (delete it after a seq.py change)
 
 Each panel's label: the sequence, #sq, the shot, her clip tick, the line on screen (if any) and `head d=` the lens's distance
@@ -103,6 +104,7 @@ def main():
     ap.add_argument('--actor', default='skirk')
     ap.add_argument('--no-actor', action='store_true')
     ap.add_argument('--ortho')
+    ap.add_argument('--cam', help='instead of the shot camera a fixed camera "r,u,f,lr,lu,lf": eye and look point in the frame of the actor\'s root (ST)')
     ap.add_argument('--stage', default='c')
     ap.add_argument('--rec')
     ap.add_argument('--cols', type=int, default=3)
@@ -173,7 +175,15 @@ def main():
                 ya = math.radians(hyaw - rt[3])
                 c, s_ = math.cos(ya), math.sin(ya)
                 head = (hb[0] + d0[0] * c + d0[2] * s_, hb[1] + d0[1], hb[2] - d0[0] * s_ + d0[2] * c)
-            if a.ortho:
+            if a.cam:
+                c = [float(x) for x in a.cam.split(',')]
+                ew, lw = render_xyz(c[:3]), render_xyz(c[3:])
+                dx, dy, dz = (lw[i] - ew[i] for i in range(3))
+                yaw, pitch = math.degrees(math.atan2(-dx, dz)), -math.degrees(math.atan2(dy, math.hypot(dx, dz)))
+                cmd += ['--views', 'camera', '--camera', f'{ew[0]:.3f}', f'{ew[1]:.3f}', f'{ew[2]:.3f}', f'{yaw:.2f}', f'{pitch:.2f}',
+                        '--fov', str(a.fov), '--aspect', '0.5625']
+                sid, dist = 'cam', (math.dist(c[:3], head) if head else None)
+            elif a.ortho:
                 az, el, ext = a.ortho.split(',')
                 cmd += ['--views', f'az:{az},{el}', '--extent', ext, '--center', f'{hw[0] / 2:.3f}', '1.1', f'{hw[2] / 2:.3f}', '--aspect', '0.5625']
                 sid, dist = 'ortho', None

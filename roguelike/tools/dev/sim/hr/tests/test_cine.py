@@ -152,7 +152,8 @@ for c, t, want in [('intro', 0, [0, 0, 20.73, 0]), ('intro', 880, [0, 0, 20.73, 
                    ('ending', 262, [0, 6.4, 3.4, 180]), ('ending', 286, [0, 6, 3.3, 180]), ('ending', 304, [0, 6, 3.3, 180]),
                    ('ending', 334, [0, 0, 9, 180]), ('ending', 1154, [0, 0, 4.5, 180]), ('ending', 1372, [0, 0, 4.5, 180])]:
     ok(all(abs(a - b) < 1e-6 for a, b in zip(R(c, t)[:3], want[:3])) and abs((R(c, t)[3] - want[3]) % 360) < 1e-6, f'tracks: her root at {c} {t} = ST{tuple(want[:3])} yaw {want[3]} ({R(c, t)})')
-d88 = R('repel', 88); ok(abs(d88[1] - 2.163) < .01 and abs(d88[2] - 1.983) < .01, f'tracks: repel 88 the root over the actor ({d88})')
+# (HF-B, HB-01) the throw's root arcs 0.6 b (seq.py toss; her pelvis rides its own path over the actor's shoulder)
+d88 = R('repel', 88); ok(abs(d88[1] - 0.59) < .01 and abs(d88[2] - 1.983) < .01, f'tracks: repel 88 the root on its low arc ({d88})')
 for c in STAGED:
     t = TR['clips'][c]; worst = 0; low = 9
     for i in range(TABLE[c][0] + 1):

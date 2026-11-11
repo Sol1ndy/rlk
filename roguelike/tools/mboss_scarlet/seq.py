@@ -896,6 +896,7 @@ def build_lead_re(W):
 # =============================================================================================================================
 # The repel counter repel {at:60|5} (hr_design §3.4; clip repel 140): locked, the bars stay on
 KR = ST(*api.CONTACT['KR'][2])
+THROW_H = 6                                 # (HF-B) the throw's root apex, tenths (= tools/scarlet_cine.mjs THROW_H)
 
 
 def build_repel(W):
@@ -914,9 +915,9 @@ def build_repel(W):
     # R5: three-quarter from the actor's right (the design's head-on ST(0, 1.6, 3.6) has the actor's head before hers: she
     # stands behind it; from here her head and the hooked arm over the right shoulder are beside the actor's)
     tr.cut(68, B, ST(2.1, 1.6, 2.7), ST(0, 1.3, 1.5), 'R5 back to back', ('her', 'actor'))
-    # R6: a step back and the look higher than the design's ST(-2.8, 0.7, 1.8) -> ST(0, 1.2, 2.0): her arc over the actor's
-    # shoulder (2.2 b up at 88) left the top of that frame (shot sheet)
-    tr.cut(78, A, ST(-3.6, 0.8, 2.2), ST(0, 1.7, 2.2), 'R6 the throw', ('her', 'actor'))
+    # R6: the design's frame again (HF-B, HB-01: the throw goes low over the actor's right shoulder; the step back and the
+    # higher look of H2 were for the old 2.2-b arc)
+    tr.cut(78, A, ST(-2.8, 0.7, 1.8), ST(0, 1.2, 2.0), 'R6 the throw', ('her', 'actor'))
     tr.cut(102, B, ST(1.6, 1.2, 4.6), ST(0, 0.6, 2.6), 'R7 over her', ('her', 'actor'))
     tr.cut(128, A, ST(-2.4, 0.8, 2.6), ST(0, 0.5, 2.8), 'R8 the kick', ('her',))
     tr.cut(132, B, ST(-5.0, 2.4, -2.0), ST(0, 1.0, 4.0), 'R9 apart (60 % only)', ('her', 'actor'))
@@ -940,11 +941,12 @@ def build_repel(W):
     s.st(e('cut1'), cut_at, K.p('qi_arc', r=22, yaw=0, pitch=0, roll=40, c=api.C_WHITE)).st(e('cut1'), cut_at, raw('entity.player.attack.sweep', 0.7, 1.2))
     s.st(e('cut2'), cut_at, K.p('qi_arc', r=22, yaw=0, pitch=0, roll=0, c=api.C_WHITE)).st(e('cut2'), cut_at, raw('entity.player.attack.sweep', 0.7, 1.4))
     s.at(e('cut1'), mv.add('stagger', [cand(floor_pt(1.2), glide(8))], 'R4 she staggers to f 1.2'))
-    # ---- R5: back to back (the step 68); R6: thrown over the actor's shoulder 78 -> on her back at f 3.0 at 101 (over the top
-    # at 88, +2.2 b), the dust ring, hp2
+    # ---- R5: back to back (the step 68); R6: thrown over the actor's shoulder 78 -> on her back at f 3.0 at 101, the dust ring,
+    # hp2. (HF-B, HB-01) a low arc (THROW_H): her clip carries her pelvis over the actor's right shoulder, the actor's hands on
+    # her sword forearm to 96; the old 2.2-b apex sailed her 2 b over a bent actor
     s.st(68, ST(0, 0, 1.8), snd('step_light'))
-    toss = mv.add('toss', [cand(floor_pt(d), leap(e('land') - e('throw'), 22)) for d in (3.0, 2.4)],
-                  'R6 the throw: over the actor to f 3.0 (apex 2.2 b)')
+    toss = mv.add('toss', [cand(floor_pt(d), leap(e('land') - e('throw'), THROW_H)) for d in (3.0, 2.4)],
+                  f'R6 the throw: over the actor\'s shoulder to f 3.0 (apex {THROW_H / 10} b)')
     s.at(e('throw'), toss, snd('thrown'))
     s.me(e('land'), K.p('dust_ring', r=15), y=.1).at(e('land'), sig('hp2'), snd('land_back'))
     # ---- R7: lying (the petal burst at 5 % only); R8: the kick at 129 (kept cards: at 5 % it kills her in this tick and

@@ -190,11 +190,17 @@ and leaves it on sneak; leaving spectator mode resets the camera; the marker sta
 2. **Hard cuts**: the idle stand is moved 4 t before its cut; a cut should show no glide. The first frame of each cutscene
    is a freshly made stand under a white / gold frame (CS1, repel, ending) — look for a one-frame jump of the view there
    and at the intro's first frame (no overlay).
+   (HF-B HB-03, 11-11: the stands are now summoned at their first shots with the shot's rotation in the summon NBT
+   (`cam/spawn_at`), and the intro opens under a black mask 0-1 too: the first frame shown is tick 2 of a stand that has stood
+   at its eye since tick 0.)
 3. **Pans**: rotation reaches the client in 1.4° steps. Slow pans to look at: intro I1 20-59 (0.07°/t), I3 the moon
    110-169 (0.13), I5 250-319 (0.07), I19 1350-1400 (0.10); cs1 S2 10-22 (0.13). If they step, they need a faster move or
    a static frame.
 4. **Shift**: held during a cutscene the view should stay on the stand (the hold re-issues `spectate` every tick): look
    for a flicker to the free spectator view; in the skip windows (CS0 20-1270, CS1 40-560) the hold skips.
+   (HF-B HB-02, 11-11: not so — the game ends a sneaking spectator's camera after the functions, every tick, so while Shift is
+   held the hold now teleports the player onto the live stand's eye each tick (`cam/hold`, `L.CAM_SNEAK_DY`): the view is the
+   shot's at each tick and loosens between ticks until Shift is released; README 홍련 절 FN-cam.)
 5. **Hand-back**: back on the F5 seat behind the avatar in the same tick, facing her, the game mode as before, no
    "F5" chat hint again, the HUD back; after CS0 the avatar stands at the fixed stage point, not where the rift left it.
 6. **Interruptions inside a cutscene**: death, 로노바's revive, `/reload`, a relog, opening the selection space — each

@@ -36,7 +36,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {Tracks, solve, frames, points, lowest, bladeInBody, SWORD, HIP_Y} from './player_motion/cine/lib.mjs';
-import {CLIPS, IDLE_CHANNELS, CONTACT, LIMIT} from './player_motion/cine/clips.mjs';
+import {CLIPS, IDLE_CHANNELS, CONTACT, LIMIT, MUTUAL, herTrack} from './player_motion/cine/clips.mjs';
 import {len, sub, slerp, lerp} from './mboss_rig_math.mjs';
 // the angle between two rotations in degrees (the written quaternions are rounded: normalised here)
 const qAngle = (a, b) => { const d = Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (Math.hypot(...a) * Math.hypot(...b)); return 2 * Math.acos(Math.min(1, d)) * 180 / Math.PI; };
@@ -128,7 +128,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     calls: {spawn: `${NS}/spawn`, play: `${NS}/play {clip:"<id>"}`, tick: `${NS}/tick`, face: `${NS}/face {yaw:<deg>}`, stop: `${NS}/stop`},
     characters: CINE_CHARS.map(c => ({n: c.n, id: c.id, models: `rlk:player_motion/${c.key}/<part>`, skin: 'rlk:skin/' + c.skin, rig: c.rig})),
     sword: {model: 'rlk:player_motion/weapons/cine_sword', of: 'rlk:item/player_motion/weapons/sword', scale: 1, hilt_to_tip: +SWORD.tip.toFixed(4), hilt_to_pommel: +(-SWORD.pommel).toFixed(4), blade_root: SWORD.root, left_hand: SWORD.left},
-    hip_y: HIP_Y, height: 2, sync_grid: GRID, limit: LIMIT, contact: CONTACT, clips: {}, checks: {},
+    hip_y: HIP_Y, height: 2, sync_grid: GRID, limit: LIMIT, contact: CONTACT, mutual: MUTUAL, clips: {}, checks: {},
   };
   const dbgPut = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
   if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/cine_dbg'), {recursive: true, force: true});
@@ -287,9 +287,33 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     fn(`${base}/sel`, [`# play {clip:"${name}"}: the next char/cine/tick snaps to tick #cavT of ${name}.`, `scoreboard players set #cavC ${OBJ} ${id}`, `scoreboard players set #cavP ${OBJ} -99`, `scoreboard players set #cavR ${OBJ} -1`]);
     if (debugDp && (debugClips.includes('all') || debugClips.includes(name))) for (let t = 0; t <= L; t += debugStep)
       dbgPut(`cine_dbg/${name}/${t}`, PARTS.map((n, i) => `data merge entity ${UUID(i)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(disp[t][n])}}`));
+    // (HF-B, HB-01) the mutual rows: her points (lane H2c's her_tracks.json) against this clip's, so that a grab / hold / throw
+    // meets on both bodies, not each side on its own stage point (the throw passed its one-sided rows with 2 b between them)
+    const mutual = {};
+    for (const m of MUTUAL.filter(x => x.clip === name)) {
+      const her = herTrack(name);
+      if (!her?.staged) { fail(`${name}: mutual ${m.id}`, ['her_tracks.json has no staged track of this clip']); continue; }
+      let worst = 0, at = m.t0;
+      if (m.over) {
+        let top = m.t0;
+        for (let t = m.t0; t <= m.t1; t++) if (her.pelvis[t][1] > her.pelvis[top][1]) top = t;
+        const P = her.pelvis[top], Sh = pts[top].shoulder_r, du = P[1] - Sh[1], dxz = Math.hypot(P[0] - Sh[0], P[2] - Sh[2]);
+        worst = Math.max(0, du - m.up, -du, dxz - m.r); at = top;
+        mutual[m.id] = {top, over: r3(du), off: r3(dxz), up: m.up, r: m.r};
+        if (worst > 0) fail(`${name}: mutual ${m.id}`, [`her pelvis ${du.toFixed(3)} b over the actor's right shoulder (0..${m.up}), ${dxz.toFixed(3)} b off it (<= ${m.r}) at t${top}`]);
+        continue;
+      }
+      for (let t = m.t0; t <= m.t1; t++) {
+        const A_ = [m.actor].flat().map(k => pts[t][k]);
+        const d = Math.min(...A_.map(a => Array.isArray(m.her) ? segDist(a, her[m.her[0]][t], her[m.her[1]][t]) : dist(a, her[m.her][t])));
+        if (d > worst) { worst = d; at = t; }
+      }
+      mutual[m.id] = {worst: r3(worst), at, tol: m.tol};
+      if (worst > m.tol) fail(`${name}: mutual ${m.id}`, [`${worst.toFixed(3)} > ${m.tol} at t${at}`]);
+    }
     const col = k => pts.map(P => P[k].map(r3));
     manifest.clips[name] = {id, len: L, grip: clip.grip, beats: clip.beats, steps: clip.steps || [], handback: clip.handback, slides: clip.slides || [], two_hands: clip.two || [], her: clip.her || [],
-      sync, keys: keyCount, key_files: keyTicks.length, json_frames: keys.length, contact,
+      sync, keys: keyCount, key_files: keyTicks.length, json_frames: keys.length, contact, mutual,
       tick: {shift: rootAt, hilt: col('hilt'), tip: col('tip'), hand_r: col('hand_r'), hand_l: col('hand_l'), pommel: col('pommel'), foot_r: col('foot_r'), foot_l: col('foot_l'), head: col('head'), shoulder_r: col('shoulder_r')}};
   });
   // the clips that follow each other without a respawn meet in one pose

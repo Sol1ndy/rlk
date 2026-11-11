@@ -11,8 +11,8 @@ the numbers in `api.py` (lane HB).
 - [x] reproduce HB-01 … HB-07 (numbers below; HB-01 also rendered through the built R6 camera)
 - [x] HB-02 the Shift snap, HB-03 the stands made at their first shots, HB-04 E2, HB-05 the coda black, HB-06 the line shots,
       HB-07 I18: sequence side + tests (test_seq R9 / R10 / F1 / F2 / F3 / S2, test_cam K4 / K6, ev_dry)
-- [ ] HB-01 the repel throw (both clips + mutual contact rows in both builders and test_contact)
-- [ ] docs (hr_design §3 / §4.3, README 홍련 절, hr2 text), final gates, frames for the lead
+- [x] HB-01 the repel throw (both clips + mutual contact rows in both builders and test_contact)
+- [x] docs (hr_design §3 / §4.3, README 0-4 / 0-8 / 0-9 / 홍련 절, hr2 text), final gates, frames for the lead
 
 ## Reproduced (head d7da75e79)
 | id | how | what |
@@ -61,13 +61,53 @@ the numbers in `api.py` (lane HB).
   brim edge from 1302; the eyes from 1332; the lens ≥ 0.58 b from the brim. Her clip unchanged (its head is already 25-44° down 0-40).
   The brim is the 84 %-opaque weave of the hat (paint): the eyes are behind it, not black.
 
+## What changed (HB-01, the repel throw)
+- **Her clip** (`scarlet_cine.mjs` R6, every tick 79-100): her pelvis rides `THROW.P` onto the actor's back and over its right
+  shoulder, head first, face up, pitched back on `THROW.PT` (6 → 108 degrees); the root arcs only `THROW_H` 0.6 b (`seq.py` `toss`
+  `leap(..., THROW_H)`; before: 2.2 b with her pelvis 2.96 b up over a bent actor). Her sword hand is held on `THROW.G` to 96 (the
+  actor's hands are on that forearm), the blade turned over 79-82 from the hook's line to `THROW.D` (out to her left past the
+  actor's right side, level, a little back: across the held forearm, so the wrist is within the held-prop limit and the hilt keeps
+  out of her torso — gripClear pushes ≤ 0.20 b); let go at 96 it swings up (17 degrees to her left of vertical: through the vertical
+  the rig's sword channels turn it over) and down beside her (97-100) to LIE's blade at 101. The hat leaves at 84 as before
+  (lower toss). R6 camera kept as designed (`ST(-2.8, 0.7, 1.8)`).
+- **The actor** (`player_motion/cine/clips.mjs` repel 78-102): its right fist hooked over her sword forearm 78-96 (0.22 b from her
+  grip toward the elbow), its left hand round her wrist 86-91 (reaching for it 79-85, letting go 92-97), the hips back under her and
+  the back bent forward, rolled left with the head ducked left of her body (`BEND` keys, `throwFit` per tick against her tracks:
+  both holds 0.52 b from the shoulders, the head ≥ 0.44 b off her body's line where reachable); its own blade out past its right
+  side `[.38, -.48, .79]` (the old `.55` down put the point under the floor at 96-97 with her new forearm).
+- **Mutual contact rows** `MUTUAL` (`scarlet_cine.mjs`, read by both builders and test_contact): KW.grip 36-48, KH.hilt 49,
+  KS.hook 70-78, KT.grip_r 78-96, KT.grip_l 86-91, KT.over 84-92 (her pelvis 0-0.6 b over the actor's right shoulder, ≤ 0.5 b off
+  it), KK.kick 129. The rig builder fails on them (against the actor manifest; `--mutual-allow` while re-authoring) and the actor
+  builder fails on them (against `her_tracks.json`; `RLK_CINE_HER_TRACKS` for a scratch copy); both write the measured values
+  (`scarlet_rig_manifest` / actor `manifest.json` `mutual`). `api.CONTACT['KT1']` is the new over-the-shoulder point
+  `ST(0.28, 1.4, 2.0)` (a separate line in api.py). hr_design §4.2 / §4.3 / R6 and the actor manifest's beats rewritten.
+- Measured (final build): KT.grip_r ≤ 0.082 b (t78), KT.grip_l ≤ 0.006 b (t86), KT.over her pelvis 0.345 b over the shoulder and
+  0.086 b off it at 88; the actor's head ≥ 0.40 b from her torso 79-96; held props right everywhere (the tip ≥ 1.45 b from her
+  elbow at 81-84, need 1.34); test_contact fails 4 mutual rows on the old head (d7da75e79), passes now.
+- test_rig: the hat's first flying tick (repel 84) moves 0.37 b (the guard lifts it off her head box while her head turns into
+  it; the worn hat already moves 0.27-0.41 b a tick at 79-83): the KNOWN bound for that tick 0.21 → 0.38 with the measured
+  alternatives in the comment (leaving later moves the clip event, its sound and the state spans; 89+ breaks KT.over).
+
 ## Tools added
 - `tools/dev/sim/hr/cine/built_shots.py`: frames through the cameras as built (seqsim's live stand) with her real rig (`--debug-dp`
   frames) and the real actor (`--cine-debug-dp` frames), `--ortho` side views, `--lines` / `--shots` tick sets.
 - `tools/dev/sim/hr/h2/framing.py`: the per-tick framing report (test_seq F1 / F2).
 
-## Next
-HB-01 (below when done), then docs and the final gates.
+## Gates (final tree)
+| gate | result |
+|---|---|
+| rig → kit → player rig (+ audio) → `regen_all.sh --mobs`, twice | identical (hash of every changed / new tree file and of the whole pack copy the same after both runs); `regen_all` failures 0; check_mboss_pack 0 problems; the pack copy = `rp_hi` byte for byte |
+| loadcheck `hfb` | 0 function load failures |
+| rplint / atlas_px (pack copy) | 0 problems / 12.935 M (≤ 13.2 M) |
+| hr suites | test_seq all (incl. the five-stage lens checks), test_cam all, test_cine 159/159, test_contact 94/94 (8 mutual rows), test_actor 167/167, test_rig 162/162, test_kit 15798/15798, ev_dry 82/82, test_flow 40/40, pat_p1 531/531, pat_p2 67/67, pat_ghost 65/65, gen_check_hr 28/28 (the generators re-run on a copy: no diff), ident_hr all (byte-identical to 35b82e5 outside the allow-list) |
+| combat suites | test_cb 296/296, test_rm all, test_np 125/125, test_bal 117/117, test_bal_boss 117/117 |
+| cost | test_flow: every phase / sequence ≤ 429 a tick on average (seq repel 389, intro 284), the fight 355 (≤ 830) |
+
+## Frames for the lead (`<S>/cb/hfb_frames/`, built cameras, her rig and the actor as built)
+`hb01_r6_throw.jpg` (R6 78-101), `hb01_side.jpg` (the same from the side), `hb06_intro_lines.jpg` / `hb06_cs1_lines.jpg` /
+`hb06_ending_lines.jpg` (the middle tick of every line; the ending sheet opens with E1 2 and E2 84-92) / `hb06_coda.jpg`,
+`hb03_hb06_intro_new_shots.jpg` (intro 2 and the new I10b / I12a / I14b / I15), `hb07_i18.jpg` (I18 1292-1348: the eyes under
+the brim until the lift).
 
 ## Real-server probes (26.3, a copy of the server dir under the shared lock; `<S>/cb/hfb_work/probe/probe.sh`)
 - `execute positioned 3.5 120 3.5 rotated 137.25 -12.5 run function rlk:mboss/cam/spawn_at {id:1}` → the stand at

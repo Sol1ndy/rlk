@@ -470,6 +470,7 @@ CONTACT = {                                             # id: (sequence, (tick f
     'KA3': ('ending', (286, 286), (0, 6.8, 2.5), 'cut on cut (the big flash)'),
     'KA4': ('ending', (298, 304), (0, 6.9, 2.6), 'blade lock (X), then both push off'),
 }
+CONTACT['KT1'] = ('repel', (88, 88), (0.28, 1.4, 2.0), 'her pelvis over the actor\'s right shoulder')   # HF-B (HB-01): the low throw
 CONTACT_TOL = {'blade': 0.08, 'body': 0.12}             # b: blades; hands and feet
 ACTOR_CLIPS = {'cs0': 1440, 'cs1': 720, 'repel': 140, 'ending': 1372, 'coda': 120}   # H3: tools/player_motion/cine/<id>.json
 ACTOR_LIMIT = {'fwd': 2.5, 'back': 1.5, 'side': 1.5, 'cs0_back': 6.0, 'air': 7.0}   # the actor's displacement from the stage origin
