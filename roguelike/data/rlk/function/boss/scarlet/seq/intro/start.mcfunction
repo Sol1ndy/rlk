@@ -11,23 +11,29 @@ execute as @a[tag=player,limit=1] run function rlk:view/sync
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[tag=rlk_safe,limit=1] ~ ~ ~
 function rlk:mboss/cam/kill
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^-0.6 ^1.9 ^-7.4 facing ^0 ^1.4 ^-3
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^-0.6 ^1.9 ^-7 facing ^0 ^1.4 ^-3
 execute at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/cam/spawn_at {id:1}
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1]
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^7 ^1.2 ^-3.5 facing ^0 ^1.2 ^-3.5
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^7 ^1.2 ^-2 facing ^0 ^1.2 ^-2
 execute at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/cam/spawn_at {id:2}
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1]
+execute unless score #mbCamRe mb matches 44.. run scoreboard players set #mbCamRe mb 44
 execute as @a[tag=player,limit=1] unless entity @s[tag=rlk_body] at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:char/cine/spawn
 function rlk:char/cine/play {clip:"cs0"}
 function rlk:boss/scarlet/rig/play/intro
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
+scoreboard players set #sq_sk hr 0
+scoreboard players set #sq_sks hr -1
+scoreboard players set #sq_skd hr 0
+scoreboard players set #sq_skn hr 0
+scoreboard players set #skip hr -1
 scoreboard players set @a[tag=player] hudHold 2
 title @a[tag=player] actionbar ""
 execute unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/intro/lock
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^0 ^0 ^-7.5 run function rlk:boss/scarlet/fx/p/arrive_rift
-function rlk:boss/scarlet/fx/hud/ovl {g:"black",in:0,hold:2,out:6}
+function rlk:boss/scarlet/fx/hud/ovl {g:"black",in:0,hold:34,out:8}
 function rlk:boss/scarlet/fx/p/ambient_p1
 execute at @a[tag=player,limit=1] run function rlk:boss/scarlet/fx/snd/cs0_wind

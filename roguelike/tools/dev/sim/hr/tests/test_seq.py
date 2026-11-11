@@ -83,7 +83,7 @@ def want(n):
 # I14 960-980, I14b (980), I15 tracking; CS1 S4b (110), S11 close on her to 654 (S13 from 654); the ending E9b (420), E14b
 # (910), E15 from 1038; the coda E4 / E30 / E52 (the opposite stand of the ending's last shot first)
 CUTS = {
-    'intro': [(0, 1), (60, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (690, 1), (750, 2),
+    'intro': [(0, 1), (76, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (690, 1), (750, 2),
               (790, 1), (820, 2), (838, 1), (960, 2), (980, 1), (1040, 2), (1230, 1), (1260, 2), (1290, 1), (1350, 2), (1406, 1)],
     'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (110, 1), (180, 2), (220, 1), (276, 2), (340, 1), (380, 2), (500, 1), (610, 2), (654, 1)],
     'repel': [(0, 1), (26, 2), (52, 1), (68, 2), (78, 1), (102, 2), (128, 1), (132, 2)],
@@ -99,7 +99,7 @@ LINE_T = {'intro': {1: 258, 2: 340, 3: 462, 4: 540, 5: 690, 6: 838, 7: 906, 8: 9
 LINE_SPAN = {1: 54, 2: 60, 3: 60, 4: 84, 5: 130, 6: 64, 7: 44, 8: 44, 9: 90, 10: 70, 11: 62, 13: 52, 14: 40, 15: 36, 16: 36,
              17: 58, 18: 66, 19: 42, 20: 118, 21: 128, 22: 128, 23: 88}
 GOLD = 'gold' if api.K.ovl('gold', 0, 1, 1) else 'white'       # the stand-in while lane H2c's glyph is missing
-OVL = {'intro': [(0, 'black', 0, 2, 6)], 'cs1': [(0, 'white', 0, 2, 2), (10, GOLD, 0, 1, 2), (642, 'negative', 0, 3, 0), (645, 'pinkwhite', 0, 3, 4),
+OVL = {'intro': [(0, 'black', 0, 34, 8)], 'cs1': [(0, 'white', 0, 2, 2), (10, GOLD, 0, 1, 2), (642, 'negative', 0, 3, 0), (645, 'pinkwhite', 0, 3, 4),
                            (650, 'red_tint', 0, 4, 20)],
        'repel': [(0, GOLD, 0, 4, 3)],
        'ending': [(0, 'white', 0, 2, 1), (70, GOLD, 0, 1, 2), (190, GOLD, 0, 6, 6), (286, GOLD, 0, 3, 6)],
@@ -214,22 +214,85 @@ def static():
            not v, str(v[:4]))
     ck('S3 the sound list of the vanilla jar was there to check against', snd_ids is not None)
     titles = [(p.relative_to(SQ).as_posix(), ln) for p in files for ln in fn_lines(p) if re.search(r'(^| run )title ', ln)]
-    ck('S3 the only title commands of seq/**: the blank actionbar at a start', all('actionbar ""' in ln for _r, ln in titles), str(titles[:3]))
+    ck('S3 the only title commands of seq/**: the blank actionbar at a start; the skip prompt\'s action bar only when no camera '
+       'holds the player', all('actionbar ""' in ln or ('/skip' in r_ and 'unless entity @a[tag=player,tag=rlk_mb_camh]' in ln)
+                               for r_, ln in titles), str([x for x in titles if 'actionbar ""' not in x[1]][:3]))
     ck('S3 the hudHold of every locked sequence, each tick', all(SEQ.HUD_HOLD in fn_lines(SQ / n / 'tick.mcfunction') for n in LOCKED)
        and not any(SEQ.HUD_HOLD in fn_lines(SQ / n / 'tick.mcfunction') for n in ('lead60', 'lead5', 'lead_re')))
-    # lines: verbatim, at their ticks, their spans
+    # lines: verbatim, at their ticks, their spans. Round V: in a locked sequence a line is typed on the camera's text
+    # (mboss_lib.cam_line); the kit's subtitle line only when no camera holds the player
     kit = json.loads((DP / 'tools/mboss_hr_fx_manifest.json').read_text(encoding='utf-8'))
-    ok = True
+    ok, why = True, []
+    held = 'entity @a[tag=player,tag=rlk_mb_camh]'
     for n, tab in LINE_T.items():
         k = tick_files(n)
         for i, t in tab.items():
-            ok &= any(f'fx/hud/line {{id:{i}}}' in ln for ln in k.get(t, []))
+            sp = LINE_SPAN[i]
+            kl = [ln for ln in k.get(t, []) if f'fx/hud/line {{id:{i}}}' in ln]
+            if len(kl) != 1 or f'unless {held}' not in kl[0]:
+                why.append((n, i, 'kit line', kl))
+            typed = [(tt, m.group(1)) for tt in range(t, t + sp) for ln in k.get(tt, [])
+                     for m in [re.search(r'tag=rlk_mb_camt\] run data merge entity @s \{text:\{text:"([^"]*)",color:"#F2D0E8"\},background:(-?\d+)\}', ln)] if m]
+            pages = api.LINE_PAGES.get(i) or (api.LINES[i],)
+            full = [x for _tt, x in typed if x in pages]
+            if [x for x in full] != list(pages) or typed[0][0] != t or len(typed[0][1].replace(' ', '')) > 2:
+                why.append((n, i, 'typed', typed[:2], full))
+            if not all(any(pg.startswith(x) for pg in pages) for _tt, x in typed):
+                why.append((n, i, 'not a prefix of the line', [x for _tt, x in typed][:3]))
+            if not any('tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}' in ln for ln in k.get(t + sp, [])):
+                why.append((n, i, 'not cleared at', t + sp))
         allc = [(t, int(m.group(1))) for t, ls in k.items() for ln in ls for m in [re.search(r'fx/hud/line \{id:(\d+)\}', ln)] if m]
         ok &= sorted(allc) == sorted((t, i) for i, t in tab.items())
-    ck('S4 each line id at its tick, once (1-11 intro, 13-16 cs1, 17-23 ending)', ok)
-    ck('S4 the lines are api.LINES verbatim in the kit, their spans the design\'s',
+    ck('S4 each line id at its tick, once (1-11 intro, 13-16 cs1, 17-23 ending): typed on the camera text from that tick (two '
+       'syllables first, every step a prefix, each page of api.LINE_PAGES whole), cleared at the end of its span; the kit\'s '
+       'subtitle line only when no camera holds the player', ok and not why, str(why[:4]))
+    ck('S4 the lines are api.LINES verbatim, their spans the design\'s',
        all(api.LINE_AT[i][2] == sp for i, sp in LINE_SPAN.items()) and len(api.LINES) == 25
-       and all(kit['lines'][str(i)]['text'] == api.LINES[i] and kit['lines'][str(i)]['on_screen'] == sp for i, sp in LINE_SPAN.items()))
+       and all(kit['lines'][str(i)]['text'] == api.LINES[i] and kit['lines'][str(i)]['on_screen'] == sp for i, sp in LINE_SPAN.items())
+       and all(' '.join(api.LINE_PAGES.get(i) or (api.LINES[i],)) == api.LINES[i] for i in api.LINES))
+    # round V (v_brief VC 1-3, 5, 8): the camera rules in the tables and the generated files
+    for n in LOCKED:
+        tr = TR[n]
+        segs = tr.segments()
+        ck(f'S6 {n}: every segment lasts 1..{CAM.SEG_MAX} ticks ({len(segs)} placements after the first keyframes)',
+           all(1 <= at - t <= CAM.SEG_MAX and 0 < dur <= CAM.SEG_MAX for _nm, _c, t, at, dur, _k in segs), str([x for x in segs if not 1 <= x[3] - x[2] <= 59][:3]))
+        ck(f'S6 {n}: every shot lasts at least {CAM.PRE} ticks (the idle camera settles) and its last move ends before the next cut',
+           all(b.t - a.t >= CAM.PRE and a.last_motion() < b.t for a, b in zip(tr.shots, tr.shots[1:])))
+        cl = tr.lines()
+        dur_err = []
+        for sh in tr.shots:
+            cur = 0
+            if sh.t > 0 and not (any('teleport_duration:0}' in x for x in cl.get(sh.t - 3, [])) and any('mboss/cam/fix' in x for x in cl.get(sh.t - 2, []))):
+                dur_err.append((sh.name, 'no preparation'))
+            for kf in sh.keys:
+                if kf.dur != cur:
+                    if not any(f'rlk_mb_cam{sh.cam},limit=1] {{teleport_duration:{kf.dur}}}' in x for x in cl.get(kf.t - 1, [])):
+                        dur_err.append((sh.name, kf.t, kf.dur))
+                    cur = kf.dur
+                if sum('mboss/cam/fix' in x and f'rlk_mb_cam{sh.cam}' in x for x in cl.get(kf.t, [])) < 1:
+                    dur_err.append((sh.name, kf.t, 'no placement'))
+        ck(f'S6 {n}: each cut prepared (duration 0 three ticks ahead, the placement two ticks ahead), each segment\'s duration set '
+           'the tick before its placement', not dur_err, str(dur_err[:4]))
+        chase = {t for sh in tr.shots for t0, t1, *_r, kind in sh.moves if kind == 'chase' for t in range(t0, t1)}
+        placed = sorted(t for t, ls in cl.items() if any('mboss/cam/fix' in x for x in ls))
+        runs = [t for t in placed if t not in chase and t - 1 in placed and t + 1 in placed and (t - 1) not in chase]
+        ck(f'S6 {n}: no placement on three ticks running outside a chase ({len(placed)} placement ticks, {len(chase)} of a chase)',
+           not runs, str(runs[:6]))
+    for n in ('intro', 'cs1'):
+        si = fn_lines(SQ / n / 'skipin.mcfunction')
+        ck(f'S7 {n}: the skip input is the jump key (never Shift), the core\'s Shift input rests (#skip hr -1), the prompt names Space',
+           any('predicate rlk:in_jump' in x for x in si) and not any('in_sneak' in x for x in si) and si[0] == 'scoreboard players set #skip hr -1'
+           and any('Space 길게' in x and '건너뛰기' in x for x in si) and not any('Shift' in x for x in si), str(si[:2]))
+        tk = fn_lines(SQ / n / 'tick.mcfunction')
+        ck(f'S7 {n}: tick calls skipin before its timeline and stops the tick of a skip there',
+           f'function rlk:boss/scarlet/seq/{n}/skipin' in tk and tk.index(f'function rlk:boss/scarlet/seq/{n}/skipin') < next(i for i, x in enumerate(tk) if '/k/' in x or '/kb/' in x))
+    now = 'execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now'
+    for rel in ('intro/skip', 'cs1/skip', 'cs1/start', 'repel/start', 'ending/start'):
+        ls = fn_lines(SQ / f'{rel}.mcfunction')
+        tp_i = [i for i, x in enumerate(ls) if re.search(r'(seq/[a-z0-9]+/m/(mark|drop|lie)$)|( run tp @s ~ ~ ~$)', x)]
+        ck(f'S8 {rel}: her model follows an instant move of her body in the same tick (rig/follow_now at the body after it and '
+           'after her turn)', tp_i and now in ls and ls.index(now) > tp_i[-1]
+           and not any('rotate @s' in x for x in ls[ls.index(now):ls.index(now) + 1]), str(tp_i))
     # music, the title, the look request, the rig looks at their ticks
     def has(n, t, frag):
         return any(frag in ln for ln in tick_files(n).get(t, []))
@@ -383,22 +446,30 @@ def run():
                 ck(f'R2 {tag}: the player held (spectator) from tick {first_held} on', not held, str(held[:6]))
                 live = [t for t in sorted(by) if t <= last and (CUTS[sn][0][0] <= t) and by[t]['live'] != TR[sn].shot_at(t).cam]
                 ck(f'R3 {tag}: the live camera of every tick = the table', not live, str(live[:6]))
-                bad = []
+                # the first keyframe of every shot: two ticks before its cut the camera (as the CLIENT has it) looks from the
+                # table's eye along the grid rotation nearest its look point, and stands still there until the cut
+                bad, unset = [], []
                 for shot in TR[sn].shots:
-                    r = by.get(shot.t)
-                    if r is None:
+                    if shot.t - 1 > max(by):
+                        continue
+                    r = by.get(shot.t - 1) if shot.t > 0 else by.get(1)
+                    if r is None or not r.get('cam') or r['cam'].get(shot.cam) is None:
+                        unset.append(shot.name)
                         continue
                     pos, rot = r['cam'][shot.cam]
-                    fr = frames_of(r)
-                    eye, look = shot.at(shot.t)
-                    we, wl = CAM.to_world(eye, fr), CAM.to_world(look, fr)
-                    lifted = shot.clamp and eye[0] in ('ST', 'ST2') and eye[2] < CAM.LOW and abs(pos[1] - (201.0 + SEQ.LIFT_TO)) < 1e-6
+                    fr = frames_of(by.get(max(shot.t - 2, 0), r))
+                    we, wl = CAM.to_world(shot.eye, fr), CAM.to_world(shot.look, fr)
+                    lifted = shot.clamp and shot.eye[0] in ('ST', 'ST2') and shot.eye[2] < CAM.LOW and abs(pos[1] - (201.0 + SEQ.LIFT_TO)) < 0.2
                     if lifted:
                         we = (we[0], 201.0 + SEQ.LIFT_TO, we[2])
-                    y, p = CAM.yaw_pitch(pos, wl)
-                    if not near(pos, we, 0.02) or (math.dist(pos, wl) > 0.2 and (ang(rot[0], y) > 0.6 or abs(rot[1] - p) > 0.6)):
-                        bad.append((shot.t, shot.name, [round(v, 2) for v in pos], [round(v, 2) for v in we], [round(v, 1) for v in rot], round(y, 1), round(p, 1)))
-                ck(f'R3 {tag}: at every cut the stand is at the table\'s eye, looking at its look point', not bad, str(bad[:3]))
+                    y, p = CAM.yaw_pitch(we, wl)
+                    lead = TR[sn].lead(shot.t - 2, shot.t) if shot.t > 0 else None
+                    tol_p, tol_r = (0.35, 8.0) if lead else (0.03, CAM.GRID / 2 + 0.05)
+                    if not near(pos, we, tol_p) or not CS.on_grid(rot) or (math.dist(we, wl) > 0.2 and abs(p) < 88
+                                                                         and (ang(rot[0], y) > tol_r or abs(rot[1] - p) > tol_r)):
+                        bad.append((shot.t, shot.name, [round(v, 2) for v in pos], [round(v, 2) for v in we], [round(v, 2) for v in rot], round(y, 1), round(p, 1)))
+                ck(f'R3 {tag}: before every cut the camera\'s viewpoint is the table\'s eye, its rotation the grid step nearest the '
+                   'look point', not bad and not unset, f'{bad[:3]} {unset[:3]}')
             else:
                 ck(f'R2 {tag}: never locked', not any(r['req'] or r['held'] for r in by.values()))
             # overlays / signals
@@ -408,8 +479,24 @@ def run():
             sg = [(t, by[t]['sig']) for t in sorted(by) if by[t]['sig']]
             ck(f'R4 {tag}: the signals {SIGS[sn]}', sg == SIGS[sn], str(sg))
             ls = [(t, int(a['id'])) for t in sorted(by) for c, a in by[t]['kit'] if c == 'hud/line']
-            ck(f'R4 {tag}: the lines at their ticks', sorted(ls) == sorted((t, i) for i, t in LINE_T.get(sn, {}).items())
-               or sn == 'event', str(ls))
+            if sn in LOCK and key != 'repel5':
+                # round V (VC 10): a held run shows every line on the live camera's text, never the kit's subtitle
+                tbad = []
+                for i, t in LINE_T.get(sn, {}).items():
+                    sp = LINE_SPAN[i]
+                    pages = api.LINE_PAGES.get(i) or (api.LINES[i],)
+                    seen = [by[tt]['text'] for tt in range(t, t + sp) if tt in by]
+                    if not seen or not seen[0] or [x for j, x in enumerate(seen) if x in pages and (j == 0 or seen[j - 1] != x)] != list(pages) \
+                            or not all(x and any(pg.startswith(x) for pg in pages) for x in seen) or by[t + sp]['text'] not in ('', None) \
+                            or (t - 1 in by and by[t - 1]['text'] not in ('', None)):
+                        tbad.append((i, t, seen[:2], seen[-1:], by[t + sp]['text']))
+                ck(f'R4 {tag}: every line typed on the live camera\'s text for its span (each page whole), gone after it; the kit\'s '
+                   'subtitle line never called while held', not tbad and not ls, f'{tbad[:3]} {ls[:3]}')
+                other = [t for t in sorted(by) if by[t]['text'] and not any(tt <= t < tt + LINE_SPAN[i] for i, tt in LINE_T.get(sn, {}).items())]
+                ck(f'R4 {tag}: no text outside the line spans', not other or sn == 'event', str(other[:5]))
+            else:
+                ck(f'R4 {tag}: the lines at their ticks', sorted(ls) == sorted((t, i) for i, t in LINE_T.get(sn, {}).items())
+                   or sn == 'event' or key == 'repel5', str(ls))
             # her marks and the distances
             miss = [(t, f, round(stage_f(by[t])[1], 2)) for t, f in HER_F.get(sn, []) if t in by and by[t]['stage']
                     and (abs(stage_f(by[t])[1] - f) > 0.06 or abs(stage_f(by[t])[0]) > 0.06)]
@@ -432,23 +519,37 @@ def run():
                     dd.append((t, d, round(got, 2)))
             ck(f'R5 {tag}: the distances her <-> the actor of the design {[d for _t, d in DIST.get(sn, [])]}', not dd, str(dd))
             if sn in LOCK:
-                sp = CAM.slow_pans(TR[sn], lambda t: frames_of(by[min(t, max(by))]))
-                for _s, nm, t0, t1, dps, _d in sp:
-                    print(f'   slow pan (in-game check: rotation is sent in 1.4-degree steps): {tag} {nm} {t0}-{t1}: {dps:.2f} deg / t')
-            if sn in LOCK:
-                # (HF-B, HB-03) the client's picture (camsim: a new stand shows its summon pose, then glides 3 ticks to each
-                # change): at the first held tick and at every cut the live stand shows where the server has it
-                held_t = [t for t in sorted(by) if by[t].get('held')]
-                at = sorted({held_t[0]} | {sh.t for sh in TR[sn].shots}) if held_t else []
-                glide = []
-                for t in at:
-                    r = by.get(t)
-                    if r is None or not r.get('view') or not r.get('srv'):
+                t0, t1 = LOCK[sn]
+                last = min(t1 - 1, max(by))
+                # round V (VC 3): cuts between settled cameras. The idle camera has stood still at the shot's first keyframe
+                # for 2 ticks (the client's interpolated pose = the server's, no step left) when it goes live; the first
+                # frame of the new shot is that place (a move that starts at the cut has made at most its first step)
+                glide, margins = [], []
+                for sh in TR[sn].shots:
+                    if sh.t == 0 or sh.t - 1 not in by or sh.t > last:
                         continue
-                    (vp, vr), (sp, sr) = r['view'], r['srv']
-                    if math.dist(vp, sp) > 0.02 or ang(vr[0], sr[0]) > 0.6 or abs(vr[1] - sr[1]) > 0.6:
-                        glide.append((t, round(math.dist(vp, sp), 3), round(ang(vr[0], sr[0]), 1)))
-                ck(f'R9 {tag}: the first held frame and every cut show the stand where it stands (no spawn glide / spin)', not glide, str(glide[:5]))
+                    a, b, c = by.get(sh.t - 2), by[sh.t - 1], by[sh.t]
+                    st = b['cl'][sh.cam]
+                    m = 0
+                    for k in range(1, 12):
+                        q = by.get(sh.t - k)
+                        if q is None or q['cl'][sh.cam] is None or q['cl'][sh.cam][2] != 0 or q['cl'][sh.cam][:2] != st[:2]:
+                            break
+                        m += 1
+                    margins.append(m)
+                    first = [kf for kf in sh.keys if kf.t == sh.t]
+                    step = 1.0 / first[0].dur if first else 0.0
+                    moved = math.dist(c['cl'][sh.cam][0], st[0])
+                    reach = math.dist(c['ent'][sh.cam][0], st[0]) * step + 1e-6
+                    if (st[2] != 0 or m < 2 or st[:2] != (b['ent'][sh.cam][0], b['ent'][sh.cam][1]) or c['con'] != sh.cam or moved > reach
+                            or (a is not None and a['con'] == sh.cam)):
+                        glide.append((sh.t, sh.name, st[2], m, round(moved, 3), round(reach, 3), c['con']))
+                ck(f'R9 {tag} (VC 3): every cut goes to a camera that has stood settled at its first keyframe for 2 ticks or more; '
+                   f'the first frame is that place (settle margins {sorted(set(margins))} t)', not glide, str(glide[:4]))
+                free = [t for t in sorted(by) if 1 <= t <= last and by[t]['held'] and by[t]['con'] != by[t]['live']]
+                ck(f'R11 {tag} (VC 6): the client looks through the live camera on every held tick', not free, str(free[:8]))
+                rg = [t for t in sorted(by) if t <= last and by[t].get('rig') and by[t].get('body1') and math.dist(by[t]['rig'], by[t]['body1'][0]) > 1e-6]
+                ck(f'R13 {tag} (VC 8): her model stands where her body stands when every tick is over', not rg, str(rg[:8]))
             if sn == 'event':
                 ev_black = [(t, i, h) for t, g, i, h, _o in ov if g == 'black']
                 rel = LOCK['event'][1]
@@ -458,6 +559,17 @@ def run():
             cm = [r['cmds'] for r in by.values()]
             print(f'   {tag}: {len(by)} ticks, commands per tick avg {sum(cm) / len(cm):.0f} / max {max(cm)} (the sequence\'s own files)')
             ck(f'R6 {tag}: at most 400 commands of its own in a tick', max(cm) <= 400, str(max(cm)))
+        if key in ('intro', 'cs1', 'repel60', 'ending'):
+            # round V (VC 1): what reached the client. Every rotation ever sent for a camera is on the 360 / 256 grid (the
+            # byte packet is then exact and agrees with the entity's place); every interpolation it ran lasted <= 59 ticks
+            off, long_ = [], []
+            n_seg = 0
+            for e in s.stands():
+                off += [(sorted(e.tags)[-1], r_) for r_ in e.data.get('sent', []) if not CS.on_grid(r_)]
+                long_ += [x for x in e.data.get('segs', []) if x[1] > CAM.SEG_MAX]
+                n_seg += len(e.data.get('segs', []))
+            ck(f'R12 {key} (VC 1): every rotation sent for a camera lies on the 1.40625-degree grid; no interpolation longer than '
+               f'{CAM.SEG_MAX} t ({n_seg} moves interpolated by the client on the last cameras)', not off and not long_, f'{off[:3]} {long_[:3]}')
         if key in ('intro', 'cs1', 'repel60', 'repel5', 'ending'):
             # (HF-B, HB-04 / HB-06) the framing of every held tick through the built cameras (hr/h2/framing.py: her rig's
             # points from her_tracks.json on her body, the actor's head from lane H3's manifest)
@@ -492,10 +604,10 @@ def stages():
     import sheets
     import shots as SH
     arenas = {lk: SH.Arena(DP, lk) for lk in ('moon', 'crimson')}
-    for key in ('cs1', 'repel60', 'ending'):
-        for st in ('c', 'n', 'e', 's', 'w'):
+    for key in ('intro', 'cs1', 'repel60', 'ending'):
+        for st in (('c',) if key == 'intro' else ('c', 'n', 'e', 's', 'w')):
             s, by = sheets.run(DP, key, st)
-            eye_bad, her_bad, fwd = [], [], None
+            eye_bad, her_bad, f5_bad, fwd = [], [], [], None
             n = 0
             for sn, recs in by.items():
                 for t, r in recs.items():
@@ -513,12 +625,23 @@ def stages():
                         rad = math.hypot(pos[0] - 880.0, pos[2] - 8.0)
                         if cls != SH.AIR or rad > 25.0 or pos[1] < 201.2:
                             eye_bad.append((sn, t, [round(v, 2) for v in pos], cell, round(rad, 2)))
+                        # round V (VC 2): the camera ENTITY (as the client has it this tick) is in air and the client's 4-b
+                        # pull-back behind it meets no block - the picture is taken from the viewpoint, not from a wall
+                        ep, er = r['cl'][r['live']][:2]
+                        hit = SH.f5_clear(ar, ep, er)
+                        if hit:
+                            f5_bad.append((sn, t, TR[sn].shot_at(t).name, [round(v, 2) for v in ep], hit))
                     (bx, byy, bz), _yaw = r['body']
                     rad = math.hypot(bx - 880.0, bz - 8.0)
                     c1, c2 = ar.cell((bx, byy + 0.01, bz)), ar.cell((bx, byy + 1.5, bz))
                     if rad > 25.0 + 1e-6 or byy < 201.0 - 1e-6 or c1[1] == SH.SOLID or c2[1] == SH.SOLID or 'barrier' in c1[0] + c2[0]:
                         her_bad.append((sn, t, [round(v, 2) for v in (bx, byy, bz)], round(rad, 2), c1[0]))
             want_fwd = 'her' if st == 'c' else 'centre'
+            if key == 'intro':
+                fwd = want_fwd                         # CS0's stage is fixed (api.CS0_P0, toward her seat)
+            shots_bad = sorted({(x[0], x[2]) for x in f5_bad})
+            ck(f'G5 {key} stage {st} (VC 2): on every locked tick the camera entity is in air and the 4-block line back to the '
+               f'viewpoint is free of blocks', not f5_bad, f'{len(f5_bad)} ticks, shots {shots_bad[:6]}, first {f5_bad[:2]}')
             ck(f'G1 {key} stage {st}: the stage faces {"her" if st == "c" else "the arena centre (ST(0, 0, FMAX) fails mv/ok)"}',
                fwd == want_fwd or (st == 'c' and fwd == 'centre'), str(fwd))
             ck(f'G2 {key} stage {st}: every lens in the walk disc, >= 0.2 b over the floor, in an air cell ({n} locked ticks)',

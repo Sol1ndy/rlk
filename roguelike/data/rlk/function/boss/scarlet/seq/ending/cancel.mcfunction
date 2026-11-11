@@ -9,6 +9,8 @@ scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
 scoreboard players set #mbCam mb 0
 function rlk:boss/scarlet/fx/hud/clear
+execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
+execute as @e[type=minecraft:text_display,tag=rlk_mb_camk] run data merge entity @s {text:"",background:0}
 scoreboard players set @a[tag=player] hudHold 0
 kill @e[type=minecraft:item_display,tag=rlk_hr_sqp]
 execute if data storage rlk:mboss {look_hr_field:"moon"} as @e[type=minecraft:item_display,tag=rlk_hr_deco_moon_halo] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}

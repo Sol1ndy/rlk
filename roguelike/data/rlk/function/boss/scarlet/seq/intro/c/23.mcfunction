@@ -1,2 +1,2 @@
 # intro: the camera at #sq 23 (@s = the body).
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] ^-0.6 ^1.885 ^-7.177 facing ^0 ^1.4 ^-2.769
+data merge entity @e[type=minecraft:item_display,tag=rlk_mb_cam1,limit=1] {teleport_duration:50}

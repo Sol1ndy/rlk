@@ -664,37 +664,72 @@ def bars(on):
     return BARS_FNS[int(on)]
 
 
-# FN-cam (홍련 rebuild, lane H2; tools/dev/plan/combat/hr_design.md §3.0 / §5.2): the cinematic lock. A module asks for it
-# every tick of a locked sequence with cam_req(live): #mbCam mb 1 (mboss/main zeroes it at its top, so a paused fight, a
-# missing player or body and every exit path drop the request by themselves) and #mbCamId mb = the live camera stand (1 =
-# rlk_mb_cam1, 2 = rlk_mb_cam2). rlk:tick reads the request right after mboss/main: 1 -> mboss/cam/hold (the player in
-# spectator mode on the live stand, `spectate` issued again every tick because sneaking leaves a spectated entity; while
-# Shift is held the player is put at the stand's eye with its rotation instead, HF-B), else
-# mboss/cam/release for a player still carrying the hold tag. The stands are marker armour stands (a LivingEntity, so
-# camera_distance 0 holds in F5; eye height 0: ArmorStand.MARKER_DIMENSIONS = fixed(0, 0), so a stand's position is the
-# eye point), tagged rlk_room rlk_mb_aux (they go with the fight's helper entities) and rlk_pet (rlk:tick's mob setup
-# skips them). A hard cut = the other stand made live; a move = one tp per tick on the live stand. The module spawns them
-# with cam('spawn') (idempotent, at the execution position) or, for a stand whose first frame shows at once, with
-# cam('spawn_at', id=i) at its first eye facing its first look (HF-B: the rotation goes into the summon NBT) and removes
-# them with cam('kill').
+# FN-cam (홍련 rebuild, lane H2; round V lane VC: tools/dev/plan/combat/v_brief.md §3 "VC", review/v/client_facts.md): the
+# cinematic lock. A module asks for it every tick of a locked sequence with cam_req(live): #mbCam mb 1 (mboss/main zeroes
+# it at its top, so a paused fight, a missing player or body and every exit path drop the request by themselves) and
+# #mbCamId mb = the live camera (1 = rlk_mb_cam1, 2 = rlk_mb_cam2). rlk:tick reads the request right after mboss/main:
+# 1 -> mboss/cam/hold (the player in spectator mode on the live camera), else mboss/cam/release for a player still
+# carrying the hold tag.
+#
+# The camera (26.3 client and server bytecode; every statement is in vc_progress.md "Verified"):
+# - a camera is an EMPTY item_display (a display draws only its content: nothing, also to a spectator; an armour stand or
+#   any other living entity is drawn as a 15 % ghost to a spectator). The game is played in F5 (third person back): a
+#   non-living camera entity is then seen from CAM_BACK = 4 blocks behind it along its own view direction, shortened by
+#   the first block in the way. So the entity stands at V + 4 * forward for the wanted viewpoint V: a module places the
+#   camera AT the viewpoint V, aims it, and calls cam('fix') as the camera (mboss/cam/fix: the rotation onto the grid, then
+#   4 blocks forward). First person and F5-front are not supported during a cutscene.
+# - rotation reaches the client as bytes (CAM_GRID = 360 / 256 degrees, floored) unless a float position-sync packet goes
+#   out, so every placed rotation is put on that grid (fix): the byte is then exact and the entity's place (V + 4 forward
+#   of the SAME rotation) agrees with it. fix also flips OnGround on every other placement, which makes the server send
+#   the float sync packet (ServerEntity: wasOnGround != onGround); nothing depends on it.
+# - a display interpolates position and rotation linearly over teleport_duration (<= CAM_SEG_MAX) client ticks from where
+#   it is when the move arrives; the duration that applies is the one the client had BEFORE that move (entity data is
+#   sent after the move packet of the same tick). So a shot is a list of keyframes: cam_dur(n) one tick ahead, then one
+#   placement per segment (not one per tick). A hard cut = the other camera made live: the idle camera gets cam_dur(0),
+#   is placed (a snap: duration 0 = snapTo + cancel) and has settled ticks before it goes live.
+# - the dialogue line and the hint are text_displays riding each camera (a passenger sits exactly on a display: its
+#   attachment points are zero), billboard "center": their translation is in the camera's own frame (x right, y up, z
+#   toward the eye, which is 4 blocks behind the entity), so they are fixed on the screen whatever the camera does:
+#   CAM_TEXT_D blocks before the eye, in the lower third (cam_line / cam_hint).
+# The hold: spectator mode + `spectate` every tick; the player's interaction ranges forced to 0 (a left click picks no
+# entity: no camera jump), the own camera distance and scale set so that the player's own F5 picture, if the client ever
+# shows it for a frame, is the shot's; the sidebar off; the F5 seat (an armour stand: a ghost) removed and made again at the
+# hand-back. Shift ends a spectate inside the game's own player tick, after every function: mboss/cam/post (the reward of
+# the tick advancement rlk:mboss/cam_post, armed by the hold each tick; ServerPlayer.tick triggers it right after its own
+# camera handling) spectates again in the same server tick, and re-sends the camera for real (`spectate` to the player and
+# back) while cam_resend ticks are left: a client that did not have the camera entity yet ignores the first packet while
+# the server already counts the camera as set, and a plain `spectate` is then a no-op (the free flight of the 11-11 test).
 CAM_REQ, CAM_ID = ('#mbCam', 'mb'), ('#mbCamId', 'mb')
 CAM_TAG, CAM_TAGS, CAM_HOLD_TAG = 'rlk_mb_cam', {1: 'rlk_mb_cam1', 2: 'rlk_mb_cam2'}, 'rlk_mb_camh'
+CAM_PART_TAG = 'rlk_mb_camx'                                           # every entity of the camera set (cameras, texts)
+CAM_LINE_TAG, CAM_HINT_TAG = 'rlk_mb_camt', 'rlk_mb_camk'              # the line / the hint text_display of each camera
 CAM_GM_TAGS = {'survival': 'rlk_mb_cgS', 'creative': 'rlk_mb_cgC'}    # the game mode to give back (neither: adventure)
-CAM_EYE = 0.0                                                          # the stand's eye above its position (b)
-CAM_FNS = ('spawn', 'spawn_at', 'hold', 'release', 'kill')
-# HF-B (HB-02): a held player whose Shift is down is put each tick at the live stand's eye with its rotation (the game ends
-# the spectating after the functions, so the view the client keeps is the player's own): the held player's eye over its
-# feet = the player's 1.62 x the F5 seat's scale 0.0625 (view/ride_mount; spectator mode keeps the scale)
-CAM_SNEAK_DY = 1.62 * 0.0625
+CAM_EYE = 0.0                                                          # a display's eye above its position (b)
+CAM_BACK = 4.0                                                         # the F5 pull-back of a non-living camera entity (b)
+CAM_GRID = 360.0 / 256.0                                               # the rotation step that reaches the client (1.40625)
+CAM_SEG_MAX = 59                                                       # teleport_duration is clamped to 0..59
+CAM_FNS = ('spawn', 'spawn_at', 'fix', 'hold', 'release', 'kill')
+CAM_RESEND = ('#mbCamRe', 'mb')                                        # ticks left in which the camera is re-sent for real
+CAM_RESEND_HOLD = 3                                                    # ... at the start of every hold
+CAM_MOD = 'rlk:mb_cam'                                                 # the id of the hold's attribute modifiers
+CAM_ADV = 'rlk:mboss/cam_post'                                         # the tick advancement whose reward is mboss/cam/post
+CAM_IN_PRED = 'rlk:mboss_cam_in'                                       # any movement key down (a free client could fly)
+CAM_SIDEBAR = 'stacks'                                                 # the pack's sidebar objective (load.mcfunction)
+# The texts. On the screen (a 16 : 9 picture; the numbers are for a vertical field of view of 70, the game's default; a
+# wider one moves both toward the middle and shrinks them: at 90 the line is 31 px tall at 1080p, the hint 17 px):
+CAM_TEXT_D = 0.3                 # blocks before the eye (nothing of a shot comes nearer to the lens)
+CAM_FOV_REF = 70.0
+CAM_LINE = {'k': 0.0858, 'y': -0.62, 'bg': 0xB8000000, 'width': 400}    # scale, the block's middle (-1 bottom .. 1 top)
+CAM_HINT = {'k': 0.0464, 'y': -0.80, 'bg': 0xB8000000, 'width': 400}
 
 
 def cam_sel(i):
-    """The selector of camera stand i (1 = A, 2 = B)."""
-    return f'@e[type=minecraft:armor_stand,tag={CAM_TAGS[int(i)]},limit=1]'
+    """The selector of camera i (1 = A, 2 = B)."""
+    return f'@e[type=minecraft:item_display,tag={CAM_TAGS[int(i)]},limit=1]'
 
 
 def cam_req(live=None):
-    """The lock request lines of one tick: #mbCam mb 1 and, when given, the live stand (#mbCamId mb 1 | 2)."""
+    """The lock request lines of one tick: #mbCam mb 1 and, when given, the live camera (#mbCamId mb 1 | 2)."""
     out = [f'scoreboard players set {CAM_REQ[0]} {CAM_REQ[1]} 1']
     if live is not None:
         assert int(live) in CAM_TAGS, live
@@ -703,14 +738,67 @@ def cam_req(live=None):
 
 
 def cam(call, **macro):
-    """function rlk:mboss/cam/<spawn | spawn_at {id} | kill | release> (hold is rlk:tick's; release: @s = a player,
-    idempotent; spawn_at {id:1|2}: stand id at the execution position with the execution rotation in its summon NBT)."""
+    """function rlk:mboss/cam/<spawn | spawn_at {id} | fix | kill | release> (hold is rlk:tick's; release: @s = a player,
+    idempotent; spawn_at {id:1|2}: camera id for the viewpoint at the execution position looking along the execution
+    rotation; fix: @s = a camera placed AT a viewpoint and aimed: the rotation onto the grid, then CAM_BACK forward)."""
     assert call in CAM_FNS and call != 'hold', call
     if call == 'spawn_at':
         assert set(macro) == {'id'} and int(macro['id']) in CAM_TAGS, macro
         return f'function rlk:mboss/cam/spawn_at {{id:{int(macro["id"])}}}'
     assert not macro, macro
     return f'function rlk:mboss/cam/{call}'
+
+
+def cam_dur(i, n):
+    """The line that sets camera i's interpolation length for the moves that reach the client after this tick (0 = snap)."""
+    assert 0 <= int(n) <= CAM_SEG_MAX, n
+    return f'data merge entity {cam_sel(i)} {{teleport_duration:{int(n)}}}'
+
+
+def cam_resend(n):
+    """The line that makes the hold re-send the camera for real during the next n held ticks (a sequence that starts while
+    the client may still be loading the place: the arrival)."""
+    assert 1 <= int(n) <= 200, n
+    return (f'execute unless score {CAM_RESEND[0]} {CAM_RESEND[1]} matches {int(n)}.. run '
+            f'scoreboard players set {CAM_RESEND[0]} {CAM_RESEND[1]} {int(n)}')
+
+
+def _argb(v):
+    v &= 0xFFFFFFFF
+    return v - (1 << 32) if v >= (1 << 31) else v
+
+
+def cam_text_geom(spec):
+    """(translation y, translation z, scale) of a camera text (CAM_LINE / CAM_HINT): the block's middle at spec['y'] of the
+    half picture height (at CAM_FOV_REF), CAM_TEXT_D before the eye; the text block's bottom edge is the display's origin
+    and one line is 9 font px of 0.025 * scale blocks (TextDisplayRenderer)."""
+    import math
+    half = CAM_TEXT_D * math.tan(math.radians(CAM_FOV_REF / 2))
+    return (spec['y'] * half - 0.025 * spec['k'] * 4.5, CAM_BACK - CAM_TEXT_D, spec['k'])
+
+
+def cam_text_px(spec, fov=CAM_FOV_REF, screen_h=1080):
+    """Screen pixels per font pixel of a camera text at a vertical field of view (a glyph is 8 font px tall)."""
+    import math
+    return 0.025 * spec['k'] / (CAM_TEXT_D * math.tan(math.radians(fov / 2))) * screen_h / 2
+
+
+def _cam_text(tag, spec, component):
+    sel = f'@e[type=minecraft:text_display,tag={tag}]'
+    if component is None:
+        return f'execute as {sel} run data merge entity @s {{text:"",background:0}}'
+    return f'execute as {sel} run data merge entity @s {{text:{component},background:{_argb(spec["bg"])}}}'
+
+
+def cam_line(component=None):
+    """The line that shows a text component (SNBT, e.g. '{text:"...",color:"#F2D0E8"}') as the dialogue line of every
+    camera (lower third, dark backdrop), or clears it (None). No effect while no camera exists."""
+    return _cam_text(CAM_LINE_TAG, CAM_LINE, component)
+
+
+def cam_hint(component=None):
+    """The same for the small hint under the line (the skip prompt)."""
+    return _cam_text(CAM_HINT_TAG, CAM_HINT, component)
 
 
 def repool(pct):

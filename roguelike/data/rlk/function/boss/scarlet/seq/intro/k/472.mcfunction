@@ -1,0 +1,3 @@
+# intro: the timeline at #sq 472 (@s = the body).
+execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:{text:"잔 들어 밝은 달 맞이하니,",color:"#F2D0E8"},background:-1207959552}
+execute if entity @a[tag=player,tag=rlk_mb_camh] run as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ 0.3 1 0

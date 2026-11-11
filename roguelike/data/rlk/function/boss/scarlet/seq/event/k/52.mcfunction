@@ -1,5 +1,8 @@
 # event: the timeline at #sq 52 (@s = the body).
+execute if score #hrEv hr matches 1 as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
+execute if score #hrEv hr matches 2 as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
 function rlk:boss/scarlet/fx/hud/clear
+execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
 execute if score #hrEv hr matches 1 at @e[tag=rlk_body,limit=1] rotated as @e[tag=rlk_body,limit=1] rotated ~ 0 positioned ^ ^1.0 ^0.35 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
 execute if score #hrEv hr matches 1 store result score #sq_x hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] Pos[0] 1000
 execute if score #hrEv hr matches 1 store result score #sq_y hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] Pos[1] 1000
