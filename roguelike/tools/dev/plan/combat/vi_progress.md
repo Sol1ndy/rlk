@@ -132,9 +132,9 @@ dynamics are bit-identical (the pattern mix lines of the two logs are the same) 
 ## Gates (the final tree; suites from a copy outside the tree)
 | gate | result |
 |---|---|
-| regeneration twice (the order above) | round 1 and round 2: `git status` empty; pack hash `2fb1f3897247c768…` both rounds (the pack's README included) |
+| regeneration twice (the order above) | round 1 and round 2: `git status` empty; pack hash `2fb1f3897247c768…` both rounds (the pack's README included); a third round on the committed head: the same |
 | `check_mboss_pack.py` | 0 problems (4 mid-boss, 4 chapter, 3 special modules, 7 arenas) |
-| loadcheck `vi_1` (26.3 server) | 0 function load failures; `Starting minecraft server version 26.3` and `Done (` in the log; 1871 advancements |
+| loadcheck `vi_1`, and `vi_2` on the pushed head (26.3 server) | 0 function load failures; `Starting minecraft server version 26.3` and `Done (` in the log; 1871 advancements |
 | `rplint.py $S/rp_vi` / `atlas_px.py` | 0 problems / 13 107 904 px |
 | hr: test_cam / test_seq / ev_dry / test_flow | ALL (ident D1 / D2 on the merged tree) / ALL (749 s) / 82 of 82 / 40 of 40 |
 | hr: test_cine / test_contact / test_actor / test_rig | 159 / 94 / 158 / 162 |
