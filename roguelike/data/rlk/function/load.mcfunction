@@ -67,8 +67,14 @@ scoreboard objectives add parLk dummy
 scoreboard objectives add parHit dummy
 scoreboard objectives add dgAt dummy
 scoreboard objectives add dgRw dummy
-# 전투 개편 C 의 전역 값(#now 이번 틱 gametime, #dgOpen 퍼펙트 닷지 창이 열림, #dgEnd · #dgKill, 섬광 간격)
+# 전투 개편 C 의 전역 값(#now 이번 틱 gametime, #dgOpen 퍼펙트 닷지 창이 열림, #dgEnd · #dgKill · #dgBox 시작 자리 상자, 섬광 간격,
+# #parWs 헛누름 연속 · #parMl 무시한 F 뒤 받지 않는 끝, #dgRf 재사용 대기를 돌려준 닷지, #dgTry 마지막 닷지 시도)
 scoreboard objectives add cb dummy
+scoreboard players add #parWs cb 0
+scoreboard players add #dgBox cb 0
+execute unless score #parMl cb matches -2147483648.. run scoreboard players set #parMl cb -1000000
+execute unless score #dgRf cb matches -2147483648.. run scoreboard players set #dgRf cb -1000000
+execute unless score #dgTry cb matches -2147483648.. run scoreboard players set #dgTry cb -1000000
 # 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
 scoreboard players set #hcK tmp 0
 scoreboard players set #hcC tmp 0
@@ -783,9 +789,13 @@ scoreboard players set #skPtMax tmp 12
 # 기본 공격에 맞은 몹: 경직 시간(틱) / 밀려나는 세기(칸/틱 × 1000. 바닐라 넉백 = 400, 0 이면 안 밀림)
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180
-# 닷지(우클릭 · 옛 대쉬 이동): 재사용 대기(틱)의 기본값. 실제 값 #dashCoolT 는 각인(질주 2개: -#dashEngSpd %)에 따라 engravings/scan_more 가 계산
-scoreboard players set #dashCoolBase tmp 12
-scoreboard players set #dashCoolT tmp 12
+# 닷지(우클릭 · 옛 대쉬 이동): 재사용 대기(틱)의 기본값 — 누르면 #dashCoolBase(아무것도 피하지 못한 닷지), 그 닷지가 공격을 피하면(퍼펙트 ·
+# 넓은 닷지) #dashCoolHitBase 가 되게 차이만큼 돌려준다(닷지 한 번에 한 번, player/def/dg_refund). 실제 값 #dashCoolT · #dashCoolHitT 는
+# 각인(질주 2개: -#dashEngSpd %, 반올림)에 따라 engravings/scan_more 가 계산
+scoreboard players set #dashCoolBase tmp 18
+scoreboard players set #dashCoolHitBase tmp 12
+scoreboard players set #dashCoolT tmp 18
+scoreboard players set #dashCoolHitT tmp 12
 # 닷지 창(누른 틱 = 0): #dgPW 틱 미만에 맞을 공격 = 퍼펙트 닷지(모든 적), #dgLW 틱 미만 = 일반 몹(#dgLooseC: 0 일반만, 1 정예까지)만 회피
 scoreboard players set #dgPW tmp 3
 scoreboard players set #dgLW tmp 7
@@ -796,10 +806,17 @@ scoreboard players set #dgEn tmp 1000
 scoreboard players set #parW3 tmp 3
 scoreboard players set #parW2 tmp 6
 scoreboard players set #parW1 tmp 10
-# 받은 F 뒤 다시 받지 않는 시간 / 그동안 또 누르면 그 뒤로 늘어나는 시간 / 패링이 된 뒤의 대기(틱; 연타 · 누르고 있기 방지)
+# 받은 F 뒤 다시 받지 않는 시간(틱) = #parGap × (1 + 헛누름 연속 #parWs cb). 헛누름 연속: 받은 F 가 아무것도 막지 못한 채 창이 끝나고
+# #parWsT 틱 안에 다음 F 를 받으면 +1(최대 #parWsMax: 12 → 24 → 36 → 48틱), 그보다 오래 쉬면 0, #parWsClr 단계 이상의 패링이 되면 0
+# (2 = 2 · 3단계. 1단계 — 타이밍이 가장 안 맞은 패링 — 는 연속을 지우지 못한다; 1 이면 어느 단계든 지움)
 scoreboard players set #parGap tmp 12
-scoreboard players set #parRe tmp 4
-scoreboard players set #parChain tmp 2
+scoreboard players set #parWsMax tmp 3
+scoreboard players set #parWsT tmp 80
+scoreboard players set #parWsClr tmp 2
+# 받지 않은 F(연타 · 키를 누르고 있어 생기는 반복 입력) 뒤 이 틱 수 동안은 어떤 F 도 받지 않는다(#parMl cb; 패링이 되어도 풀리지 않음:
+# 3틱보다 빠른 연타는 처음 한 번만 받는다) / 패링이 된 뒤 다음 F 를 받기까지(틱; 연속 공격을 3틱 간격으로도 이어 막게)
+scoreboard players set #parRe tmp 3
+scoreboard players set #parChain tmp 1
 # 2단계 · 1단계가 남기는 피해(%) / 퍼펙트 패링의 원소전투 스킬 재사용 대기 감소(틱)
 scoreboard players set #parKeep2 tmp 20
 scoreboard players set #parKeep1 tmp 50

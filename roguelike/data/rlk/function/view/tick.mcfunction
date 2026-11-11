@@ -4,6 +4,9 @@ execute if score #vFresh view matches 1 run function rlk:view/fresh
 # 시점 시스템 매 틱 (@s = 플레이어). player/tick 보다 먼저 실행된다
 # 큰 제목(vBig = 제목 줄을 쓰는 남은 틱)은 모든 상태(F5 · 개발자 모드 · 지도 · 선택 공간 · 사망)에서 틱마다 준다. 읽는 곳: F5 조준점
 # (ride_tick · sel_xhair: 이 줄 뒤에 읽음), 화무십일홍의 화면 가장자리 어둠(items/proc/hw_slash_q), 중간보스 덮개의 멈춤 정리(fieldgen · butterfly pause)
+# 큰 제목이 끝나는 틱(1 → 0)에는 F5 조준점을 바로 다시 보내게 한다(ride_tick · sel_xhair 의 10틱 셈 #xh view 를 9 로: 같은 틱의 뒤쪽에서
+# 0 이 되어 view/xhair). 패링 · 닷지 덮개가 끝날 때마다 조준점이 최대 9틱 늦게 돌아오던 것을 없앤다(리뷰 A-09)
+execute if score @s vBig matches 1 run scoreboard players set #xh view 9
 execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1
 # 지도 클릭 잠금/길게 누름 판정
 execute if score @s vMapH matches 1.. run scoreboard players remove @s vMapH 1

@@ -1,0 +1,58 @@
+A-03 run 1 (fixed-UUID mannequin with the ghost NBT; per tick after rlk:tick): t sel(@e sees it) ex(uuid exists) cb DeathTime Glowing Pos
+  t 0 sel 1 ex 1 cb 8 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 1 sel 1 ex 1 cb 7 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 2 sel 1 ex 1 cb 6 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 3 sel 1 ex 1 cb 5 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 4 sel 1 ex 1 cb 4 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 5 sel 1 ex 1 cb 3 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 6 sel 1 ex 1 cb 2 dt 0 glow 1 pos [8.5, 120.0, 0.5]
+  t 7 sel 1 ex 1 cb 1 dt 0 glow None pos [1000000.5, 400.0, 1000000.5]
+  t 8 sel 0 ex 1 cb 0 dt 0 glow None pos [1000000.5, 400.0, 1000000.5]
+  t 9 sel 0 ex 1 cb 0 dt 1 glow None pos [1000000.5, 400.0, 1000000.5]
+  t10 sel 0 ex 1 cb 0 dt 2 glow None pos [1000000.5, 400.0, 1000000.5]
+  t11 sel 0 ex 1 cb 0 dt 3 glow None pos [1000000.5, 400.0, 1000000.5]
+  t12 sel 0 ex 1 cb 0 dt 4 glow None pos [1000000.5, 400.0, 1000000.5]
+  t13 sel 0 ex 1 cb 0 dt 5 glow None pos [1000000.5, 400.0, 1000000.5]
+  t14 sel 0 ex 1 cb 0 dt 6 glow None pos [1000000.5, 400.0, 1000000.5]
+  t15 sel 0 ex 1 cb 0 dt 7 glow None pos [1000000.5, 400.0, 1000000.5]
+  t16 sel 0 ex 1 cb 0 dt 8 glow None pos [1000000.5, 400.0, 1000000.5]
+  t17 sel 0 ex 1 cb 0 dt 9 glow None pos [1000000.5, 400.0, 1000000.5]
+  t18 sel 0 ex 1 cb 0 dt 10 glow None pos [1000000.5, 400.0, 1000000.5]
+  t19 sel 0 ex 1 cb 0 dt 11 glow None pos [1000000.5, 400.0, 1000000.5]
+  t20 sel 0 ex 1 cb 0 dt 12 glow None pos [1000000.5, 400.0, 1000000.5]
+  t21 sel 0 ex 1 cb 0 dt 13 glow None pos [1000000.5, 400.0, 1000000.5]
+  t22 sel 0 ex 1 cb 0 dt 14 glow None pos [1000000.5, 400.0, 1000000.5]
+  t23 sel 0 ex 1 cb 0 dt 15 glow None pos [1000000.5, 400.0, 1000000.5]
+  t24 sel 0 ex 1 cb 0 dt 16 glow None pos [1000000.5, 400.0, 1000000.5]
+  t25 sel 0 ex 1 cb 0 dt 17 glow None pos [1000000.5, 400.0, 1000000.5]
+  t26 sel 0 ex 1 cb 0 dt 18 glow None pos [1000000.5, 400.0, 1000000.5]
+  t27 sel 0 ex 1 cb 0 dt 19 glow None pos [1000000.5, 400.0, 1000000.5]
+  t28 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t29 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t30 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t31 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t32 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t33 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t34 sel 0 ex 0 cb 0 dt 0 glow None pos None
+  t35 sel 0 ex 0 cb 0 dt 0 glow None pos None
+A-06: {'body_back': 1, 'ghost_rot': [135.0, 0.0], 'box_rot': [135.0, 0.0], 'ghost_pos': [4.5, 120.0, 0.5], 'red_team': 1}
+A-03 run 2 (the pack's own fx/pd ghost; per tick): t ghost-tagged, mannequins tagged rlk_cb_fx, mannequins within 32 b of the dodge start, Glowing, Pos, box
+  t 0 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 1
+  t 1 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 1
+  t 2 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 1
+  t 3 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 0
+  t 4 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 0
+  t 5 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 0
+  t 6 ghost 1 mann 1 near 1 glow 1 pos [4.5, 120.0, 0.5] box 0
+  t 7 ghost 0 mann 1 near 0 glow None pos [1000000.5, 400.0, 1000000.5] box 0
+  t 8 ghost 0 mann 0 near 0 glow None pos None box 0
+  t 9 ghost 0 mann 0 near 0 glow None pos None box 0
+  t10 ghost 0 mann 0 near 0 glow None pos None box 0
+  t11 ghost 0 mann 0 near 0 glow None pos None box 0
+  t12 ghost 0 mann 0 near 0 glow None pos None box 0
+  t13 ghost 0 mann 0 near 0 glow None pos None box 0
+A-07: {'dodged': 1, 'pdg': 1, 'dgKill': 511, 'box_later': 0, 'now': 508, 'now_later': 568, 'dgAt1': 508, 'dgAt0': 508, 'box0': 1, 'has_stamps': 0}
+A-02: {'dodges': 2, 'rcT_max': 40, 'fail_sound_ticks': 0}
+A-01: [(1, 1), (2, 1), (3, 7), (4, 7), (5, 7), (6, 7), (8, 7), (12, 7)]
+left at the end: any mannequin / any rlk_dgo box: ['failed', 'failed'] (failed = none left)
+tick: ['Average time per tick: 1.3ms (Target: 50.0ms)']

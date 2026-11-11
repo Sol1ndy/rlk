@@ -221,13 +221,15 @@ def write_dp():
         files[f't_{g}'] = [f'# Internal: the {g} overlay.', f'title @a[tag=player] title {title_comp(g)}']
     files['star'] = [
         '# {s}: the gold-white starburst (rlk:cb star, 0.8 b at scale 1) as a billboard text_display here (tags rlk_cb_fx',
-        '# rlk_cb_star; aged by player/def/fx/tick: it grows 2 t, then shrinks away 2 t).',
+        '# rlk_cb_star; aged by player/def/fx/tick, the first time in the tick it is made, hence cb 6: shown 1 t, it grows 2 t,',
+        '# then shrinks away 2 t).',
         '$' + text_display('star', 'rlk_cb_star', '$(s)'),
-        'scoreboard players set @e[type=minecraft:text_display,tag=rlk_cb_new] cb 5',
+        'scoreboard players set @e[type=minecraft:text_display,tag=rlk_cb_new] cb 6',
         'tag @e[type=minecraft:text_display,tag=rlk_cb_new] remove rlk_cb_new']
     files['glint'] = [
         '# The unparriable warning glint (rlk:cb glint: a gold sphere-ring with a long horizontal flare, 1.4 b x 7 b) as a',
-        '# billboard text_display here (tags rlk_cb_fx rlk_cb_glint; aged by player/def/fx/tick: bright 2 t, fading 4 t).',
+        '# billboard text_display here (tags rlk_cb_fx rlk_cb_glint; aged by player/def/fx/tick, the first time in the tick it is',
+        '# made: cb 6 = bright 2 t, fading 4 t).',
         text_display('glint', 'rlk_cb_glint', '1'),
         'scoreboard players set @e[type=minecraft:text_display,tag=rlk_cb_new] cb 6',
         'tag @e[type=minecraft:text_display,tag=rlk_cb_new] remove rlk_cb_new']
