@@ -8,4 +8,4 @@ kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_54]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_56] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_58] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
 tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_60] remove rlk_hr_trr
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_61,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.261f,1.3152f,0.0767f],left_rotation:[0.2061f,0.8822f,-0.2177f,0.3632f],scale:[0.173f,0.18f,2.1663f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_61,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.261f,1.3152f,0.0767f],left_rotation:[0.2061f,0.8822f,-0.2177f,0.3632f],scale:[0.173f,0.22f,2.1663f],right_rotation:[0f,0f,0f,1f]}}

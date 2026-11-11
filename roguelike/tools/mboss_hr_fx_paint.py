@@ -372,13 +372,14 @@ def paint_cue(a, b):
 # ---- round V (lane VB) / round W (lane WB; w_brief.md §2 WB): the blade's trail ---------------------------------------------------
 # All are neutral (white, tinted per hit) with a DARK rim: a tell must read on the pale straw grass and her white hat of the P1
 # field as well as on the crimson P2 field (review v C2; review w T3-08: round V's white-gold line was lost on the P1 wheat).
-SW_CORE = 0.70                         # the band / ribbon's bright core: this share of the card's width (blade.RIB_CORE)
+SW_CORE = 0.56                         # the band / ribbon's bright core: this share of the card's width (blade.RIB_CORE); ink
+#                                        on both sides of it (each 0.18 of the width): it reads on the pale P1 wheat by its border
 SW_ARC_TAN = 0.5                       # the sector's edges: a = +-SW_ARC_TAN b (blade.ARC_TAN)
 SW_ALPHA = (1.0, 0.62, 0.3)            # the fading frames
 # the swept piece (sector / strip): a bright ribbon along the tip's way (the outer RIBBON of the radius / the strip's length),
 # ink at its outer edge, and only a faint fill inward (review w T3-11: round V's full translucent sheet covered up to 45 % of
 # the frame when she cut near the camera)
-SW_RIB_IN, SW_RIB_OUT, SW_FILL_IN = 0.70, 0.93, 0.45
+SW_RIB_IN, SW_RIB_OUT, SW_FILL_IN, SW_INK_W = 0.68, 0.92, 0.42, 0.06   # ink at both edges of the ribbon
 
 
 def make_sw_rib(k):
@@ -391,9 +392,9 @@ def make_sw_rib(k):
         x = abs(a) * 2
         if x <= SW_CORE:
             return WHITE + (A,)
-        if x <= 0.9:
+        if x <= 0.92:
             return SW_INK + (0.9 * A,)
-        return SW_INK + (0.9 * A * (1 - smooth(0.9, 1.0, x)),)
+        return SW_INK + (0.9 * A * (1 - smooth(0.92, 1.0, x)),)
     return paint
 
 
@@ -405,7 +406,9 @@ def _swept(r, A):
         return SW_INK + (0.9 * A,)
     if r >= SW_RIB_IN:
         return WHITE + (A,)
-    t = (r - SW_FILL_IN) / (SW_RIB_IN - SW_FILL_IN)
+    if r >= SW_RIB_IN - SW_INK_W:
+        return SW_INK + (0.8 * A,)
+    t = (r - SW_FILL_IN) / (SW_RIB_IN - SW_INK_W - SW_FILL_IN)
     return mix(hexc('#D8D8D8'), WHITE, t) + (A * (0.12 + 0.3 * t),)
 
 

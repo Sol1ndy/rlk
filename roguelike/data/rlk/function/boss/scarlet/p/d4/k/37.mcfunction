@@ -7,4 +7,4 @@ execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4b1] run data merge ent
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_31] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_33] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
 tag @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_35] remove rlk_hr_trr
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_36,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4096f,1.8796f,0.1395f],left_rotation:[-0.388f,-0.6733f,-0.5453f,0.3142f],scale:[0.3277f,0.18f,1.435f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_36,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4096f,1.8796f,0.1395f],left_rotation:[-0.388f,-0.6733f,-0.5453f,0.3142f],scale:[0.3277f,0.22f,1.435f],right_rotation:[0f,0f,0f,1f]}}

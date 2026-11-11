@@ -1,3 +1,3 @@
 # TRI pattern tick 4
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3183f,0.8832f,-0.0933f],left_rotation:[-0.1207f,0.1381f,0.017f,0.9829f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_3,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3129f,0.8937f,-0.0863f],left_rotation:[-0.0422f,0.1349f,0.3923f,0.9089f],scale:[0.2784f,0.18f,1.6208f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_3,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3129f,0.8937f,-0.0863f],left_rotation:[-0.0422f,0.1349f,0.3923f,0.9089f],scale:[0.2784f,0.22f,1.6208f],right_rotation:[0f,0f,0f,1f]}}

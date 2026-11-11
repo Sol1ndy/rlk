@@ -66,10 +66,24 @@ def _select(self, sel, ctx):
 
 
 PV.Scene.select = _select
+_floor0 = PV.floor_quad
+
+
+def _floor(assets, opts, view=None):
+    """(the preview caches its one floor texture by name: a name per colour, so the fields really differ)"""
+    V, UV, T_, TI, SG = _floor0(assets, opts, view)
+    key = 'rlk:__floor_' + opts.floor.replace(',', '_') + '__'
+    PV.SPECIAL_TEXTURES[key] = (*(int(v) for v in opts.floor.split(',')), 255)
+    return V, UV, np.full(len(T_), assets.texture(key)), TI, SG
+
+
+PV.floor_quad = _floor
 
 FOV, CAM_D, PIVOT_Y, CHEST_Y = 90.0, 3.5, 2.3, 1.2          # round W: FOV 90 (the user's)
 FLOOR_Y = 201.0                     # the hr_field arena floor (api.CY)
 FIELD = {'p1': dict(floor='96,84,92', bg_top=(34, 26, 48), bg_bottom=(70, 58, 80), grass=(214, 196, 146)),
+         # round W (review w T3-08): the P1 field where her trail stands over the pale straw wheat (the worst case for a pale trail)
+         'p1w': dict(floor='214,196,146', bg_top=(34, 26, 48), bg_bottom=(70, 58, 80), grass=(214, 196, 146)),
          'p2': dict(floor='112,26,34', bg_top=(60, 12, 20), bg_bottom=(120, 30, 40), grass=(150, 30, 40))}
 HAT = (236, 233, 244)
 
@@ -391,7 +405,7 @@ def cmd_trail(st, a):
     todo = TRAIL_HITS if not a.clips else [x for x in TRAIL_HITS if x[0] in a.clips.split(',')]
     for clip, ev in todo:
         for d in (4.0, 7.0, 10.0):
-            for fld in ('p1', 'p2'):
+            for fld in ('p1', 'p1w', 'p2'):
                 r = measure_trail(st, clip, ev, d, fld)
                 rows.append(r)
                 print(f"{clip:7s} {ev:5s} D{d:<4g} {fld} " + ' | '.join(

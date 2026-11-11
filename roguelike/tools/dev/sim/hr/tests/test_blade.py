@@ -360,9 +360,9 @@ def check_trail(lab, key, scen, hits, wind_from=None):
         xf = c.keys[-1][2]
         wall = xf[2][1] * B.RIB_CORE
         if c.model.startswith('sw_fan'):
-            chord, ribbon = xf[2][0], 0.23 * xf[2][2]
+            chord, ribbon = xf[2][0], B.RIBBON * xf[2][2]
         else:
-            chord, ribbon = xf[2][0], 0.23 * xf[2][2]
+            chord, ribbon = xf[2][0], B.RIBBON * xf[2][2]
         if min(wall, chord, ribbon) < MIN_THICK - 1e-6:
             thin.append((c.t, round(wall, 3), round(chord, 3), round(ribbon, 3)))
     check(not thin, f'{lab}: every piece\'s rim wall, chord and bright ribbon >= {MIN_THICK} b', thin[:3])

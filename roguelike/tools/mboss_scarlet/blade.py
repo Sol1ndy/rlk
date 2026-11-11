@@ -282,8 +282,9 @@ RIDE_T = 2                    # t: a piece rides her model from its summon to it
 LAG = 1                       # t: the sweep t -> t + 1 opens on tick t + 1, one tick behind the blade (a planar piece cannot follow the
 #                               client's curved interpolation of a fast cut within the tick without running ahead of it somewhere)
 W_BAND = 0.26                 # b: the band on the blade (its bright core RIB_CORE x that)
-RIB_CORE = 0.70               # the bright share of a sw_rib / sw_band card's width, of a rim wall's height
-WALL, WALL_HOT = 0.18, 0.26   # b: the rim wall of a piece (the trail seen edge-on); a swing's pieces
+RIB_CORE = 0.56               # the bright share of a sw_rib / sw_band card's width, of a rim wall's height (ink on both sides)
+RIBBON = 0.24                 # the bright ribbon of a swept piece: this share of its length from the blade's base (ink on both sides)
+WALL, WALL_HOT = 0.22, 0.30   # b: the rim wall of a piece (the trail seen edge-on); a swing's pieces
 RIB_W = 0.30                  # b: a body ribbon's width
 RIB_LIFE = 6                  # t: a ribbon is gone this long after its last growth
 WAVE_W, WAVE_LIFE = 0.30, 4
@@ -454,7 +455,7 @@ def sweep(sh, t, wall=WALL):
                 beta = angle(sub(ta, q), sub(tb, q)) / 2
                 r = (ra + rb) / 2
                 # (its chord and its bright ribbon - the outer 23 % of the wedge, the sprite - at least MIN_THICK)
-                if 2 * r * math.sin(math.radians(beta)) >= MIN_THICK and 0.23 * r * math.cos(math.radians(beta)) >= MIN_THICK:
+                if 2 * r * math.sin(math.radians(beta)) >= MIN_THICK and RIBBON * r * math.cos(math.radians(beta)) >= MIN_THICK:
                     sx, sz = _fan_scale(r, beta)
                     y = nv
                     x = cross(y, z)
@@ -476,7 +477,7 @@ def sweep(sh, t, wall=WALL):
             v = sub(mb, ma)
             vp = sub(v, mul(u, dot(v, u)))
             w = norm(vp)
-            if w >= MIN_THICK and 0.23 * (norm(sub(ta, ba)) + norm(sub(tb, bb))) / 2 >= MIN_THICK:
+            if w >= MIN_THICK and RIBBON * (norm(sub(ta, ba)) + norm(sub(tb, bb))) / 2 >= MIN_THICK:
                 xw = mul(vp, 1 / w)
                 y = cross(u, xw)
                 ln = (norm(sub(ta, ba)) + norm(sub(tb, bb))) / 2
