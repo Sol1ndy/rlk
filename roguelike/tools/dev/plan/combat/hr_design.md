@@ -642,6 +642,27 @@ The probes learn the new defences. Agents: **walker** (melee, never presses F or
 Knobs, in this order: weights / cooldowns, recovery (P1 8-16, P2 10-16, ± 4), `GAUGE` rates, tiers ± 20 %, `hp` ± 15 %,
 G2's cut count (9-11), `PP_FLINCH` 0-10. The item (`sword_hwamu`) and the buff are not re-tuned here (PLAN §7 unchanged).
 
+**Restated by HB, 11-11 (lead-approved: the HB brief and the lead's message after review H-A).** The table above stays as
+written; where these lines differ, they are the targets the balance pass measures (`hrfair2.py`, `hb_progress.md`):
+- **Every target per seed.** Each row passes on seed 11, 22 and 33 separately and pooled (the kill runs on all three seeds).
+- **T1 / T2: the 타키 reference is measured by the same tool.** hrfair 1.x's 124.0 %/min cannot be reproduced: its walker
+  dodged on reaction, hrfair 2.0's never defends. `hrfair2.py base` fights 타키's whole fight with the same walker on the same
+  tree (its rift and intro as in the game, real HP at L16, seeds 11 / 22 / 33): **232.3 %/min** (230.3 / 228.6 / 238.0). Bands
+  unchanged: T1 = P1 walker ÷ 232.3 in 1.00-1.15, T2 = P2 walker ÷ 232.3 ≤ 1.25.
+- **T3: the Guardian standing re-measured** by the same tool (azsim's plaza, Lv15 vs L15, 3 600 t × 3 seeds): **165.1 %/min**
+  (the recorded 164.0 is reproduced). Band unchanged (≤ 1.8).
+- **T6 σ 1 and T12: a share of the best the window allows.** A 3-tick window around a press aimed at h − 1 with a normal
+  error σ 1 t holds P(|e| ≤ 1) = 86.6 % of presses, and a seed has only ~50-90 timed inputs (± 4 % by chance alone). The
+  target is now: of the timed inputs whose own error fell inside the window, **≥ 95 %** end as a perfect parry (T6) / a
+  perfect dodge (T12) — what the fight (the F lock, the whiff streak, the 18 / 12 t dodge cooldown, the hit timing) takes away
+  from the window's best is at most 5 %. The raw rate is reported next to the 86.6 % ceiling. T6's cleared rate (σ 0 ≥ 95 %,
+  σ 1 ≥ 90 %) is unchanged.
+- **T7m (new, the lead after review H-A): a metronome F** — pressed every p ticks from any phase k (p 8..30, every k, no cue
+  read) — clears **neither gauntlet (0 %)**. The gauntlet timing is fix lane HF-A's (`A8_SCRIPT` / `A13_SCRIPT`); G2's cut
+  count is not a balance knob for now.
+- **The input rules are the game's**: hrsim's world now runs the real `player/f_key` and `dashCool` (review H-A), checked by
+  `tests/test_input_hr.py`.
+
 ---------------------------------------------------------------------------------------------------------------------
 
 ## 7. Open questions (each has the default the build proceeds with)

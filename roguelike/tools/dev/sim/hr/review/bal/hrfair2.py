@@ -16,12 +16,20 @@ Agents (all but `stand` walk to 2.5 b at 0.216 b/t and hit her every 10 t within
   mixed s     parries P hits, perfect-dodges N hits with the same error
   dodger s    a dodge at h - 1 +- s for every hit                   masher   F every 4 t
   sloppy      F at h - 1 +- 6 t (uniform) for every hit
+  metro p/k   (gauntlets, HB) F every p ticks from the gauntlet's tick k (0 <= k < p), reading no cue: every p 8..30, every k
 Gauntlet agents stand, or walk 0.22 b/t outward / sideways / inward, and act on every cut.
 
-Targets T1-T13: hr_design §6.4. T1 / T2 divide by 타키's whole-fight melee walker and T3 by the Guardian standing as
-RECORDED by hrfair 1.x (review/bal/base_tachy.log: 124.0 and 164.0 %/min): neither boss has a suite in the repository any
-more, so "the same tool" cannot be re-run; the old walker also dodged on reaction, this one never does - read T1-T3 as
-indicative until both are re-measured with one tool.
+Targets T1-T13: hr_design §6.4. H1 divided T1 / T2 by 타키's whole-fight melee walker and T3 by the Guardian standing as
+RECORDED by hrfair 1.x (review/bal/base_tachy.log: 124.0 and 164.0 %/min; the old walker dodged on reaction, this one never
+does); HB measures both references with this tool (below) and falls back to the recorded numbers only without `base` runs.
+
+HB (balance lane, 11-11): (1) the player's inputs as the game takes them: hrsim.world_h1 now drives the REAL player/f_key
+(player/def/press / press_re / par_use: every lock constant of load.mcfunction) and the REAL dashCool (#dashCoolT, the
+refund of player/def/dg_refund) instead of its own model (review H-A; tests/test_input_hr.py checks it). (2) 타키 and the Guardian are
+re-measured by THIS tool (`base` runs: 타키's whole fight with the same walker, real HP at L16, its rift and intro as
+hrsim.special_fight; the Guardian standing in azsim's plaza, Lv15 vs L15): T1 / T2 / T3 divide by those (T1-T3 as hr_design
+§6.4 restated 11-11). (3) Every target per seed (11 / 22 / 33) and pooled; the kill runs on all three seeds; T6 sigma 1 and
+T12 as a fraction of the 3-tick window's ceiling at the agent's timing error.
 """
 import argparse
 import json
@@ -62,6 +70,7 @@ class Agent:
         self.hits = {}                # world tick -> 'P' / 'N' of the hits scheduled (the pattern's table)
         self.acted = {}               # world tick of a hit -> ('F' | 'D', the input tick)
         self.gt0 = None
+        self.m0, self.period, self.phase = s.t, 1, 0      # the metronome: F at m0 + phase + n x period
 
     def err(self):
         if self.kind == 'sloppy':
@@ -71,7 +80,7 @@ class Agent:
     def plan(self, h, par):
         """An input for the hit at world tick h."""
         s = self.s
-        act = {'walker': None, 'stand': None, 'masher': None, 'parrier': 'F' if par == 'P' else None,
+        act = {'walker': None, 'stand': None, 'masher': None, 'metro': None, 'parrier': 'F' if par == 'P' else None,
                'mixed': 'F' if par == 'P' else 'D', 'dodger': 'D', 'sloppy': 'F'}[self.kind]
         self.hits[h] = par
         if act is None or h in self.acted:
@@ -126,6 +135,8 @@ class Agent:
         self.watch()
         if self.kind == 'masher' and (s.t + 1) % 4 == 0:
             s.press(at=s.t + 1)
+        if self.kind == 'metro' and (s.t + 1 - self.m0) % self.period == self.phase:
+            s.press(at=s.t + 1)
         b, pl = H.body_of(s), s.player()
         if b is None:
             return
@@ -167,11 +178,15 @@ class Meter:
         self.loss = []
         self.grog, self.grog_on = 0, False
         self.pats, self.last_pat = [], 0
+        self.loss_by, self.prev_pat = {}, 0          # HP lost per pattern id (the running one, else the one before)
 
     def tick(self, heal=True):
         s = self.s
         cur = s.sc(self.pid, 'curHealth') or 0
         self.loss.append(max(0, self.maxhp - cur))
+        if self.loss[-1]:
+            k = (H.hr(s, '#pat') or 0) or self.prev_pat
+            self.loss_by[k] = self.loss_by.get(k, 0) + self.loss[-1]
         if heal:
             H.heal(s)
         g = (H.bal(s, 'grgT') or 0) > 0
@@ -182,6 +197,7 @@ class Meter:
         if p != self.last_pat:
             if p:
                 self.pats.append((s.t, p))
+                self.prev_pat = p
             self.last_pat = p
 
     def intake(self):
@@ -195,10 +211,19 @@ class Meter:
         return 100.0 * best / self.maxhp
 
 
+def hp_of(dp):
+    """Her registry hp (the knob of hr_design §6.4; 260 at H1)."""
+    api, _S = api_of(dp)
+    return api.BOSS['hp']
+
+
 def setup(dp, seed, level=15):
-    s, pl = H.setup_h1(dp, seed=seed, lv=level, hp=260 * LV_HP(level + 1) // 100, player_level=level)
+    s, pl = H.setup_h1(dp, seed=seed, lv=level, hp=hp_of(dp) * LV_HP(level + 1) // 100, player_level=level)
     assert H.fight_sc(s)
     return s, pl
+
+
+world = H.world_h1      # the inputs through the REAL player/f_key and dashCool (hrsim, HB 11-11)
 
 
 def hit_stats(s, ag, t0):
@@ -209,10 +234,43 @@ def hit_stats(s, ag, t0):
     d_ok = {t for t, ok in s.d_log if ok}
     timed_n = [j for j in N if ag.acted.get(j['t'], ('', -1))[0] == 'D' and ag.acted[j['t']][1] in d_ok]
     timed_p = [j for j in P if ag.acted.get(j['t'], ('', -1))[0] == 'F']
+    win = lambda j: abs(ag.acted[j['t']][1] - (j['t'] - 1)) <= 1     # noqa: E731  the input's realized error inside the 3-t window
+    timed_n_w = [j for j in timed_n if win(j)]
+    timed_p_w = [j for j in timed_p if win(j)]
     return dict(p=len(P), p_pp=sum(j['parT'] == 3 for j in P), p_t2=sum(j['parT'] == 2 for j in P), p_t1=sum(j['parT'] == 1 for j in P),
                 n=len(N), n_pd=sum(j['pdg'] == 1 for j in N), timed_n=len(timed_n), timed_n_pd=sum(j['pdg'] == 1 for j in timed_n),
                 timed_p=len(timed_p), timed_p_pp=sum(j['parT'] == 3 for j in timed_p),
+                timed_n_w=len(timed_n_w), timed_n_w_pd=sum(j['pdg'] == 1 for j in timed_n_w),
+                timed_p_w=len(timed_p_w), timed_p_w_pp=sum(j['parT'] == 3 for j in timed_p_w),
                 f=len(s.f_log), f_refused=sum(not ok for _t, ok in s.f_log), d=len(s.d_log), d_refused=sum(not ok for _t, ok in s.d_log))
+
+
+def pmix(S, pats):
+    """How many times each pattern key started."""
+    key_of = {v: k for k, v in S.TID.items()}
+    out = {}
+    for _t, p in pats:
+        k = key_of.get(p, str(p))
+        out[k] = out.get(k, 0) + 1
+    return out
+
+
+def pstat(S, m, s, t0):
+    """Per pattern key: [% max HP lost, P hits judged, of them perfect-parried, N hits judged, of them perfect-dodged]."""
+    key_of = {v: k for k, v in S.TID.items()}
+    out = {}
+    for pid, v in m.loss_by.items():
+        out.setdefault(key_of.get(pid, str(pid)), [0.0, 0, 0, 0, 0])[0] += 100.0 * v / m.maxhp
+    for j in s.judged:
+        if j['t'] > t0:
+            r = out.setdefault(key_of.get(j['pat'], str(j['pat'])), [0.0, 0, 0, 0, 0])
+            if j['np']:
+                r[3] += 1
+                r[4] += j['pdg'] == 1
+            else:
+                r[1] += 1
+                r[2] += j['parT'] == 3
+    return out
 
 
 def run_phase(job):
@@ -233,7 +291,7 @@ def run_phase(job):
     t0 = s.t
     for _ in range(ticks):
         ag.step()
-        H.world_h1(s)
+        world(s)
         m.tick()
         if (s.sc(bid, 'mhpC') or 0) < lo:
             s.setsc(bid, 'mhpC', back)
@@ -241,7 +299,7 @@ def run_phase(job):
     a6max = max([sum(1 for u in a6 if t <= u < t + 400) for t in a6] or [0])
     mins = ticks / 1200.0
     return dict(job, intake=m.intake(), worst=m.worst(), grog=m.grog / mins, ult=sum(1 for t, p in m.pats if p == S.TID['ult']) / mins,
-                a6max=a6max, pats=len(m.pats), **hit_stats(s, ag, t0))
+                a6max=a6max, pats=len(m.pats), pmix=pmix(S, m.pats), pstat=pstat(S, m, s, t0), **hit_stats(s, ag, t0))
 
 
 def run_gauntlet(job):
@@ -253,6 +311,8 @@ def run_gauntlet(job):
     s.revive = 0
     t0, jt = s.t, api.JUDGE_T[g]
     ag = Agent(s, api, S, kind, sigma, random.Random(seed * 104729 + int(sigma * 10) + len(motion)), attack=False, move=False)
+    if kind == 'metro':
+        ag.m0, ag.period, ag.phase = t0, job['period'], job['k']
     m = Meter(s)
     f0 = len(s.f_log)
     while s.t < t0 + jt - 1:
@@ -265,11 +325,11 @@ def run_gauntlet(job):
             vx, vz = {'in': (ux, uz), 'out': (-ux, -uz), 'side': (-uz, ux)}[motion]
             if motion != 'out' or d < api.WALK - 1.0:
                 H.place_player(s, p.pos[0] + vx * 0.22, p.pos[2] + vz * 0.22)
-        H.world_h1(s)
+        world(s)
         m.tick()
     cuts_dmg = 100.0 * sum(m.loss) / m.maxhp
     gau = H.hr(s, '#gau') or 0
-    H.world_h1(s)
+    world(s)
     cleared = (H.hr(s, '#sqn') or 0) == S.SEQ_ID['repel']
     presses = sum(1 for t, ok in s.f_log[f0:] if ok)
     return dict(job, cleared=cleared, segs=(api.GAUGE['max'] - gau) // api.GAUGE['seg'], presses=presses,
@@ -293,7 +353,7 @@ def run_kill(job):
         if (H.mb(s, '#mbSt') or 0) == 2 or H.body_of(s) is None:
             break
         (gag if ph in (PH['a8'], PH['a13']) else ag).step()
-        H.world_h1(s)
+        world(s)
         m.tick()
         ph = H.hr(s, '#ph')
         per[ph] = per.get(ph, 0) + 1
@@ -327,53 +387,91 @@ def run_chain(job):
             break
         ag.step()
         H.heal(s)
-        H.world_h1(s)
+        world(s)
     st = hit_stats(s, ag, t0)
     want = sum(1 for i, r in enumerate(api.HITS[key]) if r[6] == 'P' and api.HIT_PH.get(key, {}).get(i, phase) == phase)
     return dict(job, want=want, **st)
 
 
+def run_base(job):
+    """The references of T1-T3 measured by this tool (HB, 11-11): 타키's whole fight against the same walker (real HP at L16 =
+    its registry hp x LV_HP(16), its rift entered and its intro played as hrsim.special_fight, until it dies), or the
+    Guardian against the standing agent in azsim's plaza (Lv15 vs L15, 100000 HP, `ticks`). Intake over every tick from
+    the fight start (타키: its transitions included, as the README figure T1 / T2 were written against)."""
+    dp, boss, kind, seed = job['dp'], job['boss'], job['kind'], job['seed']
+    api, S = api_of(dp)
+    if boss == 'tachy':
+        hp = next(b for b in api.REG['boss'] if b['id'] == 'tachy')['hp']
+        s, pl = H.setup(dp, seed=seed, lv=15, hp=hp * LV_HP(16) // 100, player_level=15)
+        z, a, ok = H.special_fight(s, 'tachy')
+        step = H.world
+    else:
+        s, zone, pl = H.A.setup(force=1, lv=15, hp=100000, seed=seed, player_level=15, dp=dp)
+        ok = H.A.to_fight(s, zone)
+        step = H.A.world
+    assert ok, f'{boss}: the fight did not start'
+    ag = Agent(s, api, S, kind, 0, random.Random(seed * 7919))
+    m = Meter(s)
+    for _ in range(job['ticks']):
+        if (H.mb(s, '#mbSt') or 0) == 2 or H.body_of(s) is None:
+            break
+        ag.step()
+        step(s)
+        m.tick()
+    killed = (H.mb(s, '#mbSt') or 0) == 2 or H.body_of(s) is None
+    return dict(job, intake=m.intake(), worst=m.worst(), ticks_run=len(m.loss), killed=killed)
+
+
 def run(job):
     try:
-        return {'phase': run_phase, 'g': run_gauntlet, 'kill': run_kill, 'chain': run_chain}[job['mode']](job)
+        return {'phase': run_phase, 'g': run_gauntlet, 'kill': run_kill, 'chain': run_chain, 'base': run_base}[job['mode']](job)
     except Exception as e:      # noqa: BLE001
         import traceback
         return dict(job, error=repr(e), tb=traceback.format_exc()[-1500:])
 
 
-def jobs_of(dp, quick, only):
+AGENTS = (('walker', 0), ('stand', 0), ('parrier', 0), ('parrier', 1.5), ('parrier', 3), ('mixed', 0), ('dodger', 1), ('masher', 0))
+
+
+def jobs_of(dp, quick, only, seeds=None, agents=None):
     J = []
-    seeds = SEEDS[:1] if quick else SEEDS
+    seeds = seeds or (SEEDS[:1] if quick else SEEDS)
     ticks = 1200 if quick else 3600
-    if 'p1' in only or 'p2' in only:
-        for phase in (1, 2):
-            if f'p{phase}' not in only:
-                continue
-            for kind, sigma in (('walker', 0), ('stand', 0), ('parrier', 0), ('parrier', 1.5), ('parrier', 3), ('mixed', 0), ('dodger', 1),
-                                ('masher', 0)):
-                for seed in seeds:
-                    J.append(dict(mode='phase', dp=dp, phase=phase, kind=kind, sigma=sigma, seed=seed, ticks=ticks))
+    for phase in (1, 2):
+        if f'p{phase}' not in only:
+            continue
+        for kind, sigma in agents or AGENTS:
+            for seed in seeds:
+                J.append(dict(mode='phase', dp=dp, phase=phase, kind=kind, sigma=sigma, seed=seed, ticks=ticks))
     if 'g' in only:
         for g in ('a8', 'a13'):
-            J.append(dict(mode='g', dp=dp, g=g, kind='stand', sigma=0, seed=11, motion='stand'))
-            for sigma in (0, 1):
-                for motion in ('stand', 'out', 'side', 'in'):
-                    for seed in seeds:
-                        J.append(dict(mode='g', dp=dp, g=g, kind='parrier', sigma=sigma, seed=seed, motion=motion))
-            for seed in range(1, 4 if quick else 13):
-                J.append(dict(mode='g', dp=dp, g=g, kind='sloppy', sigma=0, seed=seed, motion='stand'))
             for seed in seeds:
+                J.append(dict(mode='g', dp=dp, g=g, kind='stand', sigma=0, seed=seed, motion='stand'))
+                for sigma in (0, 1):
+                    for motion in ('stand', 'out', 'side', 'in'):
+                        J.append(dict(mode='g', dp=dp, g=g, kind='parrier', sigma=sigma, seed=seed, motion=motion))
+                for k in range(1 if quick else 4):        # sloppy: 4 runs per seed and gauntlet (grp = the seed)
+                    J.append(dict(mode='g', dp=dp, g=g, kind='sloppy', sigma=0, seed=seed * 100 + k, grp=seed, motion='stand'))
                 J.append(dict(mode='g', dp=dp, g=g, kind='masher', sigma=0, seed=seed, motion='stand'))
                 J.append(dict(mode='g', dp=dp, g=g, kind='dodger', sigma=0, seed=seed, motion='stand'))
+    if 'metro' in only:       # review H-A: a metronome F, every period 8..30 and every phase; no seed (nothing random in it)
+        for g in ('a8', 'a13'):
+            for per in range(8, 31):
+                for k in range(per):
+                    J.append(dict(mode='g', dp=dp, g=g, kind='metro', sigma=0, seed=0, period=per, k=k, motion='stand'))
     if 'chain' in only:
         for key in CHAIN_AT:
             for phase in ((2,) if key in ('mx', 'nb', 'q') else (1, 2)):
                 J.append(dict(mode='chain', dp=dp, key=key, phase=phase))
     if 'kill' in only:
-        for level in ((15,) if quick else (5, 10, 15)):
-            J.append(dict(mode='kill', dp=dp, kind='walker', sigma=0, seed=11, level=level))
-        for seed in seeds[:1 if quick else 2]:
+        for seed in seeds:
+            for level in ((15,) if quick else (5, 10, 15)):
+                J.append(dict(mode='kill', dp=dp, kind='walker', sigma=0, seed=seed, level=level))
             J.append(dict(mode='kill', dp=dp, kind='parrier', sigma=1.5, seed=seed, level=15))
+    if 'base' in only:
+        for seed in seeds:
+            J.append(dict(mode='base', dp=dp, boss='tachy', kind='walker', sigma=0, seed=seed, ticks=12000))
+            J.append(dict(mode='base', dp=dp, boss='guardian', kind='stand', sigma=0, seed=seed, ticks=ticks))
     return J
 
 
@@ -382,85 +480,153 @@ def mean(xs):
     return sum(xs) / len(xs) if xs else float('nan')
 
 
-def table(res):
-    ph = lambda phase, kind, sigma=0: [r for r in res if r.get('mode') == 'phase' and r['phase'] == phase and r['kind'] == kind and r['sigma'] == sigma and 'error' not in r]   # noqa: E731
-    gz = lambda g, kind, sigma=0: [r for r in res if r.get('mode') == 'g' and r['g'] == g and r['kind'] == kind and r['sigma'] == sigma and 'error' not in r]   # noqa: E731
-    kl = lambda kind, level=None: [r for r in res if r.get('mode') == 'kill' and r['kind'] == kind and (level is None or r['level'] == level) and 'error' not in r]   # noqa: E731
+def ceiling(sigma, w=3):
+    """The share of presses aimed at h - 1 with a normal error sigma (rounded to ticks) that land in the w-tick perfect window
+    (p 0..w-1 = an error of -1..w-2 ticks): P(-1.5 < x < w - 1.5)."""
+    if not sigma:
+        return 1.0
+    cdf = lambda x: 0.5 * (1 + math.erf(x / (sigma * math.sqrt(2))))   # noqa: E731
+    return cdf(w - 1.5) - cdf(-1.5)
+
+
+# hr_design §6.4 as restated by HB (11-11): T6 sigma 1 and T12 as a share of the window's ceiling (pooled; per seed, with
+# ~90 judged inputs each, a looser floor for the sampling error); T1-T3 against references this tool measures (run_base).
+FRAC_POOLED, FRAC_SEED = 0.95, 0.90
+
+
+def rows_of(res, seed, base):
+    """The T1-T13 rows for the runs of one seed (None = all seeds pooled): [(id, what, value, band, ok | None)]."""
+    pooled = seed is None
+    ok_seed = lambda r: 'error' not in r and (pooled or r.get('grp', r.get('seed')) == seed)   # noqa: E731
+    R = [r for r in res if ok_seed(r)]
+    ph = lambda phase, kind, sigma=0: [r for r in R if r['mode'] == 'phase' and r['phase'] == phase and r['kind'] == kind and r['sigma'] == sigma]   # noqa: E731
+    gz = lambda g, kind, sigma=0: [r for r in R if r['mode'] == 'g' and r['g'] == g and r['kind'] == kind and r['sigma'] == sigma]   # noqa: E731
+    kl = lambda kind, level=None: [r for r in R if r['mode'] == 'kill' and r['kind'] == kind and (level is None or r['level'] == level)]   # noqa: E731
+    I = lambda phase, kind, sigma=0: mean(r['intake'] for r in ph(phase, kind, sigma))   # noqa: E731
     rows = []
 
     def row(tid, what, val, band, ok):
-        rows.append((tid, what, val, band, 'PASS' if ok else 'miss' if ok is not None else '-'))
-    I = lambda phase, kind, sigma=0: mean(r['intake'] for r in ph(phase, kind, sigma))   # noqa: E731
+        rows.append((tid, what, val, band, ok))
+    tk, gd = base
     w1, w2 = I(1, 'walker'), I(2, 'walker')
-    row('T1', 'P1 walker intake / 타키 whole (recorded 124.0 %/min)', f'{w1:.1f} %/min = {w1 / TACHY_WALKER:.2f} x', '1.00-1.15', 1.0 <= w1 / TACHY_WALKER <= 1.15)
+    row('T1', f'P1 walker intake / 타키 whole walker ({tk[1]} {tk[0]:.1f} %/min)', f'{w1:.1f} = {w1 / tk[0]:.2f} x', '1.00-1.15', 1.0 <= w1 / tk[0] <= 1.15)
     p3 = I(1, 'parrier', 3)
-    row('T1b', 'P1 parrier s3 intake / walker', f'{p3:.1f} %/min = {p3 / w1:.2f} x', '<= 0.60', p3 / w1 <= 0.60)
+    row('T1b', 'P1 parrier s3 intake / walker', f'{p3 / w1:.2f}', '<= 0.60', p3 / w1 <= 0.60)
     m0 = I(1, 'mixed')
-    row('T1c', 'P1 mixed s0 intake', f'{m0:.1f} %/min', '<= 5', m0 <= 5)
-    row('T2', 'P2 walker intake / 타키 whole', f'{w2:.1f} %/min = {w2 / TACHY_WALKER:.2f} x', '<= 1.25', w2 / TACHY_WALKER <= 1.25)
+    row('T1c', 'P1 mixed s0 intake %/min', f'{m0:.1f}', '<= 5', m0 <= 5)
+    row('T2', 'P2 walker intake / 타키 whole walker', f'{w2:.1f} = {w2 / tk[0]:.2f} x', '<= 1.25', w2 / tk[0] <= 1.25)
     st = max(I(1, 'stand'), I(2, 'stand'))
-    row('T3', 'standing max(P1, P2) / the Guardian standing (recorded 164.0)', f'{st:.1f} %/min = {st / GUARDIAN_STAND:.2f} x', '<= 1.8', st / GUARDIAN_STAND <= 1.8)
+    row('T3', f'standing max(P1, P2) / the Guardian standing ({gd[1]} {gd[0]:.1f})', f'{st:.1f} = {st / gd[0]:.2f} x', '<= 1.8', st / gd[0] <= 1.8)
     wr = max([r['worst'] for r in ph(1, 'walker') + ph(2, 'walker')] or [float('nan')])
-    row('T4', "walker's worst 40-t window", f'{wr:.1f} % max HP', '<= 40', wr <= 40)
+    row('T4', "walker's worst 40-t window % max HP", f'{wr:.1f}', '<= 40', wr <= 40)
     for tid, g, lim in (('T5', 'a8', 45), ('T5b', 'a13', 55)):
         v = mean(r['cuts_dmg'] for r in gz(g, 'stand'))
-        row(tid, f'every cut of {g} on a standing agent', f'{v:.1f} % max HP', f'<= {lim}', v <= lim)
-    for sigma, lim in ((0, 95), (1, 90)):
+        row(tid, f'every cut of {g} on a standing agent % max HP', f'{v:.1f}', f'<= {lim}', v <= lim)
+    for sigma in (0, 1):
         rs = gz('a8', 'parrier', sigma) + gz('a13', 'parrier', sigma)
         seg = 100.0 * sum(r['timed_p_pp'] for r in rs) / max(1, sum(r['timed_p'] for r in rs))
+        segw = 100.0 * sum(r.get('timed_p_w_pp', 0) for r in rs) / max(1, sum(r.get('timed_p_w', 0) for r in rs))
         clr = 100.0 * mean(r['cleared'] for r in rs)
-        row('T6', f'parrier s{sigma} in the gauntlets (stand / walk x3): perfect per timed F; cleared',
-            f'{seg:.1f} %; {clr:.0f} % of {len(rs)}', f'>= {lim} / >= {90 if sigma else 95}', seg >= lim and clr >= (90 if sigma else 95))
+        cl = 100.0 * ceiling(sigma)
+        row(f'T6s{sigma}', f'parrier s{sigma} gauntlets (stand / walk x3): perfect per timed F (ceiling {cl:.1f}) / per F inside the window; cleared',
+            f'{seg:.1f} ({seg / cl:.0%}) / {segw:.1f}; {clr:.0f} % of {len(rs)}', f'- / >= 95; >= {90 if sigma else 95}', segw >= 95 and clr >= (90 if sigma else 95))
     sl = gz('a8', 'sloppy') + gz('a13', 'sloppy')
     ma = gz('a8', 'masher') + gz('a13', 'masher')
     do = gz('a8', 'dodger') + gz('a13', 'dodger')
     v = (100 * mean(r['cleared'] for r in sl), 100 * mean(r['cleared'] for r in ma), 100 * mean(r['cleared'] for r in do), mean(r['cuts_dmg'] for r in do))
-    row('T7', 'sloppy clears; masher clears; dodger clears (its damage)', f'{v[0]:.0f} %; {v[1]:.0f} %; {v[2]:.0f} % ({v[3]:.1f} % HP)',
+    row('T7', 'sloppy clears; masher clears; dodger clears (its damage)', f'{v[0]:.0f}; {v[1]:.0f}; {v[2]:.0f} ({v[3]:.1f})',
         '<= 35; 0; 0 (0)', v[0] <= 35 and v[1] == 0 and v[2] == 0 and v[3] == 0)
-    a6 = max([r['a6max'] for r in res if r.get('mode') == 'phase' and 'error' not in r] or [0])
+    mt = [r for r in res if r.get('mode') == 'g' and r['kind'] == 'metro' and 'error' not in r]
+    if mt or any(r.get('kind') == 'metro' for r in res):
+        cl = {g: sorted({r['period'] for r in mt if r['g'] == g and r['cleared']}) for g in ('a8', 'a13')}
+        n = {g: (sum(r['cleared'] for r in mt if r['g'] == g), sum(1 for r in mt if r['g'] == g)) for g in ('a8', 'a13')}
+        row('T7m', 'metronome F (p 8-30, every phase) clears G1; G2 (periods that clear)',
+            f'{n["a8"][0]}/{n["a8"][1]} {cl["a8"]}; {n["a13"][0]}/{n["a13"][1]} {cl["a13"]}', '0; 0', n['a8'][0] == 0 and n['a13'][0] == 0)
+    a6 = max([r['a6max'] for r in R if r['mode'] == 'phase'] or [0])
     row('T8', 'A6 starts in any 400 t (all phase runs)', str(a6), '<= 1', a6 <= 1)
     ks = {lv: mean(r['fight_s'] for r in kl('walker', lv) if r['killed']) for lv in (5, 10, 15)}
-    row('T9', 'walker kill, fighting time Lv5 / 10 / 15 (cutscenes apart)', ' / '.join(f'{ks[lv]:.0f} s' for lv in (5, 10, 15)), '150-185',
+    row('T9', 'walker kill, fighting s, Lv5 / 10 / 15', ' / '.join(f'{ks[lv]:.0f}' for lv in (5, 10, 15)), '150-185',
         all(150 <= ks[lv] <= 185 for lv in (5, 10, 15)))
     kp = mean(r['fight_s'] for r in kl('parrier') if r['killed'])
-    row('T9b', 'parrier s1.5 kill, fighting time', f'{kp:.0f} s', '125-170', 125 <= kp <= 170)
+    row('T9b', 'parrier s1.5 kill, fighting s', f'{kp:.0f}', '125-170', 125 <= kp <= 170)
     gp, gw = mean(r['grog'] for r in ph(1, 'parrier', 1.5) + ph(2, 'parrier', 1.5)), mean(r['grog'] for r in ph(1, 'walker') + ph(2, 'walker'))
     row('T10', 'groggies / min: parrier s1.5; walker', f'{gp:.2f}; {gw:.2f}', '0.8-1.3; <= 0.4', 0.8 <= gp <= 1.3 and gw <= 0.4)
     uw, um = mean(r['ult'] for r in ph(1, 'walker') + ph(2, 'walker')), mean(r['ult'] for r in ph(1, 'mixed') + ph(2, 'mixed'))
     row('T11', 'U / min: walker; mixed s0', f'{uw:.2f}; {um:.2f}', '0.8-1.5; 0.6-1.0', 0.8 <= uw <= 1.5 and 0.6 <= um <= 1.0)
     dd = ph(1, 'dodger', 1) + ph(2, 'dodger', 1)
     v = 100.0 * sum(r['timed_n_pd'] for r in dd) / max(1, sum(r['timed_n'] for r in dd))
-    row('T12', 'dodger s1 avoids an N hit it times', f'{v:.1f} % of {sum(r["timed_n"] for r in dd)}', '>= 95', v >= 95)
+    vw = 100.0 * sum(r.get('timed_n_w_pd', 0) for r in dd) / max(1, sum(r.get('timed_n_w', 0) for r in dd))
+    cl = 100.0 * ceiling(1)
+    row('T12', f'dodger s1 avoids an N hit it times (ceiling {cl:.1f}) / of those inside the window',
+        f'{v:.1f} ({v / cl:.0%}) of {sum(r["timed_n"] for r in dd)} / {vw:.1f}', '- / >= 95', vw >= 95)
     ch = [r for r in res if r.get('mode') == 'chain' and 'error' not in r]
     got, want, ref = sum(r['p_pp'] for r in ch), sum(r['want'] for r in ch), sum(r['f_refused'] for r in ch)
-    row('T13', 'parrier s0, every chain in reach (F at h - 1): P hits perfect-parried; refused F',
-        f'{got} of {want} ({100.0 * got / max(1, want):.1f} %); {ref}', '100; 0', got == want and ref == 0)
+    row('T13', 'parrier s0, every chain in reach (F at h - 1): perfect; refused F (one run, no seed)',
+        f'{got} / {want}; {ref}', '100 %; 0', got == want and ref == 0)
     pp = ph(1, 'parrier', 0) + ph(2, 'parrier', 0)
     v = 100.0 * sum(r['timed_p_pp'] for r in pp) / max(1, sum(r['timed_p'] for r in pp))
-    row('T13f', '... in the free fight: of the P hits that found it; refused F (presses for hits that missed lock F)',
-        f'{v:.1f} % of {sum(r["timed_p"] for r in pp)}; {sum(r["f_refused"] for r in pp)} of {sum(r["f"] for r in pp)}', '(report)', None)
-    bad = [(r['key'], r['phase'], r['p_pp'], r['want'], r['f_refused']) for r in ch if r['p_pp'] != r['want'] or r['f_refused']]
-    if bad:
-        print('T13 chains not fully parried (key, phase, perfect, P hits, refused):', bad)
-    w = max(len(r[1]) for r in rows)
-    print(f'{"#":4} {"target":{w}}  {"measured":34} {"band":22} result')
-    for tid, what, val, band, ok in rows:
-        print(f'{tid:4} {what:{w}}  {val:34} {band:22} {ok}')
-    print('\nby agent (intake %/min, worst 40 t %, groggy / min, U / min, patterns):')
+    row('T13f', '... free fight: perfect of the P hits that found it; refused F of presses',
+        f'{v:.1f} of {sum(r["timed_p"] for r in pp)}; {sum(r["f_refused"] for r in pp)} / {sum(r["f"] for r in pp)}', '(report)', None)
+    return rows
+
+
+def base_of(res):
+    """(타키 whole walker %/min, label), (the Guardian standing %/min, label): measured here when the base runs are present,
+    else hrfair 1.x's recorded numbers."""
+    tk = [r['intake'] for r in res if r.get('mode') == 'base' and r['boss'] == 'tachy' and r.get('killed') and 'error' not in r]
+    gd = [r['intake'] for r in res if r.get('mode') == 'base' and r['boss'] == 'guardian' and 'error' not in r]
+    return ((mean(tk), 'measured') if tk else (TACHY_WALKER, 'recorded 1.x'), (mean(gd), 'measured') if gd else (GUARDIAN_STAND, 'recorded 1.x'))
+
+
+def table(res):
+    base = base_of(res)
+    seeds = sorted({r.get('grp', r.get('seed')) for r in res if r.get('mode') in ('phase', 'g', 'kill') and r.get('kind') != 'metro' and 'error' not in r})
+    cols = [rows_of(res, sd, base) for sd in seeds] + [rows_of(res, None, base)]
+    w = max(len(r[1]) for r in cols[-1])
+    print(f'{"#":5} {"target":{w}}  {"band":20} ' + ' '.join(f'{"s" + str(sd):24}' for sd in seeds) + f' {"pooled":30} result')
+    out = []
+    for i, (tid, what, val, band, ok) in enumerate(cols[-1]):
+        per = [c[i] for c in cols[:-1]]
+        oks = [p[4] for p in per] + [ok]
+        res_ = '-' if ok is None else 'PASS' if all(oks) else 'miss'
+        print(f'{tid:5} {what:{w}}  {band:20} ' + ' '.join(f'{(p[2] + (" *" if p[4] is False else "")):24}' for p in per) + f' {val:30} {res_}')
+        out.append(dict(id=tid, what=what, band=band, seeds={str(sd): [p[2], p[4]] for sd, p in zip(seeds, per)}, pooled=[val, ok], result=res_))
+    print('(* = this seed misses the band)')
+    tkr = [r for r in res if r.get('mode') == 'base' and 'error' not in r]
+    for r in tkr:
+        print(f'  base {r["boss"]} {r["kind"]} seed {r["seed"]}: intake {r["intake"]:.1f} %/min over {r["ticks_run"]} t, worst {r["worst"]:.1f} %, '
+              f'killed {r["killed"]}')
+    ph = lambda phase, kind, sigma=0: [r for r in res if r.get('mode') == 'phase' and r['phase'] == phase and r['kind'] == kind and r['sigma'] == sigma and 'error' not in r]   # noqa: E731
+    print('\nby agent, pooled (intake %/min, worst 40 t %, groggy / min, U / min, patterns / min, P hits (perfect), N hits (perfect dodge)):')
     for phase in (1, 2):
-        for kind, sigma in (('walker', 0), ('stand', 0), ('parrier', 0), ('parrier', 1.5), ('parrier', 3), ('mixed', 0), ('dodger', 1), ('masher', 0)):
+        for kind, sigma in AGENTS:
             rs = ph(phase, kind, sigma)
             if rs:
                 print(f'  P{phase} {kind:8} s{sigma:<3} intake {mean(r["intake"] for r in rs):6.1f}  worst {max(r["worst"] for r in rs):5.1f}  '
                       f'grog {mean(r["grog"] for r in rs):.2f}  U {mean(r["ult"] for r in rs):.2f}  pats/min {mean(r["pats"] / (r["ticks"] / 1200) for r in rs):.1f}  '
-                      f'P hits {sum(r["p"] for r in rs)} (pp {sum(r["p_pp"] for r in rs)})  N hits {sum(r["n"] for r in rs)} (pd {sum(r["n_pd"] for r in rs)})')
-    for r in kl('walker') + kl('parrier'):
+                      f'P hits {sum(r["p"] for r in rs)} (pp {sum(r["p_pp"] for r in rs)})  N hits {sum(r["n"] for r in rs)} (pd {sum(r["n_pd"] for r in rs)})  '
+                      f'F {sum(r["f"] for r in rs)} (refused {sum(r["f_refused"] for r in rs)})')
+    for phase in (1, 2):
+        for kind, sigma in (('walker', 0), ('parrier', 1.5)):
+            rs = [r for r in ph(phase, kind, sigma) if 'pmix' in r]
+            if rs:
+                tot = {}
+                for r in rs:
+                    for k, v in r['pmix'].items():
+                        tot[k] = tot.get(k, 0) + v
+                mins = sum(r['ticks'] for r in rs) / 1200.0
+                print(f'  P{phase} {kind} s{sigma} patterns / min: ' + ' '.join(f'{k} {v / mins:.2f}' for k, v in sorted(tot.items(), key=lambda kv: -kv[1])))
+    for r in sorted((r for r in res if r.get('mode') == 'kill' and 'error' not in r), key=lambda r: (r['kind'], r['level'], r['seed'])):
         print(f'  kill {r["kind"]} Lv{r["level"]} seed {r["seed"]}: killed {r["killed"]} fighting {r["fight_s"]:.0f} s, cutscenes {r["cut_s"]:.0f} s, '
               f'intake {r["intake"]:.0f} %/min, groggies {r["grog"]}')
+    ch = [r for r in res if r.get('mode') == 'chain' and 'error' not in r]
+    bad = [(r['key'], r['phase'], r['p_pp'], r['want'], r['f_refused']) for r in ch if r['p_pp'] != r['want'] or r['f_refused']]
+    if bad:
+        print('T13 chains not fully parried (key, phase, perfect, P hits, refused):', bad)
     err = [r for r in res if 'error' in r]
     if err:
         print(f'\n{len(err)} run(s) failed:', err[0]['error'], err[0].get('tb', '')[-600:])
-    return rows
+    return out
 
 
 def main():
@@ -469,10 +635,26 @@ def main():
     ap.add_argument('--out', default=str(HERE / 'out'))
     ap.add_argument('--jobs', type=int, default=4)
     ap.add_argument('--quick', action='store_true')
-    ap.add_argument('--only', default='p1,p2,g,kill,chain')
+    ap.add_argument('--only', default='p1,p2,g,kill,chain,base')
+    ap.add_argument('--seeds', default='')
+    ap.add_argument('--agents', default='', help='phase agents kind:sigma,... (default: all eight)')
+    ap.add_argument('--base', default='', help='a hrfair2.json whose base runs (타키 / the Guardian) are reused')
+    ap.add_argument('--table', default='', help='only print the table of an existing hrfair2.json (+ --base)')
     a = ap.parse_args()
-    J = jobs_of(str(Path(a.dp).resolve()), a.quick, set(a.only.split(',')))
-    print(f'hrfair 2.0: {len(J)} runs, {a.jobs} at a time', flush=True)
+    extra = []
+    if a.base:
+        extra = [r for r in json.loads(Path(a.base).read_text(encoding='utf-8')) if r.get('mode') == 'base']
+    if a.table:
+        res = json.loads(Path(a.table).read_text(encoding='utf-8'))
+        if extra and not any(r.get('mode') == 'base' for r in res):
+            res += extra
+        table(res)
+        return
+    seeds = tuple(int(x) for x in a.seeds.split(',')) if a.seeds else None
+    agents = tuple((k, float(v) if '.' in v else int(v)) for k, v in (x.split(':') for x in a.agents.split(','))) if a.agents else None
+    J = jobs_of(str(Path(a.dp).resolve()), a.quick, set(a.only.split(',')), seeds, agents)
+    J.sort(key=lambda j: -(j.get('ticks', 0) + (12000 if j['mode'] in ('kill', 'base') else 0)))   # the long runs first
+    print(f'hrfair 2.0 (HB): {len(J)} runs, {a.jobs} at a time', flush=True)
     with Pool(a.jobs) as pool:
         res = []
         for i, r in enumerate(pool.imap_unordered(run, J)):
@@ -482,7 +664,7 @@ def main():
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / 'hrfair2.json').write_text(json.dumps(res, ensure_ascii=False, indent=1, default=str), encoding='utf-8')
-    table(res)
+    table(res + [r for r in extra if not any(x.get('mode') == 'base' for x in res)])
 
 
 if __name__ == '__main__':

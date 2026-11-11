@@ -775,19 +775,20 @@ def snap(s):
 
 # ------------------------------------------------------------------------------------------------- H1 (hr rebuild, 11-11)
 # The world of the rebuilt fight's suites (pat_p1 / pat_p2 / pat_ghost / test_gauge / test_bal_hr / test_scarlet) and of
-# hrfair 2.0: ScSim + the player's input rules of player/def as the lead ruled them on 11-11 (review A-01 / A-12;
-# plan/combat/review/rulings_A.md), the judge's result per hit (player/def/end), the #hzNoParry option of every hazard
-# made, and lane B's balance clock on her body (mob/tick's balance line; mob/setup runs the REAL bal/init).
-#   F: an accepted press locks F for #parGap (12 t); a press while locked is ignored and pushes the lock a full #parGap; a
-#      press that parried keeps the short chain lock (the REAL player/def/par_use: hit + #parChain); the whiff streak: an
-#      accepted press whose window (#parW1, 10 t) ran out unused, followed within 40 t by another unused one, lengthens the
-#      lock to 24 t, then 36 t (from that press); any parry resets it.
-#   dodge: cooldown 18 t, 12 t when it avoided an attack (6 t refunded at the perfect dodge).
-# The constants come from the loaded pack (load.mcfunction: #parGap / #parChain / #parW1 tmp) where they exist; the ruled
-# numbers that have no constant yet are INPUT_RULES defaults (read from the pack too once the core fix names them).
-INPUT_RULES = {'gap': 12, 'chain': 2, 'win': 10, 'streak_win': 40, 'streak_cap': 3, 'dodge_cd': 18, 'dodge_refund': 6}
-INPUT_SCORES = {'gap': ('#parGap', 'tmp'), 'chain': ('#parChain', 'tmp'), 'win': ('#parW1', 'tmp'),
-                'streak_win': ('#parStreakW', 'tmp'), 'dodge_cd': ('#dashCoolMiss', 'tmp'), 'dodge_refund': ('#dashCoolBack', 'tmp')}
+# hrfair 2.0: ScSim + the player's inputs as the game takes them, the judge's result per hit (player/def/end), the
+# #hzNoParry option of every hazard made, and lane B's balance clock on her body (mob/tick's balance line; mob/setup runs
+# the REAL bal/init).
+#   F: the REAL player/f_key at the head of the tick (rlk:tick's input pre-pass, #now cb = this tick): player/def/press
+#      (the lock #parGap x (1 + the whiff streak #parWs: +1 when the press before blocked nothing and came <= #parWsT t
+#      earlier, at most #parWsMax; 0 after a longer pause) / player/def/press_re (a refused press: no F for #parRe t,
+#      #parMl), and in the judge player/def/par_use (#parChain; a parry of tier >= #parWsClr clears the streak). A press is
+#      accepted when it stamped parAt = now.
+#   dodge: the REAL cooldown score dashCool: refused while >= 1 (player/dash), set to #dashCoolT when accepted, the judge's
+#      player/def/dg_refund gives #dashCoolT - #dashCoolHitT back on a dodge that avoided a hit, player/tick's - 1 per tick.
+#      The dodge itself is stamped by world_sc (dgAt; the move and the start-spot box are not modelled: the player stands).
+# HB (11-11, review H-A): until then the F lock was a Python model with its own numbers (whiff window 40 not 80, the long
+# lock a press late and capped at 36 not 48, a refused press pushing the lock a full #parGap, any parry clearing the
+# streak); tests/test_input_hr.py checks this world against the rules of README 3 「패링 · 닷지」 on press sequences.
 sys.setrecursionlimit(max(sys.getrecursionlimit(), 6000))   # the dash probes recurse once per 0.5 b (hcut: 32 steps)
 
 
@@ -797,21 +798,8 @@ class H1Sim(ScSim):
         self.judged = []             # dict(t, dodged, parT, pdg, pat, pt, ph, np) of every judged hit on the player
         self.f_at = set()            # world ticks with an F press asked
         self.f_log = []              # (tick, accepted)
-        self.f_open = None           # the tick of the accepted press whose window is still open
-        self.f_whiffs, self.f_whiff_t = 0, -10 ** 6
         self.d_at = set()            # world ticks with a dodge asked
         self.d_log = []
-        self.d_ready, self.d_open = -10 ** 6, None
-        self.rules = None
-
-    def rule(self, k):
-        if self.rules is None:
-            self.rules = dict(INPUT_RULES)
-            for name, (fp, obj) in INPUT_SCORES.items():
-                v = self.sc(fp, obj)
-                if v is not None and v > 0:
-                    self.rules[name] = v
-        return self.rules[k]
 
     def call(self, fid, ctx, macro=None):
         if fid == 'rlk:mboss/hz/make':
@@ -822,68 +810,47 @@ class H1Sim(ScSim):
                 h['np'] = np_
             return r
         if fid == 'rlk:player/def/end':
-            j = dict(t=self.t, dodged=self.sc('#dodged', 'tmp') or 0, parT=self.sc('#parT', 'tmp') or 0,
-                     pdg=self.sc('#pdg', 'tmp') or 0, pat=self.sc('#pat', 'hr') or 0, pt=self.sc('#pt', 'hr') or 0,
-                     ph=self.sc('#ph', 'hr') or 0, np=self.sc('#hcNP', 'tmp') or 0)
-            self.judged.append(j)
-            if j['pdg'] and self.d_open is not None:          # the dodge avoided an attack: 6 t of its cooldown back
-                self.d_ready -= self.rule('dodge_refund')
-                self.d_open = None
+            self.judged.append(dict(t=self.t, dodged=self.sc('#dodged', 'tmp') or 0, parT=self.sc('#parT', 'tmp') or 0,
+                                    pdg=self.sc('#pdg', 'tmp') or 0, pat=self.sc('#pat', 'hr') or 0, pt=self.sc('#pt', 'hr') or 0,
+                                    ph=self.sc('#ph', 'hr') or 0, np=self.sc('#hcNP', 'tmp') or 0))
         return super().call(fid, ctx, macro)
 
     def press(self, at=None):
-        """An F press on world tick `at` (default: the next one), with the lock rules."""
+        """An F press on world tick `at` (default: the next one), taken by the REAL player/f_key in that tick."""
         self.f_at.add(self.t + 1 if at is None else at)
 
     def dodge(self, at=None):
-        """A dodge on world tick `at` (default: the next one), with its cooldown."""
+        """A dodge on world tick `at` (default: the next one), refused while the REAL dashCool runs."""
         self.d_at.add(self.t + 1 if at is None else at)
 
 
 def world_h1(s):
-    """One game tick of the H1 world: the inputs of this tick (F with its lock rules, the dodge with its cooldown), her
-    balance clock, then world_sc."""
+    """One game tick of the H1 world: the inputs of this tick (F through the REAL player/f_key, the dodge against the REAL
+    dashCool), her balance clock, world_sc, then player/tick's dashCool - 1."""
     t = s.t + 1
     pl = s.player()
+    pid = ('e', pl.id) if pl is not None else None
     if pl is not None:
-        pid = ('e', pl.id)
-        g = lambda o: (-10 ** 6 if s.sc(pid, o) is None else s.sc(pid, o))       # noqa: E731
-        # the open press: used (a parry stamped parHit) or its window ran out (a whiff)
-        if s.f_open is not None:
-            if g('parHit') >= s.f_open:
-                s.f_open, s.f_whiffs = None, 0
-            elif t - s.f_open >= s.rule('win'):
-                s.f_whiffs = s.f_whiffs + 1 if s.f_open - s.f_whiff_t <= s.rule('streak_win') else 1
-                s.f_whiff_t = s.f_open
-                if s.f_whiffs >= 2:
-                    s.setsc(pid, 'parLk', max(g('parLk'), s.f_open + s.rule('gap') * min(s.f_whiffs, s.rule('streak_cap'))))
-                s.f_open = None
+        pc = Ctx(pl, tuple(pl.pos), tuple(pl.rot))
         if t in s.f_at:
             s.f_at.discard(t)
-            lk = g('parLk')
-            if t >= lk:
-                s.parry(at=t)
-                s.setsc(pid, 'parLk', t + s.rule('gap'))
-                s.f_open = t
-                s.f_log.append((t, True))
-            else:
-                s.setsc(pid, 'parLk', max(lk, t + s.rule('gap')))
-                s.f_log.append((t, False))
+            s.setsc('#now', 'cb', t)
+            s.call('rlk:player/f_key', pc)
+            s.f_log.append((t, s.sc(pid, 'parAt') == t))
         if t in s.d_at:
             s.d_at.discard(t)
-            if t >= s.d_ready:
-                s.dash(at=t)
-                s.d_ready = t + s.rule('dodge_cd')
-                s.d_open = t
-                s.d_log.append((t, True))
-            else:
+            if (s.sc(pid, 'dashCool') or 0) >= 1:
                 s.d_log.append((t, False))
-        if s.d_open is not None and t - s.d_open > 3:
-            s.d_open = None
+            else:
+                s.dash(at=t)
+                s.setsc(pid, 'dashCool', s.sc('#dashCoolT', 'tmp'))
+                s.d_log.append((t, True))
     b = body_of(s)
     if b is not None and b.alive and (s.sc(('e', b.id), 'balT') or 0) >= 1 and 'rlk_mb_dying' not in b.tags:
         s.call('rlk:bal/tick', Ctx(b, tuple(b.pos), tuple(b.rot)))
     world_sc(s)
+    if pid is not None and (s.sc(pid, 'dashCool') or 0) >= 1:
+        s.setsc(pid, 'dashCool', s.sc(pid, 'dashCool') - 1)
 
 
 def setup_h1(dp, seed=11, lv=15, hp=5834, player_level=15):
