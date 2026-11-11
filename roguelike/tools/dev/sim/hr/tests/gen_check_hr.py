@@ -11,7 +11,7 @@ both are removed at the end. The generators of this boss (contract §1 / PLAN §
 
   core     tools/build_mboss_core.py            F:mboss/** (not arena/ nor the mid-boss module trees), F:boss/test/**
   arena    tools/build_mboss_arena.py           F:mboss/arena/**
-  rig      node tools/build_scarlet_rig.mjs     F:boss/scarlet/rig/**, tools/scarlet_rig_manifest.json; the RP's
+  rig      node tools/build_scarlet_rig.mjs     F:boss/scarlet/rig/**, tools/scarlet_rig_manifest.json, tools/scarlet_blade_track.json; the RP's
            --resourcepack <rp copy>             mboss/scarlet/** + the items-atlas entries (assets/minecraft/atlases/)
   kit      tools/build_mboss_hr_fx.py --skip-rp F:boss/scarlet/fx/**, tools/mboss_hr_fx_manifest.json (S1K; only once it
                                                 exists: I1b)
@@ -69,7 +69,8 @@ def owned(gen, rel):
     if gen == 'rig':
         # (+ lane H2c, 11-11: her points per tick for the contact suites, written next to them)
         return (rel.startswith(FN + 'boss/scarlet/rig/') or rel == 'tools/scarlet_rig_manifest.json'
-                or rel == 'tools/dev/sim/hr/cine/her_tracks.json')
+                or rel == 'tools/dev/sim/hr/cine/her_tracks.json'
+                or rel == 'tools/scarlet_blade_track.json')         # round V (lane VB): the blade track sidecar
     if gen == 'kit':
         return rel.startswith(FN + 'boss/scarlet/fx/') or rel == 'tools/mboss_hr_fx_manifest.json'
     if gen == 'scarlet':

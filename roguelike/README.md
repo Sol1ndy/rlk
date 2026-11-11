@@ -429,7 +429,12 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   이벤트, `test_kit` 효과 킷, `test_arena_hr` 경기장, `test_hwamu` · `test_moon` 아이템 · 버프, `ident_hr` 35b82e5 와 바이트 비교, `gen_check_hr`
   생성 순서 · 소유 경로; 모의기 `sim/hr/tests/lib` · `sim/hr/s1k/lib` · `sim/hr/sr`; 11-11 다시 만든 싸움에서 더한 것: `pat_p2` · `test_gauge` ·
   `test_bal_hr` · `test_clips_h1c` · `test_seq` · `test_cam` · `test_cine` · `test_contact` · `test_actor` · 한 판 전체 `test_flow`,
-  검토 H-A 의 `test_metro`(박자 F 로 연참을 못 깸, 진짜 F 함수; 탐색 도구 `sim/hr/review/metro`), 레인 H2 의 세계
+  검토 H-A 의 `test_metro`(박자 F 로 연참을 못 깸, 진짜 F 함수; 탐색 도구 `sim/hr/review/metro`), 라운드 V 레인 VB 의 `test_blade`(칼끝의
+  길 · 베기 효과를 리그의 칼날 궤적 `tools/scarlet_blade_track.json` 과 대조: 선동작 10 / 6틱, 길이 뜨는 틱 수, 머리가 맞는 틱에 닿음,
+  베기 조각의 면 4도 · 테 0.12칸 안, 카드 두께 0.12칸 이상, 게임 시계를 읽지 않음) + 그림 · 측정 도구 `sim/hr/vb/fightcam.py`(진짜 싸움
+  카메라 — F5: 아바타 머리 0.5칸 위 받침에서 3.5칸 뒤 — 로 그녀의 리그 · 아바타 · 카드를 그림: `strip` 클립 한 타, `fight` 생성된 패턴을
+  H1 세계에서 돌려 틱마다, `measure` 4 · 7 · 10칸에서 자세 차이 · 칼날 / 길의 픽셀 폭 · 별 / 섬광이 가려지지 않는 몫) ·
+  `sim/hr/vb/windups.py`(타격마다 휘두르기 구간과 선동작 틱), 레인 H2 의 세계
   `sim/hr/h2/{camsim,seqsim}.py`(+ HF-B 의 매 틱 화면 잡기 `framing.py`, 지은 카메라로 그리는 `sim/hr/cine/built_shots.py`), 균형 `sim/hr/review/bal/hrfair2.py` — 목록과 몫은 홍련 절 「파일 · 생성 순서」), 챕터 틀 `sim/az/tests_cm/`(라우팅 · 프록시 · 틀 도우미,
   중간보스 행동 불변 `test_m0diff`, 생성 순서 `gen_check`, 바이트 고정 `ident`(낡음: 0-9)), 정적 검사기(`check_refs` · `check_macro` ·
   `check_nbtpath` · `lint_mc`), 전투 개편 lane R `sim/cb/tests/`(`test_rm`: 요이미야 · 활 삭제와 저장 월드 이전 · F5 하나 · 전투 중 선택 안내, 11-10; lane C `test_cb`:
@@ -647,6 +652,13 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   (HB-01). I18 에서 갓 테를 들기 전(1330)까지 눈이 테에 가려 보이지 않음(HB-07; 테의 짜임이 84 % 불투명). 코다 끝의 검은 화면이 다
   덮인 뒤에 화면이 아바타로 돌아옴(HB-05). 대사가 뜰 때마다 화면이 그녀의 얼굴 · 어깨 가까이(HB-06).
 
+- (라운드 V 레인 VB, `tools/dev/plan/combat/vb_progress.md`; 클라이언트는 여기서 띄울 수 없어 모두 그림 도구 · 바이트코드로만 봄) 칼끝의
+  길(흰 금빛 / 노랑 · 보라 · 파랑 선과 별 머리)이 실제 화면에서 잘 보이고 머리가 끝에 닿는 순간이 맞는 순간과 같게 느껴지는지; 베기 조각이
+  칼을 따라 가는지(조각 사이 이음매가 꽃잎처럼 보이는 정도); 칼날의 흰 테가 과하지 않은지; 패링 신호 별의 어두운 테가 밝은 풀 · 흰 갓
+  위에서 읽히는지; 돌진이 2칸 앞에서 멈추는 느낌(위험 지대는 뒤까지 닿음); 도약 3.4칸에서 그녀가 화면 안에 남는지(카메라를 아래로
+  많이 숙이고 있으면 여전히 위로 나감); 연참의 자리(앞 오른쪽 2.2칸)에서 칼이 카메라를 스치지 않는지, 마지막 내리꽂기가 화면 위쪽에
+  15틱 보이는지; 게이지 구분선 넷; G1 실패의 가는 빛기둥; VP 의 슬로 모션 박자 동안 길 · 머리 · 베기가 패턴 시계와 함께 멈추는지
+  (명령은 모두 패턴 틱에 있지만 1틱 보간은 실제 시간으로 끝남).
 - (11-11 검토 H-A 고침, `tools/dev/plan/combat/hfa_progress.md`) 패링 신호: 그녀 칼날의 흰 · 금빛 별(1.5-1.9칸, 가운데 작은 분홍)이 F5 에서
   붉은 들판 · 달빛 들판 모두에서 바로 보이는지, 노랑 · 보라 · 파랑 섬광과 헷갈리지 않는지; 신호 소리(철 실로폰 0.7 · 1.8)가 보라 섬광의 자수정
   종소리와 확실히 다르게 들리고 거슬리지 않는지(검토 HA-06 · HA-07). 게이지가 가득 찬 채 중간 거리면 그녀가 미끄러져 다가와 회전 월륜을 도는지(HA-09).
@@ -2811,6 +2823,11 @@ CS1 40~560 에만(누를수록 밝아짐). 그 밖의 글자 안내는 없다.
   효과 도구 476). 단계 파일이 없으면 생성기가 대역으로 돈다(리그 `rig_stub/**`, 장면 `core/sq/**`, 연참 `core/gs/**`, 효과 · 소리 = 바닐라 입자 /
   소리, 배우 줄 = `api.actor_ready()` 가 매니페스트를 볼 때까지 빈 줄): **지금 트리에는 대역이 없다**(HI 에서 확인: 리그 대역 0, `actor_ready`
   참, `gold` 덮개 · 킷의 소리 조리법 사용 — 배우의 베기 셋만 킷에 조리법이 없어 바닐라 휘두르기 소리).
+- **라운드 V(레인 VB)**: `tools/mboss_scarlet/blade.py`(칼날 궤적 → 휘두르기 분석 · 칼끝의 길 / 머리 / 베기 조각 / 겨눈 선 카드의 명령;
+  `p1.py` · `p_ghost.py` · `shield.py` · `s3lib.py` 가 씀; 실행 중 부분 `core/sw/{aim,march,head}` · `core/near`), 리그 생성기가 쓰는
+  `tools/scarlet_blade_track.json`(싸움 클립마다 틱별 칼날 밑 · 끝 · 가슴 · 머리 · 갓 꼭대기, 그녀의 좌표계 [왼쪽, 위, 앞]; 클립을 고치면
+  길과 베기 효과가 따라 움직임: 리그 → 킷 → `regen_all.sh` 순서), 킷의 새 카드 `sw_path` · `sw_head` · `sw_arc_0..2`(16 640 px),
+  칼날 모습 `edge`(`glow_edge` 2 048 px; 싸우는 동안 코어가 켜고 잠긴 장면에서는 `off`), 보스바 `#buSubSeg`(`tools/build_bossbar.py`).
 - 리소스팩 생성기(README 0-4 의 순서, `regen_all.sh` 에 없음): `node tools/build_scarlet_rig.mjs --resourcepack <팩>`(+ `scarlet_{geometry,paint,pose,
   retarget,clips,skin}.mjs` · `scarlet_cine.mjs`; `boss/scarlet/rig/**` 통째 · `tools/scarlet_rig_manifest.json` · `tools/dev/sim/hr/cine/her_tracks.json` ·
   RP `mboss/scarlet/**`) → `python3 tools/build_mboss_hr_fx.py --resourcepack <팩>`(`build_rift.py` 다음; `fx/**` · 매니페스트 · RP `mboss/hr_kit/**` ·
