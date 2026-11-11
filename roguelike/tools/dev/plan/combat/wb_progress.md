@@ -56,6 +56,14 @@ period 1-40, from any start, gets 5 perfect parries (clear) in G1 / G2.
 - test_metro rewritten to the new rule: periods 1-40, starts from T - 200, at most 4 in both (33 / 33).
 - Removed the dead `tag=rlk_hr_sw` line from `player/def/beat/st/tp_on` (lane WP's file, the coordinator's request; the trail's
   riding cards carry `rlk_mb_part`).
+- Gates on the re-timed tree: regeneration twice clean (pack `376a5321ea53` both rounds), rplint 0, atlas 13.109 M, check 0,
+  loadcheck `wbfin2` 0 failures + `Done (`; test_metro 33/33; chainparry 624/624 (G1 9/9, G2 11/11, smallest gap 14, 0
+  exceptions); test_cb 400/400; test_blade 347, pat_p1 559, pat_p2 70, pat_ghost 65, test_scarlet 48, test_flow 40,
+  test_clips_h1c 297, test_kit 15 313, test_rig 162, test_bal_hr 79, test_gauge 33, test_vi 208, ident_hr pass; gen_check_hr 28 / 28.
+- hrfair 2.0 `--only g,metro,chain`, seeds 11 / 22 / 33 (`<S>/wb/hrfair_g/run.log`): T5 40.3 / T5b 49.3 %; T6 s0 100 % of the F in
+  the window, cleared 100 %; T6 s1 in the window 100 %, perfect per timed F 85.0-91.2 % (ceiling 86.6), cleared 100 % (8 / 8 per
+  seed); T7 sloppy 0, masher (F every 4 t) 0 (was: G2 cleared in all 3 seeds), dodger 0; T7m metronome 8-30 every phase 0 / 437
+  clears in G1 and G2 (most segments taken 4); T13 53 / 53 perfect, 0 refused.
 
 ## Design (as built; `blade.py` header and hr_design.md §11)
 Nothing is drawn where the blade is going. The trail is generated from the sword the rig SHOWS on the pattern clock (`blade.Shown`:
