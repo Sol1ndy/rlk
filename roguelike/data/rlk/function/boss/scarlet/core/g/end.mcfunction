@@ -6,6 +6,8 @@ scoreboard players set #done hr 0
 scoreboard players set #pat hr 0
 scoreboard players set #pt hr 0
 scoreboard players set #pipoff hr 0
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr]
+kill @e[type=minecraft:marker,tag=rlk_hr_trt]
 execute if score #gres hr matches 1 run return run function rlk:boss/scarlet/core/repel/start
 execute if score #gk hr matches 1 run return run function rlk:boss/scarlet/core/p2/from_fail
 function rlk:boss/scarlet/core/revive/start

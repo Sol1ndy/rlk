@@ -8,6 +8,8 @@ scoreboard players set #pt hr 0
 scoreboard players set #ppf hr 0
 kill @e[type=minecraft:marker,tag=rlk_hr_lock]
 function rlk:boss/scarlet/core/ground
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr]
+kill @e[type=minecraft:marker,tag=rlk_hr_trt]
 execute unless score #dec hr matches 5 unless score #dec hr matches 12 run function rlk:boss/scarlet/core/gauge/pat
 execute if score #dec hr matches 11 if score #ultq hr matches 1 unless score #fl hr matches 1.. run return run function rlk:boss/scarlet/core/start/ult
 scoreboard players set #ultq hr 0

@@ -1,4 +1,4 @@
 # BLUE pattern tick 19
-execute store result storage rlk:hr core.sw.d double 0.4167 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
-execute at @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_m22,limit=1] ~ ~2.636 ~
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_blueb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4119f,1.1972f,0.469f],left_rotation:[-0.1045f,0.0432f,-0.6993f,0.7058f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_blue_11]
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_trr","rlk_hr_trq","rlk_hr_tr_blue_19","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.6407f,1.3519f,0.3562f],left_rotation:[-0.1673f,-0.0228f,-0.9499f,0.2631f],scale:[0f,0.3f,1.435f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_quad_0","minecraft:custom_model_data":{colors:[11917567]}}}}

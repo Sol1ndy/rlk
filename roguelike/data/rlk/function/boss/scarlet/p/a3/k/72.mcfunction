@@ -1,7 +1,5 @@
 # A3 pattern tick 72
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a369] ~ ~ ~ ~ 0
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a369_68] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a369_70] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a3","rlk_hr_swn","rlk_hr_sw_a369_72"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.3323f,1.6509f,0.4394f],left_rotation:[-0.6777f,0.2808f,0.6279f,0.26f],scale:[0.3608f,1f,1.7989f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.34f,1.6529f,0.4392f],left_rotation:[0.292f,-0.705f,-0.5971f,0.2473f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_68] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_70] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_71,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3322f,1.651f,0.4394f],left_rotation:[-0.6777f,0.2807f,0.6278f,0.2601f],scale:[0.3227f,0.3f,1.6089f],right_rotation:[0f,0f,0f,1f]}}

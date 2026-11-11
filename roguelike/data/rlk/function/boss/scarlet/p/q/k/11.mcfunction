@@ -1,7 +1,3 @@
 # Q pattern tick 11
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ~ ~1.0 ~ run function rlk:boss/scarlet/core/sw/aim {dy:"-1.0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.1667 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_q0b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.391f,0.6928f,0.0291f],left_rotation:[-0.5207f,0.6582f,-0.4786f,0.2581f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_q0_3]

@@ -66,6 +66,6 @@ execute if score #pt hr matches 58 run function rlk:boss/scarlet/p/rings/k/58
 execute if score #pt hr matches 59 run function rlk:boss/scarlet/p/rings/k/59
 execute if score #pt hr matches 60 run function rlk:boss/scarlet/p/rings/k/60
 execute if score #pt hr matches 61 run function rlk:boss/scarlet/p/rings/k/61
-execute if score #pt hr matches 62 if score #ph hr matches 7 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_rings54_56]
-execute if score #pt hr matches 63 if score #ph hr matches 7 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_rings54_57]
-execute if score #pt hr matches 64 run scoreboard players set #done hr 1
+execute if score #pt hr matches 62 run function rlk:boss/scarlet/p/rings/k/62
+execute if score #pt hr matches 63 if score #ph hr matches 7 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_rings1_55]
+execute if score #pt hr matches 64 run function rlk:boss/scarlet/p/rings/k/64

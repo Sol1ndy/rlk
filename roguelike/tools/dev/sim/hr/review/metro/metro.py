@@ -3,6 +3,9 @@
 
     python3 metro.py table <s1> <s2> ...                     best perfect parries per period 2-40 (any start >= T - 200)
     python3 metro.py search <lo> <hi> <seed> <iters> [g2]    local search (G2's cut spacing with g2): fewest periods / starts at 4
+    --w (either command): the rules without the whiff ladder (round W, the user's ruling 11-12); round W's tables were found with
+    dfs.c built -DNOLADDER -DKMIN=1 -DKMAX=40 (wb_progress.md: G1 ./dfs_w 9 28 34 200 32 4 <base> 14 14 23 14 24 24 14 14,
+    G2 ./dfs_w 11 <s1 range> 222 40 4 <base> 14 14 23 21 14 24 14 14 14 14; every period 1-40 <= 4)
 
 The model is fm.c (the shipped F rules); tests/test_metro.py checks the chosen strikes with the real F functions. G2 rows
 from strikes: g2rows() (the old A13_SCRIPT's move order and offsets: D -> contact clip + 11, the vanish before D2).
@@ -14,9 +17,13 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SO = HERE / 'fm.so'
+# round W (lane WB): --w = the shipped rules without the whiff ladder (fm.c -DNOLADDER); tables over periods 1-40 then
+W = '--w' in sys.argv
+if W:
+    sys.argv.remove('--w')
+SO = HERE / ('fm_w.so' if W else 'fm.so')
 if not SO.exists():
-    subprocess.run(['gcc', '-O2', '-shared', '-fPIC', '-o', str(SO), str(HERE / 'fm.c')], check=True)
+    subprocess.run(['gcc', '-O2', '-shared', '-fPIC'] + (['-DNOLADDER'] if W else []) + ['-o', str(SO), str(HERE / 'fm.c')], check=True)
 _L = ctypes.CDLL(str(SO))
 
 
@@ -80,7 +87,7 @@ def search(lo, hi, seed, iters, gmin, base):
 if __name__ == '__main__':
     if sys.argv[1] == 'table':
         s = [int(x) for x in sys.argv[2:]]
-        _w, d = evaluate(s, 2, 40)
+        _w, d = evaluate(s, 1 if W else 2, 40)
         print(' '.join(f'{k}:{v[0]}' for k, v in d.items()))
         print('starts at 4+ (8-30):', {k: v[1] for k, v in d.items() if 8 <= k <= 30 and v[1]})
     else:

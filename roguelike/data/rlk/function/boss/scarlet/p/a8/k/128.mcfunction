@@ -1,4 +1,3 @@
 # A8 pattern tick 128.
-function rlk:boss/scarlet/g/cut/aim {s:139}
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c139] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c139,limit=1] ^1.63 ^2.208 ^-1.061
+function rlk:boss/scarlet/g/cut/aim {s:138}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b127] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4458f,1.5803f,-0.3499f],left_rotation:[-0.933f,0.25f,-0.067f,0.25f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}

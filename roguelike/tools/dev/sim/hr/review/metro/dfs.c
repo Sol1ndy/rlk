@@ -9,11 +9,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef KMIN
 #define KMIN 8
+#endif
+#ifndef KMAX
 #define KMAX 30
+#endif
+#ifdef NOLADDER          /* round W: no whiff ladder (gcc -O2 -DNOLADDER -DKMIN=1 -DKMAX=40 -o dfs_w dfs.c) */
+#define WSMAX 0
+#else
+#define WSMAX 3
+#endif
 #define NK (KMAX - KMIN + 1)
 #define LO (-200)
+#ifndef TMAX
 #define TMAX 260
+#endif
 #define NT (TMAX - LO + 1)
 typedef struct { int parAt, parLk, parHit, parMl, ws, pp, nextp; } St;
 static St *ST;            /* [depth][NK][NT] */
@@ -24,7 +35,7 @@ static int GMIN[32], REST[33];
 static void press(St *s, int t) {
     if (t < s->parLk || t < s->parMl) { s->parMl = t + 3; return; }
     int d = t - s->parAt;
-    if (s->parHit < s->parAt && d <= 80 && s->ws < 3) s->ws++;
+    if (s->parHit < s->parAt && d <= 80 && s->ws < WSMAX) s->ws++;
     if (d > 80) s->ws = 0;
     s->parAt = t; s->parLk = t + 12 * (1 + s->ws);
 }
@@ -60,6 +71,13 @@ static void dfs(int d, int prev) {
             int dist = 0;
             for (int i = 0; i < N; i++) dist += abs(seq[i] - base[i]);
             nsol++;
+#ifdef PRINTALL
+            if (dist <= PRINTALL) {          /* round W: every solution this near the base (ranked by metro.py) */
+                printf("all %d:", dist);
+                for (int i = 0; i < N; i++) printf(" %d", seq[i]);
+                printf("\n");
+            }
+#endif
             if (dist < best_d) {
                 best_d = dist; memcpy(bestseq, seq, sizeof(int) * N);
                 printf("sol %d dist %d:", nsol, dist);

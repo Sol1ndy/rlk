@@ -1,6 +1,8 @@
 # A13 pattern tick 120.
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_c113_114]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_c113_116] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-function rlk:boss/scarlet/g/cut/aim {s:128}
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c128] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c128,limit=1] ^-0.517 ^2.704 ^-0.039
+function rlk:boss/scarlet/g/cut/lock {s:127}
+execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] positioned ^0.073 ^3.127 ^-0.021 run function rlk:boss/scarlet/fx/p/glint {c:2}
+execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
+execute rotated as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @s ~ ~ ~ ~ 0
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b100] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4744f,1.5986f,0.0231f],left_rotation:[-0.8881f,-0.3679f,0.1055f,0.2547f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_112]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_114] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"

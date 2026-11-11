@@ -1,3 +1,3 @@
 # A3 pattern tick 42
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a345] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a345,limit=1] ^0.1 ^2.069 ^1.923
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.1175f,1.1068f,0.5871f],left_rotation:[-0.1986f,-0.185f,0.9617f,-0.0382f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a3","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a3_42","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2508f,1.2515f,0.2589f],left_rotation:[0.0982f,-0.3461f,0.5656f,0.7426f],scale:[0f,0.3f,2.0043f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16774616]}}}}

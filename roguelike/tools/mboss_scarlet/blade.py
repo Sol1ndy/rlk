@@ -1,28 +1,25 @@
-"""The blade track of 홍련's fight clips and everything drawn from it (round V, lane VB; v_brief.md §3 VB 1-3).
+"""The blade track of 홍련's fight clips and everything drawn from it (round V lane VB: the track, the wind-ups, the cue's place;
+round W lane WB: the TRAIL - w_brief.md §2 WB).
 
 tools/build_scarlet_rig.mjs writes tools/scarlet_blade_track.json: per fight / gauntlet clip tick the blade's base and tip
-(and her chest, head, hat crown) in her own frame, [left, up, forward] blocks from her feet. That frame is the local frame of
-a display entity standing at her feet with her yaw (+x left, +y up, +z forward), so a track point is a display translation
-and `^left ^up ^forward` as it stands. From the track this module derives, per hit (clip, hit tick h):
+(and her chest, head, hat crown) in her own frame, [left, up, forward] blocks from her feet, whether the sword shows, and f0
+(the tick the sword's first key ends at: before it the rig blends in from the pose before the clip). That frame is the local
+frame of a display entity standing at her feet with her yaw (+x left, +y up, +z forward), so a track point is a display
+translation and `^left ^up ^forward` as it stands. A key sent on pattern tick t ends at its target tick: at the instant of
+pattern tick t the client shows the blade of clip tick t and moves it to tick t + 1 during that tick.
+
+From the track this module derives, per hit (clip, hit tick h):
 
   the swing    [a, b]: the ticks round h in which the tip travels >= V_SWING b / t (a = the wound pose, b = the follow-through's
                end, capped); the wind-up is `reached` at w = the first tick from which the blade stays within WIND_TOL of its
                pose at a (v_brief: w <= h - 10 for a single / first hit, <= h - 6 for a chain follow-up)
-  the path     the tip's way from a to h as the client shows it (the blade's base moves in a line, its direction turns evenly
-               between two ticks: the display interpolation), cut into straight pieces of <= PATH_STEP deg: the drawn blade path
-               (the user's "laser pointer"), cards of kind sw_path, PATH_W wide, with a head (sw_head) that runs along it and
-               arrives at the tip's place of tick h on tick h
-  the slash    the surface the blade sweeps from a to b, one sector card (sw_arc_0..2) per <= ARC_STEP deg of turn, standing
-               in the plane of the two blade positions that bound it, its rim on the tip's way: plane, direction, reach and timing
-               are the blade's own. A piece is born on the pattern tick its sweep is shown and is gone ARC_LIFE t later.
+  the trail    (round W; the user, 11-12: the blade's way is NOT to be shown ahead of the cut - mark the way it has come) the
+               band on the blade, the pieces it leaves on what it sweeps, the ribbon behind her where her body carries it, the
+               wave of a line struck beyond its reach: see the section below. Round V's drawn path, its running head, the
+               target lines, the tall mark and the standing lines are gone: nothing shows where the blade is going to go.
 
 Everything is literal commands on pattern ticks (the pattern clock #pt hr): nothing here runs on the game clock, so a clock that
-is slowed or frozen (lane VP's hit-stop beat) keeps path, head and slash in step with the blade. Cards carry rlk_hr_sw + the
-pattern's tags (its cancel kills them) + rlk_room + rlk_mb_aux.
-
-Frames: RIDE = the cards stand at her feet and are teleported with her every tick (melee swings: the path stays on the blade
-while she steps and turns); HERE = left where they were made (the slash pieces: the trail hangs in the air); a caller may give
-another executor (a marker's place: the gauntlet stations, the dash / dive targets).
+is slowed or frozen (lane VP's beat) keeps the trail in step with the blade.
 """
 import json
 import math
@@ -33,32 +30,25 @@ from . import api
 TRACK_FILE = Path(__file__).resolve().parents[1] / 'scarlet_blade_track.json'
 _TRACK = {}
 
-# --- the rules (v_brief §3 VB; tests/test_blade.py reads them) -------------------------------------------------------------
+# --- the rules (v_brief §3 VB 1; w_brief §2 WB; tests/test_blade.py reads them) -----------------------------------------------
 V_SWING = 0.30            # b / t of the tip: a swing tick
 SWING_BACK, SWING_ON = 7, 3   # at most this many ticks of swing before / after the hit tick
 WIND_TOL = 0.42           # b: the blade's base and tip stay this near their pose at the swing's start = the wind-up is held
-LEAD_FIRST, LEAD_CHAIN = 10, 6      # the wind-up is reached / the path shows this long before a single or first / a chain hit
-SHOW_FIRST, SHOW_CHAIN = 12, 8      # what the generators aim for (never less than the rule; a chain: never before the hit before)
-PATH_W = 0.24             # b: a path card's width (its bright core PATH_CORE x that; v_brief: >= 0.12 b)
-PATH_CORE = 0.56
-PATH_STEP = 30.0          # deg of blade turn per straight piece of the path
-ARC_STEP = 45.0           # deg of blade turn per slash piece
-ARC_LIFE = 6              # t: a slash piece is gone this long after it was born (v_brief: gone within ~6 t of the hit)
-ARC_FRAMES = ((0, 'sw_arc_0'), (2, 'sw_arc_1'), (4, 'sw_arc_2'))    # the piece's fading frames (ticks after its birth)
+LEAD_FIRST, LEAD_CHAIN = 10, 6      # the wind-up is reached this long before a single or first / a chain hit
 ARC_TAN = 0.5             # the sector sprite: its edges run from the apex (a 0, b 0) to (a +-0.5, b 1) x 1 / sqrt(1.25)
 ARC_INNER = 0.30          # the sprite fades out below this share of the radius
-HEAD_S = 0.62             # b: the head card's size
-MIN_THICK = 0.12          # b: v_brief's floor for any path / effect card
-TAG, TAG_RIDE, TAG_HEAD, TAG_NEW = 'rlk_hr_sw', 'rlk_hr_swr', 'rlk_hr_swh', 'rlk_hr_swn'
+MIN_THICK = 0.12          # b: the floor for any trail card (v_brief / w_brief: nothing thinner)
 KIT = api.RP_KIT          # rlk:mboss/hr_kit/
-# colours (RGB ints, the sprites are white): the path of a parryable hit white-gold, an unparriable one its flash's colour
-COL = {'P': 0xFFE9A8, 'yellow': 0xFFE14A, 'purple': 0xD68BFF, 'blue': 0x5AA8FF, 'flare': 0xFFFFFF}
-SLASH = {api.C_LILAC: 0xE2B4FF, api.C_MAGENTA: 0xFF8AD8, api.C_YELLOW: 0xFFE98A, api.C_CRIMSON: 0xFF6A80, api.C_WHITE: 0xFFFFFF}
+
+
+_BLADE = []
 
 
 def track(clip):
     if not _TRACK:
-        _TRACK.update(json.loads(TRACK_FILE.read_text(encoding='utf-8'))['clips'])
+        d = json.loads(TRACK_FILE.read_text(encoding='utf-8'))
+        _TRACK.update(d['clips'])
+        _BLADE[:] = d.get('blade', (0.165, 1.6))
     return _TRACK[clip]
 
 
@@ -193,59 +183,6 @@ class Swing:
         d = slerp(unit(d0), unit(d1), f)
         return b, add(b, mul(d, norm(d0) + (norm(d1) - norm(d0)) * f))
 
-    def steps(self, t0, t1, deg):
-        """Float ticks from t0 to t1 with at most `deg` of blade turn (and 0.9 b of tip travel) between two of them."""
-        out = [float(t0)]
-        for i in range(t0, t1):
-            d0, d1 = sub(self.T[i], self.B[i]), sub(self.T[i + 1], self.B[i + 1])
-            n = max(1, math.ceil(angle(d0, d1) / deg - 1e-6), math.ceil(math.dist(self.T[i], self.T[i + 1]) / 0.9 - 1e-6))
-            out += [i + (k + 1) / n for k in range(n)]
-        return out
-
-    def path(self, a=None, h=None):
-        """The tip's way a .. h: [(float tick, point)]."""
-        a, h = self.a if a is None else a, self.h if h is None else h
-        return [(u, self.blade(u)[1]) for u in self.steps(a, h, PATH_STEP)]
-
-    def pieces(self, a=None, b=None):
-        """The slash a .. b: one piece per step of the blade's sweep: dict(t = the pattern-clock tick (clip ticks) it shows on,
-        kind 'arc' (apex q, bisector z, normal n, half-angle beta deg, radius r, inner = the base's share of r) or 'line' (the
-        blade moved along itself: p0 -> p1), u0, u1)."""
-        a, b = self.a if a is None else a, self.b if b is None else b
-        us = self.steps(a, b, ARC_STEP)
-        out = []
-        for u0, u1 in zip(us, us[1:]):
-            b0, t0 = self.blade(u0)
-            b1, t1 = self.blade(u1)
-            d0, d1 = unit(sub(t0, b0)), unit(sub(t1, b1))
-            born = int(math.ceil(u1 - 1e-9))
-            phi = angle(d0, d1)
-            n = cross(d0, d1)
-            if phi < 5.0 or norm(n) < 1e-6:
-                if math.dist(t0, t1) >= 0.25:
-                    out.append(dict(t=born, kind='line', p0=t0, p1=t1, u0=u0, u1=u1))
-                continue
-            n = unit(n)
-            # the apex: the point nearest both blade lines (the two lines' common perpendicular's middle)
-            w0 = sub(b0, b1)
-            bb, dd, ee = dot(d0, d1), dot(d0, w0), dot(d1, w0)
-            den = 1 - bb * bb
-            s0 = (bb * ee - dd) / den
-            s1 = (ee - bb * dd) / den
-            q = lerp(add(b0, mul(d0, s0)), add(b1, mul(d1, s1)), 0.5)
-            r0, r1 = norm(sub(t0, q)), norm(sub(t1, q))
-            # an apex beyond the tips or far behind the bases (the blade slid more than it turned): a band of the tip's way
-            # (or the two radii differ: a thrust that turns a little)
-            if min(dot(sub(t0, q), d0), dot(sub(t1, q), d1)) <= 0.3 or max(r0, r1) > 6.0 or abs(r0 - r1) > 0.22:
-                out.append(dict(t=born, kind='line', p0=t0, p1=t1, u0=u0, u1=u1))
-                continue
-            z = unit(add(unit(sub(t0, q)), unit(sub(t1, q))))
-            beta = angle(sub(t0, q), sub(t1, q)) / 2
-            inner = (norm(sub(b0, q)) + norm(sub(b1, q))) / (r0 + r1)
-            out.append(dict(t=born, kind='arc', q=q, z=z, n=n, beta=beta, r=(r0 + r1) / 2, inner=inner, u0=u0, u1=u1,
-                            tips=(t0, t1), bases=(b0, b1)))
-        return out
-
 
 # a hit whose swing the rule of thumb misreads: a4's plunge is one whirl of the blade from the flip's first tick (the wind-up is
 # the apex pose before it)
@@ -271,11 +208,11 @@ def car(p):
 
 
 def _tags(key, *more):
-    return '[' + ','.join(f'"{t}"' for t in (TAG, 'rlk_room', 'rlk_mb_aux', api.TAGS['pat'], f'rlk_hr_p_{key}') + more) + ']'
+    return '[' + ','.join(f'"{t}"' for t in ('rlk_hr_sw', 'rlk_room', 'rlk_mb_aux', api.TAGS['pat'], f'rlk_hr_p_{key}') + more) + ']'
 
 
 def card(key, kind, t, q, s, col, tags=(), bb='fixed', tpd=1):
-    """One literal summon of a sweep card at the executor: translation t, left rotation q, scale s (the track frame)."""
+    """One literal summon of a plain card at the executor (shield.py's fail column): translation t, left rotation q, scale s."""
     return ('summon minecraft:item_display ~ ~ ~ {Tags:' + _tags(key, TAG_NEW, *tags) + f',billboard:"{bb}",item_display:"none",'
             'brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
             f'teleport_duration:{int(tpd)},interpolation_duration:0,transformation:{{translation:[{",".join(f4(v) for v in t)}],'
@@ -285,37 +222,7 @@ def card(key, kind, t, q, s, col, tags=(), bb='fixed', tpd=1):
 
 
 SEL = '@e[type=minecraft:item_display,tag={}]'
-AT_BODY = 'at @s'          # the frame of a card: her feet and yaw NOW (the body's place when the command runs, not the place the
-#                            tick function was called at: a glide may have moved her since)
-
-
-def place(at=AT_BODY):
-    """The cards just summoned to the frame `at` (its place, its yaw, pitch 0)."""
-    return [f'execute {at} run tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ 0', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}']
-
-
-def ride_cmd(mine, at=AT_BODY):
-    """Every tick while a path rides its frame."""
-    return f'execute {at} run tp {SEL.format(mine)} ~ ~ ~ ~ 0'
-
-
-def seg_card(key, p0, p1, col, tags, w=PATH_W, kind='sw_path'):
-    d = sub(p1, p0)
-    x, y, z = frame_z(unit(d))
-    return card(key, kind, p0, quat(x, y, z), (w, w, norm(d)), col, tags)
-
-
-def arc_card(key, pc, col, tags):
-    """A slash piece (Swing.pieces row) as its card: the sector sprite's apex on q, its axis along z, lying in the plane with
-    the normal n, squeezed to the half-angle beta, its rim at r on the two blade positions."""
-    if pc['kind'] == 'line':
-        return seg_card(key, pc['p0'], pc['p1'], col, tags, w=PATH_W * 1.5)
-    k = math.tan(math.radians(pc['beta'])) / ARC_TAN
-    sa, ca = ARC_TAN / math.sqrt(1 + ARC_TAN ** 2), 1 / math.sqrt(1 + ARC_TAN ** 2)
-    s = pc['r'] / math.sqrt(k * k * sa * sa + ca * ca)
-    z, y = pc['z'], pc['n']
-    x = cross(y, z)
-    return card(key, ARC_FRAMES[0][1], pc['q'], quat(x, y, z), (s * k, 1.0, s), col, tags, tpd=0)
+AT_BODY = 'at @s'          # the body's place when the command runs
 
 
 def _gate(cond, cmd):
@@ -328,8 +235,8 @@ class Out:
     def __init__(self):
         self.t = {}
 
-    def at(self, t, *cmds):
-        self.t.setdefault(int(t), []).extend(c for c in cmds if c)
+    def at(self, t, *cmds, cond=None):
+        self.t.setdefault(int(t), []).extend(_gate(cond, c) if cond else c for c in cmds if c)
 
     def into(self, pb, cond=None):
         """Merge into a pattern builder (cond: an execute condition put before every line)."""
@@ -338,161 +245,478 @@ class Out:
         return self
 
 
-def path_ride(out, key, sw, t0, show, col, uid, head=True, flare=True, at=AT_BODY):
-    """The drawn blade path of swing sw (clip tick 0 = pattern tick t0), riding her, shown from pattern tick `show` (>= 0) to
-    the hit; the head arrives at the tip's place of the hit tick on the hit tick; from the swing's start the path burns white
-    (the tip's trail) and is gone ARC_LIFE - 2 t after the hit. uid: a short id unique in the pattern (the cards' own tag).
-    Returns dict(show, hit, segs, first_head, pts)."""
-    h, a = t0 + sw.h, t0 + sw.a
-    show = max(0, min(show, a))
-    pts = sw.path()
-    mine = f'{TAG}_{uid}'
-    sel = SEL.format(mine)
-    cmds = [seg_card(key, p0, p1, col, (TAG_RIDE, mine)) for (_u0, p0), (_u1, p1) in zip(pts, pts[1:])]
-    out.at(show, *cmds, *place(at))
-    # the riding: from the tick after it is made until it is killed
-    end = h + ARC_LIFE - 2
-    for t in range(show + 1, end):
-        out.at(t, ride_cmd(mine, at))
-    if head:
-        # the head: at pattern tick t it is sent to where it shall be at t + 1 (1 t of client interpolation): it reaches the hit
-        # point as tick h is shown. It runs the whole path at an even pace.
-        lens = [0.0]
-        for (_u0, p0), (_u1, p1) in zip(pts, pts[1:]):
-            lens.append(lens[-1] + math.dist(p0, p1))
-
-        def at_len(s):
-            for i in range(1, len(lens)):
-                if s <= lens[i] or i == len(lens) - 1:
-                    f = 0.0 if lens[i] == lens[i - 1] else (s - lens[i - 1]) / (lens[i] - lens[i - 1])
-                    return lerp(pts[i - 1][1], pts[i][1], max(0.0, min(1.0, f)))
-        hsel = f'@e[type=minecraft:item_display,tag={TAG_HEAD},tag={mine},limit=1]'
-        n = max(1, h - show)
-        out.at(show, 'summon minecraft:item_display ~ ~ ~ {Tags:' + _tags(key, TAG_HEAD, mine)
-               + ',billboard:"center",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
-               f'teleport_duration:1,interpolation_duration:0,transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],'
-               f'scale:[{f4(HEAD_S)},{f4(HEAD_S)},{f4(HEAD_S)}],right_rotation:[0f,0f,0f,1f]}},'
-               f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_head",'
-               f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}',
-               f'execute {at} rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] / n))}')
-        for t in range(show + 1, h):
-            out.at(t, f'execute {at} rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] * (t + 1 - show) / n))}')
-        out.at(h, f'kill {hsel}')
-    if flare:
-        out.at(max(show + 1, a + 1), f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
-    out.at(end, f'kill {sel}')
-    return dict(show=show, hit=h, segs=len(cmds), pts=pts, uid=uid, end=end)
-
-
-def slash(out, key, sw, t0, col, uid, a=None, b=None):
-    """The slash of swing sw: its pieces, each born on the pattern tick its sweep is shown, left in the air where the blade
-    was, fading through ARC_FRAMES and gone ARC_LIFE t after its birth. Returns the pieces (with their pattern ticks)."""
-    pcs = sw.pieces(a, b)
-    by = {}
-    for pc in pcs:
-        by.setdefault(t0 + pc['t'], []).append(pc)
-    for t, row in sorted(by.items()):
-        grp = f'{TAG}_{uid}_{t}'
-        out.at(t, *[arc_card(key, pc, col, (grp,)) for pc in row], *place())
-        sel = SEL.format(grp)
-        for dt, frame in ARC_FRAMES[1:]:
-            if any(pc['kind'] == 'arc' for pc in row):
-                out.at(t + dt, f'execute as {sel} run data modify entity @s item.components."minecraft:item_model" set value "{KIT}{frame}"')
-        out.at(t + ARC_LIFE, f'kill {sel}')
-    return [dict(pc, pt=t0 + pc['t']) for pc in pcs]
+# =================================================================================================================================
+# Round W (lane WB; w_brief.md §2 WB; the user, 11-12: 「보스의 검로가 보이는건 미리 경로를 보여주라는게 아니라 공격이 좀 더 잘
+# 보이도록 이미 지나온 경로를 표시하라는 거야」): the TRAIL. Nothing is drawn where the blade is going to go (round V's drawn path, its
+# running head, the target lines, the tall mark and the standing lines are gone); the blade leaves a bright ribbon on what it has
+# swept. Everything is generated from the blade the rig SHOWS on the pattern clock (Shown: the sword part's transform per clip
+# tick as the client gets it - the track's sp / sq - played at the pattern ticks the pattern plays its clips, the blend-in before
+# a clip's f0 from the pose shown before):
+#
+#   the band     one card on the blade (kind sw_band: a lance from the guard to the tip, W_BAND wide) with the sword part's own
+#                translation and rotation (+ the constant turn of the lance onto the blade's axis): at pattern tick k it is sent
+#                the sword's transform of tick k + 1 with one tick of interpolation, as the rig's own keys are, so it moves
+#                exactly as the blade does. From the first known pose to the end of the last follow-through: the trail's head.
+#   the pieces   per pattern tick t the surface the blade sweeps t -> t + 1 (the client's own interpolation of the sword part),
+#                in planar pieces of <= ARC_STEP deg of blade turn: a sector (sw_fan) where it turns about a point of its own
+#                line, else a strip (sw_quad) where it moves sideways. Every piece of the sweep t -> t + 1 is summoned at t with NO
+#                width on the blade's line of tick t, and at t + 1 given its full shape with one tick of interpolation: it opens
+#                from where the blade was to where it went one tick behind it (LAG) - nothing ahead of the blade, at any instant,
+#                whatever the client's interpolation of the sword does inside a tick. It rides her model the two
+#                ticks it is made on and is then left in the world where it was swept (a dash leaves it behind her); its fading
+#                frames at FADE, gone LIFE t after it began to open. A swing's pieces (a hit's [a, b]) are whiter and wear a
+#                taller rim wall (the trail seen edge-on): round V's slash IS the trail's brightest stretch (one effect).
+#   the ribbon   where her BODY carries the blade (a dash, a lunge, a dive, a gauntlet approach, a leap into a cut): a band in the
+#                world from where her sword hand was when the move began, grown each tick to the hand's place one tick back
+#                (core/sw/rib): it stays one step behind her model at any clock speed.
+#   the wave     a dash-through's line and kcut's three crossing lines strike beyond her blade's reach: ON the hit tick (never
+#                before) the struck line flashes for WAVE_LIFE t.
+#
+# The band and the pieces carry rlk_mb_part: lane VP's beat (player/def/beat/**: its held ticks, the slow motion's stretched
+# interpolation, the rocked-back tilt) treats them as it treats her rig's parts. The core's fight hook rides TR_RIDE cards to her
+# model after rig/tick (RIDE_CMD: at the rig's root part). Every command is a literal line on a pattern tick: a held or slowed
+# pattern clock holds the trail with the blade.
+LIFE = 7                      # t: a piece is gone this long after it began to open (w_brief: fading out over ~6-8 t)
+FADE = ((3, 1), (5, 2))       # (ticks after it began to open, fading frame)
+RIDE_T = 2                    # t: a piece rides her model from its summon to its opening tick, then stays where it was swept
+LAG = 1                       # t: the sweep t -> t + 1 opens on tick t + 1, one tick behind the blade (a planar piece cannot follow the
+#                               client's curved interpolation of a fast cut within the tick without running ahead of it somewhere)
+W_BAND = 0.26                 # b: the band on the blade (its bright core RIB_CORE x that)
+RIB_CORE = 0.56               # the bright share of a sw_rib / sw_band card's width, of a rim wall's height (ink on both sides)
+RIBBON = 0.24                 # the bright ribbon of a swept piece: this share of its length from the blade's base (ink on both sides)
+WALL, WALL_HOT = 0.22, 0.30   # b: the rim wall of a piece (the trail seen edge-on); a swing's pieces
+RIB_W = 0.30                  # b: a body ribbon's width
+RIB_LIFE = 6                  # t: a ribbon is gone this long after its last growth
+WAVE_W, WAVE_LIFE = 0.30, 4
+ARC_STEP = 30.0               # deg of blade turn per planar piece (its chord lies within 3.5 % of the radius inside the tip's way)
+TIP_STEP = 0.9                # b of tip travel per planar piece
+MIN_TURN = 3.0                # deg: under it the blade did not turn (a strip, or nothing)
+HOT_MIX = 0.55                # a swing's pieces: the colour mixed this far to white
+FAN_CHORD = 1.0               # the wedge sprite's corners lie at b = this (its rim and the rim wall are the chord between them)
+TAG = 'rlk_hr_sw'             # round V's tag: card() (shield.py's fail column) keeps it
+TAG_NEW = 'rlk_hr_swn'
+TR, TR_RIDE, TR_BAND, TR_GROW, TR_TGT, TR_NEW = 'rlk_hr_tr', 'rlk_hr_trr', 'rlk_hr_trb', 'rlk_hr_trg', 'rlk_hr_trt', 'rlk_hr_trn'
+TR_FAM = {'fan': 'rlk_hr_trf', 'quad': 'rlk_hr_trq', 'rib': 'rlk_hr_tri'}      # the model family of a card (core/pp fades by it)
+BEAT_TAG = 'rlk_mb_part'      # lane VP's beat passes take displays with this tag (the rig's parts carry it)
+TR_SEL = SEL.format(TR)
+# colours (RGB ints, the sprites are white): a parryable hit white-gold, an unparriable one its flash's colour
+COL = {'P': 0xFFE9A8, 'yellow': 0xFFE14A, 'purple': 0xD68BFF, 'blue': 0x5AA8FF, 'flare': 0xFFFFFF}
+R_LANCE = (-math.sqrt(0.5), 0.0, 0.0, math.sqrt(0.5))   # turns a lance card's +z onto the sword part's +y (the blade's axis)
 
 
-# --- the target line: a dash's / a dive's way, known only in the game -------------------------------------------------------------
-# Where her body carries the blade (a dash through the locked spot, a plunge onto it) the blade's way in the world is her own
-# way: a straight line from her to the target. Its length is measured in the game (core/sw/march: 0.5 b steps from the line's
-# start along its aim until the tagged target is reached), its head runs to the target and arrives on the hit tick. One such
-# line lives at a time (TAG_LINE).
-TAG_LINE, TAG_LHEAD, TAG_TGT = 'rlk_hr_swl', 'rlk_hr_swlh', 'rlk_hr_swt'
-LINE_STEP, LINE_MAX = 0.5, 64
-STO = f'{api.STORAGE} core.sw'
-LINE_SEL = f'@e[type=minecraft:item_display,tag={TAG_LINE}]'
-LHEAD_SEL = f'@e[type=minecraft:item_display,tag={TAG_LHEAD}]'
+def blade_span():
+    """(bladeLo, tip): the blade along the sword part's local +y (the track's top-level `blade`)."""
+    track('a1')
+    return tuple(_BLADE)
+
+
+def hot(col):
+    r, g, b = (col >> 16) & 255, (col >> 8) & 255, col & 255
+    m = lambda v: int(round(v + (255 - v) * HOT_MIX))      # noqa: E731
+    return (m(r) << 16) | (m(g) << 8) | m(b)
+
+
+# --- quaternions (x, y, z, w) ----------------------------------------------------------------------------------------------------
+def qmul(a, b):
+    ax, ay, az, aw = a
+    bx, by, bz, bw = b
+    return (aw * bx + ax * bw + ay * bz - az * by, aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw, aw * bw - ax * bx - ay * by - az * bz)
+
+
+def qrot(q, v):
+    x, y, z, w = q
+    u = (x, y, z)
+    c1 = cross(u, v)
+    c2 = cross(u, c1)
+    return tuple(v[i] + 2 * (w * c1[i] + c2[i]) for i in range(3))
+
+
+def qslerp(a, b, u):
+    """JOML's Quaternionf.slerp (the client's display interpolation): the shorter way."""
+    d = sum(x * y for x, y in zip(a, b))
+    if d < 0:
+        b, d = tuple(-x for x in b), -d
+    if d > 0.9995:
+        r = tuple(x + (y - x) * u for x, y in zip(a, b))
+    else:
+        th = math.acos(min(1.0, d))
+        s = math.sin(th)
+        r = tuple((math.sin((1 - u) * th) * x + math.sin(u * th) * y) / s for x, y in zip(a, b))
+    n = math.sqrt(sum(x * x for x in r))
+    return tuple(x / n for x in r)
+
+
+# --- what the rig shows ----------------------------------------------------------------------------------------------------------
+class Shown:
+    """The sword her rig shows on a pattern's clock. st[t] = (translation, rotation) of the sword part at the instant of pattern tick
+    t (the client moves it to st[t + 1] during that tick), None while the sword is not shown or its place is not known.
+    segs = [(pattern tick, clip)] (api.play at that tick: its clip tick 0 is that pattern tick); a clip's ticks before its f0 (the
+    sword's first key) are the rig's blend from the transform shown before - known when that is, else None (a pattern's first
+    clip: the stance she comes from is not known at build time). hidden = pattern ticks of state/hidden (until the next clip);
+    last = the last pattern tick wanted."""
+
+    def __init__(self, segs, hidden=(), last=None):
+        self.st, self.clip = {}, {}
+        self.lo, self.hi = blade_span()
+        prev = None
+        segs = sorted(segs)
+        for i, (t0, clip) in enumerate(segs):
+            tr = track(clip)
+            n, f0 = len(tr['sp']) - 1, int(tr.get('f0', 0))
+            t1 = segs[i + 1][0] if i + 1 < len(segs) else (t0 + n if last is None else last)
+            hid = min((h for h in hidden if t0 <= h and (h < t1 or i + 1 == len(segs))), default=None)
+            start = prev
+            for t in range(t0, t1 + 1):
+                ct = min(n, t - t0)
+                if hid is not None and t >= hid:
+                    s = None
+                elif ct >= f0:
+                    s = (tuple(tr['sp'][ct]), tuple(tr['sq'][ct])) if tr['on'][ct] else None
+                elif start is not None and tr['on'][min(f0, n)]:
+                    u = ct / f0
+                    s = (lerp(start[0], tr['sp'][f0], u), qslerp(start[1], tuple(tr['sq'][f0]), u))
+                else:
+                    s = None
+                self.st[t] = s
+                self.clip[t] = (clip, ct)
+            prev = self.st[t1]
+
+    def known(self, t):
+        return self.st.get(t) is not None
+
+    def at(self, u):
+        """(translation, rotation) at the float pattern tick u (the client's interpolation between two ticks)"""
+        i = int(math.floor(u))
+        f = u - i
+        a = self.st.get(i)
+        if f < 1e-9:
+            return a
+        b = self.st.get(i + 1)
+        if a is None or b is None:
+            return None
+        return lerp(a[0], b[0], f), qslerp(a[1], b[1], f)
+
+    def blade(self, u):
+        """(base, tip) in her frame at the float pattern tick u, or None"""
+        s = self.at(u)
+        if s is None:
+            return None
+        p, q = s
+        return add(p, qrot(q, (0.0, self.lo, 0.0))), add(p, qrot(q, (0.0, self.hi, 0.0)))
+
+
+# --- the pieces: the surface the blade sweeps in one tick ------------------------------------------------------------------------
+def _fan_scale(r, beta):
+    """(sx, sz) of a sw_fan card whose corners stand at the radius r, its half-angle beta deg (the wedge sprite: edges a = +-b / 2,
+    its rim the chord b = 1 between the corners - a uniform circle would bulge out past the tip's way when the card is squeezed)"""
+    return 2 * r * math.sin(math.radians(beta)), r * math.cos(math.radians(beta))
+
+
+def splits(sh, t):
+    """Float ticks t .. t + 1 with <= ARC_STEP deg of blade turn and <= TIP_STEP b of tip travel between two of them."""
+    p0, p1 = sh.blade(t), sh.blade(t + 1)
+    d0, d1 = sub(p0[1], p0[0]), sub(p1[1], p1[0])
+    n = max(1, math.ceil(angle(d0, d1) / ARC_STEP - 1e-6), math.ceil(math.dist(p0[1], p1[1]) / TIP_STEP - 1e-6))
+    # (the client's slerp may bend the way: check the halves)
+    while n < 12:
+        us = [t + k / n for k in range(n + 1)]
+        bl = [sh.blade(u) for u in us]
+        if all(angle(sub(a[1], a[0]), sub(b[1], b[0])) <= ARC_STEP + 1e-6 and math.dist(a[1], b[1]) <= TIP_STEP + 1e-6
+               for a, b in zip(bl, bl[1:])):
+            return us
+        n += 1
+    return [t + k / n for k in range(n + 1)]
+
+
+def sweep(sh, t, wall=WALL):
+    """The pieces of the blade's way t -> t + 1: [dict(kind 'fan' | 'quad', u0, u1, xf0 = (translation, rotation, scale) with no
+    width on the blade's line of tick t, xf1 = its full shape, + its geometry for the tests)]. Where the blade only slid along
+    itself, or the piece would be narrower than MIN_THICK, there is none (the band on the blade is the trail there)."""
+    b0, t0 = sh.blade(t)
+    d0 = unit(sub(t0, b0))
+    us = splits(sh, t)
+    out = []
+    for ua, ub in zip(us, us[1:]):
+        (ba, ta), (bb, tb) = sh.blade(ua), sh.blade(ub)
+        da, db = unit(sub(ta, ba)), unit(sub(tb, bb))
+        ph = angle(da, db)
+        nv = cross(da, db)
+        pc = None
+        if ph >= MIN_TURN and norm(nv) > 1e-6:
+            nv = unit(nv)
+            w0 = sub(ba, bb)
+            bq, dd, ee = dot(da, db), dot(da, w0), dot(db, w0)
+            den = 1 - bq * bq
+            q = lerp(add(ba, mul(da, (bq * ee - dd) / den)), add(bb, mul(db, (ee - bq * dd) / den)), 0.5)
+            ra, rb = norm(sub(ta, q)), norm(sub(tb, q))
+            if min(dot(sub(ta, q), da), dot(sub(tb, q), db)) > 0.3 and max(ra, rb) <= 6.0 and abs(ra - rb) <= 0.22:
+                z = unit(add(unit(sub(ta, q)), unit(sub(tb, q))))
+                beta = angle(sub(ta, q), sub(tb, q)) / 2
+                r = (ra + rb) / 2
+                # (its chord and its bright ribbon - the outer 23 % of the wedge, the sprite - at least MIN_THICK)
+                if 2 * r * math.sin(math.radians(beta)) >= MIN_THICK and RIBBON * r * math.cos(math.radians(beta)) >= MIN_THICK:
+                    sx, sz = _fan_scale(r, beta)
+                    y = nv
+                    x = cross(y, z)
+                    # the start: no width, in its own plane about its own apex, turned back from its first edge by the blade's
+                    # turn since the tick began: it opens by turning about the apex, so every piece of the tick starts from the
+                    # tick's first blade position and its leading edge never turns farther than the blade has
+                    ea = unit(sub(ta, q))
+                    back = -math.radians(angle(d0, da))
+                    z0 = unit(add(mul(ea, math.cos(back)), mul(cross(y, ea), math.sin(back))))
+                    if abs(dot(sub(t0, q), y)) > 0.08:
+                        z0 = ea                         # (the tick's first blade position is not in this piece's plane: from its own edge)
+                    _sx0, sz0 = _fan_scale(r, 0.0)
+                    pc = dict(kind='fan', q=q, z=z, n=nv, beta=beta, r=r, tips=(ta, tb), bases=(ba, bb),
+                              xf0=(q, quat(cross(y, z0), y, z0), (0.0, wall, sz0)), xf1=(q, quat(x, y, z), (sx, wall, sz)))
+        if pc is None:
+            # no turn about a point of its own line: a strip between the two blade lines, its far end at the tips
+            u = unit(add(da, db))
+            ma, mb = lerp(ba, ta, 0.5), lerp(bb, tb, 0.5)
+            v = sub(mb, ma)
+            vp = sub(v, mul(u, dot(v, u)))
+            w = norm(vp)
+            if w >= MIN_THICK and RIBBON * (norm(sub(ta, ba)) + norm(sub(tb, bb))) / 2 >= MIN_THICK:
+                xw = mul(vp, 1 / w)
+                y = cross(u, xw)
+                ln = (norm(sub(ta, ba)) + norm(sub(tb, bb))) / 2
+                c = sub(lerp(ma, mb, 0.5), mul(u, ln / 2))             # the base end's middle
+                m0 = lerp(b0, t0, 0.5)
+                # the start: no width, across the way where the blade of tick t is (it grows from there as the blade moves on)
+                c0 = sub(c, mul(xw, dot(sub(c, m0), xw)))
+                rot = quat(xw, y, u)
+                pc = dict(kind='quad', c=c, u=u, x=xw, n=y, w=w, len=ln, tips=(ta, tb), bases=(ba, bb),
+                          xf0=(c0, rot, (0.0, wall, ln)), xf1=(c, rot, (w, wall, ln)))
+        if pc:
+            pc.update(u0=ua - t, u1=ub - t)
+            out.append(pc)
+    return out
+
+
+def band_xf(s, w=W_BAND):
+    """The band's transformation for the sword transform s = (translation, rotation): the sword's own frame, the lance turned onto
+    its +y (sw_band's lance runs from bladeLo / tip to 1 of its length: scaled to the tip it starts at the guard)."""
+    p, q = s
+    return p, qmul(q, R_LANCE), (w, w, blade_span()[1])
+
+
+# --- cards -----------------------------------------------------------------------------------------------------------------------
+def _ttags(key, *more, beat=True):
+    base = (TR, BEAT_TAG) if beat else (TR,)
+    return '[' + ','.join(f'"{t}"' for t in base + ('rlk_room', 'rlk_mb_aux', api.TAGS['pat'], f'rlk_hr_p_{key}') + more) + ']'
+
+
+def _xf(t, q, s):
+    return (f'transformation:{{translation:[{",".join(f4(v) for v in t)}],left_rotation:[{",".join(f4(v) for v in q)}],'
+            f'scale:[{",".join(f4(v) for v in s)}],right_rotation:[0f,0f,0f,1f]}}')
+
+
+def tcard(key, model, xf, col, tags, tpd=1, ipd=1, beat=True):
+    """One literal summon of a trail card at the executor (xf = (translation, left rotation, scale) in its frame)."""
+    return ('summon minecraft:item_display ~ ~ ~ {Tags:' + _ttags(key, *tags, beat=beat) + ',billboard:"fixed",item_display:"none",'
+            'brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
+            f'teleport_duration:{int(tpd)},interpolation_duration:{int(ipd)},{_xf(*xf)},'
+            f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}{model}",'
+            f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}')
+
+
+def _model_cmd(sel, model):
+    return f'execute as {sel} run data modify entity @s item.components."minecraft:item_model" set value "{KIT}{model}"'
+
+
+# --- the trail of a pattern ------------------------------------------------------------------------------------------------------
+TRAILS = {}               # key -> [record of trail()] (the tests)
+
+
+def trail(out, key, uid, sh, t0, t1, col_at, hot_at=None, cond_at=None):
+    """The band and the pieces of the shown sword sh on pattern ticks t0 .. t1 into out: the band shows the poses t0 .. t1, the
+    pieces the sweeps t -> t + 1 for t0 <= t < t1. col_at(t) = the colour (int) of tick t's sweep; hot_at(t): it belongs to a
+    swing; cond_at(t): an execute condition for the commands of tick t (or None). Returns the record (TRAILS)."""
+    hot_at = hot_at or (lambda t: False)
+    cond_at = cond_at or (lambda t: None)
+    rec = dict(uid=uid, shown=sh, t0=t0, t1=t1, pieces={}, band=[], col={}, hot={}, bandcol={})
+    # the band: runs of known transforms; at tick k it is sent the sword's transform of tick k + 1 (one tick of interpolation)
+    t = t0
+    while t <= t1:
+        if not sh.known(t):
+            t += 1
+            continue
+        e = t
+        while e + 1 <= t1 and sh.known(e + 1):
+            e += 1
+        mine = f'{TR}_{uid}b{t}'
+        sel = SEL.format(mine)
+        col = col_at(min(t, t1 - 1) if t1 > t0 else t)
+        # summoned a tick early with no size on the pose of tick t: from t it grows onto the blade as it moves (a display that
+        # is new to the client cannot interpolate in its first tick)
+        p0, q0, _s = band_xf(sh.st[t])
+        out.at(t - 1, tcard(key, 'sw_band', (p0, q0, (0.0, 0.0, 0.0)), col, (TR_RIDE, TR_BAND, mine)), cond=cond_at(t - 1))
+        rec['bandcol'][t] = col
+        last = None
+        for k in range(t, e + 1):
+            if not sh.known(k + 1):
+                break
+            xf = _xf(*band_xf(sh.st[k + 1]))
+            c2 = col_at(k)
+            extra = ''
+            if c2 != col:
+                col = c2
+                extra = f',item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_band","minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}'
+            rec['bandcol'][k] = col
+            if xf != last or extra:
+                out.at(k, f'execute as {sel} run data merge entity @s {{start_interpolation:0,interpolation_duration:1,{xf}{extra}}}',
+                       cond=cond_at(k))
+                last = xf
+        out.at(e + 1, f'kill {sel}', cond=cond_at(e + 1))
+        rec['band'].append((t, e))
+        t = e + 1
+    # the pieces
+    for t in range(t0, t1):
+        if not (sh.known(t) and sh.known(t + 1)):
+            continue
+        h = bool(hot_at(t))
+        pcs = sweep(sh, t, WALL_HOT if h else WALL)
+        if not pcs:
+            continue
+        col = hot(col_at(t)) if h else col_at(t)
+        o = t + LAG                                     # the tick it opens on
+        grp = f'{TR}_{uid}_{t}'
+        gsel = SEL.format(grp)
+        for i, pc in enumerate(pcs):
+            fam = pc['kind']
+            out.at(o - 1, tcard(key, f'sw_{fam}_0', pc['xf0'], col, (TR_RIDE, TR_FAM[fam], grp, f'{TR}_i{i}')), cond=cond_at(o - 1))
+            out.at(o, f'execute as {gsel[:-1]},tag={TR}_i{i}] run data merge entity @s {{start_interpolation:0,{_xf(*pc["xf1"])}}}',
+                   cond=cond_at(o))
+        out.at(o + RIDE_T - 1, f'tag {gsel} remove {TR_RIDE}', cond=cond_at(o + RIDE_T - 1))
+        fams = sorted({pc['kind'] for pc in pcs})
+        for dt, fr in FADE:
+            for fam in fams:
+                s_ = gsel if len(fams) == 1 else f'{gsel[:-1]},tag={TR_FAM[fam]}]'
+                out.at(o + dt, _model_cmd(s_, f'sw_{fam}_{fr}'), cond=cond_at(o + dt))
+        out.at(o + LIFE, f'kill {gsel}', cond=cond_at(o + LIFE))
+        rec['pieces'][t] = pcs
+        rec['col'][t], rec['hot'][t] = col, h
+    rec['end'] = max([e + 1 for _t, e in rec['band']] + [t + LAG + LIFE for t in rec['pieces']] + [t0])
+    TRAILS.setdefault(key, []).append(rec)
+    return rec
+
+
+RIG_ROOT = api.RIG_UUID.format(0)
+# the core's fight hook, after rig/tick: the riding cards to her model (the rig's root part: its place and yaw, also when the core
+# put her elsewhere inside the hook - rig/follow_now)
+RIDE_CMD = f'execute at {RIG_ROOT} run tp {SEL.format(TR_RIDE)} ~ ~ ~ ~ ~'
+
+
+def stop_lines():
+    """A perfect parry's flinch (core/pp): the band goes with the swing; the pieces / ribbons jump to their last fading frame (the
+    pattern ends PP_FLINCH t later, core/pat_end kills them)."""
+    return [f'kill {SEL.format(TR_BAND)}', f'tag {SEL.format(TR_GROW)} remove {TR_GROW}',
+            f'kill @e[type=minecraft:marker,tag={TR_TGT}]'] + \
+        [_model_cmd(SEL.format(TR_FAM[f]), f'sw_{f}_2') for f in ('fan', 'quad', 'rib')]
+
+
+def end_lines():
+    """core/pat_end and the gauntlet's end: whatever of a trail is left."""
+    return [f'kill {TR_SEL}', f'kill @e[type=minecraft:marker,tag={TR_TGT}]']
+
+
+# --- the ribbon: her body carries the blade ---------------------------------------------------------------------------------------
+RIBS = {}                 # key -> [dict(uid, t0, t1, col, cond, end)] (the tests)
 
 
 def runtime(W, fn, sset):
-    """core/sw/{aim,march,head}: the run-time part of the target line (written once by p1.py)."""
-    W.w('core/sw/aim', [
-        '# {dy} The target line (blade.py; one at a time, rlk_hr_swl) to here, aimed as the executing rotation, as long as the way',
-        f'# to the target (the entity tagged {TAG_TGT}; dy = its height below the line): core/sw/march counts {LINE_STEP} b steps.',
-        f'tp {LINE_SEL} ~ ~ ~ ~ ~',
-        sset('#sw_n', 0),
-        f'$function {api.NS}core/sw/march {{dy:"$(dy)"}}',
-        f'execute as {LINE_SEL} store result entity @s transformation.scale[2] float {LINE_STEP} run scoreboard players get #sw_n {api.OBJ}'])
-    W.w('core/sw/march', [
-        f'# {{dy}} One {LINE_STEP} b step of the target line\'s measure (at most {LINE_MAX}): stops within 0.45 b of the target.',
-        f'execute if score #sw_n {api.OBJ} matches {LINE_MAX}.. run return 0',
-        f'$execute positioned ~ ~$(dy) ~ if entity @e[tag={TAG_TGT},distance=..0.45] run return 0',
-        f'scoreboard players add #sw_n {api.OBJ} 1',
-        f'$execute positioned ^ ^ ^{LINE_STEP} run function {api.NS}core/sw/march {{dy:"$(dy)"}}'])
-    W.w('core/sw/head', [
-        '# {d} The target line\'s head to d blocks along the line (blade.py: d = the line\'s length x the share of the way it',
-        '# shall have run one tick from now).',
-        f'$execute at {LINE_SEL[:-1]},limit=1] run tp {LHEAD_SEL} ^ ^ ^$(d)'])
+    """core/sw/{rib,rib1}: the run-time part of the ribbon (written once by p1.py)."""
+    o = api.OBJ
+    tgt = f'@e[type=minecraft:marker,tag={TR_TGT},limit=1]'
+    W.w('core/sw/rib', [
+        '# The growing ribbon (blade.py; rlk_hr_trg: one at a time; @s = the body, at the hand\'s place now): it turns to the',
+        f'# marker {TR_TGT} (the hand\'s place one tick ago) and becomes as long as the way to it (one tick of interpolation: one',
+        '# step behind her model, never ahead of it), then the marker comes here.',
+        f'execute as {SEL.format(TR_GROW)} at @s facing entity {tgt} feet run function {api.NS}core/sw/rib1',
+        f'tp {tgt} ~ ~ ~'])
+    W.w('core/sw/rib1', [
+        f'# @s = the growing ribbon, at it, facing the marker {TR_TGT}: turn there; its length = (marker - here) . the aim (x 1000).',
+        'tp @s ~ ~ ~ ~ ~',
+        f'execute positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {{Tags:["rlk_hr_tru","rlk_room","rlk_mb_aux"]}}',
+        *[f'execute store result score #sw_{a} {o} run data get entity {tgt} Pos[{i}] 1000' for i, a in enumerate('xyz')],
+        *[ln for i, a in enumerate('xyz') for ln in (
+            f'execute store result score #sw_n {o} run data get entity @s Pos[{i}] 1000',
+            f'scoreboard players operation #sw_{a} {o} -= #sw_n {o}',
+            f'execute store result score #sw_u {o} run data get entity @e[type=minecraft:marker,tag=rlk_hr_tru,limit=1] Pos[{i}] 1000',
+            f'scoreboard players operation #sw_u {o} -= #sw_n {o}',
+            f'scoreboard players operation #sw_{a} {o} *= #sw_u {o}')],
+        'kill @e[type=minecraft:marker,tag=rlk_hr_tru]',
+        f'scoreboard players operation #sw_x {o} += #sw_y {o}',
+        f'scoreboard players operation #sw_x {o} += #sw_z {o}',
+        f'execute if score #sw_x {o} matches ..0 run return 0',
+        f'execute store result entity @s transformation.scale[2] float 0.000001 run scoreboard players get #sw_x {o}'])
 
 
-def target_line(out, key, show, lock, h, col, start, pre, post, dy='0', w=PATH_W):
-    """The target line of a dash / dive hit (pattern ticks; @s = the body): shown from `show`, aimed every tick at `pre` (the
-    player) until the lock, at `post` (the lock marker) from the lock tick on, the head arriving on h. start: execute
-    subcommands that put the executing position on the line's start and the rotation on its aim, with {T} = the target
-    selector. Returns dict(show, lock, hit)."""
-    show = min(show, lock) if pre else lock
-    tags = (TAG_LINE,)
-    out.at(show, f'kill {LINE_SEL}', f'kill {LHEAD_SEL}',
-           card(key, 'sw_path', (0, 0, 0), (0, 0, 0, 1), (w, w, 1.0), col, tags, tpd=0),
-           'summon minecraft:item_display ~ ~ ~ {Tags:' + _tags(key, TAG_LHEAD)
-           + ',billboard:"center",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
-           f'teleport_duration:1,interpolation_duration:0,transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],'
-           f'scale:[{f4(HEAD_S)},{f4(HEAD_S)},{f4(HEAD_S)}],right_rotation:[0f,0f,0f,1f]}},'
-           f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_head",'
-           f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}',
-           f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}')
-    n = h - show
-    for t in range(show, h):
-        if t <= lock:
-            tgt = post if t == lock else pre
-            out.at(t, f'tag @e[tag={TAG_TGT}] remove {TAG_TGT}', f'tag {tgt} add {TAG_TGT}',
-                   f'execute {start.replace("{T}", tgt)} run function {api.NS}core/sw/aim {{dy:"{dy}"}}',
-                   f'tag @e[tag={TAG_TGT}] remove {TAG_TGT}')
-        u = (t + 1 - show) / n
-        out.at(t, f'execute store result storage {STO}.d double {f4(LINE_STEP * u)[:-1]} run scoreboard players get #sw_n {api.OBJ}',
-               f'function {api.NS}core/sw/head with storage {STO}')
-    out.at(h, f'kill {LHEAD_SEL}',
-           f'execute as {LINE_SEL} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
-    out.at(h + 3, f'kill {LINE_SEL}')
-    return dict(show=show, lock=lock, hit=h)
+def hand(sh, t):
+    """The point of her frame the ribbon follows at pattern tick t: her sword hand (the blade's base); not shown: chest high."""
+    p = sh.blade(t) if sh is not None and sh.known(t) else None
+    return p[0] if p else (0.0, 1.1, 0.25)
 
 
-def static_line(out, key, uid, show, h, col, where, length, w=PATH_W, life=3):
-    """A straight path card of a known length left in the world (kcut's crossing lines, nb's bands: through the locked spot):
-    where = execute subcommands for its start and aim (the card runs `length` b along the executing rotation)."""
-    mine = f'{TAG}_{uid}'
+def ribbon(out, key, uid, sh, ta, tb, col, cond=None, w=RIB_W, seg=99):
+    """The ribbon of a body move (the glide / leap called at pattern tick ta; the body there at tb). @s = the body: on pattern tick
+    t the hook runs after the movement library moved it (its place of tick t; her model reaches it during this tick). The ribbon
+    starts at the hand's place of ta; on ta + 1 .. tb + 1 it grows to the hand's place one tick back (core/sw/rib). seg: a new
+    straight piece every seg ticks (a curved way: a leap). Then it fades and is gone RIB_LIFE t after its last growth."""
+    def at_hand(t):
+        return f'at @s rotated as @s rotated ~ 0 positioned {car(hand(sh, t))}'
+    tgt = f'@e[type=minecraft:marker,tag={TR_TGT},limit=1]'
+    end = ta
+    for s in range(ta, tb + 1, seg):
+        e = min(tb + 1, s + seg)
+        mine = f'{TR}_{uid}r{s}'
+        sel = SEL.format(mine)
+        first = s == ta
+        mk = (f'kill @e[type=minecraft:marker,tag={TR_TGT}]',
+              f'execute {at_hand(s)} run summon minecraft:marker ~ ~ ~ {{Tags:{_ttags(key, TR_TGT, beat=False)}}}') if first else ()
+        out.at(s, *mk, f'tag {SEL.format(TR_GROW)} remove {TR_GROW}',
+               f'execute {"at " + tgt if not first else at_hand(s)} run ' + tcard(key, 'sw_rib_0', ((0, 0, 0), (0, 0, 0, 1), (w, w, 0.0)),
+                                                                              col, (TR_FAM['rib'], TR_GROW, mine), tpd=0, beat=False),
+               cond=cond)
+        for t in range(s + 1, e + 1):
+            out.at(t, f'execute {at_hand(t + 1)} run function {api.NS}core/sw/rib', cond=cond)
+        out.at(e + 1, f'tag {sel} remove {TR_GROW}', cond=cond)
+        out.at(e + 2, _model_cmd(sel, 'sw_rib_1'), cond=cond)
+        out.at(e + 4, _model_cmd(sel, 'sw_rib_2'), cond=cond)
+        out.at(e + RIB_LIFE, f'kill {sel}', cond=cond)
+        end = max(end, e + RIB_LIFE)
+    out.at(tb + 2, f'kill @e[type=minecraft:marker,tag={TR_TGT}]', cond=cond)
+    RIBS.setdefault(key, []).append(dict(uid=uid, t0=ta, t1=tb, col=col, cond=cond, seg=seg, end=end))
+    return end
+
+
+WAVES = {}
+
+
+def wave(out, key, uid, h, col, where, length=None, store=None, w=WAVE_W, cond=None):
+    """The struck line of a hit that reaches beyond her blade (a dash-through's line, kcut's crossing lines): a band left in the
+    world ON the hit tick h, WAVE_LIFE t. where = execute subcommands for its start and aim; its length a number, or store = the
+    fake player holding it in half blocks (a dash's probed length)."""
+    mine = f'{TR}_{uid}w'
     sel = SEL.format(mine)
-    out.at(show, f'execute {where} run ' + card(key, 'sw_path', (0, 0, 0), (0, 0, 0, 1), (w, w, length), col, (mine,), tpd=0),
-           f'execute {where} run tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ ~', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}')
-    out.at(h, f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
-    out.at(h + life, f'kill {sel}')
-    return dict(show=show, hit=h, len=length)
+    out.at(h, f'execute {where} run ' + tcard(key, 'sw_rib_0', ((0, 0, 0), (0, 0, 0, 1), (w, w, length or 0.0)), col,
+                                             (TR_FAM['rib'], TR_NEW, mine), tpd=0, ipd=0, beat=False),
+           f'execute {where} run tp {SEL.format(TR_NEW)} ~ ~ ~ ~ ~', cond=cond)
+    if store:
+        out.at(h, f'execute as {SEL.format(TR_NEW)} store result entity @s transformation.scale[2] float 0.5 run scoreboard players get {store} {api.OBJ}',
+               cond=cond)
+    out.at(h, f'tag {SEL.format(TR_NEW)} remove {TR_NEW}', cond=cond)
+    out.at(h + 2, _model_cmd(sel, 'sw_rib_1'), cond=cond)
+    out.at(h + 3, _model_cmd(sel, 'sw_rib_2'), cond=cond)
+    out.at(h + WAVE_LIFE, f'kill {sel}', cond=cond)
+    WAVES.setdefault(key, []).append(dict(uid=uid, hit=h, col=col, len=length, store=store))
+    return h + WAVE_LIFE
 
 
-# --- a hit of a pattern ---------------------------------------------------------------------------------------------------------
-DRAWN = {}                # key -> [dict(kind 'ride' | 'line' | 'static', clip, event, show, hit, lead, col, first, ...)] (tests)
-
-
-def lead_of(h, prev):
-    """(first?, the tick the path shows): a single / first hit SHOW_FIRST before it, a chain follow-up SHOW_CHAIN before it
-    but never before the tick after the hit before it."""
-    if prev is None or h - prev > 24:
-        return True, h - SHOW_FIRST
-    return False, max(prev + 1, h - SHOW_CHAIN)
-
-
+# --- a pattern's hits and its trail ----------------------------------------------------------------------------------------------
 def colour_of(key, idx):
-    """The path colour of api.HITS[key][idx]: white-gold for a parryable hit, else its (group's) last flash's colour."""
+    """The trail colour of api.HITS[key][idx]: white-gold for a parryable hit, else its (group's) last flash's colour."""
     row = api.HITS[key][idx]
     if row[6] == 'P':
         return COL['P'], 'P'
@@ -500,55 +724,41 @@ def colour_of(key, idx):
     return COL[fl[-1][0]], fl[-1][0]
 
 
-def ride(pb, key, idx, prev=None, t0=0, cond=None, slash_col=api.C_LILAC, path=True, sl=True, show=None, a=None, b=None):
-    """The drawn path (riding her) and the slash of api.HITS[key][idx] into the pattern builder pb. prev = the hit tick before
-    it in the chain (None: a single / first hit); t0 = the pattern tick of the clip's tick 0."""
-    clip, event = api.HITS[key][idx][0], api.HITS[key][idx][1]
-    sw = swing_of(clip, event, a=a, b=b)
-    h = t0 + sw.h
-    first, sh = lead_of(h, prev)
-    sh = max(0, sh if show is None else show)
-    col, cname = colour_of(key, idx)
-    uid = f'{clip}{sw.h}'
-    out = Out()
-    rec = dict(kind='ride', clip=clip, event=event, hit=h, first=first, col=cname, sw=sw, t0=t0, show=None, pieces=[])
-    if path:
-        r = path_ride(out, key, sw, t0, sh, col, uid)
-        rec.update(show=r['show'], lead=h - r['show'], pts=r['pts'], end=r['end'])
-    if sl:
-        rec['pieces'] = slash(out, key, sw, t0, SLASH[slash_col], uid)
-    out.into(pb, cond)
-    DRAWN.setdefault(key, []).append(rec)
-    return rec
+def pattern_hits(key, t0_of=None, only=None):
+    """[(pattern tick of the hit, Swing, colour, colour name, HITS index, clip tick 0's pattern tick)] of a P1 / P2 pattern, one
+    per clip event (t0_of: clip -> its pattern tick 0; only: the HITS indices to take)."""
+    out, seen = [], set()
+    for i, row in enumerate(api.HITS[key]):
+        clip, ev = row[0], row[1]
+        if (clip, ev) in seen or (only is not None and i not in only):
+            continue
+        seen.add((clip, ev))
+        c0 = (t0_of or {}).get(clip, 0)
+        sw = swing_of(clip, ev)
+        col, name = colour_of(key, i)
+        out.append((c0 + sw.h, sw, col, name, i, c0))
+    return out
 
 
-MARK_W, MARK_H0, MARK_H1, MARK_HEAD = 0.14, 1.95, 4.35, 0.36
+def colours(hits):
+    """col_at, hot_at for trail() from hits = [(hit tick, Swing, colour, ..., clip t0)]: a sweep has the colour of the next hit
+    (after the last: the last one's); it is hot inside a swing [a, b]."""
+    hs = sorted(hits, key=lambda x: x[0])
+
+    def col_at(t):
+        for h in hs:
+            if h[0] >= t + 1:
+                return h[2]
+        return hs[-1][2]
+
+    def hot_at(t):
+        return any(h[5] + h[1].a <= t and t + 1 <= h[5] + h[1].b for h in hs)
+    return col_at, hot_at
 
 
-def target_mark(out, key, uid, show, h, col, at):
-    """The tall in-air mark over a target (v_brief §3 VB 4: a tell at the target that cannot be missed; never a floor decal): a
-    thin bright column from MARK_H0 to MARK_H1 over the point `at` (execute subcommands: the lock marker's place) from `show`
-    on, a head that comes down it and reaches its foot on the hit tick h. A dash runs straight at the player's lens (its own
-    line is seen end-on, behind the avatar): this mark stands over the avatar's head, across the view."""
-    mine = f'{TAG}_{uid}'
-    sel = SEL.format(mine)
-    hsel = f'@e[type=minecraft:item_display,tag={TAG_HEAD},tag={mine},limit=1]'
-    up = f'{at} positioned ~ ~{MARK_H0} ~ rotated 0 -90'
-    out.at(show, f'execute {up} run ' + card(key, 'sw_path', (0, 0, 0), (0, 0, 0, 1), (MARK_W, MARK_W, MARK_H1 - MARK_H0), col, (mine,), tpd=0),
-           f'execute {up} run tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ ~', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}',
-           f'execute {at} positioned ~ ~{MARK_H1} ~ run summon minecraft:item_display ~ ~ ~ {{Tags:' + _tags(key, TAG_HEAD, mine)
-           + ',billboard:"center",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
-           f'teleport_duration:1,interpolation_duration:0,transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],'
-           f'scale:[{f4(MARK_HEAD)},{f4(MARK_HEAD)},{f4(MARK_HEAD)}],right_rotation:[0f,0f,0f,1f]}},'
-           f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_head",'
-           f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}')
-    n = max(1, h - show)
-    for t in range(show, h):
-        y = MARK_H1 + (MARK_H0 - MARK_H1) * (t + 1 - show) / n
-        out.at(t, f'execute {at} run tp {hsel} ~ ~{y:.3f} ~')
-    out.at(h, f'kill {hsel}', f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
-    out.at(h + 2, f'kill {sel}')
-    return dict(show=show, hit=h)
+def end_of(hits):
+    """The trail's last tick: the end of the last hit's follow-through (its swing's b)."""
+    return max(h[5] + h[1].b for h in hits)
 
 
 # --- the parry cue's place -------------------------------------------------------------------------------------------------------

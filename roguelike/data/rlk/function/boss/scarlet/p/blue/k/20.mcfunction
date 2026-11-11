@@ -1,10 +1,11 @@
 # BLUE pattern tick 20
-execute store result storage rlk:hr core.sw.d double 0.4583 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
-execute at @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_m22,limit=1] ~ ~2.293 ~
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_swn","rlk_hr_sw_blue22_20"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,transformation:{translation:[1.0939f,1.5477f,1.5129f],left_rotation:[0.1553f,-0.2904f,0.0478f,0.943f],scale:[0.36f,0.36f,0.6579f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_path","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 function rlk:boss/scarlet/p/blue/dash
 execute at @s run function rlk:boss/scarlet/fx/snd/lunge
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:90}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_blueb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2945f,1.1399f,0.7008f],left_rotation:[-0.037f,0.0123f,-0.7061f,0.707f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_blue_19,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4812f,1.2545f,0.4215f],left_rotation:[-0.1673f,-0.0228f,-0.9499f,0.2631f],scale:[0.396f,0.3f,1.435f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_blue_20","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2081f,1.1042f,-0.5011f],left_rotation:[-0.1102f,-0.0249f,-0.9772f,0.1797f],scale:[0f,0.3f,2.7006f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[11917567]}}}}
+kill @e[type=minecraft:marker,tag=rlk_hr_trt]
+execute at @s rotated as @s rotated ~ 0 positioned ^0.446 ^1.212 ^0.63 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_hr_tr","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_trt"]}
+tag @e[type=minecraft:item_display,tag=rlk_hr_trg] remove rlk_hr_trg
+execute at @s rotated as @s rotated ~ 0 positioned ^0.446 ^1.212 ^0.63 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_tri","rlk_hr_trg","rlk_hr_tr_bluer0r20"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:1,transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[0.3f,0.3f,0f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_rib_0","minecraft:custom_model_data":{colors:[5941503]}}}}

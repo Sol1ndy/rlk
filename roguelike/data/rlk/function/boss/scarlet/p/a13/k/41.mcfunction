@@ -1,10 +1,6 @@
 # A13 pattern tick 41.
-execute at @e[type=minecraft:marker,tag=rlk_hr_cut,scores={hr=41},limit=1] rotated as @a[tag=player,limit=1] rotated ~ 0 run function rlk:boss/scarlet/fx/snd/g_rise
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c41] ~ ~ ~ ~ 0
-kill @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c41,limit=1]
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_swn","rlk_hr_sw_c41_41"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.5364f,1.0853f,0.2304f],left_rotation:[0.1382f,-0.5199f,0.217f,0.8146f],scale:[0.9275f,1f,1.9929f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_swn","rlk_hr_sw_c41_41"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.605f,1.235f,0.1259f],left_rotation:[0.086f,-0.3229f,0.2426f,0.9108f],scale:[0.9699f,1f,2.0854f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_swn","rlk_hr_sw_c41_41"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.5481f,1.3126f,0.148f],left_rotation:[0.0293f,-0.1095f,0.2557f,0.9601f],scale:[0.9638f,1f,2.072f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
-function rlk:boss/scarlet/g/cut/make {s:58,t:17,dmg:37,kb:0,n:1}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b17] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2297f,1.0507f,-0.0507f],left_rotation:[-0.3696f,-0.8924f,0.2391f,0.099f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_33]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_35] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_37] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_39] remove rlk_hr_trr

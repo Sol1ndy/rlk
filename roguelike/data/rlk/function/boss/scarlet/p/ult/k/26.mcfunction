@@ -1,10 +1,8 @@
 # ULT pattern tick 26
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_ult24] ~ ~ ~ ~ 0
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_ult24_22] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_ult24_24] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_ult","rlk_hr_swn","rlk_hr_sw_ult24_26"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.0139f,0.9794f,0.143f],left_rotation:[0.0039f,0.6751f,0.1315f,0.7259f],scale:[0.7827f,1f,2.4843f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_ult","rlk_hr_swn","rlk_hr_sw_ult24_26"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.1437f,0.9995f,0.1304f],left_rotation:[-0.0166f,0.7799f,0.1305f,0.612f],scale:[0.7551f,1f,2.3965f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/ult_web {t:22}
 function rlk:boss/scarlet/fx/hud/ovl {g:"web",in:2,hold:16,out:2}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_ultb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.7105f,1.143f,-0.0993f],left_rotation:[-0.5337f,-0.63f,-0.4639f,-0.321f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_ult_22] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_ult_24] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_ult_25,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[-0.0152f,0.9824f,0.1436f],left_rotation:[-0.0048f,0.6755f,0.1184f,0.7278f],scale:[0.7018f,0.3f,2.2267f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_ult_25,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.1448f,1.0022f,0.1305f],left_rotation:[-0.0028f,0.7803f,0.1382f,0.6099f],scale:[0.6765f,0.3f,2.1459f],right_rotation:[0f,0f,0f,1f]}}

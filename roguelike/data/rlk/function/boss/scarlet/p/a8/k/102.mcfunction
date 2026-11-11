@@ -1,7 +1,4 @@
 # A8 pattern tick 102.
-function rlk:boss/scarlet/g/cut/lock {s:109}
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] positioned ^0.073 ^3.127 ^-0.021 run function rlk:boss/scarlet/fx/p/glint {c:2}
-execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
-execute rotated as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @s ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c109] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c109,limit=1] ^-0.505 ^2.757 ^0.402
+function rlk:boss/scarlet/rig/play/g_x
+execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:2}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b76] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4757f,1.5082f,0.0175f],left_rotation:[-0.8835f,-0.366f,0.1119f,0.2701f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}

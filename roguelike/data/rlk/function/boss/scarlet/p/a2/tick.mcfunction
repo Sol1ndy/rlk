@@ -22,6 +22,6 @@ execute if score #pt hr matches 16 run function rlk:boss/scarlet/p/a2/k/16
 execute if score #pt hr matches 17 run function rlk:boss/scarlet/p/a2/k/17
 execute if score #pt hr matches 18 run function rlk:boss/scarlet/p/a2/k/18
 execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/a2/k/19
-execute if score #pt hr matches 20 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a212_14]
-execute if score #pt hr matches 21 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a212_15]
-execute if score #pt hr matches 22 run scoreboard players set #done hr 1
+execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/a2/k/20
+execute if score #pt hr matches 21 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a2_13]
+execute if score #pt hr matches 22 run function rlk:boss/scarlet/p/a2/k/22

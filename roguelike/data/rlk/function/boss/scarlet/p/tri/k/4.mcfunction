@@ -1,7 +1,3 @@
 # TRI pattern tick 4
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ~ ~1.0 ~ run function rlk:boss/scarlet/core/sw/aim {dy:"-1.0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.125 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3183f,0.8832f,-0.0933f],left_rotation:[-0.1207f,0.1381f,0.017f,0.9829f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_3,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3129f,0.8937f,-0.0863f],left_rotation:[-0.0422f,0.1349f,0.3923f,0.9089f],scale:[0.2784f,0.22f,1.6208f],right_rotation:[0f,0f,0f,1f]}}

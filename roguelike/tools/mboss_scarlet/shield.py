@@ -35,6 +35,7 @@ G = api.GAUGE
 
 
 FAIL_COL_W, FAIL_COL_T, FAIL_COL_TAG = 0.3, 5, 'rlk_hr_sw_col'
+FAIL_COL_RGB = 0xE2B4FF                 # lilac (round V's slash colour)
 
 
 def build(W):
@@ -72,9 +73,9 @@ def build(W):
       + S.fx('dive_impact', [part(S.DUST['lilac'], 1.2, 0.1, 1.2, 0, 30)], pos='positioned ~ ~0.1 ~', r=30)
       # round V (v_brief §3 VB 4; review v G2: the kit's 9 b light column - two crossed quads over a block wide on the player's own
       # spot - filled over half the screen for 7 frames when the push carried the lens through it): a thin column instead (a
-      # blade.py path card, FAIL_COL_W wide, 6 b tall; p/<g>/fail's caller removes it FAIL_COL_T t later)
-      + [f'execute positioned ~ ~0.1 ~ rotated 0 -90 run ' + B.card('a8', 'sw_path', (0, 0, 0), (0, 0, 0, 1), (FAIL_COL_W, FAIL_COL_W, 6.0),
-                                                                  B.SLASH[api.C_LILAC], (FAIL_COL_TAG,), tpd=0),
+      # blade.py lance card, FAIL_COL_W wide, 6 b tall; p/<g>/fail's caller removes it FAIL_COL_T t later)
+      + [f'execute positioned ~ ~0.1 ~ rotated 0 -90 run ' + B.card('a8', 'sw_rib_0', (0, 0, 0), (0, 0, 0, 1), (FAIL_COL_W, FAIL_COL_W, 6.0),
+                                                                  FAIL_COL_RGB, (FAIL_COL_TAG,), tpd=0),
          f'execute positioned ~ ~0.1 ~ rotated 0 -90 run tp {B.SEL.format(B.TAG_NEW)} ~ ~ ~ ~ ~', f'tag {B.SEL.format(B.TAG_NEW)} remove {B.TAG_NEW}']
       + S.snd('fail_impact', pos='positioned ~ ~ ~'))
     w('ult/fatal', [

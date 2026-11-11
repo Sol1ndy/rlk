@@ -848,3 +848,51 @@ As built: `vi_progress.md`, `tools/dev/sim/hr/tests/test_vi.py`.
 - **The actor hides lane VP's stand-in rig** (`char/cine/hide`: `rlk_pl` out of view) for the one tick a beat outlives the start of
   a locked sequence.
 
+
+## 11. Round W (11-12, lane WB) — the blade's trail replaces the drawn path (`w_brief.md` §2 "WB"; `wb_progress.md`)
+The user, after round V in play: 「보스의 검로가 보이는건 미리 경로를 보여주라는게 아니라 공격이 좀 더 잘 보이도록 이미 지나온 경로를
+표시하라는 거야」. `w_brief.md` wins over §9 where they disagree. As built (`tools/mboss_scarlet/blade.py`):
+- §2.1 tells: **nothing shows where the blade is going to go**. §9's drawn path, its running head, the dash / dive target lines, the
+  tall mark over a dash's spot, kcut's three lines, nb's band lines and the gauntlet station's standing path are gone (with their
+  run-time `core/sw/{aim,march,head}` and the kit card `sw_path`). The telegraph is the wind-up pose, the cue star (P), the colour
+  flashes (N) and the sounds, as before.
+- §2.2 effects: **the trail of where the blade has been**, generated from the sword part's transform per clip tick as the client
+  shows it (the rig's sidecar `scarlet_blade_track.json`: `sp` / `sq` per tick, `f0` = where the clip's blend-in from the pose before
+  ends), played at the pattern ticks the pattern plays its clips:
+  - the **band** on the blade (lance `sw_band`, 0.26 b, from the guard to the tip) carries the sword part's own translation and
+    rotation and is sent the next tick's transform each tick with one tick of interpolation: it moves exactly as the blade does,
+    from the first known pose (the first clip's `f0`) to the end of the last hit's follow-through (its swing's b);
+  - the **pieces**: the surface the blade sweeps in each tick, in planar pieces of <= 30 deg of blade turn (a wedge `sw_fan` with
+    its chord as the bright rim when it turns about a point of its own line, a strip `sw_quad` when it slides sideways), each with a
+    rim wall (0.22 b; a swing's 0.30 b) so it reads edge-on; the sweep t -> t + 1 opens on t + 1 (**one tick behind the blade**:
+    a planar piece cannot follow the client's curved slerp inside a fast tick without running ahead of it somewhere), rides her
+    model for its two ticks and then stays where it was swept; fading frames at +3 / +5, gone 7 t after it began to open;
+  - a swing's pieces (a hit's [a, b]) are mixed 55 % toward white with the taller wall: §9's slash IS the trail's brightest stretch;
+  - the **ribbon** (`sw_rib`, 0.30 b) behind her where her body carries the blade (A4 / A10 / q_air dives, A9 / HCUT / BLUE / KCUT
+    dashes, TRI's lunge, MX's streak, Q's ghost lunge; the gauntlet's D1-D4 approaches, A8.3's leap, the A8.9 dive): from the hand's
+    place when the move began, grown each tick to the hand's place one tick back (`core/sw/rib`), fading after the move, 6 t;
+  - the **wave**: the struck line of a dash-through (from the dash start along the probed length) and kcut's three crossing lines
+    flash ON the hit tick for 4 t (they reach beyond her blade).
+  Colour: the hit the blade is on its way to — white-gold `#FFE9A8` (P), the flash's colour (N); every bright core has ink on both
+  sides (the white-gold is close to the P1 wheat: ΔE 15). Sizes: every bright core / ribbon >= 0.12 b.
+- §1.5 a perfect parry's flinch (`core/pp`) kills the band and fades the rest; `core/pat_end` / `core/g/end` kill whatever of a trail
+  is left. The band and the pieces carry `rlk_mb_part` (the perfect parry / dodge beat treats them as her rig's parts); the fight
+  hook rides them to the rig's root part after `rig/tick` (`blade.RIDE_CMD`).
+- §2.2 moves (review w T3-06, the camera inside her): a stop point must keep her body 1.3 b off the player's camera line (their eyes
+  to 4 b behind them along their view, `core/cam_ok`): the dash-throughs' stop (2.0 b before the spot, else 3.5 b, else she cuts from
+  where she is), `core/near` (the dives: 1.4 b, else 2.9 b, else the spot), MX's streak, the gauntlet spots' candidates; after a move
+  standing in that line she steps 1.8 b out of it in 2 t (`core/cam_clear`: a9, hcut, blue, kcut, tri, a4, a10, mx, q_air's dive).
+  Hit ticks, damage, shapes, weights, the wind-up clips, the blade edge, the cue star, the flashes, leap heights, dash stops and the
+  gauntlet stations are §9's.
+- §6.1 tests: `test_blade.py` (rewritten), `test_vi.py` beatpat (the trail cards beat on = off, frozen on held ticks).
+- **§2.4 the gauntlets re-timed** (the user's ruling 11-12, after lane WP removed the whiff ladder: every accepted F locks 12 t, a
+  parry of any tier 1 t, an ignored press blocks F 3 t; the lock rule stays and only the cut ticks move): G1 strikes
+  **31 45 64 88 108 138 163 181 195** (round V 30 48 64 91 109 139 163 180 196), G2 **28 46 66 89 112 127 151 170 189 205 219**
+  (27 41 58 91 113 128 152 169 190 206 220); the judges 220 / 242, the dives' reappearances 202 / 224, the clips and their order
+  unchanged; every move keeps its offset from the strike it delivers (`api._g1_rows` / `_g2_rows`: D -14 (D3 -16), ring / wrap /
+  dome -3, rise / leap -9, X -6, vert -5), every gap >= 14, a reappearance >= 2 t after the vanish before it; G2's extra vanish
+  96 (was 97); bolts G1 34 96 166 218 (99 -> 96: 2 t from c5's lock), G2 70 160 195 240 (198 = c10's lock -> 195). Result
+  (`tests/test_metro.py`, the real F functions, every period 1-40 and every start from T - 200): **at most 4 perfect parries in
+  either gauntlet** (5 clear). No table keeps every period at 3 under these rules and the moves' spacing (the exhaustive search
+  `tools/dev/sim/hr/review/metro/dfs.c -DNOLADDER`: G1 none); the G1 table is the one of the 6 364 sets within 14 t of round V's
+  with the fewest periods reaching 4 (4, 15, 19, 25, 33 t), the G2 table the nearest found (distance 23 t; 4 at 3-8, 12-23, 31 t).

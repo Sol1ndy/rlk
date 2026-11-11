@@ -109,6 +109,11 @@ scoreboard players set #cd_nb hr 0
 scoreboard players set #cd_q hr 0
 scoreboard players set #ai_uc hr 0
 scoreboard players set #sw_n hr 0
+scoreboard players set #sw_x hr 0
+scoreboard players set #sw_y hr 0
+scoreboard players set #sw_z hr 0
+scoreboard players set #sw_u hr 0
+scoreboard players set #sw_c hr 0
 scoreboard players set #skip hr 0
 scoreboard players set #hud hr 1
 scoreboard players set #mx_rep hr 0

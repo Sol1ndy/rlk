@@ -1,6 +1,9 @@
 # A13 pattern tick 198.
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_c190_192]
-function rlk:boss/scarlet/g/cut/aim {s:206}
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c206] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c206,limit=1] ^-1.057 ^1.413 ^1.33
-execute at @e[tag=rlk_body,limit=1] rotated as @a[tag=player,limit=1] rotated ~-130 0 positioned ^ ^ ^5.2 positioned ~ 201 ~ run function rlk:boss/scarlet/g/bolt
+function rlk:boss/scarlet/g/cut/lock {s:205}
+execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] positioned ^-0.639 ^2.068 ^0.619 run function rlk:boss/scarlet/fx/p/glint {c:2}
+execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
+execute rotated as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @s ~ ~ ~ ~ 0
+execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:3}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_190]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_192] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_194] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"

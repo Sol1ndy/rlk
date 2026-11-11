@@ -3,5 +3,5 @@ function rlk:boss/scarlet/fx/follow_on
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.072 ^3.119 ^0.165 run function rlk:boss/scarlet/fx/p/glint {c:2}
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_tri38] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_tri38,limit=1] ^-1.186 ^2.201 ^0.707
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.1125f,1.4517f,0.5784f],left_rotation:[-0.7497f,-0.4156f,0.2497f,0.4505f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_23]

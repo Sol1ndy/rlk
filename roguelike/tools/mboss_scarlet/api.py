@@ -312,59 +312,76 @@ _TC = ('TC', KB_CUT)      # F1 (HR-19): the counting cuts of the gauntlets (DMG[
 # functions). The old G1 strikes 30 46 64 94 110 138 164 180 196 gave 5 to a 14 / 15 / 16-t beat. Moved: c2 46 -> 48 (A8.2
 # 2 t later), c4 94 -> 91 (D2 77, A8.4 88: the glide and the sweep 3 t earlier), c5 110 -> 109 (A8.5 103), c6 138 -> 139
 # (D1 125, A8.1 136), c7 164 -> 163 (D3 147, A8.6 160); every gap >= 14, the clips, the judge and the bolts as they were.
-A8_SCRIPT = (                                     # G1 (60 %): 9 parry cuts in 220 t
-    (0, 'A8.T', 'g_tell', None),
-    (16, 'D1', 'g_dash', (16, 23, 30) + _TC),     # c1
-    (27, 'A8.1', 'g_ring', (30, 41, 48) + _TC),   # c2
-    (39, 'A8.2', 'g_rise', (48, 57, 64) + _TC),   # c3
-    (55, 'A8.3', 'g_leap', None),                 # gone 71
-    (77, 'D2', 'g_glide', (77, 84, 91) + _TC),    # c4
-    (88, 'A8.4', 'g_sweep', (91, 102, 109) + _TC),  # c5
-    (103, 'A8.5', 'g_x', None),                   # gone 117
-    (125, 'D1', 'g_dash', (125, 132, 139) + _TC),  # c6
-    (136, 'A8.1', 'g_ring', None),
-    (147, 'D3', 'g_drop', (147, 156, 163) + _TC),  # c7
-    (160, 'A8.6', 'g_wrap', (163, 173, 180) + _TC),  # c8
-    (177, 'A8.7', 'g_dome', (180, 189, 196) + _TC),  # c9
-    (191, 'A8.8', 'g_vert', None),                # pink glow 192-195, rises (the dive's reappearance cuts the rise short)
-    # round V (v_brief §3 VB 4: nothing hits from an empty screen): the dive reappears 18 t before the judge (was 6), in the
-    # F5 view, and holds its wind-up 15 t (clip g_dive: appear 0, dive 15, hit 18)
-    (202, 'A8.9', 'g_dive', None),                # reappears 202 in normal colours, in view; dives 217; judge at 220
-    (220, 'judge', None, None),                   # gauge 0: seq/repel {at:60} in this tick; fail §2.4: g_reform 220-230,
-)                                                 # P2 decision at 240
-# HA-03, G2: 30 44 58 86 114 128 156 172 186 200 216 gave 10 perfect parries to a 14-t beat and 5 to 3-t / 6-t mashers. With
-# 11 cuts, every gap >= 14 and the moves' own spacing kept (a reappearance only after the vanish before it: the leap's gone
-# + 2, the ring's vanish + 2, the X's gone + 2), no strike set found keeps every period 8-30 at <= 3 (local searches,
-# an exhaustive DFS; hfa_progress.md); this one is the best found: at most 4 (16 t: 24 of 427 starts, 19 t: 2), never
-# the 5 a clear needs at any period 2-40. Moved: the D1 reappearance 16 -> 13 and every later beat (the clips and their
-# order unchanged; the dome three now 21 / 16 apart).
-A13_SCRIPT = (                                    # G2 (5 %): 11 parry cuts in 242 t, no discs, no yellow
-    (0, 'A8.T', 'g_tell', None),
-    (13, 'D1', 'g_dash', (13, 20, 27) + _TC),     # c1
-    (24, 'A8.1', 'g_ring', (27, 34, 41) + _TC),   # c2
-    (32, 'A8.2', 'g_rise', (41, 51, 58) + _TC),   # c3
-    (49, 'A8.3', 'g_leap', None),                 # gone 65
-    (77, 'D1', 'g_dash', (77, 84, 91) + _TC),     # c4
-    (88, 'A8.1', 'g_ring', None),                 # gone 97 (EXTRA_VANISH)
-    (99, 'D2', 'g_glide', (99, 106, 113) + _TC),  # c5
-    (110, 'A8.4', 'g_sweep', (113, 121, 128) + _TC),  # c6
-    (122, 'A8.5', 'g_x', None),                   # gone 136
-    (138, 'D4', 'g_run', (138, 145, 152) + _TC),  # c7
-    (149, 'A8.6', 'g_wrap', (152, 162, 169) + _TC),  # c8
-    (166, 'A8.7', 'g_dome', (169, 183, 190) + _TC),  # c9
-    (187, 'A8.7', 'g_dome', (190, 199, 206) + _TC),  # c10
-    (203, 'A8.7', 'g_dome', (206, 213, 220) + _TC),  # c11
-    (215, 'A8.8', 'g_vert', None),                # rises (cut short by the dive's reappearance)
-    (224, 'A8.9', 'g_dive', None),                # reappears 224 (round V: 18 t before the judge), dives 239; judge at 242
-    (242, 'judge', None, None),                   # gauge 0: seq/repel {at:5}; fail: the instant death
-)
+# Round W (lane WB; the user's ruling 11-12: the whiff ladder is gone - every accepted F locks 12 t, a parry of any tier 1 t, an
+# ignored press blocks F 3 t - and the gauntlets are re-timed instead): the strikes are chosen so that no blind F metronome of any
+# period 1-40 t, from any start (fresh F state, any tick from 200 t before T0 on), gets more than 4 perfect parries (5 clear a
+# gauntlet) under the shipped rules (tests/test_metro.py drives the real functions; the search tools.dev/sim/hr/review/metro,
+# `dfs.c -DNOLADDER`: the nearest strike set to round V's among all such sets that keep the moves' own spacing). The rows are
+# written from the strikes (_g1_rows / _g2_rows: every move at its old offset from the strike it delivers), the judge fixed.
+G1_STRIKES = (31, 45, 64, 88, 108, 138, 163, 181, 195)
+G2_STRIKES = (28, 46, 66, 89, 112, 127, 151, 170, 189, 205, 219)
+G1_JUDGE, G2_JUDGE = 220, 242
+
+
+def _g1_rows(s, j):
+    """G1 (60 %): 9 parry cuts. A cut row (made, lock, strike) sits on the step one before the move whose contact delivers it."""
+    s1, s2, s3, s4, s5, s6, s7, s8, s9 = s
+    c = lambda m, x: (m, x - 7, x) + _TC      # noqa: E731
+    return ((0, 'A8.T', 'g_tell', None),
+            (s1 - 14, 'D1', 'g_dash', c(s1 - 14, s1)),        # c1
+            (s1 - 3, 'A8.1', 'g_ring', c(s1, s2)),            # c2
+            (s2 - 9, 'A8.2', 'g_rise', c(s2, s3)),            # c3
+            (s3 - 9, 'A8.3', 'g_leap', None),                 # gone s3 + 7
+            (s4 - 14, 'D2', 'g_glide', c(s4 - 14, s4)),       # c4 (>= the leap's gone + 2)
+            (s4 - 3, 'A8.4', 'g_sweep', c(s4, s5)),           # c5
+            (s5 - 6, 'A8.5', 'g_x', None),                    # gone s5 + 8
+            (s6 - 14, 'D1', 'g_dash', c(s6 - 14, s6)),        # c6 (>= the X's gone + 2)
+            (s6 - 3, 'A8.1', 'g_ring', None),
+            (s7 - 16, 'D3', 'g_drop', c(s7 - 16, s7)),        # c7 (>= 8 t after the ring's contact)
+            (s7 - 3, 'A8.6', 'g_wrap', c(s7, s8)),            # c8
+            (s8 - 3, 'A8.7', 'g_dome', c(s8, s9)),            # c9
+            (s9 - 5, 'A8.8', 'g_vert', None),                 # pink glow, rises (the dive's reappearance cuts the rise short)
+            # round V (v_brief §3 VB 4: nothing hits from an empty screen): the dive reappears 18 t before the judge, in the F5
+            # view, and holds its wind-up 15 t (clip g_dive: appear 0, dive 15, hit 18)
+            (j - 18, 'A8.9', 'g_dive', None),
+            (j, 'judge', None, None))                         # gauge 0: seq/repel {at:60} in this tick; fail §2.4: g_reform,
+    #                                                           the P2 decision at FAIL60_P2_T
+
+
+def _g2_rows(s, j):
+    """G2 (5 %): 11 parry cuts, no discs, no yellow."""
+    s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11 = s
+    c = lambda m, x: (m, x - 7, x) + _TC      # noqa: E731
+    return ((0, 'A8.T', 'g_tell', None),
+            (s1 - 14, 'D1', 'g_dash', c(s1 - 14, s1)),        # c1
+            (s1 - 3, 'A8.1', 'g_ring', c(s1, s2)),            # c2
+            (s2 - 9, 'A8.2', 'g_rise', c(s2, s3)),            # c3
+            (s3 - 9, 'A8.3', 'g_leap', None),                 # gone s3 + 7
+            (s4 - 14, 'D1', 'g_dash', c(s4 - 14, s4)),        # c4 (>= the leap's gone + 2)
+            (s4 - 3, 'A8.1', 'g_ring', None),                 # vanishes (EXTRA_VANISH)
+            (s5 - 14, 'D2', 'g_glide', c(s5 - 14, s5)),       # c5 (>= the vanish + 2)
+            (s5 - 3, 'A8.4', 'g_sweep', c(s5, s6)),           # c6
+            (s6 - 6, 'A8.5', 'g_x', None),                    # gone s6 + 8
+            (s7 - 14, 'D4', 'g_run', c(s7 - 14, s7)),         # c7 (>= the X's gone + 2)
+            (s7 - 3, 'A8.6', 'g_wrap', c(s7, s8)),            # c8
+            (s8 - 3, 'A8.7', 'g_dome', c(s8, s9)),            # c9
+            (s9 - 3, 'A8.7', 'g_dome', c(s9, s10)),           # c10
+            (s10 - 3, 'A8.7', 'g_dome', c(s10, s11)),         # c11
+            (s11 - 5, 'A8.8', 'g_vert', None),                # rises (cut short by the dive's reappearance)
+            (j - 18, 'A8.9', 'g_dive', None),                 # reappears 18 t before the judge, dives 3 t before it
+            (j, 'judge', None, None))                         # gauge 0: seq/repel {at:5}; fail: the instant death
+
+
+A8_SCRIPT = _g1_rows(G1_STRIKES, G1_JUDGE)
+A13_SCRIPT = _g2_rows(G2_STRIKES, G2_JUDGE)
 SCRIPTS = {'a8': A8_SCRIPT, 'a13': A13_SCRIPT}
 GAUNTLETS = ('a8', 'a13')
 CUT_IDS = {'a8': tuple(str(i) for i in range(1, 10)), 'a13': tuple(str(i) for i in range(1, 12))}
 CUT_GAP_MIN = 14          # every strike gap: a missed F (12 t refusal) never blocks the next cut
-EXTRA_VANISH = {'a13': (97,)}                     # g_ring does not end vanished: the vanish before D2's reappearance
+EXTRA_VANISH = {'a13': (min(G2_STRIKES[3] - 3 + 12, G2_STRIKES[4] - 14 - 2),)}   # g_ring does not end vanished: the vanish
+#                                                   before D2's reappearance (its clip's end, at the latest 2 t before D2)
 # HA-03: G1's 102 -> 99 and G2's 205 -> 198 (the re-timed cuts would put them on a lock / one tick before a strike)
-BOLTS = {'a8': (34, 99, 166, 218), 'a13': (70, 160, 198, 240)}    # deco_bolt 3-6 b from the player (no hit), T+
+BOLTS = {'a8': (34, 96, 166, 218), 'a13': (70, 160, 195, 240)}    # deco_bolt 3-6 b from the player (no hit), T+
 JUDGE_T = {'a8': 220, 'a13': 242}
 REPEL_T = JUDGE_T                                 # the repel starts in the judge tick (its first frames are the gold deflect)
 # the 11-06 moon disc: only the kit's prop size reads it now (build_mboss_hr_fx.py DISC_SCALE); the module launches none
@@ -1126,8 +1143,9 @@ KIT_SPRITE_CAP = 260_000
 # hr_design §5.4: 22 432 px were left; the one planned new sprite group (lane H1c), counted once the kit generator declares it
 KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),),      # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
                   'cue': ((1, 64, 64),),             # HA-07 (review H-A): the parry cue's white-gold sparkle (4 096 px)
-                  # round V (lane VB, v_brief §3 VB 2-3): the drawn blade path, its head, the slash sector (16 640 px)
-                  'sw_path': ((1, 16, 16),), 'sw_head': ((1, 64, 64),), 'sw_arc': ((3, 64, 64),)}
+                  # round V (lane VB): the flashes' rimmed star (sw_head); round W (lane WB, w_brief §2 WB): the blade's trail -
+                  # the band / ribbon / rim wall (sw_rib), the swept sector (sw_arc) and strip (sw_quad), 3 fading frames each
+                  'sw_rib': ((3, 16, 16),), 'sw_head': ((1, 64, 64),), 'sw_arc': ((3, 64, 64),), 'sw_quad': ((3, 16, 16),)}
 KIT_SPRITES.update({k: v for k, v in KIT_SPRITES_HR.items() if kit_declares('sprite', k)})
 KIT_SPRITE_PX = sum(f * w * h for rows in KIT_SPRITES.values() for f, w, h in rows)
 assert KIT_SPRITE_PX == 237_568 + sum(f * w * h for k, rows in KIT_SPRITES_HR.items() if k in KIT_SPRITES for f, w, h in rows) \

@@ -1,5 +1,6 @@
 # MX pattern tick 22
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_mx16_16]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_mx16_18] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_mx28] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_mx28,limit=1] ^0.718 ^0.804 ^1.549
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_mxb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.1097f,1.384f,0.4191f],left_rotation:[-0.5792f,-0.0862f,0.4056f,0.7018f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_mx_14]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_mx_16] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_mx_18] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_mx_20] remove rlk_hr_trr

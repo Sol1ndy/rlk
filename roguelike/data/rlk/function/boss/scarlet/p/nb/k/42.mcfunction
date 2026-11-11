@@ -1,3 +1,5 @@
 # NB pattern tick 42
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_nb40] ~ ~ ~ ~ 0
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_nb40_40] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_nbb2]
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_34]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_38] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_40] remove rlk_hr_trr

@@ -1,7 +1,6 @@
 # BLUE pattern tick 11
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ~ ~1.0 ~ run function rlk:boss/scarlet/core/sw/aim {dy:"-1.0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.0833 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_blueb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4363f,1.299f,0.1336f],left_rotation:[-0.2067f,0.0862f,-0.6762f,0.7018f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_blue_3]
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_blue_9] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_blue_10,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4021f,1.2649f,0.1089f],left_rotation:[-0.4171f,-0.071f,-0.8304f,0.3626f],scale:[0.7752f,0.22f,1.7082f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_blue","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_blue_11","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.4852f,1.3004f,0.2167f],left_rotation:[-0.3216f,-0.0485f,-0.8934f,0.3111f],scale:[0f,0.22f,1.5502f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[5941503]}}}}

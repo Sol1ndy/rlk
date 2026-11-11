@@ -1,4 +1,5 @@
 # A1 pattern tick 10
 execute at @s run function rlk:boss/scarlet/fx/snd/a1_fan
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a114] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a114,limit=1] ^-1.167 ^0.66 ^1.556
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a1b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.3438f,1.0943f,0.3105f],left_rotation:[-0.6861f,-0.5572f,0.1711f,0.4353f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a1_2]
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a1","rlk_hr_trr","rlk_hr_trq","rlk_hr_tr_a1_10","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.4072f,1.1593f,0.0894f],left_rotation:[-0.1438f,-0.8721f,-0.1607f,0.4393f],scale:[0f,0.22f,1.435f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_quad_0","minecraft:custom_model_data":{colors:[16771496]}}}}

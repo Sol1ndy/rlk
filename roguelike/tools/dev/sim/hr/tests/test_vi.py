@@ -12,7 +12,7 @@ skip on Space, the actor). Each lane's own suite proves its part alone; this one
             answered perfectly (F one tick before each parryable hit; a second run also perfect-dodges the unparriable ones),
             once with the beat's world hold off (#btOn tmp 0) and once on. The beat-on run must be the beat-off run, world tick
             by world tick: the pattern clock, her body, the rig calls (her clip), the sweep cards (the drawn path, its head, the
-            slash pieces: rlk_hr_sw), the kit's calls and its live cards with their remaining life (the cue star, the flashes:
+            slash pieces: rlk_hr_sw; round W: the trail rlk_hr_tr), the kit's calls and its live cards with their remaining life (the cue star, the flashes:
             on the beat's clock since the integration), the hazards and the judged hits. On a held tick nothing of hers moves
             or ages. Every path head disappears on a tick a hit of the pattern lands (in world ticks, beat on). The gauntlets'
             judge counts as before (#gau, #gres and the judged strikes).
@@ -157,9 +157,10 @@ def cards(s, tag):
 
 
 def sw_state(s):
-    """The sweep cards of blade.py as the world holds them: (own tags, place, yaw) of each."""
-    return tuple(sorted((tuple(sorted(t for t in e.tags if t.startswith('rlk_hr_sw'))), tuple(round(v, 3) for v in e.pos),
-                         round(e.rot[0] % 360, 2)) for e in cards(s, B.TAG)))
+    """The blade's trail cards of blade.py (round W: the band, the pieces, the ribbons, the struck lines; rlk_hr_tr) as the world
+    holds them: (own tags, place, yaw) of each."""
+    return tuple(sorted((tuple(sorted(t for t in e.tags if t.startswith('rlk_hr_tr'))), tuple(round(v, 3) for v in e.pos),
+                         round(e.rot[0] % 360, 2)) for e in cards(s, B.TR)))
 
 
 def kit_state(s):
@@ -231,13 +232,9 @@ def pat_world(key, on, policy, ph):
             if before != after:
                 st['froze'].append((s.t - t0, [i for i, (x, y) in enumerate(zip(before, after)) if x != y]))
         else:
-            heads0 = {e.id for e in cards(s, B.TAG_HEAD)} | {e.id for e in cards(s, B.TAG_LHEAD)}
             H.world_h1(s)
             b = H.body_of(s)
             wt = s.t - t0
-            heads1 = {e.id for e in cards(s, B.TAG_HEAD)} | {e.id for e in cards(s, B.TAG_LHEAD)}
-            for i in heads0 - heads1:
-                st['heads'][i] = wt
             sc = tuple(sorted((k[0], v) for k, v in s.scores.items() if k[1] in ('mb', OBJ) and isinstance(k[0], str)
                               and k[0] not in SKIP_SC))
             rows[wt] = dict(sc=sc, body=(tuple(round(v, 3) for v in b.pos), round(b.rot[0], 2)) if b else None,
@@ -302,10 +299,9 @@ def beatpat():
                f'no kit card, no rig call, no kit call, not her body, not #pt changes; nothing held at the end',
                s1['held'] == 5 * par + 4 * pd == s1['lag'] and s0['held'] == 0 and not s1['froze'] and not s1['left']
                and s1['real'] == len(r1) + s1['held'], (s1['held'], par, pd, s1['lag'], s1['froze'][:3], s1['left']))
-            if s1['heads']:
-                bad = {i: t for i, t in s1['heads'].items() if t not in s1['hits'] and t - 1 not in s1['hits']}
-                ck(f'{lab}: each of the {len(s1["heads"])} path heads is gone on a world tick a hit lands (beat on), having '
-                   f'run there on the pattern clock', not bad, (sorted(bad.values()), sorted(s1['hits'])))
+            if api.HITS.get(key):
+                ck(f'{lab}: the blade\'s trail is there ({s1["nsw"]} cards at most) and moves with her pattern clock (above: the same on '
+                   f'every world tick beat on / off, nothing of it changes on a held tick)', s1['nsw'] >= 2, s1['nsw'])
             if key in api.GAUNTLETS:
                 cuts = [c[2] for _t, _s, _cl, c in api.SCRIPTS[key] if c]
                 ck(f'{lab}: the gauntlet judge counts as before: every one of the {len(cuts)} cuts a perfect parry, the shield '
@@ -323,11 +319,15 @@ def beatpat():
        w[1] == 'execute if score #btHold cb matches 1 run return run schedule function rlk:boss/scarlet/fx/e/world 1t replace'
        and any(a.endswith('run time query gametime') and b == lag for a, b in zip(w, w[1:]))
        and any(a.endswith('run time query gametime') and b == lag for a, b in zip(mk, mk[1:])), w[:3])
-    sw = [l for p in (FN / 'boss/scarlet/p').rglob('*.mcfunction') for l in p.read_text(encoding='utf-8').split('\n') if '"rlk_hr_sw"' in l and 'summon ' in l]
-    ck(f'beatpat: every sweep card ({len(sw)} summon lines) is an item_display with teleport_duration 0 or 1 and no shadow: the '
-       f'slow motion\'s stretch pass (beat/st/tp_on) takes the moving ones',
+    sw = [l for p in (FN / 'boss/scarlet/p').rglob('*.mcfunction') for l in p.read_text(encoding='utf-8').split('\n') if '"rlk_hr_tr"' in l and 'summon minecraft:item_display' in l]
+    ride = [l for l in sw if '"rlk_hr_trr"' in l]
+    ck(f'beatpat: every trail card ({len(sw)} summon lines) is an item_display with teleport_duration 0 or 1 and no shadow; the ones that '
+       f'ride her model and open with her blade ({len(ride)}: the band, the pieces) carry rlk_mb_part, so the slow motion\'s stretch '
+       f'passes (beat/st/tp_on, beat/st/pass) and the rocked-back tilt take them as they take her rig\'s parts',
        len(sw) > 200 and all('minecraft:item_display' in l and 'shadow_radius:0f' in l and re.search(r'teleport_duration:[01],', l) for l in sw)
-       and any('tag=rlk_hr_sw,' in l and 'beat/st/tp1' in l for l in fn_lines('player/def/beat/st/tp_on')))
+       and ride and all('"rlk_mb_part"' in l and 'interpolation_duration:1' in l for l in ride)
+       and any('tag=rlk_mb_part,' in l and 'beat/st/tp1' in l for l in fn_lines('player/def/beat/st/tp_on'))
+       and any('tag=rlk_mb_part,' in l and 'beat/st/one' in l for l in fn_lines('player/def/beat/st/pass')))
 
 
 # ============================================================================================================ follow

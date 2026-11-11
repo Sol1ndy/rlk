@@ -1,3 +1,5 @@
 # A3S pattern tick 26
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a330] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a330,limit=1] ^1.441 ^2.373 ^1.249
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3sb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4939f,1.5468f,-0.3842f],left_rotation:[-0.8289f,0.3433f,-0.169f,0.408f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a3s_18]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3s_20] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3s_22] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""fightcam.py — 홍련's attacks as the player sees them: frame strips from the real fight camera (round V, lane VB).
+"""fightcam.py — 홍련's attacks as the player sees them: frame strips from the real fight camera (round V, lane VB; round W,
+lane WB: the blade's trail instead of round V's drawn path, FOV 90 by default - the user plays at 90 - and the `trail` measure).
 
 The fight is played in F5 (README §13): the vanilla third-person camera rides a seat 0.5 b over the avatar's head, 3.5 b
 behind it along the view (view/ride_set default d 3.5, s 1.0; FOV 70). With the player aiming at her chest from D blocks:
@@ -7,7 +8,7 @@ the pivot (0, 2.3, 0) over the avatar at the origin, the lens 3.5 b behind it on
 3.13 b up, looking 13.6 deg down). 1080p: focal 771 px, 1 b at 10 b = 77 px.
 
 Her figure is her rig as built (the rig builder's --debug-dp frames hr_dbg/<clip>/<t>; the blade look `edge` as in the
-fight), the avatar is the pack's own (hr_dbg/avatar: Skirk's idle), the path / head / slash cards are the commands
+fight), the avatar is the pack's own (hr_dbg/avatar: Skirk's idle), the trail cards are the commands
 tools/mboss_scarlet/blade.py generates (the same lines the patterns run), all drawn by the pack's item models through
 tools/dev/sim/preview/raiden_preview.py (a z-buffer rasteriser). Fields: p1 = the moon field (grey-violet, pale straw grass
 tufts), p2 = the crimson field.
@@ -16,7 +17,13 @@ tufts), p2 = the crimson field.
           [--from T --to T] [--no-fx] [--w 480] -o out.jpg
   python3 -I fightcam.py <roguelike> --dbg <debug dp> --rp <rp> measure [--clips a,b] [--json out.json]
       per hit of api.HITS (+ the gauntlet cuts): at 4 / 7 / 10 b on both fields the wind-up pose against idle (silhouette
-      pixels that differ), the blade's and the path's width in px, the cue star's / the flash's visible share
+      pixels that differ), the blade's width in px, the cue star's / the flash's visible share
+  python3 -I fightcam.py <roguelike> --dbg <debug dp> --rp <rp> trail [--clips a,b] [--json out.json]
+      round W: per hit, at 4 / 7 / 10 b, on both fields, at the instants of the wind-up's hold, the swing and the hit: the trail's
+      pixels (the band on the blade, the pieces), the band's width in px (its area / its length on screen), the swing's bright
+      ribbon width in px, the luminance contrast of the trail against the field / her behind it
+  (the frame of pattern tick t: her rig at clip tick t, the trail cards as the commands of the ticks before t left them - the
+  state the client shows at that instant: a card sent on tick t - 1 arrives there on t)
 """
 import argparse
 import importlib.util
@@ -59,10 +66,24 @@ def _select(self, sel, ctx):
 
 
 PV.Scene.select = _select
+_floor0 = PV.floor_quad
 
-FOV, CAM_D, PIVOT_Y, CHEST_Y = 70.0, 3.5, 2.3, 1.2
+
+def _floor(assets, opts, view=None):
+    """(the preview caches its one floor texture by name: a name per colour, so the fields really differ)"""
+    V, UV, T_, TI, SG = _floor0(assets, opts, view)
+    key = 'rlk:__floor_' + opts.floor.replace(',', '_') + '__'
+    PV.SPECIAL_TEXTURES[key] = (*(int(v) for v in opts.floor.split(',')), 255)
+    return V, UV, np.full(len(T_), assets.texture(key)), TI, SG
+
+
+PV.floor_quad = _floor
+
+FOV, CAM_D, PIVOT_Y, CHEST_Y = 90.0, 3.5, 2.3, 1.2          # round W: FOV 90 (the user's)
 FLOOR_Y = 201.0                     # the hr_field arena floor (api.CY)
 FIELD = {'p1': dict(floor='96,84,92', bg_top=(34, 26, 48), bg_bottom=(70, 58, 80), grass=(214, 196, 146)),
+         # round W (review w T3-08): the P1 field where her trail stands over the pale straw wheat (the worst case for a pale trail)
+         'p1w': dict(floor='214,196,146', bg_top=(34, 26, 48), bg_bottom=(70, 58, 80), grass=(214, 196, 146)),
          'p2': dict(floor='112,26,34', bg_top=(60, 12, 20), bg_bottom=(120, 30, 40), grass=(150, 30, 40))}
 HAT = (236, 233, 244)
 
@@ -113,21 +134,40 @@ class Stage:
         opts = SimpleNamespace(alpha_scale=1.0, bg_top=F['bg_top'], bg_bottom=F['bg_bottom'], flat=False, light='mc', floor=F['floor'],
                                floor_half=30.0, translucent=True, tex_mode='uv')
         h = round(w * 9 / 16)
-        img, z = PV.render_view(geo, view, w, h, opts, self.assets)
+        img, z = render_lit(geo, view, w, h, opts, self.assets)
         return img, z, view
 
     def cards_of(self, cmds, ticks, her_pos, her_yaw=180.0):
-        """The sweep cards alive after each pattern tick: {tick: [entities]} (cmds: {tick: [command]}, run at her feet)."""
+        """The trail cards as the client shows them at the instant of each pattern tick: {tick: [entities]} (cmds: {tick:
+        [command]}, run at her feet): the commands of the ticks before it (a card sent on t - 1 arrives on t)."""
+        import copy
         sc = PV.Scene(self.dbg, (0, 0, 0), scores={}, macros={}, max_depth=2, follow=False)
         out = {}
         for t in range(0, max(ticks) + 1):
+            if t in ticks:
+                out[t] = [copy.deepcopy(e) for e in sc.entities if e.alive]
             c = PV.Ctx(her_pos, her_yaw, 0.0)
             for line in cmds.get(t, []):
                 sc.command(line, c, 0)
-            if t in ticks:
-                import copy
-                out[t] = [copy.deepcopy(e) for e in sc.entities if e.alive]
+            # (the fight hook's ride: the riding cards to her model, her yaw - a summon takes no rotation)
+            sc.command(f'tp @e[tag=rlk_hr_trr] {her_pos[0]} {her_pos[1]} {her_pos[2]} {her_yaw} 0', c, 0)
         return out
+
+
+def render_lit(geo, view, w, h, opts, assets):
+    """The frame with the trail's cards (rlk_hr_tr: brightness 15, shade false) drawn unlit and everything else under the vanilla
+    entity light (the rasteriser lights every quad alike): the lit frame, with the pixels the cards change taken from a flat one."""
+    import copy
+    img, z = PV.render_view(geo, view, w, h, opts, assets)
+    if not any('rlk_hr_tr' in e.tags for e, *_r in geo.items):
+        return img, z
+    fl = SimpleNamespace(**{**vars(opts), 'light': 'flat'})
+    flat = PV.render_view(geo, view, w, h, fl, assets)[0]
+    g2 = copy.copy(geo)
+    g2.items = [x for x in geo.items if 'rlk_hr_tr' not in x[0].tags]
+    bare = PV.render_view(g2, view, w, h, fl, assets)[0]
+    m = np.abs(flat - bare).max(axis=2) > 0.004
+    return np.where(m[..., None], flat, img), z
 
 
 def label(img, txt, w):
@@ -149,13 +189,15 @@ def sheet(panels, cols, out):
 
 
 def hit_cmds(st, clip, event, col=None, lead=None):
-    """The path + slash commands of one hit as a melee swing riding her (pattern tick = clip tick)."""
+    """The trail commands of one hit (round W: the band and the pieces of blade.trail, the clip played at pattern tick 0, its
+    hit's colours), her standing still (pattern tick = clip tick)."""
     B = st.blade
     sw = B.swing_of(clip, event)
+    sh = B.Shown([(0, clip)], last=sw.b + 1)
+    t0 = next(t for t in range(0, sw.b + 1) if sh.known(t))
+    col = col or B.COL['P']
     out = B.Out()
-    lead = lead or B.SHOW_FIRST
-    B.path_ride(out, 'x', sw, 0, sw.h - lead, col or B.COL['P'], 'a')
-    B.slash(out, 'x', sw, 0, B.SLASH[st.api.C_LILAC], 'a')
+    B.trail(out, 'x', 'a', sh, t0, sw.b, lambda t: col, lambda t: sw.a <= t and t + 1 <= sw.b)
     return sw, out.t
 
 
@@ -241,20 +283,8 @@ def measure_hit(st, clip, event, dist, idle='idle', lead_rule=10):
     out['blade_len_px'] = round(ln, 1)
     out['blade_w_px'] = round(area / ln, 1) if ln > 25 else None           # (end-on to the lens: no width to speak of)
     out['blade_w_min_px'] = round(0.092 * f / math.dist(pos, her_point(tr['t'][tw], dist)), 1)      # the sheath's least width, any side
-    # (c) the path: cards alone, their width = area / the pieces' length on screen
-    o = B.Out()
-    r = B.path_ride(o, 'x', sw, 0, max(0, sw.h - B.SHOW_FIRST), B.COL['P'], 'm', head=False, flare=False)
-    cards = st.cards_of(o.t, [r['show']], (0.0, 0.0, float(dist)))[r['show']]
-    a_ = st.frame(clip, tw, dist, 'p1', cards, w=W, her=False, avatar=False)[0]
     b_ = st.frame(clip, tw, dist, 'p1', (), w=W, her=False, avatar=False)[0]
-    area = int(_mask(a_, b_, 0.04).sum())
-    pts = [view.screen(view.cam(np.array(her_point(p, dist))), 1920, 1080) for _u, p in r['pts']]
-    ln = float(sum(np.linalg.norm(q - p) for p, q in zip(pts, pts[1:])))
-    out['path_len_px'] = round(ln, 1)
-    out['path_w_px'] = round(area / ln, 1) if ln > 25 else None
-    full = st.frame(clip, tw, dist, 'p1', cards, w=W)[0]
     nop = st.frame(clip, tw, dist, 'p1', (), w=W)[0]
-    out['path_seen'] = round(int(_mask(full, nop, 0.04).sum()) / max(1, area), 2)        # the share her body / hat / the avatar leave
     # (d) the cue star (parryable: at blade_mid, hit - 7): the share of it her hat / body / the avatar leave visible
     tc = max(0, sw.h - api.CUE_LEAD)
     cue = _card('rlk:mboss/hr_kit/cue_0', her_point(B.cue_point(clip, tc), dist), 2.1)
@@ -308,7 +338,7 @@ def cmd_measure(st, a):
             r.update(key=key, parry=par, first=first)
             rows.append(r)
             print(f"{key:6s} {clip:7s} {ev:6s} {par} D{d:<4g} lead {r['lead']:2d} pose {r['pose_px']:6d} px ({r['pose_share']:.2f} of her) "
-                  f"blade {r['blade_w_px']} px (min {r['blade_w_min_px']}) path {r['path_w_px']} px seen {r['path_seen']:.2f} "
+                  f"blade {r['blade_w_px']} px (min {r['blade_w_min_px']}) "
                   f"cue seen {r['cue_seen']:.2f} on her {r['cue_on_her']:.2f} flash seen {r['flash_seen']:.2f} slash {r['slash_deg']} deg", flush=True)
     ink, core = (0x1C, 0x0B, 0x2E), (255, 233, 168)
     con = {f: dict(rim_vs_grass=round(contrast(ink, FIELD[f]['grass']), 1), rim_vs_hat=round(contrast(ink, HAT), 1),
@@ -318,6 +348,71 @@ def cmd_measure(st, a):
     print('contrast (WCAG ratio) of the tells\' dark rim / white-gold core:', json.dumps(con))
     if a.json:
         Path(a.json).write_text(json.dumps(dict(rows=rows, contrast=con), indent=1))
+
+
+# ----------------------------------------------------------------------------- trail: round W's measure on the rendered pixels
+TRAIL_HITS = (('a1', 'hit'), ('a2', 'hit'), ('a3', 'h1'), ('a3', 'h4'), ('d4', 'h1'), ('d4', 'h3'), ('tri', 'h1'), ('rings', 'r1'),
+              ('a4', 'hit'), ('a9', 'cut'), ('a10', 'hit'), ('hcut', 'cut'), ('kcut', 'cut'), ('ult', 'cut1'), ('mx', 'x'), ('mx', 'dome'),
+              ('nb', 'b1'), ('q_air', 'beam'), ('g_rise', 'hit'), ('g_sweep', 'hit'), ('g_vert', 'hit'))
+
+
+def lum(img):
+    v = np.where(img <= 0.03928, img / 12.92, ((img + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * v[..., 0] + 0.7152 * v[..., 1] + 0.0722 * v[..., 2]
+
+
+def measure_trail(st, clip, event, dist, field, w=960):
+    """The trail of one hit at one distance / field: at the hold (the wind-up held), one tick after the hit (the swing's pieces):
+    its visible pixels, the band's width (px at 1080p), the luminance contrast against what is behind it."""
+    B, api = st.blade, st.api
+    key = next(k for k, hs in api.HITS.items() if any(r[0] == clip and r[1] == event for r in hs))
+    idx = next(i for i, r in enumerate(api.HITS[key]) if r[0] == clip and r[1] == event)
+    col = B.colour_of(key, idx)[0]
+    sw, cmds = hit_cmds(st, clip, event, col)
+    k2 = 1080 / round(w * 9 / 16)
+    hp = (0.0, 0.0, float(dist))
+    res = dict(clip=clip, event=event, dist=dist, field=field, col=hex(col))
+    for name, tau in (('hold', max(sw.w + 2, 2)), ('swing', sw.h), ('after', min(sw.h + 2, sw.b + 3))):
+        cards = st.cards_of(cmds, [tau], hp)[tau]
+        band = [e for e in cards if 'rlk_hr_trb' in e.tags]
+        alone = st.frame(clip, tau, dist, field, cards, w=w, her=False, avatar=False)[0]
+        empty = st.frame(clip, tau, dist, field, (), w=w, her=False, avatar=False)[0]
+        full = st.frame(clip, tau, dist, field, cards, w=w)[0]
+        none = st.frame(clip, tau, dist, field, (), w=w)[0]
+        m_all = _mask(alone, empty, 0.04)
+        seen = _mask(full, none, 0.04)
+        r = dict(px=int(round(seen.sum() * k2 * k2)), seen=round(float(seen.sum()) / max(1, int(m_all.sum())), 2))
+        if seen.sum():
+            la, lb = lum(full)[seen], lum(none)[seen]
+            ratio = (np.maximum(la, lb) + 0.05) / (np.minimum(la, lb) + 0.05)
+            r['contrast_med'] = round(float(np.median(ratio)), 2)
+            r['contrast_ok'] = round(float((ratio >= 1.5).mean()), 2)
+        if band:
+            bm = _mask(st.frame(clip, tau, dist, field, band, w=w, her=False, avatar=False)[0], empty, 0.04)
+            pos, _y, pitch = camera(dist)
+            view = PV.View('camera', 0.0, pitch, True, pos, FOV)
+            tr = B.track(clip)
+            ct = min(tau, len(tr['t']) - 1)
+            pb, pt_ = (view.screen(view.cam(np.array(her_point(tr[k][ct], dist))), w, round(w * 9 / 16)) for k in ('b', 't'))
+            ln = float(np.linalg.norm(pb - pt_))
+            r['band_w_px'] = round(bm.sum() / ln * k2, 1) if ln > 12 else None
+        res[name] = r
+    return res
+
+
+def cmd_trail(st, a):
+    rows = []
+    todo = TRAIL_HITS if not a.clips else [x for x in TRAIL_HITS if x[0] in a.clips.split(',')]
+    for clip, ev in todo:
+        for d in (4.0, 7.0, 10.0):
+            for fld in ('p1', 'p1w', 'p2'):
+                r = measure_trail(st, clip, ev, d, fld)
+                rows.append(r)
+                print(f"{clip:7s} {ev:5s} D{d:<4g} {fld} " + ' | '.join(
+                    f"{n} px {r[n]['px']} seen {r[n]['seen']} band {r[n].get('band_w_px')} contrast {r[n].get('contrast_med')} "
+                    f"(>=1.5: {r[n].get('contrast_ok')})" for n in ('hold', 'swing', 'after')), flush=True)
+    if a.json:
+        Path(a.json).write_text(json.dumps(rows, indent=1))
 
 
 # ----------------------------------------------------------------------------- the real pattern (the module in the H1 world)
@@ -337,7 +432,7 @@ def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
         n0 = len(self.ents)
         r = base_cmd(self, t, ctx)
         try:
-            if t and t[0] == 'summon' and '"rlk_hr_sw"' in ' '.join(t):         # (the tag itself: not the rig's rlk_hr_sword part)
+            if t and t[0] == 'summon' and '"rlk_hr_tr"' in ' '.join(t):         # round W: the trail's cards
                 for e in self.ents[n0:]:
                     NB[e.id] = PV.parse_snbt(' '.join(t[5:]))
             elif t and t[0] == 'data' and t[1] == 'merge' and t[2] == 'entity' and ctx.ex is not None and ctx.ex.id in NB:
@@ -382,7 +477,7 @@ def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
     if key == 'ult':
         assert H.until_h1(s, lambda s: (H.hr(s, '#pat') or 0) == tid, 160)
     ids = {v['id']: k for k, v in json.loads((st.wt / 'tools/scarlet_rig_manifest.json').read_text())['clips'].items()}
-    recs = []
+    recs, LEN = [], {}
     for _ in range(limit):
         if (H.hr(s, '#pat') or 0) != tid:
             break
@@ -396,13 +491,18 @@ def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
         b = H.body_of(s)
         p = s.player()
         clip_name, ct, hid = RIG['clip'], RIG['ct'], RIG['hidden']
-        n = H.hr(s, '#sw_n')
+        n = H.hr(s, '#sw_x')
         cards = []
         for e in s.ents:
             if e.alive and e.id in NB:
                 nb = json.loads(json.dumps(NB[e.id], default=float))
-                if 'rlk_hr_swl' in e.tags and n is not None:
-                    nb['transformation']['scale'][2] = 0.5 * (n or 0)
+                # (the sim keeps no display NBT: a ribbon's length is core/sw/rib1's #sw_x, a struck line's the dash's probe)
+                if 'rlk_hr_trg' in e.tags and n:
+                    LEN[e.id] = n * 1e-6
+                if 'rlk_hr_tri' in e.tags and 'rlk_hr_trg' not in e.tags and e.id not in LEN and any(t.endswith('w') for t in e.tags):
+                    LEN[e.id] = 0.5 * (H.hr(s, f'#{key}_n') or 0)
+                if e.id in LEN:
+                    nb['transformation']['scale'][2] = LEN[e.id]
                 cards.append((tuple(e.pos), e.rot[0], e.rot[1], nb))
         recs.append(dict(pt=H.hr(s, '#pt') or 0, body=(tuple(b.pos), b.rot[0]), clip=clip_name, ct=ct, hidden=bool(hid),
                          player=(tuple(p.pos), p.rot[0]), cards=cards))
@@ -419,7 +519,7 @@ def fight_frame(st, rec, cam, field, w=480, look='edge'):
         c = PV.Ctx(bp, byaw, 0.0)
         n = st.api.CLIPS[rec['clip']][0]
         sc.run_file('rlk:boss/scarlet/rig/spawn', c)
-        sc.run_file(f"rlk:hr_dbg/{rec['clip']}/{max(0, min(n, rec['ct'] or 0))}", c)
+        sc.run_file(f"rlk:hr_dbg/{rec['clip']}/{max(0, min(n, (rec['ct'] or 0) + 1))}", c)     # (the instant the cards' targets show)
         sc.command(f'tp @e[tag=rlk_hr_part] {bp[0]:.3f} {bp[1]:.3f} {bp[2]:.3f} {byaw:.2f} 0', c, 0)
         for e in sc.entities:
             if 'rlk_hr_sword_glow' in e.tags and look:
@@ -447,7 +547,7 @@ def fight_frame(st, rec, cam, field, w=480, look='edge'):
             c = int(cmd['colors'][0])
             geo.items[i] = (e, baked, [np.array([(c >> 16 & 255) / 255, (c >> 8 & 255) / 255, (c & 255) / 255])] * max(1, len(tints)), M, name)
     h = round(w * 9 / 16)
-    img, z = PV.render_view(geo, view, w, h, opts, st.assets)
+    img, z = render_lit(geo, view, w, h, opts, st.assets)
     return img, z, view, geo
 
 
@@ -522,6 +622,9 @@ def main():
     f.add_argument('--crop')
     f.add_argument('--zoom', type=float, default=2.0, help='render at 1080p and show the middle 1/zoom of the screen (0: the whole screen)')
     f.add_argument('-o', '--out', required=True)
+    tm = sub.add_parser('trail')
+    tm.add_argument('--clips')
+    tm.add_argument('--json')
     m = sub.add_parser('measure')
     m.add_argument('--clips')
     m.add_argument('--dist', type=float)
@@ -530,6 +633,8 @@ def main():
     st = Stage(a.wt, a.dbg, a.rp)
     if a.cmd == 'measure':
         return cmd_measure(st, a)
+    if a.cmd == 'trail':
+        return cmd_trail(st, a)
     if a.cmd == 'strip':
         cmd_strip(st, a)
     elif a.cmd == 'fight':

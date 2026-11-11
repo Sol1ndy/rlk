@@ -1,5 +1,12 @@
 # Q pattern tick 23
-kill @e[type=minecraft:item_display,tag=rlk_hr_swl]
 execute if score #q_hit hr matches 1 at @s positioned ~ 204.4 ~ run function rlk:mboss/mv/glide {t:8}
 execute if score #q_hit hr matches 1 at @s run function rlk:boss/scarlet/fx/snd/leap
 execute if score #q_hit hr matches 1 at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:20}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_q0_15]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_q0_19] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1b21] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5824f,1.6162f,0.0493f],left_rotation:[-0.6423f,0.1202f,0.0796f,0.7528f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #q_hit hr matches 1 run tag @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_21] remove rlk_hr_trr
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_22,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3599f,1.0613f,0.1481f],left_rotation:[0.5506f,0.6453f,0.5281f,0.0388f],scale:[0.7216f,0.22f,1.8338f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_22,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5208f,1.2692f,0.073f],left_rotation:[-0.4137f,-0.661f,-0.6225f,0.0666f],scale:[0.6684f,0.22f,1.6981f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #q_hit hr matches 1 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_q","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_q1_23","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.5871f,1.5058f,0.0456f],left_rotation:[-0.3994f,-0.6224f,-0.6503f,0.1768f],scale:[0f,0.22f,1.6339f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_qr0r16] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_rib_1"

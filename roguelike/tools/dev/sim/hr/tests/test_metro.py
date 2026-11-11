@@ -2,17 +2,18 @@
 """test_metro.py: review H-A HA-03 (lead ruling) — no blind F metronome clears a gauntlet.
 
 The rebuilt gauntlets G1 (a8) / G2 (a13) are cleared by 5 perfect parries of their cuts, read off the cue at each lock. A
-player who presses F at a fixed period k from some start, without looking, must not get there: for every period
-k = 8..30 t and every start (phase and offset: the train starts at any tick from 120 t before the gauntlet to its last
-cut, fresh F state), at most 3 perfect parries in G1 (the ruling) and in G2 at most 3 but for at most two periods where a
-few starts reach 4 (lane HFA's deviation: with 11 cuts, gaps >= 14 and the moves' spacing no strike set was found that keeps
-every period at 3; tools/dev/plan/combat/hfa_progress.md) — never the 5 a clear needs, at any period 2-40. The presses go through the REAL F functions
-(player/f_key -> player/def/press | press_re, the judge player/def/judge -> judge2 -> par3 / par2 / par1 -> par_use; the
-whiff streak, the lock ladder and the refusal window exactly as shipped), the strikes at the gauntlet's own strike ticks
-(read from a real gauntlet run in the H1 world, = api.SCRIPTS). Sections:
+player who presses F at a fixed period k from some start, without looking, must not get there. Round W (lane WB; the user's
+ruling 11-12: the whiff ladder is gone - every accepted F locks 12 t, a parry of any tier 1 t, an ignored press blocks F 3 t -
+and the gauntlets are re-timed instead, w_brief / wb_progress.md): for every period k = 1..40 t and every start (phase and
+offset: the train starts at any tick from 200 t before the gauntlet to its last cut, fresh F state) at most 4 perfect parries
+in either gauntlet (round V's lane HFA held G1 to 3 with the ladder; without it no strike set under the moves' spacing keeps
+every period at 3 - the exhaustive search tools/dev/sim/hr/review/metro/dfs.c -DNOLADDER). The presses go through the REAL F
+functions (player/f_key -> player/def/press | press_re, the judge player/def/judge -> judge2 -> par3 / par2 / par1 -> par_use;
+the lock and the refusal window exactly as shipped), the strikes at the gauntlet's own strike ticks (read from a real gauntlet
+run in the H1 world, = api.SCRIPTS). Sections:
   world   one run of each gauntlet in the H1 world (no F): the judged strike ticks = the script's (the train's input)
-  train   every period 8..30 and every start: the best train per period (the table), <= 3 perfect parries; mashers (2..7 t)
-          and slow beats (31..40 t) never reach the 5 a clear needs
+  train   every period 1..40 and every start: the best train per period (the table), <= 4 perfect parries (never the 5 a
+          clear needs), in both gauntlets
   real    the best train of every period, played in the real gauntlet (F through player/f_key before each world tick):
           the segments it takes = the train's perfect parries, and the gauge is not 0 at the judge (no repel)
     python3 test_metro.py <roguelike> [section ...]      (from a copy of tools/dev/sim outside the datapack; ~4 min)
@@ -31,10 +32,9 @@ ONLY = set(sys.argv[2:])
 api, S = P.load_api(DP)
 SEG, MAXG = api.GAUGE['seg'], api.GAUGE['max']
 TEST = {'a8': 21, 'a13': 27}
-KS = range(8, 31)
-LEAD = 120                   # a train may start this long before the gauntlet (its whiffs build the lock ladder first)
-MAX_PP = 3
-G2_OVER = {'periods': 2, 'starts': 30}     # G2: periods 8-30 allowed to reach 4 (and their starts in all), never 5
+KS = range(1, 41)
+LEAD = 200                   # a train may start this long before the gauntlet (every phase of its 12-t lock)
+MAX_PP = 4                   # round W: at most 4 (5 clear a gauntlet)
 STUB = ('rlk:player/def/guard', 'rlk:items/hook/on_parry_press', 'rlk:items/hook/on_parry', 'rlk:items/hook/on_pdodge',
         'rlk:char/motion/finish', 'rlk:char/cd_cut', 'rlk:player/def/fx/p1', 'rlk:player/def/fx/p2', 'rlk:player/def/fx/p3',
         'rlk:player/def/fx/pd', 'rlk:items/proc/hw_ctr_q', 'rlk:player/def/pd_go', 'rlk:player/def/dg_refund')
@@ -135,12 +135,12 @@ if run('train') or run('real'):
         st = STRIKES.get(g) or strikes_of(g)
         table = {}
         N4[g] = {}
-        for k in list(range(2, 8)) + list(KS) + list(range(31, 41)):
+        for k in KS:
             best = (-1, None, None)
             n4 = 0
             for t0 in range(-LEAD, st[-1] + 1):
                 pp, tiers, acc = TR.train(st, k, t0)
-                n4 += pp > MAX_PP
+                n4 += pp >= MAX_PP
                 if pp > best[0]:
                     best = (pp, t0, tiers)
             table[k] = best
@@ -148,21 +148,12 @@ if run('train') or run('real'):
         BEST[g] = table
         row = ' '.join(f'{k}:{table[k][0]}' for k in KS)
         print(f'metronome {g} (best perfect parries per period {KS.start}-{KS.stop - 1} t, any start): {row}', flush=True)
-        print(f'  mashers 2-7 t: {" ".join(f"{k}:{table[k][0]}" for k in range(2, 8))}; slow 31-40 t: '
-              f'{" ".join(f"{k}:{table[k][0]}" for k in range(31, 41))}', flush=True)
         worst = max(table[k][0] for k in KS)
-        if g == 'a8':
-            ck(f'train {g}: no metronome of period {KS.start}-{KS.stop - 1} t (any start) gets more than {MAX_PP} perfect parries '
-               f'(worst {worst})', worst <= MAX_PP, {k: table[k][:2] for k in KS if table[k][0] > MAX_PP})
-        else:
-            over = {k: N4[g][k] for k in KS if table[k][0] > MAX_PP}
-            ck(f'train {g}: no metronome of period {KS.start}-{KS.stop - 1} t (any start) gets more than {MAX_PP + 1} perfect '
-               f'parries, more than {MAX_PP} only at {len(over)} period(s) <= {G2_OVER["periods"]} and {sum(over.values())} start(s) '
-               f'<= {G2_OVER["starts"]} ({over})', worst <= MAX_PP + 1 and len(over) <= G2_OVER['periods']
-               and sum(over.values()) <= G2_OVER['starts'], {k: table[k][:2] for k in KS if table[k][0] > MAX_PP})
-        ck(f'train {g}: mashers (2-7 t) and slow beats (31-40 t) never reach the {api.PIPS} a clear needs',
-           all(table[k][0] < api.PIPS for k in list(range(2, 8)) + list(range(31, 41))),
-           {k: table[k][:2] for k in list(range(2, 8)) + list(range(31, 41)) if table[k][0] >= api.PIPS})
+        at4 = {k: N4[g][k] for k in KS if table[k][0] >= MAX_PP}
+        print(f'  periods reaching {MAX_PP} (starts): {at4}', flush=True)
+        ck(f'train {g}: no metronome of period {KS.start}-{KS.stop - 1} t (any start from T - {LEAD}) gets more than {MAX_PP} perfect '
+           f'parries - never the {api.PIPS} a clear needs (worst {worst}; {MAX_PP} at {len(at4)} period(s))', worst <= MAX_PP < api.PIPS,
+           {k: table[k][:2] for k in KS if table[k][0] > MAX_PP})
         # the cue-reader still clears: F at h - 1 for every cut
         pp_all = 0
         TR.reset()

@@ -13,7 +13,7 @@ execute if score #pt hr matches 59..67 at @s unless entity @e[tag=rlk_body,limit
 execute if score #pt hr matches 70..71 if score #pp hr matches 1 run function rlk:boss/scarlet/core/pp
 execute if score #pt hr matches 70..78 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 74..78 run function rlk:boss/scarlet/ai/tail_step
-execute if score #pt hr matches 1 if score #ph hr matches 7 at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:42}
+execute if score #pt hr matches 1 run function rlk:boss/scarlet/p/a3/k/1
 execute if score #pt hr matches 2 run function rlk:boss/scarlet/p/a3/k/2
 execute if score #pt hr matches 3 run function rlk:boss/scarlet/p/a3/k/3
 execute if score #pt hr matches 4 run function rlk:boss/scarlet/p/a3/k/4
@@ -32,8 +32,8 @@ execute if score #pt hr matches 16 run function rlk:boss/scarlet/p/a3/k/16
 execute if score #pt hr matches 17 run function rlk:boss/scarlet/p/a3/k/17
 execute if score #pt hr matches 18 run function rlk:boss/scarlet/p/a3/k/18
 execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/a3/k/19
-execute if score #pt hr matches 20 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a314_14]
-execute if score #pt hr matches 21 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a314_15]
+execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/a3/k/20
+execute if score #pt hr matches 21 run function rlk:boss/scarlet/p/a3/k/21
 execute if score #pt hr matches 22 run function rlk:boss/scarlet/p/a3/k/22
 execute if score #pt hr matches 23 run function rlk:boss/scarlet/p/a3/k/23
 execute if score #pt hr matches 24 run function rlk:boss/scarlet/p/a3/k/24
@@ -48,12 +48,12 @@ execute if score #pt hr matches 32 run function rlk:boss/scarlet/p/a3/k/32
 execute if score #pt hr matches 33 run function rlk:boss/scarlet/p/a3/k/33
 execute if score #pt hr matches 34 run function rlk:boss/scarlet/p/a3/k/34
 execute if score #pt hr matches 35 run function rlk:boss/scarlet/p/a3/k/35
-execute if score #pt hr matches 36 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a330_30]
+execute if score #pt hr matches 36 run function rlk:boss/scarlet/p/a3/k/36
 execute if score #pt hr matches 37 run function rlk:boss/scarlet/p/a3/k/37
 execute if score #pt hr matches 38 run function rlk:boss/scarlet/p/a3/k/38
-execute if score #pt hr matches 39 run function rlk:boss/scarlet/p/a3/k/39
-execute if score #pt hr matches 40 run function rlk:boss/scarlet/p/a3/k/40
-execute if score #pt hr matches 41 run function rlk:boss/scarlet/p/a3/k/41
+execute if score #pt hr matches 39 as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0682f,1.0056f,0.5586f],left_rotation:[-0.2484f,-0.2721f,0.9268f,-0.0727f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #pt hr matches 40 as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0594f,1.001f,0.5662f],left_rotation:[-0.2485f,-0.2705f,0.9273f,-0.0722f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #pt hr matches 41 as @e[type=minecraft:item_display,tag=rlk_hr_tr_a3b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0728f,1.0257f,0.5734f],left_rotation:[-0.235f,-0.2709f,0.931f,-0.0684f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 execute if score #pt hr matches 42 run function rlk:boss/scarlet/p/a3/k/42
 execute if score #pt hr matches 43 run function rlk:boss/scarlet/p/a3/k/43
 execute if score #pt hr matches 44 run function rlk:boss/scarlet/p/a3/k/44
@@ -89,6 +89,6 @@ execute if score #pt hr matches 73 run function rlk:boss/scarlet/p/a3/k/73
 execute if score #pt hr matches 74 run function rlk:boss/scarlet/p/a3/k/74
 execute if score #pt hr matches 75 run function rlk:boss/scarlet/p/a3/k/75
 execute if score #pt hr matches 76 run function rlk:boss/scarlet/p/a3/k/76
-execute if score #pt hr matches 77 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a369_71]
-execute if score #pt hr matches 78 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a369_72]
-execute if score #pt hr matches 79 run scoreboard players set #done hr 1
+execute if score #pt hr matches 77 run function rlk:boss/scarlet/p/a3/k/77
+execute if score #pt hr matches 78 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a3_70]
+execute if score #pt hr matches 79 run function rlk:boss/scarlet/p/a3/k/79

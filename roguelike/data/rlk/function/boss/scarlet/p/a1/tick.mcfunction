@@ -4,6 +4,7 @@ execute if score #pt hr matches 4..7 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 15..16 if score #pp hr matches 1 run function rlk:boss/scarlet/core/pp
 execute if score #pt hr matches 15..23 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 19..23 run function rlk:boss/scarlet/ai/tail_step
+execute if score #pt hr matches 1 run function rlk:boss/scarlet/p/a1/k/1
 execute if score #pt hr matches 2 run function rlk:boss/scarlet/p/a1/k/2
 execute if score #pt hr matches 3 run function rlk:boss/scarlet/p/a1/k/3
 execute if score #pt hr matches 4 run function rlk:boss/scarlet/p/a1/k/4
@@ -24,6 +25,6 @@ execute if score #pt hr matches 18 run function rlk:boss/scarlet/p/a1/k/18
 execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/a1/k/19
 execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/a1/k/20
 execute if score #pt hr matches 21 run function rlk:boss/scarlet/p/a1/k/21
-execute if score #pt hr matches 22 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a114_16]
-execute if score #pt hr matches 23 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a114_17]
-execute if score #pt hr matches 24 run scoreboard players set #done hr 1
+execute if score #pt hr matches 22 run function rlk:boss/scarlet/p/a1/k/22
+execute if score #pt hr matches 23 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a1_15]
+execute if score #pt hr matches 24 run function rlk:boss/scarlet/p/a1/k/24
