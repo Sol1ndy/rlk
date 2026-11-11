@@ -3,10 +3,8 @@
 README 3 「패링 · 닷지」 / 2 「닷지」 written out here as a reference model, on press and dodge sequences. hrsim drives the REAL
 player/f_key (player/def/press / press_re, the judge's par_use) and the REAL dashCool; the reference reads every constant
 from the loaded pack (load.mcfunction):
-  F  accepted unless now < parLk or now < #parMl; accepted: the whiff streak #parWs + 1 when the press before blocked
-     nothing (parHit < parAt) and came <= #parWsT t earlier (at most #parWsMax), 0 when it came longer ago; parLk = now +
-     #parGap x (1 + #parWs). Refused: #parMl = now + #parRe. A parry (the judge): parHit = parLk - #parChain = now, the
-     streak cleared at tier >= #parWsClr.
+  F  accepted unless now < parLk or now < #parMl; accepted: parLk = now + #parGap (round W: the whiff ladder is gone, the
+     user's ruling). Refused: #parMl = now + #parRe. A parry (the judge, any tier): parHit = parLk - #parChain = now.
   dodge  accepted when dashCool is 0: dashCool = #dashCoolT; a dodge that avoided a hit gets #dashCoolT - #dashCoolHitT
      back once; - 1 per tick. Round W: a press inside the cooldown 1..#dgChW t after the set's first dodge is the double
      dodge's second move (dashCool + #dashCoolT), once per set.
@@ -27,7 +25,6 @@ class Ref:
     def __init__(self, s):
         g = lambda k: s.sc(k, 'tmp')    # noqa: E731
         self.gap, self.re, self.chain = g('#parGap'), g('#parRe'), g('#parChain')
-        self.ws_t, self.ws_max, self.ws_clr = g('#parWsT'), g('#parWsMax'), g('#parWsClr')
         self.cd, self.cd_hit, self.chw = g('#dashCoolT'), g('#dashCoolHitT'), g('#dgChW')
         self.par_at = self.par_lk = self.par_hit = self.ml = -10 ** 6
         self.ws = 0
@@ -38,18 +35,11 @@ class Ref:
         if t < self.par_lk or t < self.ml:
             self.ml = t + self.re
             return False
-        d = t - self.par_at
-        if self.par_hit < self.par_at and d <= self.ws_t and self.ws < self.ws_max:
-            self.ws += 1
-        if d > self.ws_t:
-            self.ws = 0
-        self.par_at, self.par_lk = t, t + self.gap * (1 + self.ws)
+        self.par_at, self.par_lk = t, t + self.gap
         return True
 
     def parry(self, t, tier):
         self.par_hit, self.par_lk = t, t + self.chain
-        if tier >= self.ws_clr:
-            self.ws = 0
 
     def dodge(self, t):
         if t < self.d_ready:
@@ -110,8 +100,8 @@ def same(name, rel, **kw):
 # whiffs only (no attack in reach)
 got, _p, s = same('whiffs 20 t apart (the streak: 12 -> 24 -> 36 -> 48 t)', [1 + 20 * i for i in range(8)])
 ck('... and the streak reaches the cap: refused presses 3, 5, 7, 8', got == [True, True, False, True, False, True, False, False], got)
-same('whiffs 70 t apart (inside #parWsT 80: the streak grows)', [1, 71, 141, 211, 281])
-same('whiffs 90 t apart (longer than #parWsT: the streak stays 0)', [1, 91, 181, 271])
+same('whiffs 70 t apart (no ladder: 12 t each)', [1, 71, 141, 211, 281])
+same('whiffs 13 t apart (no ladder: every one taken)', [1, 14, 27, 40, 53])
 same('a held key (every 4 t)', list(range(1, 81, 4)))
 same('mashing every 2 t', list(range(1, 61, 2)))
 same('every 3 t', list(range(1, 61, 3)))

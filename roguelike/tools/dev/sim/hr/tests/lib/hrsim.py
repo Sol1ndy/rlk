@@ -781,9 +781,8 @@ def snap(s):
 # #hzNoParry option of every hazard made, and lane B's balance clock on her body (mob/tick's balance line; mob/setup runs
 # the REAL bal/init).
 #   F: the REAL player/f_key at the head of the tick (rlk:tick's input pre-pass, #now cb = this tick): player/def/press
-#      (the lock #parGap x (1 + the whiff streak #parWs: +1 when the press before blocked nothing and came <= #parWsT t
-#      earlier, at most #parWsMax; 0 after a longer pause) / player/def/press_re (a refused press: no F for #parRe t,
-#      #parMl), and in the judge player/def/par_use (#parChain; a parry of tier >= #parWsClr clears the streak). A press is
+#      (the lock #parGap; round W: the whiff ladder is gone) / player/def/press_re (a refused press: no F for #parRe t,
+#      #parMl), and in the judge player/def/par_use (#parChain, any tier). A press is
 #      accepted when it stamped parAt = now.
 #   dodge: the REAL cooldown score dashCool: refused while >= 1 (player/dash), set to #dashCoolT when accepted, the judge's
 #      player/def/dg_refund gives #dashCoolT - #dashCoolHitT back on a dodge that avoided a hit, player/tick's - 1 per tick.

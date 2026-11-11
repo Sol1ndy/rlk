@@ -14,8 +14,10 @@ scoreboard players set @s atkCD 0
 execute if score #dgMv cb matches 1 at @e[tag=rlk_body,limit=1] run function rlk:player/dodge/snd_step
 execute if score #dgMv cb matches 2 at @e[tag=rlk_body,limit=1] run function rlk:player/dodge/snd_flip
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:cloud ~ ~0.15 ~ 0.2 0.03 0.2 0.01 3
-# 현재 이동 입력 방향(없으면 시선 방향)으로 이동 시작
-function rlk:player/dash_dir
+# 현재 이동 입력 방향(없으면 시선 방향)으로 이동 시작. 백스텝(공격을 피한 첫 동작) 뒤의 옆돌기는 그 방향 그대로
+execute unless score #dgMv cb matches 2 run function rlk:player/dash_dir
+execute if score #dgMv cb matches 2 unless score #dgPrev cb matches 4 run function rlk:player/dash_dir
+execute if score #dgMv cb matches 2 if score #dgPrev cb matches 4 run function rlk:player/dodge/len
 # 캐릭터의 닷지 동작(리그 캐릭터의 클립 dash / dash2, 마네킹 캐릭터의 웅크림 / 대역 리그)
 function rlk:char/motion/dash
 # 아이템 닷지 트리거(동작마다 한 번: 더블 닷지는 두 번)

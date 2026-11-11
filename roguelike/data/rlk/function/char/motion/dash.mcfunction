@@ -1,8 +1,10 @@
 # @s = player, from player/dash_go: the avatar's dodge motion (round W: the reference game's dodge set; build_player_beat.mjs).
-# #dgMv cb 1 = the plain dodge: a quick crouching hop-step (rig characters: clip dash, 6 ticks; mannequin characters: the
-# mannequin's own crouch pose until player/dodge/stand), 2 = the second move of a double dodge (char/motion/dash2).
-# The clip's yaw is locked and its basis turned to the dodge direction (player/dash_dir: dashUX / dashUZ, unit x 100).
+# #dgMv cb 1 = the plain dodge with no direction held: a twist on the spot (clip dash, 6 ticks), 3 = with a direction held: a
+# low lunge-step (clip dash_l, 10 ticks), 2 = the second move of a double dodge (char/motion/dash2). Mannequin characters: the
+# mannequin's own crouch pose while the body moves (player/dodge/crouch -> stand). The clip's yaw is locked and its basis turned
+# to the dodge direction (player/dash_dir: dashUX / dashUZ, unit x 100).
 execute if score #dgMv cb matches 2 run return run function rlk:char/motion/dash2
+execute if score #dgMv cb matches 3 run return run function rlk:char/motion/dash_l
 execute if score #charN tmp matches 5 run function rlk:char/motion/start {char:"arle",clip:"dash"}
 execute if score #charN tmp matches 3 run function rlk:char/motion/start {char:"skirk",clip:"dash"}
 execute if score #charN tmp matches 6 run function rlk:char/motion/start {char:"navia",clip:"dash"}

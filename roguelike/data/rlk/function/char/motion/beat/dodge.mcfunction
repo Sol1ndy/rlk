@@ -4,7 +4,7 @@
 # Not while a move-locked action plays, nor over a rig clip other than the dodge's own (dash / dash2): the flip is presentation
 # and never cuts the player's own action. The glow starts either way.
 execute if score @s pmMoveLock matches 1 run return run function rlk:char/motion/beat/tint_on
-execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"dash"} unless data storage rlk:player_motion active{clip:"dash2"} run return run function rlk:char/motion/beat/tint_on
+execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"dash"} unless data storage rlk:player_motion active{clip:"dash_l"} unless data storage rlk:player_motion active{clip:"dash_b"} unless data storage rlk:player_motion active{clip:"dash2"} run return run function rlk:char/motion/beat/tint_on
 execute if score #charN tmp matches 5 unless score @s arM matches 1.. run function rlk:char/motion/start {char:"arle",clip:"pdodge"}
 execute if score #charN tmp matches 5 if score @s arM matches 1.. run function rlk:char/motion/start {char:"arle",clip:"pdodge_i"}
 execute if score #charN tmp matches 3 unless score @s skM matches 1.. run function rlk:char/motion/start {char:"skirk",clip:"pdodge"}

@@ -24,6 +24,8 @@ execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub
 execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub with storage rlk:dm
 execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub with storage rlk:dm
 scoreboard players remove @s dashMoveT 1
+# round W: 닷지 동안 웅크렸던 마네킹 아바타는 이동이 끝나는 틱에 선다(player/dodge/crouch)
+execute if score @s dashMoveT matches 0 if score #dgCr cb matches 1 run function rlk:player/dodge/stand
 # 아이템 닷지 이동 중 트리거
 function rlk:items/hook/on_dash_move
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:cloud ~ ~0.1 ~ 0.08 0.02 0.08 0.005 1

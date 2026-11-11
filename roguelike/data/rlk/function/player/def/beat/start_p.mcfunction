@@ -8,9 +8,10 @@ scoreboard players set #btK cb 1
 scoreboard players set #btA cb 0
 scoreboard players set #btAct cb 0
 tag @e[tag=rlk_hc_atk,limit=1] add rlk_bt_atk
-# 접점(검이 만난 자리: 머리 높이, 적 쪽 0.65칸)을 표식으로 남긴다: 2틱의 별빛 · 6틱의 불꽃이 같은 자리
-execute if entity @e[tag=rlk_hc_atk,limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.5 ~ facing entity @e[tag=rlk_hc_atk,limit=1] eyes positioned ^ ^ ^0.65 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_bt_pt","rlk_pet"]}
-execute unless entity @e[tag=rlk_hc_atk,limit=1] at @e[tag=rlk_body,limit=1] rotated as @e[tag=rlk_body,limit=1] rotated ~ 0 positioned ~ ~1.5 ~ positioned ^ ^ ^0.65 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_bt_pt","rlk_pet"]}
+# 접점(검이 만난 자리: 머리 위, 적 쪽 0.75칸, 오른쪽으로 0.35칸)을 표식으로 남긴다: 2틱의 별빛 · 6틱의 불꽃이 같은 자리. round W(검토 T3-07):
+# 머리 높이 · 적과 아바타 사이의 줄 위에서는 카메라(아바타 뒤)에서 별빛 대부분이 아바타의 머리에 가렸다
+execute if entity @e[tag=rlk_hc_atk,limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.5 ~ facing entity @e[tag=rlk_hc_atk,limit=1] eyes positioned ^-0.35 ^0.45 ^0.75 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_bt_pt","rlk_pet"]}
+execute unless entity @e[tag=rlk_hc_atk,limit=1] at @e[tag=rlk_body,limit=1] rotated as @e[tag=rlk_body,limit=1] rotated ~ 0 positioned ~ ~1.5 ~ positioned ^-0.35 ^0.45 ^0.75 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_bt_pt","rlk_pet"]}
 execute at @e[type=minecraft:marker,tag=rlk_bt_pt,limit=1] run function rlk:player/def/fx/p3_at
 # 아바타: 쳐내는 동작(리그 캐릭터의 클립 · 마네킹 캐릭터의 대역 리그)과 무기의 노란 빛
 function rlk:char/motion/beat/parry

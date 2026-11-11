@@ -91,10 +91,13 @@ function solve(frame, axis, grip, scale) {
 }
 const SWORD_AXIS = [-Math.SQRT1_2, Math.SQRT1_2, 0], SWORD_GRIP = [0.28, -0.28, 0], SWORD_SCALE = 0.85;
 export const BEAT_CLIPS = ['pparry', 'pdodge'];
-// Round W (lane WP): the dodge itself. dash = the plain dodge (a quick crouching hop-step), dash2 = the second move of a double
-// dodge (an aerial cartwheel). Rig characters: compiled clips, weapon on the back ("sheathed", as the old dash clip was); the
-// mannequin characters: dash = the mannequin's own crouch pose (char/motion/dash), dash2 = the stand-in rig (lite/f).
-export const DODGE_CLIPS = ['dash', 'dash2'];
+// Round W (lane WP): the dodge itself (the reference game's dodge set; the old dash is gone). dash = the plain dodge with no
+// direction held (a twist on the spot), dash_l = with a direction held (a low lunge-step), dash_b = the move turned into a
+// back-step away from the attacker when the dodge avoided an attack, dash2 = the second move of a double dodge (an aerial
+// cartwheel). Rig characters: compiled clips, weapon on the back ("sheathed", as the old dash clip was); the mannequin
+// characters: the mannequin's own crouch pose for dash / dash_l / dash_b (player/dodge/crouch), dash2 = the stand-in rig (lite/f).
+export const DODGE_CLIPS = ['dash', 'dash_l', 'dash_b', 'dash2'];
+const DODGE_ACTIVE = DODGE_CLIPS.map(c => `unless data storage rlk:player_motion active{clip:"${c}"}`).join(' ');
 const LITE_CLIPS = [['pparry', 'p'], ['pdodge', 'd'], ['dash2', 'f']];        // clip, its lite/<short>/ folder; plClip = index + 1
 const bodyOnly = f => Object.fromEntries(BODY.map(k => [k, r3(f.pose[k])]));
 export const LITE = [                          // #charN, the cutscene actor's part models, what the mannequin holds
@@ -138,15 +141,15 @@ function sprites(rpRoot, hot) {
   const dir = path.join(rpRoot, 'assets/rlk/textures/player_motion/weapons');
   fs.mkdirSync(dir, {recursive: true});
   const px = (w, h, f) => { const a = Buffer.alloc(w * h * 4); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) a.set(f(x, y).map(v => Math.max(0, Math.min(255, Math.round(v)))), (y * w + x) * 4); return png(w, h, a); };
-  // <sprite>_hot: the sprite at half resolution (the UVs are relative), 72 % toward yellow-white (ref_pd.md: #FDF7D4 /
-  // #F5C058), alpha 205 where the sprite is opaque
+  // <sprite>_hot: the sprite at half resolution (the UVs are relative), 90 % toward yellow-white (ref_pd.md: #FDF7D4 /
+  // #F5C058), alpha 235 where the sprite is opaque (round W, review T3-07: at 72 % / 205 the dark red scythe read orange-brown)
   const all = {...WEAPON_SPRITES, ...naviaWeaponSprites()}, names = [];
   for (const name of hot) {
     const [w, h, fn] = all[name], hw = Math.max(8, w >> 1), hh = Math.max(8, h >> 1), buf = paint(hw, hh, fn);
     for (let i = 0; i < hw * hh; i++) {
       if (!buf[i * 4 + 3]) continue;
-      for (let k = 0; k < 3; k++) buf[i * 4 + k] = Math.round(buf[i * 4 + k] + (HOT[k] - buf[i * 4 + k]) * 0.72);
-      buf[i * 4 + 3] = 205;
+      for (let k = 0; k < 3; k++) buf[i * 4 + k] = Math.round(buf[i * 4 + k] + (HOT[k] - buf[i * 4 + k]) * 0.9);
+      buf[i * 4 + 3] = 235;
     }
     fs.writeFileSync(path.join(dir, name + '_hot.png'), png(hw, hh, buf));
     names.push(name + '_hot');
@@ -330,7 +333,7 @@ export function buildBeat({fn, json, assets, rpRoot, here, transform, nbt, chara
     '# (clip pparry; ref_pd.md 4) and the weapon\'s yellow-white glow. Rig characters play their clip, mannequin characters the stand-in rig.',
     '# A rig character that has already started another action since the F (an attack clip, a skill) keeps it: only the guard clip',
     '# or no clip gives way to the lunge. The weapon glows either way.',
-    `execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"guard"} unless data storage rlk:player_motion active{clip:"pparry"} unless data storage rlk:player_motion active{clip:"pparry_i"} unless data storage rlk:player_motion active{clip:"pdodge"} unless data storage rlk:player_motion active{clip:"pdodge_i"} unless data storage rlk:player_motion active{clip:"dash"} unless data storage rlk:player_motion active{clip:"dash2"} run return run function ${M}/beat/wglow_on`,
+    `execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"guard"} unless data storage rlk:player_motion active{clip:"pparry"} unless data storage rlk:player_motion active{clip:"pparry_i"} unless data storage rlk:player_motion active{clip:"pdodge"} unless data storage rlk:player_motion active{clip:"pdodge_i"} ${DODGE_ACTIVE} run return run function ${M}/beat/wglow_on`,
     ...startRig('pparry'),
     `execute if data storage rlk:player_motion active{clip:"pparry"} run function ${M}/beat/face`,
     `execute if data storage rlk:player_motion active{clip:"pparry_i"} run function ${M}/beat/face`,
@@ -342,7 +345,7 @@ export function buildBeat({fn, json, assets, rpRoot, here, transform, nbt, chara
     '# Not while a move-locked action plays, nor over a rig clip other than the dodge\'s own (dash / dash2): the flip is presentation',
     '# and never cuts the player\'s own action. The glow starts either way.',
     `execute if score @s pmMoveLock matches 1 run return run function ${M}/beat/tint_on`,
-    `execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"dash"} unless data storage rlk:player_motion active{clip:"dash2"} run return run function ${M}/beat/tint_on`,
+    `execute if score @s pmActive matches 1 ${DODGE_ACTIVE} run return run function ${M}/beat/tint_on`,
     ...startRig('pdodge'),
     `execute if data storage rlk:player_motion active{clip:"pdodge"} run function ${M}/beat/face`,
     `execute if data storage rlk:player_motion active{clip:"pdodge_i"} run function ${M}/beat/face`,
@@ -351,15 +354,23 @@ export function buildBeat({fn, json, assets, rpRoot, here, transform, nbt, chara
   // char/motion/dash: the dodge's avatar motion (player/dash_go). #dgMv cb 1 = the plain step, 2 = the second move.
   const faceArgs = ['execute store result storage rlk:player_motion face.dx double 0.01 run scoreboard players get @s dashUX',
     'execute store result storage rlk:player_motion face.dz double 0.01 run scoreboard players get @s dashUZ'];
-  fn('dash', ['# @s = player, from player/dash_go: the avatar\'s dodge motion (round W: the reference game\'s dodge set; build_player_beat.mjs).',
-    '# #dgMv cb 1 = the plain dodge: a quick crouching hop-step (rig characters: clip dash, 6 ticks; mannequin characters: the',
-    '# mannequin\'s own crouch pose until player/dodge/stand), 2 = the second move of a double dodge (char/motion/dash2).',
-    '# The clip\'s yaw is locked and its basis turned to the dodge direction (player/dash_dir: dashUX / dashUZ, unit x 100).',
-    `execute if score #dgMv cb matches 2 run return run function ${M}/dash2`,
-    ...rig.map(([char, info]) => `execute if score #charN tmp matches ${info.id} run function ${M}/start {char:"${char}",clip:"dash"}`),
+  const stepClip = (clip, sign) => [
+    ...rig.map(([char, info]) => `execute if score #charN tmp matches ${info.id} run function ${M}/start {char:"${char}",clip:"${clip}"}`),
     ...LITE.map(c => `${liteIf(c)} if entity @e[type=minecraft:mannequin,tag=rlk_av,limit=1] run function rlk:player/dodge/crouch`),
-    'execute unless data storage rlk:player_motion active{clip:"dash"} run return 0',
-    ...faceArgs, `function ${M}/dash_face with storage rlk:player_motion face`].join('\n'));
+    `execute unless data storage rlk:player_motion active{clip:"${clip}"} run return 0`,
+    ...faceArgs.map(l => sign < 0 ? l.replace('double 0.01', 'double -0.01') : l), `function ${M}/dash_face with storage rlk:player_motion face`];
+  fn('dash', ['# @s = player, from player/dash_go: the avatar\'s dodge motion (round W: the reference game\'s dodge set; build_player_beat.mjs).',
+    '# #dgMv cb 1 = the plain dodge with no direction held: a twist on the spot (clip dash, 6 ticks), 3 = with a direction held: a',
+    '# low lunge-step (clip dash_l, 10 ticks), 2 = the second move of a double dodge (char/motion/dash2). Mannequin characters: the',
+    '# mannequin\'s own crouch pose while the body moves (player/dodge/crouch -> stand). The clip\'s yaw is locked and its basis turned',
+    '# to the dodge direction (player/dash_dir: dashUX / dashUZ, unit x 100).',
+    `execute if score #dgMv cb matches 2 run return run function ${M}/dash2`,
+    `execute if score #dgMv cb matches 3 run return run function ${M}/dash_l`,
+    ...stepClip('dash', 1)].join('\n'));
+  fn('dash_l', ['# @s = player (char/motion/dash): the lunge-step clip toward the dodge direction.', ...stepClip('dash_l', 1)].join('\n'));
+  fn('dash_b', ['# @s = player (player/dodge/away: the dodge avoided an attack; not over the perfect dodge\'s handspring or the cartwheel):',
+    '# the upright back-step (clip dash_b, 8 ticks) facing the attacker - the basis is turned against the move (dashUX / dashUZ x -1).',
+    ...stepClip('dash_b', -1)].join('\n'));
   fn('dash2', ['# @s = player (char/motion/dash): the double dodge\'s second move, an aerial cartwheel along the dodge direction (9 ticks;',
     '# rig characters: clip dash2, mannequin characters: the stand-in rig, lite/f).',
     ...rig.map(([char, info]) => `execute if score #charN tmp matches ${info.id} run function ${M}/start {char:"${char}",clip:"dash2"}`),

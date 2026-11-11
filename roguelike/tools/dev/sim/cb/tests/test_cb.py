@@ -18,11 +18,14 @@ datapack root (read only).
            use-item click (rcU) fires on ticks 1, 5, 9 ... only, with no fail sound while held (review A-02); F and a
            right-click in one tick both act (A-08); a player without stamps keeps the first dodge and the dodge-start
            box always goes (A-07)
-  lock     review A-01: the whiff streak (lock 12 / 24 / 36 / 48 t, cleared by a pause or a tier 2-3 parry, kept by tier
-           1), presses every 1-2 t are accepted once, blind pressing at every period 1-40 t and at irregular gaps keeps
-           <= 10 % of the ticks in a perfect window (and of real strikes), legit play is never refused (h - 1 for chains
-           with gaps >= 10 t, F every 3 t and every 2 t in any phase), one mistimed or stray press costs at most the
-           next hit, mashing through a 3-t string parries one cut
+  lock     review A-01 without its whiff ladder (round W, the user's ruling): every accepted press locks #parGap 12 t, a parry
+           of any tier shortens it to #parChain; presses every 1-2 t are accepted once (#parRe); blind pressing is measured
+           and bounded by the base lock alone (<= 3 / 12 of the ticks in a perfect window); legit play is never refused (h - 1
+           for chains with gaps >= 10 t, F every 3 t and every 2 t in any phase), one mistimed or stray press costs at most the
+           next hit, mashing through a 3-t string parries one cut; the chain lemma (the user, 11-12: every parryable hit of
+           any chain can be perfect-parried): random chains with gaps 1-40, the ideal press (h - 1; h after a 1-t gap) is
+           never refused and every hit is perfect, also after a tier-1 / tier-2 parry, with the dodge cooldown running and
+           during a dodge's move
   judge    the order i-frames > perfect dodge > perfect parry > loose dodge > tier 2 > tier 1 > hit, the outputs
            (#dodged / #parT / #pdg), the one-shot context reset, no-dodge (ignores dodges and i-frames), no-parry
   tiers    the real hit (cm/hit_me -> cm/hit_pl -> hit_pl2 -> take_damage) with F pressed 0..12 t before the hit: tier 3
@@ -31,10 +34,11 @@ datapack root (read only).
   dodge    perfect 0-2 t for every class; loose 3-6 t for normal and elite, not for bosses; 7+ nothing
   cool     review A-12: the dodge cooldown is 18 t after a dodge that avoided nothing and 12 t after one that avoided an
            attack (perfect or loose; the refund once per dodge); 질주 2 = 14 / 10; the fail sound only on a fresh press
-  double   round W (the dash is gone: the reference game's dodge set): the plain dodge's step (1.0 b in 3 t, the speed
-           table and the real move), a second press 1..#dgChW t later = the double dodge's second move (a new stamp with
-           its own perfect / loose window and refund, 1.8 b in 6 t, the cooldown + #dashCoolT), one per set, a held F5
-           repeat never chains it, a press after the window or after the second move is refused
+  double   round W (the dash is gone: the reference game's dodge set): the speed tables and the real moves - no direction:
+           a 0.4 b twist on the spot (3 t); a direction held: a 1.6 b lunge-step that way (5 t); a dodge that avoided an
+           attack: a 2.7 b back-step straight away from the attacker (4 t, once per stamp); a second press 1..#dgChW t later
+           = the double dodge's cartwheel (2.2 b in 6 t, a new stamp with its own perfect / loose window and refund, the
+           cooldown + #dashCoolT), one per set; a press after the window or after the second move is refused
   context  cm brain / projectile (owner by cmId) / elite class / Raiden / the boss framework (hurt_ctx: boss body) /
            vanilla (ctx_va): attacker tag rlk_hc_atk, class, kind; the tag never outlives the judge
   energy   +10 pt (1000) once per dodge (a second hit in the same window gives none), clamped at the burst cost, 스커크
@@ -73,6 +77,7 @@ datapack root (read only).
 Harness: lib/psim.py + lib/mcsim.py (lane R's vendored harness) with gametime (`time query gametime` = s.gt) and a call log.
 Prints one line per check; exit 1 on any failure. Run it from a copy outside the datapack (tools/dev/sim/README.md 1).
 """
+import math
 import random
 import re
 import sys
@@ -685,46 +690,31 @@ def t_lock():
     e = brain(s)
     # thousands of parries follow: their effect entities (never aged here) would only slow every selector down
     s.stub |= {'rlk:player/def/fx/p1', 'rlk:player/def/fx/p2', 'rlk:player/def/fx/p3', 'rlk:player/def/guard'}
-    ck('lock: the constants (load): #parGap 12, streak cap 3 within 80 t, cleared from tier 2, #parRe 3, #parChain 1',
-       (G(s, '#parGap'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr'), G(s, '#parRe'), G(s, '#parChain')) == (12, 3, 80, 2, 3, 1),
-       (G(s, '#parGap'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr'), G(s, '#parRe'), G(s, '#parChain')))
+    ck('lock: the constants (load): #parGap 12, #parRe 3, #parChain 1; no whiff ladder (round W: #parWsMax / #parWsT / #parWsClr gone)',
+       (G(s, '#parGap'), G(s, '#parRe'), G(s, '#parChain'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr')) == (12, 3, 1, None, None, None),
+       (G(s, '#parGap'), G(s, '#parRe'), G(s, '#parChain'), G(s, '#parWsMax'), G(s, '#parWsT'), G(s, '#parWsClr')))
     gap = G(s, '#parGap') or 12
-    # the whiff streak: every accepted press that follows an unused one within #parWsT lengthens the lock
+    # round W (w_brief §6, the user: 「없애」): unused presses one after the other always lock #parGap
     fresh(s)
     locks = []
     for k in range(6):
         acc, _ = prepass(s, f=True)
-        locks.append((acc, P(s, 'parLk') - s.gt, G(s, '#parWs', 'cb')))
+        locks.append((acc, P(s, 'parLk') - s.gt))
         for _ in range(P(s, 'parLk') - s.gt - 1):
             prepass(s)
-    ck('lock: unused presses one after the other: the lock is 12 / 24 / 36 / 48 / 48 t (the whiff streak 0-3)',
-       locks == [(True, gap * (min(k, 3) + 1), min(k, 3)) for k in range(6)], locks)
-    for _ in range(81):
-        prepass(s)
-    acc, _ = prepass(s, f=True)
-    ck('lock: a pause longer than #parWsT after an unused press clears the streak (lock 12 again)',
-       acc and P(s, 'parLk') - s.gt == gap and G(s, '#parWs', 'cb') == 0, (acc, P(s, 'parLk') - s.gt, G(s, '#parWs', 'cb')))
-
-    def streak2():
+    ck('lock: unused presses one after the other: the lock is 12 t every time (the whiff ladder 12 / 24 / 36 / 48 is gone)',
+       locks == [(True, gap)] * 6, locks)
+    # after a parry of any tier the next press is taken on the next tick (#parChain)
+    for ago, tier in ((7, 1), (4, 2), (1, 3)):
         fresh(s)
         prepass(s, f=True)
-        for _ in range(gap - 1):
-            prepass(s)
-        prepass(s, f=True)
-        for _ in range(2 * gap - 1):
-            prepass(s)
-        prepass(s, f=True)                                 # the third unused press in a row: streak 2
-        return G(s, '#parWs', 'cb')
-    for ago, tier, keep in ((7, 1, True), (4, 2, False), (1, 3, False)):
-        w = streak2()
-        for _ in range(ago):
+        for _ in range(ago - 1):
             prepass(s)
         cm_hit(s, e, 30)
-        got = (G(s, '#parT'), G(s, '#parWs', 'cb'), P(s, 'parLk') - s.gt)
+        got = (G(s, '#parT'), P(s, 'parLk') - s.gt)
         acc, _ = prepass(s, f=True)
-        ck(f'lock: streak 2, then a tier-{tier} parry: the streak is {"kept" if keep else "cleared"}, the next press is taken '
-           f'on the next tick (lock {gap * (3 if keep else 1)})', w == 2 and got == (tier, 2 if keep else 0, G(s, '#parChain'))
-           and acc and P(s, 'parLk') - s.gt == gap * (3 if keep else 1), (w, got, acc, P(s, 'parLk') - s.gt))
+        ck(f'lock: a tier-{tier} parry: the lock drops to #parChain ({G(s, "#parChain")} t), the next press is taken on the next tick',
+           got == (tier, G(s, '#parChain')) and acc, (got, acc))
     # ignored presses: nothing is accepted for #parRe ticks after one, a parry does not clear that
     fresh(s)
     prepass(s, f=True)
@@ -758,9 +748,14 @@ def t_lock():
             worst = worst[:2] + (dmg, name) + worst[4:]
         if acc > worst[4]:
             worst = worst[:4] + (acc, name)
-    ck(f'lock: blind F at every period 3-40 t and 9 irregular rhythms, 600 t each: at most {worst[0]:.1f} % of the ticks are in a '
-       f'perfect window (<= 10; {worst[1]}), a strike would still do {worst[2]:.1f} % of its damage (>= 70; {worst[3]}), at most '
-       f'{worst[4]} presses accepted (<= 18; {worst[5]})', worst[0] <= 10 and worst[2] >= 70 and worst[4] <= 18, worst)
+    # round W: without the whiff ladder the only bound is the base lock: at most one accepted press per #parGap, so at most
+    # #parW3 / #parGap of the ticks in a perfect window (the review A-01 targets <= 10 % / >= 70 % were the ladder's, dropped by
+    # the user's ruling - the numbers are printed for the lead)
+    cap = 100.0 * G(s, '#parW3') / gap
+    ck(f'lock: blind F at every period 3-40 t and 9 irregular rhythms, 600 t each (no ladder): at most {worst[0]:.1f} % of the ticks '
+       f'are in a perfect window ({worst[1]}; the base lock caps it at {cap:.0f} %), a strike would still do {worst[2]:.1f} % of '
+       f'its damage ({worst[3]}), at most {worst[4]} presses accepted ({worst[5]}; <= 600 / {gap} + 1)',
+       worst[0] <= cap + 0.01 and worst[4] <= 600 // gap + 1, worst)
     # ... and against real strikes (the reviewer's loop 2: cm/hit_me at random 20-60 t gaps)
     r, t, st = random.Random(11), 0, set()
     while True:
@@ -773,8 +768,8 @@ def t_lock():
     for name, press in (('every 4 t', set(range(0, 9000, 4))), ('every 12 t', set(range(0, 9000, 12))), ('every 13 t', set(range(0, 9000, 13)))):
         acc, _, tiers, lost = blind(s, e, press, 9000, st)
         out.append((name, round(100.0 * tiers[3] / len(st), 1), round(100.0 * lost / base, 1), acc))
-    ck(f'lock: blind F against {len(st)} real strikes (9000 t): {out} (name, % perfect <= 10, % of the damage >= 70, presses)',
-       all(o[1] <= 10 and o[2] >= 70 for o in out), out)
+    ck(f'lock: blind F against {len(st)} real strikes (9000 t, no ladder): {out} (name, % perfect <= {cap:.0f}, % of the damage, '
+       f'presses) - reported for the lead', all(o[1] <= cap + 0.01 for o in out), out)
     # legit play is never refused
     for g_ in (10, 11, 12, 15, 20, 40):
         hits = [20 + g_ * i for i in range(7)]
@@ -825,6 +820,56 @@ def t_lock():
             got.append(len([t for t in tiers if t]))
     ck('lock: mashing F every 1-2 t through a 3-t string parries the first cut or two (the first press, and a second one '
        '2 t later that follows a parry), never the string', max(got) <= 2, got)
+    # the chain lemma (the user, 11-12): every parryable hit of any chain can be answered perfectly by an ideal player - F one
+    # tick before each hit, or on the hit's own tick when the hit before was one tick earlier (one press answers one tick)
+    def ideal(hits):
+        out, prev = set(), None
+        for h in sorted(hits):
+            out.add(h if prev is not None and h - prev == 1 else h - 1)
+            prev = h
+        return out
+    rnd, bad = random.Random(23), []
+    seqs = [[20 + g * i for i in range(8)] for g in (1, 2, 3, 4, 5, 6, 8, 10, 11, 12, 13, 16, 20, 24, 40)]
+    for _ in range(120):
+        t, hs = 20, []
+        for _k in range(rnd.randint(2, 12)):
+            hs.append(t)
+            t += rnd.choice((1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 18, 25, 40))
+        seqs.append(hs)
+    for hs in seqs:
+        tiers, ref = chain(s, e, set(hs), ideal(hs))
+        if tiers != [3] * len(hs) or ref:
+            bad.append((hs[:6], tiers, ref))
+    ck(f'lock: the chain lemma: {len(seqs)} chains (gaps 1-40 t, fixed and random), the ideal press for every hit: every hit a '
+       f'perfect parry, no press refused', not bad, bad[:3])
+    # ... also when the hit before was parried at tier 1 or 2 (a late answer does not lose the next one), with the dodge's
+    # cooldown running and during a dodge's move (the dodge never blocks F)
+    bad = []
+    for g_ in (2, 3, 5, 10, 12):
+        for early in (4, 7):                                 # tier 2 / tier 1 on the first hit
+            hs = [30 + g_ * i for i in range(5)]
+            pr = (ideal(hs) - {hs[0] - 1}) | {hs[0] - early}
+            tiers, ref = chain(s, e, set(hs), pr)
+            if tiers[1:] != [3] * 4 or ref:
+                bad.append((g_, early, tiers, ref))
+    ck('lock: after a tier-1 / tier-2 parry of a chain\'s first hit every later hit is still perfect (gaps 2-12 t)', not bad, bad[:3])
+    fresh(s)
+    t0 = s.gt
+    tiers, ref, mvs = [], 0, []
+    for k, h in enumerate((10, 13, 16, 22)):
+        while s.gt < t0 + h - 1:
+            prepass(s, rc=(s.gt + 1 == t0 + 4 or s.gt + 1 == t0 + 7))   # dodges on 4 and 7: the step, then the double dodge
+            cooldown(s)
+        acc, _ = prepass(s, f=True)
+        ref += not acc
+        mv = P(s, 'dashMoveT')
+        cooldown(s)
+        prepass(s)
+        cm_hit(s, e, 60)
+        tiers.append(G(s, '#parT'))
+        mvs.append(mv)
+    ck(f'lock: F while the dodge cooldown runs and a dodge moves (a step on 4, the double dodge on 7): every press taken, every '
+       f'hit a perfect parry ({tiers}; moving on the press ticks {mvs})', ref == 0 and tiers == [3] * 4 and mvs[0] >= 1, (tiers, ref, mvs))
     no_errors(s, 'lock')
 
 
@@ -936,7 +981,7 @@ def t_cool():
         prepass(s, rc=True)
         cooldown(s)
         res = None
-        s.setsc('#dgMv', 'cb', 0)                         # this set's second move is not wanted: every later press tests the cooldown
+        s.setsc('#dgN', 'cb', 2)                          # this set's second move is spent: every later press tests the cooldown
         for k in range(1, 40):
             _, dg = prepass(s, rc=True)
             if dg:
@@ -1017,9 +1062,11 @@ def t_double():
             out.append(G(s, '#dgSp'))
         P(s, 'dashMoveT', 0)
         return out
-    ck('double: no dash any more - the plain dodge\'s step 0.5 / 0.3 / 0.2 b (1.0 b in 3 t), the second move 0.25 / 0.4 / 0.4 / '
-       '0.35 / 0.25 / 0.15 b (1.8 b in 6 t); #dgChW 10', speeds(1, 3) == [500, 300, 200] and speeds(2, 6) == [250, 400, 400, 350, 250, 150]
-       and chw == 10, (speeds(1, 3), speeds(2, 6), chw))
+    tabs = (speeds(1, 3), speeds(3, 5), speeds(4, 4), speeds(2, 6))
+    ck('double: no dash any more - the speed tables (b x 1000 per tick): the twist 200 / 120 / 80 (0.4 b), the lunge-step 500 / 400 / '
+       '350 / 200 / 150 (1.6 b), the back-step 900 / 800 / 600 / 400 (2.7 b), the cartwheel 300 / 450 / 450 / 450 / 350 / 200 (2.2 b); '
+       '#dgChW 10', tabs == ([200, 120, 80], [500, 400, 350, 200, 150], [900, 800, 600, 400], [300, 450, 450, 450, 350, 200])
+       and chw == 10, (tabs, chw))
 
     def tick(rc=False, hit=False):
         """one game tick: the pre-pass (a right-click on the eye shield), player/tick's move line, a strike, the cooldown"""
@@ -1045,9 +1092,37 @@ def t_double():
         tick()
         trail.append(at())
     moved = round(trail[-1][1] - p0[1], 3)
-    ck(f'double: a plain dodge with no move input steps {moved} b forward (1.0) in 3 ticks and stops (no 3-b dash)',
-       dg and abs(moved - 1.0) < 0.02 and trail[2] == trail[4] and G(s, '#dgMv', 'cb') == 1 and P(s, 'dashCool') == G(s, '#dashCoolT') - 5,
+    ck(f'double: a plain dodge with no direction held: a twist on the spot, {moved} b forward (0.4) in 3 ticks and stops (no 3-b dash)',
+       dg and abs(moved - 0.4) < 0.02 and trail[2] == trail[4] and G(s, '#dgMv', 'cb') == 1 and P(s, 'dashCool') == G(s, '#dashCoolT') - 5,
        (trail, P(s, 'dashCool')))
+    # a direction held (the body moved 0.2 b along +x in the tick before): a 1.6 b lunge-step that way
+    fresh(s)
+    pl.pos = [0.5, 64.0, 0.5]
+    P(s, 'dashPX', 30)
+    P(s, 'dashPZ', 50)
+    dg, _ = tick(rc=True)
+    mv = G(s, '#dgMv', 'cb')
+    for _ in range(6):
+        tick()
+    dx, dz = round(pl.pos[0] - 0.5, 3), round(pl.pos[2] - 0.5, 3)
+    ck(f'double: a plain dodge with a direction held (+x): a lunge-step {dx} b that way (1.6) in 5 ticks', dg and mv == 3
+       and abs(dx - 1.6) < 0.03 and abs(dz) < 0.02, (dg, mv, dx, dz))
+    # a dodge that avoids an attack: a back-step straight away from the attacker (the brain stands at +x)
+    fresh(s)
+    pl.pos = [0.5, 64.0, 0.5]
+    P(s, 'dashPX', 50)
+    P(s, 'dashPZ', 50)
+    tick(rc=True)
+    x0, z0 = pl.pos[0], pl.pos[2]
+    _, lost = tick(hit=True)
+    mv = G(s, '#dgMv', 'cb')
+    for _ in range(5):
+        tick()
+    dx, dz = pl.pos[0] - x0, pl.pos[2] - z0
+    d = round(math.hypot(dx, dz), 3)
+    ck(f'double: a perfect dodge of a strike from +x turns the move into a back-step away from it: {d} b (2.7; the direction\'s '
+       f'octagonal norm costs ~5 %) along -x ({round(dx, 2)}) in 4 ticks', lost == 0 and mv == 4 and 2.5 <= d <= 2.8 and dx < -2.4,
+       (lost, mv, dx, dz, pl.pos))
     # the double dodge: a second press k ticks later
     for k in (1, 4, chw):
         fresh(s)
@@ -1064,8 +1139,8 @@ def t_double():
         for _ in range(7):
             tick()
         z1 = round(pl.pos[2] - z0, 3)
-        ck(f'double: a second press {k} t after the first is the double dodge: a new stamp, the move 6 t / {z1} b (1.8), the '
-           f'cooldown + #dashCoolT ({c2 + 1} = 18 - {k} + 18)', dg and mv == 2 and t2 == t1 + k and mt == 5 and abs(z1 - 1.8) < 0.02
+        ck(f'double: a second press {k} t after the first is the double dodge: a new stamp, the cartwheel 6 t / {z1} b (2.2), the '
+           f'cooldown + #dashCoolT ({c2 + 1} = 18 - {k} + 18)', dg and mv == 2 and t2 == t1 + k and mt == 5 and abs(z1 - 2.2) < 0.02
            and c2 + 1 == 2 * G(s, '#dashCoolT') - k, (dg, mv, t2 - t1, mt, z1, c2))
         n0 = len(s.calls('rlk:player/dash_fail'))
         tick(rc=True)

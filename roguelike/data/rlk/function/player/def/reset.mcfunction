@@ -8,6 +8,5 @@ scoreboard players set @s dgAt -1000000
 scoreboard players set @s dgRw -1000000
 scoreboard players set #dgEnd cb -1000000
 scoreboard players set #dgKill cb -1000000
-scoreboard players set #parWs cb 0
 scoreboard players set #parMl cb -1000000
 scoreboard players set #dgRf cb -1000000

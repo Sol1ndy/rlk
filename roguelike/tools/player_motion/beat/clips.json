@@ -1114,114 +1114,41 @@
   "dash": {
    "length": 6,
    "weapon_state": "sheathed",
-   "lite": false,
    "ground": [
     [
      0,
-     0
-    ],
-    [
-     2,
      6
     ]
    ],
-   "note2": "the plain dodge (round W: the reference game's dodge - a quick crouching hop-step, not a dash): 6 ticks, heading = the dodge direction",
+   "note2": "the plain dodge with no direction held (round W; the reference: she stays in place, the torso twists, an arm flung out sideways, ~12 frames): a quick twist on the spot, 6 ticks",
    "keys": [
     {
      "tick": 0,
-     "note": "the press: a quick duck forward, the lead knee driving up",
      "pose": {
       "shift": [
        0,
-       -0.1,
-       -0.05
+       -0.08,
+       0
       ],
       "root": [
-       -20,
-       0,
+       -6,
+       -8,
        0
       ],
       "torso": [
-       -12,
-       0,
-       0
-      ],
-      "head": [
-       14,
-       0,
-       0
-      ],
-      "right_arm": [
-       -40,
-       0,
-       -22
-      ],
-      "right_elbow": [
+       -6,
        30,
-       0,
-       0
-      ],
-      "left_arm": [
-       -30,
-       0,
-       22
-      ],
-      "left_elbow": [
-       35,
-       0,
-       0
-      ],
-      "right_leg": [
-       42,
-       0,
-       -3
-      ],
-      "right_knee": [
-       -70,
-       0,
-       0
-      ],
-      "left_leg": [
-       -12,
-       0,
-       3
-      ],
-      "left_knee": [
-       -48,
-       0,
-       0
-      ]
-     },
-     "blade": "arm"
-    },
-    {
-     "tick": 1,
-     "note": "the hop: both feet off the floor, knees tucked, arms trailing",
-     "pose": {
-      "shift": [
-       0,
-       0.07,
-       -0.1
-      ],
-      "root": [
-       -26,
-       0,
-       0
-      ],
-      "torso": [
-       -14,
-       0,
        0
       ],
       "head": [
-       18,
-       0,
+       4,
+       -26,
        0
       ],
       "right_arm": [
-       -55,
+       20,
        0,
-       -26
+       -70
       ],
       "right_elbow": [
        20,
@@ -1229,153 +1156,86 @@
        0
       ],
       "left_arm": [
-       -48,
+       40,
        0,
-       26
+       40
       ],
       "left_elbow": [
-       24,
+       50,
        0,
        0
       ],
       "right_leg": [
-       55,
+       10,
        0,
-       -3
+       -10
       ],
       "right_knee": [
-       -85,
+       -24,
        0,
        0
       ],
       "left_leg": [
-       18,
+       -10,
        0,
-       3
+       10
       ],
       "left_knee": [
-       -80,
+       -20,
        0,
        0
       ]
      },
-     "blade": "arm"
+     "blade": "arm",
+     "note": "the press: a dip, the torso already twisting"
     },
     {
      "tick": 2,
-     "note": "the lead foot reaches",
      "pose": {
       "shift": [
        0,
-       0,
-       -0.06
+       -0.12,
+       0
       ],
       "root": [
-       -18,
-       0,
+       -8,
+       -14,
        0
       ],
       "torso": [
-       -10,
-       0,
-       0
-      ],
-      "head": [
-       12,
-       0,
-       0
-      ],
-      "right_arm": [
-       -30,
-       0,
-       -20
-      ],
-      "right_elbow": [
-       30,
-       0,
-       0
-      ],
-      "left_arm": [
-       -20,
-       0,
-       20
-      ],
-      "left_elbow": [
-       35,
-       0,
-       0
-      ],
-      "right_leg": [
-       38,
-       0,
-       -3
-      ],
-      "right_knee": [
-       -25,
-       0,
-       0
-      ],
-      "left_leg": [
-       -28,
-       0,
-       3
-      ],
-      "left_knee": [
-       -40,
-       0,
-       0
-      ]
-     },
-     "blade": "arm"
-    },
-    {
-     "tick": 3,
-     "note": "landed low",
-     "pose": {
-      "shift": [
-       0,
-       0,
-       -0.02
-      ],
-      "root": [
-       -10,
-       0,
-       0
-      ],
-      "torso": [
-       -6,
-       0,
+       -8,
+       46,
        0
       ],
       "head": [
        6,
-       0,
+       -40,
        0
       ],
       "right_arm": [
-       -10,
+       10,
        0,
-       -14
+       -112
       ],
       "right_elbow": [
-       25,
+       6,
        0,
        0
       ],
       "left_arm": [
-       -6,
+       60,
        0,
-       14
+       62
       ],
       "left_elbow": [
-       28,
+       70,
        0,
        0
       ],
       "right_leg": [
-       22,
+       14,
        0,
-       -3
+       -14
       ],
       "right_knee": [
        -34,
@@ -1383,21 +1243,88 @@
        0
       ],
       "left_leg": [
-       -16,
+       -14,
        0,
-       3
+       14
       ],
       "left_knee": [
-       -30,
+       -28,
        0,
        0
       ]
      },
-     "blade": "arm"
+     "blade": "arm",
+     "note": "the twist at its widest: the right arm flung out sideways, the left across the chest, knees bent"
+    },
+    {
+     "tick": 4,
+     "pose": {
+      "shift": [
+       0,
+       -0.04,
+       0
+      ],
+      "root": [
+       -4,
+       -4,
+       0
+      ],
+      "torso": [
+       -4,
+       14,
+       0
+      ],
+      "head": [
+       2,
+       -12,
+       0
+      ],
+      "right_arm": [
+       10,
+       0,
+       -40
+      ],
+      "right_elbow": [
+       16,
+       0,
+       0
+      ],
+      "left_arm": [
+       20,
+       0,
+       24
+      ],
+      "left_elbow": [
+       30,
+       0,
+       0
+      ],
+      "right_leg": [
+       8,
+       0,
+       -7
+      ],
+      "right_knee": [
+       -14,
+       0,
+       0
+      ],
+      "left_leg": [
+       -8,
+       0,
+       7
+      ],
+      "left_knee": [
+       -12,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "unwinding"
     },
     {
      "tick": 6,
-     "note": "standing again",
      "pose": {
       "shift": [
        0,
@@ -1460,7 +1387,8 @@
        0
       ]
      },
-     "blade": "arm"
+     "blade": "arm",
+     "note": "ready"
     }
    ]
   },
@@ -2173,6 +2101,706 @@
       ]
      },
      "blade": "arm"
+    }
+   ]
+  },
+  "dash_l": {
+   "length": 10,
+   "weapon_state": "sheathed",
+   "ground": [
+    [
+     0,
+     10
+    ]
+   ],
+   "note2": "the plain dodge with a direction held (round W; the reference: a low lunge-step in the input direction, deep lean, trailing leg straight, standing again by ~40 frames): 10 ticks, heading = the dodge direction",
+   "keys": [
+    {
+     "tick": 0,
+     "pose": {
+      "shift": [
+       0,
+       -0.08,
+       -0.06
+      ],
+      "root": [
+       -22,
+       0,
+       0
+      ],
+      "torso": [
+       -12,
+       0,
+       0
+      ],
+      "head": [
+       16,
+       0,
+       0
+      ],
+      "right_arm": [
+       -40,
+       0,
+       -18
+      ],
+      "right_elbow": [
+       30,
+       0,
+       0
+      ],
+      "left_arm": [
+       40,
+       0,
+       18
+      ],
+      "left_elbow": [
+       40,
+       0,
+       0
+      ],
+      "right_leg": [
+       50,
+       0,
+       -4
+      ],
+      "right_knee": [
+       -60,
+       0,
+       0
+      ],
+      "left_leg": [
+       -24,
+       0,
+       4
+      ],
+      "left_knee": [
+       -12,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "the push-off: leaning in, the lead knee driving"
+    },
+    {
+     "tick": 2,
+     "pose": {
+      "shift": [
+       0,
+       -0.22,
+       -0.14
+      ],
+      "root": [
+       -36,
+       0,
+       0
+      ],
+      "torso": [
+       -16,
+       0,
+       0
+      ],
+      "head": [
+       28,
+       0,
+       0
+      ],
+      "right_arm": [
+       -30,
+       0,
+       -30
+      ],
+      "right_elbow": [
+       24,
+       0,
+       0
+      ],
+      "left_arm": [
+       -50,
+       0,
+       26
+      ],
+      "left_elbow": [
+       16,
+       0,
+       0
+      ],
+      "right_leg": [
+       68,
+       0,
+       -6
+      ],
+      "right_knee": [
+       -72,
+       0,
+       0
+      ],
+      "left_leg": [
+       -44,
+       0,
+       6
+      ],
+      "left_knee": [
+       -4,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "the lunge: deep forward lean, front knee bent, the trailing leg straight behind, arms low and back"
+    },
+    {
+     "tick": 5,
+     "pose": {
+      "shift": [
+       0,
+       -0.2,
+       -0.1
+      ],
+      "root": [
+       -30,
+       0,
+       0
+      ],
+      "torso": [
+       -14,
+       0,
+       0
+      ],
+      "head": [
+       24,
+       0,
+       0
+      ],
+      "right_arm": [
+       -24,
+       0,
+       -28
+      ],
+      "right_elbow": [
+       24,
+       0,
+       0
+      ],
+      "left_arm": [
+       -40,
+       0,
+       24
+      ],
+      "left_elbow": [
+       18,
+       0,
+       0
+      ],
+      "right_leg": [
+       60,
+       0,
+       -6
+      ],
+      "right_knee": [
+       -68,
+       0,
+       0
+      ],
+      "left_leg": [
+       -40,
+       0,
+       6
+      ],
+      "left_knee": [
+       -6,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "held low, sliding to a stop"
+    },
+    {
+     "tick": 8,
+     "pose": {
+      "shift": [
+       0,
+       -0.07,
+       -0.03
+      ],
+      "root": [
+       -10,
+       0,
+       0
+      ],
+      "torso": [
+       -6,
+       0,
+       0
+      ],
+      "head": [
+       8,
+       0,
+       0
+      ],
+      "right_arm": [
+       0,
+       0,
+       -16
+      ],
+      "right_elbow": [
+       16,
+       0,
+       0
+      ],
+      "left_arm": [
+       -8,
+       0,
+       14
+      ],
+      "left_elbow": [
+       14,
+       0,
+       0
+      ],
+      "right_leg": [
+       20,
+       0,
+       -4
+      ],
+      "right_knee": [
+       -24,
+       0,
+       0
+      ],
+      "left_leg": [
+       -14,
+       0,
+       4
+      ],
+      "left_knee": [
+       -8,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "rising"
+    },
+    {
+     "tick": 10,
+     "pose": {
+      "shift": [
+       0,
+       0,
+       0
+      ],
+      "root": [
+       -2,
+       0,
+       0
+      ],
+      "torso": [
+       -2,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       4,
+       0,
+       -8
+      ],
+      "right_elbow": [
+       12,
+       0,
+       0
+      ],
+      "left_arm": [
+       4,
+       0,
+       8
+      ],
+      "left_elbow": [
+       12,
+       0,
+       0
+      ],
+      "right_leg": [
+       4,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       -4,
+       0,
+       3
+      ],
+      "left_knee": [
+       -8,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "ready"
+    }
+   ]
+  },
+  "dash_b": {
+   "length": 8,
+   "weapon_state": "sheathed",
+   "ground": [
+    [
+     0,
+     0
+    ],
+    [
+     3,
+     8
+    ]
+   ],
+   "note2": "the dodge that avoided an attack (round W; the reference: a straight, upright back-step away from the enemy, legs apart, landing with the arms spread wide, ready ~18-25 frames after the press): 8 ticks, heading = toward the attacker (the body moves backward)",
+   "keys": [
+    {
+     "tick": 0,
+     "pose": {
+      "shift": [
+       0,
+       -0.08,
+       0.02
+      ],
+      "root": [
+       6,
+       0,
+       0
+      ],
+      "torso": [
+       4,
+       0,
+       0
+      ],
+      "head": [
+       -4,
+       0,
+       0
+      ],
+      "right_arm": [
+       20,
+       0,
+       -30
+      ],
+      "right_elbow": [
+       30,
+       0,
+       0
+      ],
+      "left_arm": [
+       20,
+       0,
+       30
+      ],
+      "left_elbow": [
+       30,
+       0,
+       0
+      ],
+      "right_leg": [
+       -10,
+       0,
+       -10
+      ],
+      "right_knee": [
+       -26,
+       0,
+       0
+      ],
+      "left_leg": [
+       10,
+       0,
+       10
+      ],
+      "left_knee": [
+       -26,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "the push: upright, a small crouch"
+    },
+    {
+     "tick": 1,
+     "pose": {
+      "shift": [
+       0,
+       0.1,
+       0.06
+      ],
+      "root": [
+       10,
+       0,
+       0
+      ],
+      "torso": [
+       6,
+       0,
+       0
+      ],
+      "head": [
+       -6,
+       0,
+       0
+      ],
+      "right_arm": [
+       10,
+       0,
+       -60
+      ],
+      "right_elbow": [
+       16,
+       0,
+       0
+      ],
+      "left_arm": [
+       10,
+       0,
+       60
+      ],
+      "left_elbow": [
+       16,
+       0,
+       0
+      ],
+      "right_leg": [
+       -16,
+       0,
+       -16
+      ],
+      "right_knee": [
+       -20,
+       0,
+       0
+      ],
+      "left_leg": [
+       18,
+       0,
+       16
+      ],
+      "left_knee": [
+       -30,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "the hop back: feet off the floor, legs apart, arms opening"
+    },
+    {
+     "tick": 3,
+     "pose": {
+      "shift": [
+       0,
+       -0.12,
+       0.04
+      ],
+      "root": [
+       4,
+       0,
+       0
+      ],
+      "torso": [
+       2,
+       0,
+       0
+      ],
+      "head": [
+       -2,
+       0,
+       0
+      ],
+      "right_arm": [
+       0,
+       0,
+       -84
+      ],
+      "right_elbow": [
+       4,
+       0,
+       0
+      ],
+      "left_arm": [
+       0,
+       0,
+       84
+      ],
+      "left_elbow": [
+       4,
+       0,
+       0
+      ],
+      "right_leg": [
+       -12,
+       0,
+       -16
+      ],
+      "right_knee": [
+       -30,
+       0,
+       0
+      ],
+      "left_leg": [
+       14,
+       0,
+       16
+      ],
+      "left_knee": [
+       -30,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "landed wide: arms spread out, knees bent"
+    },
+    {
+     "tick": 5,
+     "pose": {
+      "shift": [
+       0,
+       -0.06,
+       0.02
+      ],
+      "root": [
+       0,
+       0,
+       0
+      ],
+      "torso": [
+       0,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       6,
+       0,
+       -50
+      ],
+      "right_elbow": [
+       10,
+       0,
+       0
+      ],
+      "left_arm": [
+       6,
+       0,
+       50
+      ],
+      "left_elbow": [
+       10,
+       0,
+       0
+      ],
+      "right_leg": [
+       -6,
+       0,
+       -10
+      ],
+      "right_knee": [
+       -16,
+       0,
+       0
+      ],
+      "left_leg": [
+       8,
+       0,
+       10
+      ],
+      "left_knee": [
+       -16,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "settling"
+    },
+    {
+     "tick": 8,
+     "pose": {
+      "shift": [
+       0,
+       0,
+       0
+      ],
+      "root": [
+       -2,
+       0,
+       0
+      ],
+      "torso": [
+       -2,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       4,
+       0,
+       -8
+      ],
+      "right_elbow": [
+       12,
+       0,
+       0
+      ],
+      "left_arm": [
+       4,
+       0,
+       8
+      ],
+      "left_elbow": [
+       12,
+       0,
+       0
+      ],
+      "right_leg": [
+       4,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       -4,
+       0,
+       3
+      ],
+      "left_knee": [
+       -8,
+       0,
+       0
+      ]
+     },
+     "blade": "arm",
+     "note": "ready"
     }
    ]
   }

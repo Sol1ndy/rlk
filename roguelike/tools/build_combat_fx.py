@@ -132,12 +132,14 @@ def strip_px(i, n=4, w=256, h=64):
 
 
 def tint_px(w, h):
-    warm, hot = hexc('#E9C9AE'), hexc('#F2B46A')
+    # round W (review T3-07): a saturated warm orange at about half the old cover (0.11-0.21 -> 0.06-0.12) - t3 measured +20 % (P1)
+    # / +40 % (P2) brightness and no warmth on the red P2 field against the reference's +10 %, toward #E1C7B9
+    warm, hot = hexc('#FFB45A'), hexc('#FF8C2E')
 
     def px(x, y):
         u, v = (x + 0.5) / w * 2 - 1, (y + 0.5) / h * 2 - 1
         e = math.hypot(u * 0.9, v)
-        return mix(warm, hot, smooth(0.5, 1.4, e)) + (0.11 + 0.10 * smooth(0.4, 1.35, e),)
+        return mix(warm, hot, smooth(0.5, 1.4, e)) + (0.06 + 0.06 * smooth(0.4, 1.35, e),)
     return px
 
 
@@ -354,21 +356,22 @@ def title_comp(run):
     return f'{{text:"",extra:[{{text:"{run}",font:"{FONT}",color:"white",shadow_color:0}}]}}'
 
 
-def glyph_comp(run):
-    return f'{{text:"",extra:[{{text:"{run}",font:"{FONT}",color:"white"}}]}}'
+def glyph_comp(run, color='white'):
+    return f'{{text:"",extra:[{{text:"{run}",font:"{FONT}",color:"{color}"}}]}}'
 
 
-def text_display(run, tag, scale, rot='[0f,0f,0f,1f]', dy='-0.12f'):
+def text_display(run, tag, scale, rot='[0f,0f,0f,1f]', dy='-0.12f', color='white'):
     s = f'{scale}f'
     return ('summon minecraft:text_display ~ ~ ~ {Tags:["rlk_cb_fx","' + tag + '","rlk_cb_new"],billboard:"center",'
             'background:0,shadow:0b,see_through:0b,line_width:400,brightness:{sky:15,block:15},view_range:2f,'
-            'text:' + glyph_comp(run) + ',transformation:{translation:[0f,' + dy + ',0f],left_rotation:' + rot + ','
+            'text:' + glyph_comp(run, color) + ',transformation:{translation:[0f,' + dy + ',0f],left_rotation:' + rot + ','
             f'scale:[{s},{s},{s}],right_rotation:[0f,0f,0f,1f]}}}}')
 
 
 def card(run, tag, cb, scale='$(s)', **kw):
     """summon one glyph card and start its age (cb = shown ticks + 1: player/def/fx/tick ages it once in its spawn tick)"""
-    return [('$' if '$' in str(scale) else '') + text_display(run, tag, scale, **kw),
+    macro = '$' in str(scale) or '$' in str(kw.get('color', ''))
+    return [('$' if macro else '') + text_display(run, tag, scale, **kw),
             f'scoreboard players set @e[type=minecraft:text_display,tag=rlk_cb_new] cb {cb}',
             'tag @e[type=minecraft:text_display,tag=rlk_cb_new] remove rlk_cb_new']
 
@@ -398,9 +401,10 @@ def write_dp():
         '# the 4 freeze ticks, then gone in 2 t while the sparks fly: the shrink is sent at the end of the last freeze tick).',
         *card(gl('star'), 'rlk_cb_star', 6)]
     files['spark'] = [
-        '# {s}: the normal guard\'s small yellow spark (rlk:cb spark, 0.4 b at scale 1; tiers 2 and 1), tags rlk_cb_fx',
+        '# {s, c}: the normal guard\'s spark (rlk:cb spark, 0.4 b at scale 1; tiers 2 and 1, the perfect parry\'s contact) in the',
+        '# text colour c (round W: a colour per tier - the glyph is pale yellow-white, the colour multiplies it), tags rlk_cb_fx',
         '# rlk_cb_spark: cb 4 = shown 1 t, gone in 2 t.',
-        *card(gl('spark'), 'rlk_cb_spark', 4)]
+        *card(gl('spark'), 'rlk_cb_spark', 4, color='$(c)')]
     files['burst'] = [
         '# {s}: the perfect dodge\'s radial pink-red burst (rlk:cb burst, 1.4 b at scale 1), tags rlk_cb_fx rlk_cb_burst:',
         '# cb 4 = it grows for 2 t and is gone on the third.',

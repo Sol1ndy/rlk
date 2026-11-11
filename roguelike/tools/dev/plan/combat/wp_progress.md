@@ -16,7 +16,11 @@ the downloaded .ogg / .wav of ~150 candidate events: untrusted data, read with `
 - [x] 3 the dodge set (the dash is gone): plain step 1.0 b / 3 t, double dodge (second press 1..10 t later: aerial
       cartwheel 1.8 b / 6 t, new stamp, cooldown + 18), perfect dodge = the beat; clips `dash` (rewritten) / `dash2` (new)
       for all seven characters; held-F5 repeats never chain the double; hrsim / test_input_hr model; test_cb `double`
-- [ ] 4 README 2 / 3 / 12-1 / 0-x, gates, commit, push  (in progress)
+- [x] 3b (review T3-02/03) the dodge moves by context: twist / lunge-step / back-step on an avoided hit / cartwheel
+- [x] 3c (review T3-05 / T3-07 / T3-10) tier sparks bigger, coloured, beside the head; star above the head line; tint warmer
+      and half as strong; bolts 1.5x with white-yellow dust; weapon glow hotter and re-applied on beat ticks 1-2; guard whoosh
+- [x] 4 README 2 / 3 / 10 / 12-1 and the rig notes; checkpoint a68b795d2 pushed
+- [ ] 5 gates on the final tree, commit, push, report
 - [ ] 5 dash dependents: the list below checked in the code; balance sims; final gates; report
 
 ## Item 1 — sounds (what was measured, what is built)
@@ -47,22 +51,39 @@ landing sound) → the landing taken low on 8 → ready stance on 10 → over on
 stretched ×2 (passes on 0 2 4 6, teleport_duration on 0 / back on 6, all back on 8). Contract kept: the clock list, the
 gates, untouchable, the input buffer, proofs (a)-(e) in `test_cb beat` / `beatloop_cb` / `beatloop_hr` / `test_vi`.
 
-## Item 3 — the dodge set (the old dash removed)
-Reference `dodge.mp4` (input log parsed per frame, frames read on the floor grid): a plain dodge is a quick low hop-step,
-12-15 frames of motion (4-5 ticks), ≈ 0.5-1 body heights (≈ 0.9 b) in the input direction, standing again by ≈ 30 frames;
-a second press 3-26 frames (1-9 ticks) after the first chains the double dodge (log `SHIFT→SHIFT 더블 닷지`, 13 of 13
-seen), an aerial cartwheel / side flip, inverted 24-34 frames after the second press; the perfect dodge triggers from
-either. Built: `player/dash` (first press: step, cooldown 18 = #dashCoolT) → `player/dodge/again` (a press inside the
-cooldown, 1..#dgChW = 10 world ticks after the set's first stamp, not a held F5 repeat: the second move, a new stamp, cooldown
-+ 18) → `player/dash_go` → `player/dash_dir` (direction = move input else look, as before) → `player/dash_move_tick` with
-`player/dodge/speed` (step 0.5 / 0.3 / 0.2 b = 1.0 b in 3 t; second move 0.25 / 0.4 / 0.4 / 0.35 / 0.25 / 0.15 = 1.8 b in 6 t;
-the old dash: 1 b × 3 t). Windows unchanged (perfect 0-2, loose 3-6 for normal / elite), one refund per stamp, energy once
-per stamp. Avatar: rig characters clip `dash` (the hop-step, 6 t) / `dash2` (the cartwheel, 9 t); the mannequin characters
-crouch for the step (vanilla mannequin pose `crouching` until box_end, verified VALID_POSES in the bytecode) and play dash2
-on the stand-in rig (`lite/f`).
+## Item 3 — the dodge set (the old dash removed; w_brief §4 "WP, changed", review T3-02 / T3-03)
+Reference `dodge.mp4` (this lane: the input log parsed per frame, frames on the floor grid; the reviewer: floor-compensated
+tracks, `review/w/findings_fight.json` T3-03): no attack, no direction -> in place (< 0.3 bh), a twist with an arm flung out,
+~12 frames; an attack incoming -> a straight upright back-step away from the enemy, 1.9-2.2 bh, 5-12 frames, arms spread on
+landing; a direction held -> a low lunge-step that way, ~1.4 bh, 20-25 frames; a second press 3-26 frames (1-9 ticks) after
+the first -> the double dodge's sideways cartwheel (20 frames, ~1.3 bh more); no slow motion / tint / sound on a plain
+dodge. Built (`player/dash` -> `player/dodge/again` -> `player/dash_go` -> `dash_dir` / `dodge/len` / `dash_move_tick` +
+`dodge/speed*`, `player/dodge/away` from `player/def/dg_refund`):
+
+| move (#dgMv) | when | travel | clip (rig) | mannequin |
+|---|---|---|---|---|
+| 1 twist | first press, no direction held | 0.4 b / 3 t forward (0.2 0.12 0.08) | `dash` 6 t | crouch |
+| 3 lunge-step | first press, moving / F5 input held | 1.6 b / 5 t that way (0.5 0.4 0.35 0.2 0.15) | `dash_l` 10 t | crouch |
+| 4 back-step | the stamp avoided an attack (perfect / loose / 홍련 pip query), once per stamp | 2.7 b / 4 t straight away from the attacker (0.9 0.8 0.6 0.4) | `dash_b` 8 t facing the attacker (not over pdodge / dash2) | crouch |
+| 2 cartwheel | a second press 1..#dgChW (10) world ticks after the first, not a held F5 repeat, once per set | 2.2 b / 6 t (0.3 0.45 0.45 0.45 0.35 0.2), after a back-step in its direction | `dash2` 9 t | stand-in rig `lite/f` |
+
+Windows unchanged: perfect 0-2 t (every class), loose 3-6 t (normal / elite); every move is a stamp (its own windows, refund,
+energy). Cooldown 18 / 12 after an avoided attack (질주 2: 14 / 10); the cartwheel adds 18 (a set = 2 windows per 36 t, the
+old rate). The old dash: 3 b / 3 t every time (1 b a tick), a flat "superman" pose.
 
 ## Dash dependents checked (and what became of them)
-(see README; filled in step 5)
+| what read the dash | where | now |
+|---|---|---|
+| item hooks on_dash / on_dash_move (키리온 marks, 고통 & 절망, 열혈 저울, 선학의 깃, 생명줄, tutorial counter) | `items/hook/on_dash*` | once per move (a double dodge = twice, at the old rate: each move costs 18 t of cooldown); on_dash_move every moving tick of a move. Shorter paths: fewer enemies passed |
+| 질주 (2) cooldown −20 %, (4) wind damage to enemies passed (2.2 b round the body each move tick) | `engravings/dash/regen`, `engravings/dash/hit` | (2) unchanged (14 / 10); (4) unchanged radius, shorter path (README 12-1 updated) |
+| 질주 (1) move speed +5 % | `stat` | unaffected |
+| room traversal (gaps, steps) | `dash_sub` / `dash_up_*`, `room/fall/*` | doors are reachable on flat floor from every zone (README 10): nothing needs the dash; the one-block step-up per move stays; the safe-spot marker still skips moving ticks |
+| knockback / DoT immunity while moving, `mboss/mv/lv_sample`, `mboss/push/capsule`, `view/move`, `combat/request`, `loco/observe`, 클로린드 auto fire, 나비아 aim, burst / fall / map resetting dashMoveT | many | read `dashMoveT` only: unchanged (moves last 3-6 t, as the dash's 3) |
+| the rig dash clips (arle / skirk / navia `dash`, 나비아's fx + audio) | `tools/player_motion/{arle,skirk}.json`, `navia/dash_sheathe.json`, `navia_audio/dash.py` | removed; `dash` / `dash_l` / `dash_b` / `dash2` generated for all seven from `beat/clips.json` |
+| the dash sound (wind_charge burst + breeze slide, −20..−30 dBFS in t3, louder than the parries: T3-10) | `player/dash_go` | `player/dodge/snd_step` (leather + a quiet slide) / `snd_flip` |
+| the balance sims | `hr/tests/lib/hrsim.py` (hrfair2, test_bal_hr, pat_*, test_metro) | model the cooldown, not the travel (the player stands): the double dodge added to the cooldown model; targets unmoved (test_bal_hr / pat_* results below) |
+| old fair sims of the chapter bosses (`mb3/fgfix`, `tk/review`, `ap/balance`, `tele/fg`, `mb2/balance`) | not gated | model the pre-11-10 dash (charges, i-frames, 3-b escape) — already out of date since 11-10; not changed (listed for the lead) |
+| boss fairness that assumed dash travel | hazards | every hit goes through the judge (windows + the start-spot box `rlk_dgo`); escaping an area without timing now needs walking or the back-step after an avoided hit |
 
 ## Requests to other lanes
 - none yet
