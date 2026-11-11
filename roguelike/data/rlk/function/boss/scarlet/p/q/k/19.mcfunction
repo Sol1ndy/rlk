@@ -1,6 +1,6 @@
 # Q pattern tick 19
 scoreboard players set #hzEl mb 3
-scoreboard players set #hzKB mb 5
+scoreboard players set #hzKB mb 0
 scoreboard players set #hzKBDir mb 1
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1

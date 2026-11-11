@@ -423,13 +423,15 @@ def pattern_files(W, ctx):
         w(f'core/hz_tag/{k}', [f'# @s = a hazard of {k.upper()} just made: the pattern tags (its cancel kills it).',
                                f'tag @s add {api.TAGS["pat"]}', f'tag @s add {S.tag_p(k)}'])
     pe = ['# The pattern set #done (@s = body): the lock marker gone, on the floor; the gauge + 3 (not A6, not U); rings at a full',
-          '# gauge -> ult at once; mx may repeat once at <= 30 % HP; after A6 the decision at once with the far rule; else the',
-          '# recovery.',
+          '# gauge -> ult at once, unless a floor step is reserved (#fl: HA-01, the step starts at the next decision, no ult);',
+          '# mx may repeat once at <= 30 % HP; after A6 the decision at once with the far rule; else the recovery.',
           sset('#done', 0), f'scoreboard players operation #dec {OBJ} = #pat {OBJ}', sset('#pat', 0), sset('#pt', 0), sset('#ppf', 0),
           f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground'),
           f'execute unless score #dec {OBJ} matches {TID["a6"]} unless score #dec {OBJ} matches {TID["ult"]} run {fn("core/gauge/pat")}']
     if 'rings' in present and 'ult' in present:
-        pe.append(f'execute if score #dec {OBJ} matches {TID["rings"]} if score #ultq {OBJ} matches 1 run return run {fn("core/start/ult")}')
+        # HA-01 (review H-A, lead ruling): a floor reached during the forced rings ends the chain there (as mx's repeat)
+        pe.append(f'execute if score #dec {OBJ} matches {TID["rings"]} if score #ultq {OBJ} matches 1 unless score #fl {OBJ} matches 1.. '
+                  f'run return run {fn("core/start/ult")}')
     pe.append(sset('#ultq', 0))
     if 'mx' in present:
         pe.append(f'execute if score #dec {OBJ} matches {TID["mx"]} if function {NS}core/mx_rep run return 1')
@@ -483,7 +485,9 @@ def pattern_files(W, ctx):
     GRG = 100
     air = []                                # (pattern, the #pt ticks she is out of reach or mid-strike: no break may start)
     E_ = api.ev
-    for k, a, b in (('a4', E_('a4', 'leap'), E_('a4', 'hit')), ('a10', E_('a10', 'spring'), E_('a10', 'hit')),
+    # HA-05 (review H-A): a4 is airborne twice: the leap -> the landing hit, and the ring hop -> its landing (hit 2 in the air)
+    for k, a, b in (('a4', E_('a4', 'leap'), E_('a4', 'hit')), ('a4', E_('a4', 'ring'), E_('a4', 'land')),
+                    ('a10', E_('a10', 'spring'), E_('a10', 'hit')),
                     ('nb', E_('nb', 'leap'), E_('nb', 'land')), ('q', E_('q_grab', 'go'), None),
                     ('hcut', E_('hcut', 'go'), E_('hcut', 'cut')), ('a9', E_('a9', 'go'), E_('a9', 'cut')),
                     ('kcut', E_('kcut', 'go'), E_('kcut', 'cut')), ('blue', E_('blue', 'go'), E_('blue', 'hit')),
@@ -492,7 +496,8 @@ def pattern_files(W, ctx):
         if k in present:
             air.append((k, a, b))
     BAL_REFUSE.clear()
-    BAL_REFUSE.update({k: (a, b) for k, a, b in air})
+    for k, a, b in air:
+        BAL_REFUSE.setdefault(k, []).append((a, b))
     w('bal_ok', ['# @s = body: may the balance groggy start now? (hr_design §1.3; a refused break stays pending: lane B starts it at',
                  '# the first allowed tick.)',
                  f'execute unless score #ph {OBJ} matches {PH["p1"]} unless score #ph {OBJ} matches {PH["p2"]} run return fail',
@@ -508,8 +513,12 @@ def pattern_files(W, ctx):
       + ([f'execute if score #pat {OBJ} matches {TID["mx"]} if score #mx_pre {OBJ} matches 1.. run return fail'] if 'mx' in present else [])
       + ['return 1'])
     w('bal_on', ['# @s = body: the break. The pattern goes (hazards, locks, the ghost state, the blade look; an airborne body is put',
-                 f'# on the floor), the gauge stays; clip grog_in ({gin} t: the guard is smashed open, she falls onto her back).',
-                 fn('core/cancel_pat0'), sset('#ai_fl', 0), api.play('grog_in')])
+                 f'# on the floor), the gauge stays, the queued reactions go (core/trig0); clip grog_in ({gin} t: the guard is smashed',
+                 '# open, she falls onto her back).',
+                 fn('core/cancel_pat0'), sset('#ai_fl', 0), fn('core/trig0'), api.play('grog_in')])
+    w('core/trig0', ['# HA-02 (review H-A, lead ruling): the reactions queued "while she recovers" go at the groggy\'s start and end (@s any):',
+                     '# the counter trigger and its hit count, the flinch, the skill trigger (on_hit feeds none of them while groggy).',
+                     sset('#ctr', 0), sset('#flq', 0), sset('#a6q', 0), sset('#hits', 0)])
     w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the looks, the ambience; a floor reached now is',
                    f'# reserved and cuts the groggy to its kip-up (grgT {kip}); down (loop) once grog_in ended, kipup in the last {kip} t;',
                    '# hittable all along. Her hits\' events are dropped (no gauge charge while groggy).',
@@ -522,8 +531,17 @@ def pattern_files(W, ctx):
          f'execute if score @s grgT matches {GRG - gin} run {api.play("down")}',
          f'execute if score @s grgT matches {kip} run {api.play("kipup")}',
          api.rig('tick')])
-    w('bal_off', [f'# @s = body: the balance groggy is over: a {api.GROGGY_RECOVER}-t recovery, then the AI.', fn('core/ev0'),
+    w('bal_off', [f'# @s = body: the balance groggy is over: a {api.GROGGY_RECOVER}-t recovery first (nothing queued in the groggy jumps it:',
+                  '# core/trig0), then the AI.', fn('core/ev0'), fn('core/trig0'),
                   fn('ai/rec_start'), sset('#rec', api.GROGGY_RECOVER)])
+    # HA-04 (review H-A): /reload during the groggy respawns the rig in its idle pose: she lies in the down loop at once, or
+    # kips up from the tick the groggy has reached (bal_tick plays kipup at grgT = kip; the next rig/tick advances the clip)
+    w('core/grog_re', [f'# The rig was respawned during the balance groggy (@s = body; the reload hook): down (loop) at once while more than',
+                       f'# {kip} t are left, else kipup from the tick it has reached (its clock hrRigT = {kip} - grgT; the next rig/tick shows',
+                       '# the following tick).',
+                       f'execute if score @s grgT matches {kip + 1}.. run return run {api.play("down")}',
+                       sset('#t', kip), f'scoreboard players operation #t {OBJ} -= @s grgT', api.play('kipup'),
+                       f'scoreboard players operation @s hrRigT = #t {OBJ}'])
     w('core/bal/floor', [
         f'# hr_design §1.3: CS1 / lead5 starts with a break pending (@s = body): the pending break is dropped and she keeps',
         f'# {api.BAL["floor_min"]} pips (she is not broken inside a cutscene and does not come out of it full).',
@@ -541,7 +559,7 @@ def pattern_files(W, ctx):
         'function rlk:bal/ui/draw'])
 
 
-BAL_REFUSE = {}          # pattern -> (first, last #pt tick) bal_ok refuses (tests)
+BAL_REFUSE = {}          # pattern -> [(first, last #pt tick), ...] bal_ok refuses (tests; last None = to the end)
 
 
 # ================================================================================================== phases
@@ -790,7 +808,9 @@ def hooks(W, ctx):
     present = ctx.present
     w('on_hit', [
         '# Hook on_hit (@s = body inside combat/apply, before apply_mods; scores only): a skill / burst hit flags the A6 trigger',
-        '# (#skillDmg tmp 1; resolved by the next fight tick), a hit while she recovers / idles feeds the counter trigger.',
+        '# (#skillDmg tmp 1; resolved by the next fight tick), a hit while she recovers / idles feeds the counter trigger. HA-02:',
+        '# none of it while the balance groggy runs (grgT; the punish window queues no reaction).',
+        f'execute if score @s grgT matches 1.. run return 0',
         f'execute if score #skillDmg tmp matches 1 run {sset("#a6q", 1)}',
         f'execute if score #pat {OBJ} matches 0 if score #ph {OBJ} matches {PH["p1"]} run {fn("core/hit_rec")}',
         f'execute if score #pat {OBJ} matches 0 if score #ph {OBJ} matches {PH["p2"]} run {fn("core/hit_rec")}'])
@@ -945,6 +965,7 @@ def hooks(W, ctx):
         f'execute if score #rp {OBJ} matches 1 run {fn("core/replay/end")}',
         f'execute if score #ph {OBJ} matches {PH["p1"]} if score #pat {OBJ} matches 1.. run {fn("core/cancel_pat")}',
         f'execute if score #ph {OBJ} matches {PH["p2"]} if score #pat {OBJ} matches 1.. run {fn("core/cancel_pat")}',
+        f'execute if score @s grgT matches 1.. run {fn("core/grog_re")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]}.. run {fn("core/re/look")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]} run return run {fn("core/re/cs1")}',
         f'execute if score #ph {OBJ} matches {PH["lead60"]} run return run {fn("core/re/lead")}',
@@ -1028,8 +1049,8 @@ def tests(W, ctx):
             continue
         w(f'test/go/{k}', [f'# Test {TID[k]}: {k.upper()} now.', f'execute unless function {NS}core/force run return 0']
           + need_p2 + [fn(f'core/start/{k}')])
-    w('core/ult_go', [f'# The gauge is full (or a test / lock): RINGS now with ULT to follow (@s = body; #ultq).',
-                      sset(GAU, api.GAUGE['max']), fn('core/start/rings'), sset('#ultq', 1)])
+    w('core/ult_go', [f'# The gauge is full (or a test / lock): RINGS now with ULT to follow (@s = body; #ultq; the gauge close is over).',
+                      sset(GAU, api.GAUGE['max']), sset('#ai_uc', 0), fn('core/start/rings'), sset('#ultq', 1)])
     table = {19: 'test/groggy', 20: 'test/cs1', 21: 'test/a8', 22: 'test/a8_0', 23: 'test/a8_fail', 24: 'test/repel', 26: 'test/lead',
              27: 'test/a13', 28: 'test/a13_0', 29: 'test/a13_fail', 30: 'test/intro', 32: 'test/look_crimson',
              33: 'test/p2', 34: 'test/hp5', 35: 'test/skip100', 36: 'test/cs1_skip', 37: 'test/gauge', 38: 'test/bal1',

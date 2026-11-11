@@ -166,7 +166,9 @@ KB_CHAIN, KB_FINAL, KB_SINGLE, KB_CUT = 0, 3, 2, 0    # chain hits / the last hi
 # is announced by the parry cue CUE_LEAD t before it (CUE_KIT at blade_mid + CUE_SND), an N hit by the module's own flash
 # (FLASH: yellow / purple / blue; #mbNpOwn mb 1 keeps the framework glint off). The a8 / a13 entries are derived from the
 # scripts of section 3 by _script_hits (section 7): each cut lands on the move whose clip 'hit' meets its strike tick.
-KB_THROW = 5              # q: the grab throws the player back
+# HA-08 (review H-A, lead ruling; README 0-6, 타키's lesson: knockback only on the last hit of a chain): q's grab is the
+# first hit of a chain (the beam, the dive, the pillar follow when it lands), so it pushes nothing (kb 0): the throw is her
+# pose (q_air 0-2), the player stays where the aimed beam then finds them; only the pillar (the last hit) knocks back.
 _RING = ('disc', (2.6,))
 HITS = {
     'a1': [('a1', 'hit', 'sector', (4.0, 80), 'T2', KB_SINGLE, 'P')],
@@ -197,7 +199,7 @@ HITS = {
     'nb': [('nb', 'b1', 'line', (16.0, 3.0), 'T2', KB_CHAIN, 'P'), ('nb', 'b2', 'line', (16.0, 3.0), 'T2', KB_CHAIN, 'P'),
            ('nb', 'b3', 'line', (16.0, 3.0), 'T3', KB_FINAL, 'P')],
     # q (hr_design §8.2: the grab is unparriable): q_grab's grab, then q_air only when the grab landed (clock + Q_AIR_T0)
-    'q': [('q_grab', 'grab', 'pdisc', (2.2,), 'T2', KB_THROW, 'N'), ('q_air', 'beam', 'line', (14.0, 2.6), 'T2', KB_CHAIN, 'P'),
+    'q': [('q_grab', 'grab', 'pdisc', (2.2,), 'T2', KB_CHAIN, 'N'), ('q_air', 'beam', 'line', (14.0, 2.6), 'T2', KB_CHAIN, 'P'),
           ('q_air', 'hit', 'pdisc', (2.6,), 'T3', KB_CHAIN, 'P'), ('q_air', 'pillar', 'pdisc', (2.4,), 'T3', KB_FINAL, 'N')],
 }
 HIT_PH = {'rings': {3: 1, 4: 2, 5: 2}}            # HITS row -> the only fight phase it is made in (1 P1 / 2 P2)
@@ -268,8 +270,8 @@ BAL = {'after_repel': 3, 'floor_min': 3, 'grog_in': 12, 'kip': 20}   # balance p
 #                                                      step that met a break; the grog_in clip; the kip-up's ticks left
 PP_FLINCH = 6             # a perfect parry on a pattern's last / single hit: clip flinch, the pattern ends this many t later
 CUE_LEAD = 7              # the parry cue: exactly this many t before every parryable hit (= LOCK_LEAD, the aim-lock tick)
-CUE_KIT = ('glint', {'c': 2})          # the pink sparkle glint at rig anchor blade_mid
-CUE_SND = 'parry_cue'                  # KIT_SOUND_RECIPES: block.amethyst_block.chime 0.6 pitch 1.9
+CUE_KIT = ('glint', {'c': 2})          # the white-gold cue sparkle (HA-07; a pink glint inside) at rig anchor blade_mid
+CUE_SND = 'parry_cue'                  # KIT_SOUND_RECIPES: block.note_block.iron_xylophone 0.7 pitch 1.8 (HA-06)
 # the module's own unparriable flashes on her chest (anchor chest; #mbNpOwn mb 1 for the whole fight): (kit preset, args)
 FLASH = {'yellow': ('yellow_tell', {'t': 6}), 'purple': ('star4', {}), 'blue': ('flash_blue', {'t': 15})}
 FLASH_SND = {'yellow': 'yellow_chime', 'purple': 'a9_star', 'blue': 'flash_blue'}
@@ -294,19 +296,25 @@ BU_SHIELD = 1             # the under-bar colour (#buSubCol): electro for the 5-
 # the gauntlet's start), or the step's tick when clip is None; cut = (made, lock, strike, tier, kb) of the cut hazard made
 # at that step (api.cut), else None. A move's contact = t + ev(clip, 'hit') = the strike of the cut made one step earlier.
 _TC = ('TC', KB_CUT)      # F1 (HR-19): the counting cuts of the gauntlets (DMG['TC'])
+# HA-03 (review H-A, lead ruling): the strikes are re-timed so that no blind F metronome clears a gauntlet: for every period
+# 8-30 t and every start (fresh F state, any tick from 120 t before T0 on) the shipped F rules (player/f_key, press,
+# press_re, par_use, the judge) give at most 3 perfect parries in G1 (5 are needed; tests/test_metro.py drives the real
+# functions). The old G1 strikes 30 46 64 94 110 138 164 180 196 gave 5 to a 14 / 15 / 16-t beat. Moved: c2 46 -> 48 (A8.2
+# 2 t later), c4 94 -> 91 (D2 77, A8.4 88: the glide and the sweep 3 t earlier), c5 110 -> 109 (A8.5 103), c6 138 -> 139
+# (D1 125, A8.1 136), c7 164 -> 163 (D3 147, A8.6 160); every gap >= 14, the clips, the judge and the bolts as they were.
 A8_SCRIPT = (                                     # G1 (60 %): 9 parry cuts in 220 t
     (0, 'A8.T', 'g_tell', None),
     (16, 'D1', 'g_dash', (16, 23, 30) + _TC),     # c1
-    (27, 'A8.1', 'g_ring', (30, 39, 46) + _TC),   # c2
-    (37, 'A8.2', 'g_rise', (46, 57, 64) + _TC),   # c3
+    (27, 'A8.1', 'g_ring', (30, 41, 48) + _TC),   # c2
+    (39, 'A8.2', 'g_rise', (48, 57, 64) + _TC),   # c3
     (55, 'A8.3', 'g_leap', None),                 # gone 71
-    (80, 'D2', 'g_glide', (80, 87, 94) + _TC),    # c4
-    (91, 'A8.4', 'g_sweep', (94, 103, 110) + _TC),  # c5
-    (104, 'A8.5', 'g_x', None),                   # gone 118
-    (124, 'D1', 'g_dash', (124, 131, 138) + _TC),  # c6
-    (135, 'A8.1', 'g_ring', None),
-    (148, 'D3', 'g_drop', (148, 157, 164) + _TC),  # c7
-    (161, 'A8.6', 'g_wrap', (164, 173, 180) + _TC),  # c8
+    (77, 'D2', 'g_glide', (77, 84, 91) + _TC),    # c4
+    (88, 'A8.4', 'g_sweep', (91, 102, 109) + _TC),  # c5
+    (103, 'A8.5', 'g_x', None),                   # gone 117
+    (125, 'D1', 'g_dash', (125, 132, 139) + _TC),  # c6
+    (136, 'A8.1', 'g_ring', None),
+    (147, 'D3', 'g_drop', (147, 156, 163) + _TC),  # c7
+    (160, 'A8.6', 'g_wrap', (163, 173, 180) + _TC),  # c8
     (177, 'A8.7', 'g_dome', (180, 189, 196) + _TC),  # c9
     (191, 'A8.8', 'g_vert', None),                # pink glow 192-195, rises out of view, hidden 209
     (214, 'A8.9', 'g_dive', None),                # reappears 214 in normal colours 6 b up, dives; judge at 220
@@ -1017,7 +1025,9 @@ KIT_SOUND_RECIPES = {
     'ev_take_i': (('item.armor.equip_netherite', 0.7, 1.1), ('block.note_block.chime', 0.6, 1.5)),
     'ev_take_b': (('entity.generic.drink', 0.5, 1.2), ('block.amethyst_block.resonate', 0.7, 1.4)),
     # hr_design §2.1-2.2 (lane H1 / H1c; the kit generator writes fx/snd/<name> for every recipe of this table)
-    'parry_cue': (('block.amethyst_block.chime', 0.6, 1.9),),             # CUE_SND: h - 7 of every parryable hit
+    # HA-06 (review H-A, lead ruling): the cue ("press F now") is its own sound family, unlike the purple flash's amethyst
+    # chime ("F does nothing"): a short, light metal tink no other recipe of hers uses
+    'parry_cue': (('block.note_block.iron_xylophone', 0.7, 1.8),),        # CUE_SND: h - 7 of every parryable hit
     'flash_blue': (('block.beacon.activate', 0.5, 1.8),),                 # the blue flash
     'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),       # U 24
     'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),     # U 46
@@ -1074,7 +1084,8 @@ KIT_SPRITES = {
 }
 KIT_SPRITE_CAP = 260_000
 # hr_design §5.4: 22 432 px were left; the one planned new sprite group (lane H1c), counted once the kit generator declares it
-KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),)}       # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
+KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),),      # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
+                  'cue': ((1, 64, 64),)}             # HA-07 (review H-A): the parry cue's white-gold sparkle (4 096 px)
 KIT_SPRITES.update({k: v for k, v in KIT_SPRITES_HR.items() if kit_declares('sprite', k)})
 KIT_SPRITE_PX = sum(f * w * h for rows in KIT_SPRITES.values() for f, w, h in rows)
 assert KIT_SPRITE_PX == 237_568 + sum(f * w * h for k, rows in KIT_SPRITES_HR.items() if k in KIT_SPRITES for f, w, h in rows) \
@@ -1569,7 +1580,7 @@ def _check_contract():
         assert key in P1 + P2, key
         for i, (clip, e, shape, dims, tier, kb, par) in enumerate(hs):
             assert clip in CLIPS and e in CLIPS[clip][2], f'HITS {key}: {clip}.{e}'
-            assert tier in DMG and kb in (KB_CHAIN, KB_SINGLE, KB_FINAL, KB_THROW) and par in ('P', 'N'), (key, tier, kb, par)
+            assert tier in DMG and kb in (KB_CHAIN, KB_SINGLE, KB_FINAL) and par in ('P', 'N'), (key, tier, kb, par)
             assert shape in ('sector', 'disc', 'line', 'dash_line', 'pdisc', 'full'), (key, shape)
             # every N hit has its flash row (a group's other rows share it: ()), no P hit has one
             assert (i in FLASH_AT.get(key, {})) == (par == 'N'), f'HITS {key}[{i}]: the flash table and the P / N column differ'

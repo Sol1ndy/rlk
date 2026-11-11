@@ -159,6 +159,13 @@
     32
    ]
   ],
+  "cue": [
+   [
+    1,
+    64,
+    64
+   ]
+  ],
   "shards": [
    [
     2,
@@ -356,6 +363,10 @@
   "glint_1": [
    32,
    32
+  ],
+  "cue_0": [
+   64,
+   64
   ],
   "shards_0": [
    32,
@@ -778,6 +789,23 @@
    "texture": "rlk:mboss/hr_kit/glint_1",
    "source": "own",
    "desc": "four-point star in a circle (tinted)"
+  },
+  "cue_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/cue_0",
+   "source": "own",
+   "desc": "the parry cue: a white-gold sparkle, rays to the edge (HA-07)"
   },
   "shards_0": {
    "plane": "face",
@@ -1638,8 +1666,8 @@
   "rift_arc2": "rlk:item/rift/arc_2",
   "rift_arc3": "rlk:item/rift/arc_3"
  },
- "atlas_px_new": 241664,
- "sprite_px": 237568,
+ "atlas_px_new": 245760,
+ "sprite_px": 241664,
  "sprite_cap": 260000,
  "gate_icon_px": 4096,
  "presets": {
@@ -1792,7 +1820,7 @@
    "args": [
     "c"
    ],
-   "doc": "A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white). HR rebuild: c 2 is the parry cue at blade_mid (api.CUE_KIT): larger (1.8 b) and fuller, three crossed sparkles for 7 t.",
+   "doc": "A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white). HR rebuild: c 2 is the parry cue at blade_mid (api.CUE_KIT): the white-gold cue sparkle (rays to 1.6 b, HA-07) over a pink one, for 7 t.",
    "cards": 3,
    "c_split": [
     1,
@@ -3198,9 +3226,9 @@
   ],
   "parry_cue": [
    [
-    "block.amethyst_block.chime",
-    0.6,
-    1.9
+    "block.note_block.iron_xylophone",
+    0.7,
+    1.8
    ]
   ],
   "flash_blue": [

@@ -3,6 +3,7 @@
 scoreboard players set #ai_fl hr 0
 scoreboard players set #ai_nn hr 0
 scoreboard players set #ai_bs hr 0
+scoreboard players set #ai_uc hr 0
 execute if score #ph hr matches 1 store result score #rec hr run random value 12..20
 execute if score #ph hr matches 7 store result score #rec hr run random value 14..20
 execute unless score #ph hr matches 1 unless score #ph hr matches 7 run scoreboard players set #rec hr 14

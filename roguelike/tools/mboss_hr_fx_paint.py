@@ -334,6 +334,33 @@ def paint_glint(a, b):
     return ramp(GREYS, 0.6 * smooth(0.0, 0.8, r)) + (al,)
 
 
+CUE_GOLD = hexc('#FFD878')
+
+
+def paint_cue(a, b):
+    """cue frame 0 (HA-07, review H-A: the parry cue at her blade): a white-gold sparkle that reads from the F5 camera on
+    the crimson P2 field: a bright white core with a warm gold rim, four long white rays that reach the card's edge (alpha
+    >= 0.5 to 80 % of the half-width) and four short diagonal rays; painted in colour (the kit tints it white). Unlike
+    glint_0 (a soft dot whose rays fade at a third of the card) it fills the card it is given."""
+    r = math.hypot(a, b)
+
+    def ray(u, v, reach, w0):
+        t = abs(u) / reach
+        if t >= 1:
+            return 0.0
+        return glow(abs(v), w0 * (1 - t) ** 0.7 + 0.03, 1.0) * (1 - t ** 4)
+    d1, d2 = (a + b) / 1.4142, (a - b) / 1.4142
+    core = glow(r, 0.27, 1.0)
+    halo = 0.6 * glow(r, 0.45, 1.0)
+    main = max(ray(a, b, 0.99, 0.13), ray(b, a, 0.99, 0.13))
+    diag = 0.9 * max(ray(d1, d2, 0.62, 0.09), ray(d2, d1, 0.62, 0.09))
+    al = max(core, halo, main, diag)
+    if al < 0.04:
+        return CLEAR
+    gold = smooth(0.06, 0.22, r) * (1 - smooth(0.3, 0.55, r)) + 0.35 * smooth(0.55, 1.0, r)
+    return mix(WHITE, CUE_GOLD, gold) + (min(1.0, al * 1.15),)
+
+
 def paint_star4(a, b):
     """glint frame 1 (star4): a slim four-point star inside a thin circle (A9's chest star; neutral)."""
     r = math.hypot(a, b)

@@ -9,6 +9,7 @@ execute if score #fl hr matches 1.. run return fail
 execute if entity @s[tag=rlk_hr_ghost] run return fail
 execute if entity @s[tag=rlk_mb_inv] run return fail
 execute if score #pat hr matches 4 if score #pt hr matches 2..20 run return fail
+execute if score #pat hr matches 4 if score #pt hr matches 28..38 run return fail
 execute if score #pat hr matches 7 if score #pt hr matches 2..22 run return fail
 execute if score #pat hr matches 17 if score #pt hr matches 2..46 run return fail
 execute if score #pat hr matches 18 if score #pt hr matches 16.. run return fail

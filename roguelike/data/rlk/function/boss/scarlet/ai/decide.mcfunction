@@ -24,7 +24,9 @@ execute if score #mbLock mb matches 16 run return run function rlk:boss/scarlet/
 execute if score #mbLock mb matches 17 run return run function rlk:boss/scarlet/core/start/nb
 execute if score #mbLock mb matches 18 run return run function rlk:boss/scarlet/core/start/q
 execute if score #ai_nx hr matches 8 run return run function rlk:boss/scarlet/ai/next_fb
-execute if score #gau hr matches 50.. if score #ai_d2 hr matches ..1210000 run return run function rlk:boss/scarlet/core/ult_go
+execute if score #gau hr matches 50.. if score #ai_d2 hr matches ..202500 run return run function rlk:boss/scarlet/core/ult_go
+execute if score #gau hr matches 50.. if score #ai_d2 hr matches ..1210000 if score #ai_uc hr matches 1 run return run function rlk:boss/scarlet/core/ult_go
+execute if score #gau hr matches 50.. if score #ai_d2 hr matches ..1210000 run return run function rlk:boss/scarlet/ai/ult_close
 function rlk:boss/scarlet/ai/rear_count
 execute if score #ai_rc hr matches 4.. if function rlk:boss/scarlet/ai/rear run return 1
 execute if score #ai_ff hr matches 1 if function rlk:boss/scarlet/ai/after_a6 run return 1

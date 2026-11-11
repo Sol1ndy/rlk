@@ -2,8 +2,9 @@
 """test_gauge.py: the 5-segment gauge of the rebuilt 홍련 fight outside the gauntlets (hr_design §1.2, §6.1; lane H1):
 +3 when a pattern ends (not A6, not U), +5 per hit of hers that lands (a tier 1 / 2 parry lands; a perfect parry and a
 perfect dodge do not), the cap 50, no charge while groggy / in a lead-in / gauntlet / cutscene, a full gauge forces rings
--> ult in the near / mid band (not from far), 0 after ult's second cut, full at lead60's tick 0 and at the refill beats of
-lead5 / lead_re, the under bar = #gau / 10 of 5.
+-> ult in the near band (HA-09: from the mid band she glides in first, then the rings reach; not from far), 0 after ult's
+second cut, full at lead60's tick 0 and at the refill beats of lead5 / lead_re, the under bar = #gau / 10 of 5; HA-01: a
+floor reached during the forced rings ends the chain (no ult), the step (CS1 / lead5) starts at the next decision.
     python3 test_gauge.py <roguelike>      (from a copy of tools/dev/sim outside the datapack)
 """
 import sys
@@ -80,6 +81,79 @@ first = []
 H.until_h1(s, lambda s: bool(first), 200, each=lambda s: (H.heal(s), first.append(H.hr(s, '#pat')) if (H.hr(s, '#pat') or 0) else None))
 ck('a full gauge with the player far: the first move is not rings (she closes first)', first and first[0] != S.TID['rings'], first)
 ck('... and the gauge is still full for the next near / mid decision', g(s) == G['max'], g(s))
+# HA-09 (review H-A): a full gauge forces the rings only in the near band; from the mid band she glides in first (ai/ult_close)
+# and the rings start near enough to reach a standing player (every ring lands); a player who keeps away does not make it a
+# chase (the close ends after its time, the rings start)
+NEAR = api.BANDS[0]
+for dist in (3.0, 6.0, 8.0, 10.5):
+    s = fresh(seed=5)
+    s.setsc('#gau', 'hr', G['max'])
+    H.facing_setup(s, dist)
+    n0, j0 = len(s.hzr), len(s.judged)
+    st = {}
+
+    def each(s):
+        H.heal(s)
+        if H.hr(s, '#pat') == S.TID['rings'] and 'd' not in st:
+            b, p = H.body_of(s), s.player()
+            st['d'] = ((b.pos[0] - p.pos[0]) ** 2 + (b.pos[2] - p.pos[2]) ** 2) ** 0.5
+            st['t'] = s.t
+        if 'glide' not in st and H.hr(s, '#ai_mv') == 7:
+            st['glide'] = s.t
+    H.until_h1(s, lambda s: 't' in st and s.t >= st['t'] + api.RINGS_END[1], 400, each=each)
+    rings = sorted({h['pt'] + h['tell'] for h in s.hzr[n0:] if h['pat'] == S.TID['rings']})
+    hit = sorted({j['t'] - st['t'] for j in s.judged[j0:] if 't' in st and j['t'] - st['t'] in rings})
+    # (from 6 b her recovery walk may already bring her into the near band; from 10.5 b only the glide can)
+    ck(f'full gauge, the player {dist} b away: the rings start within the near band ({st.get("d", 0):.1f} b <= {NEAR} b)'
+       + ('' if dist <= NEAR else ', after a glide in' if dist > 10 else ''),
+       'd' in st and st['d'] <= NEAR + 0.05 and (dist > NEAR or 'glide' not in st) and (dist <= 10 or 'glide' in st), (st, dist))
+    ck(f'full gauge, the player {dist} b away: every ring reaches a standing player ({len(hit)} of {len(rings)})',
+       len(rings) == 4 and hit == rings, (rings, hit))
+s = fresh(seed=5)
+s.setsc('#gau', 'hr', G['max'])
+H.facing_setup(s, 8.0)
+st = {}
+
+
+def away(s):
+    H.heal(s)
+    if H.hr(s, '#ai_mv') == 7:
+        st.setdefault('glide', s.t)
+        b, p = H.body_of(s), s.player()
+        dx, dz = p.pos[0] - b.pos[0], p.pos[2] - b.pos[2]
+        n = (dx * dx + dz * dz) ** 0.5 or 1
+        H.place_player(s, p.pos[0] + 0.32 * dx / n, p.pos[2] + 0.32 * dz / n)   # walks away faster than she glides
+    if H.hr(s, '#pat') == S.TID['rings']:
+        st.setdefault('rings', s.t)
+
+
+H.until_h1(s, lambda s: 'rings' in st, 300, each=away)
+ck('full gauge, a player who keeps away: the close ends after its time and the rings start (no chase)',
+   'glide' in st and 'rings' in st and st['rings'] - st['glide'] <= 42, st)
+
+# HA-01 (review H-A, lead ruling): a floor reached during the forced rings: no ult, the step (CS1 at 60 %, lead5 at 5 %)
+for ph, tid, step in ((1, 80, 'cs1'), (2, 34, 'lead')):
+    s = fresh(seed=11, p2=(ph == 2))
+    H.facing_setup(s, 3.0)
+    H.hold(s)
+    H.test_id(s, tid)                                  # HP = the floor + 1
+    H.test_id(s, 12)                                   # the gauge full: rings now, ult to follow
+    H.hold(s, False)
+    pats, hit = [], [False]
+
+    def each(s):
+        H.heal(s)
+        if not hit[0] and H.hr(s, '#pat') == S.TID['rings'] and H.hr(s, '#pt') == 3:
+            H.A.strike(s, H.body_of(s), 5000)
+            hit[0] = True
+        p = H.hr(s, '#pat') or 0
+        if p and (not pats or pats[-1] != p):
+            pats.append(p)
+    ok = H.until_h1(s, lambda s: H.hr(s, '#ph') == api.PH[step], 200, each=each)
+    ck(f'P{ph}: the floor reached during the forced rings: the rings end, no ult, then {step} '
+       f'({"CS1" if ph == 1 else "lead5"})', hit[0] and ok and pats == [S.TID['rings']] and H.hr(s, '#fl') == 0,
+       (hit[0], ok, pats, H.hr(s, '#ph')))
+
 # no charge while groggy
 s = fresh()
 H.facing_setup(s, 3.0)
