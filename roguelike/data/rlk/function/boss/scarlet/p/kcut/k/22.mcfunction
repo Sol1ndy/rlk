@@ -1,11 +1,13 @@
 # KCUT pattern tick 22
 kill @e[type=minecraft:item_display,tag=rlk_hr_swlh]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_swl] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_m22,limit=1]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_m22] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_kcut22_20] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_kcut","rlk_hr_swn","rlk_hr_sw_kcut22_22"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0128f,0.5881f,0.3691f],left_rotation:[-0.0004f,-0.0536f,0.9986f,0.001f],scale:[0.9804f,1f,1.9659f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_kcut","rlk_hr_swn","rlk_hr_sw_kcut22_22"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0229f,0.6509f,0.3357f],left_rotation:[-0.2414f,-0.0519f,0.9689f,0.014f],scale:[0.9915f,1f,1.9881f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_kcut","rlk_hr_swn","rlk_hr_sw_kcut22_22"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.0734f,0.6981f,0.4487f],left_rotation:[-0.4682f,-0.0471f,0.882f,0.0261f],scale:[0.9526f,1f,1.9099f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_k0] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_k1] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}

@@ -280,8 +280,8 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
     K(10, {...ST2, ...CROUCH, rot: [0, 0, 0], lf: 0, pos: [0, -.32, 0], ...B(0, 30, 150, -1, {gL: .55}), tor: [-14, -20, 0], hairS: 0, skW: 0}, 'i'), K(12, {pos: [0, -.3, 0]})],
     {src: 'v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash'});
   // D2 g_glide: appears low 0, glides in legs forward 2-9 (a sliding stop), the sword arm back
-  C('g_glide', [K(0, {...ST, ...LOW, vis: .5, ...SW(160, 20, -1, 140, -45, .62), tor: [-24, 30, 0]}), K(2, {vis: 1, pos: [0, -.4, 0], rot: [12, 0, 0], tor: [-24, 26, 0], fL: [.13, .1, -.6], fR: [-.13, .12, .3], hairS: -.7, skW: .8}, 'o'),
-    K(9, {pos: [0, -.42, 0], rot: [6, 0, 0], tor: [-26, 30, 0], fL: [.15, .1, -.5], fR: [-.15, .1, .28], hairS: -.2, skW: .2}, 'o'),
+  C('g_glide', [K(0, {...ST, ...LOW, vis: .5, ...SW(160, 20, -1, 140, -45, .62), tor: [-24, 30, 0]}), K(2, {vis: 1, pos: [0, -.42, 0], rot: [4, 0, 0], tor: [-24, 28, 0], fL: [.13, .1, -.6], fR: [-.13, .12, .3], hairS: -.7, skW: .8}, 'o'),
+    K(7, {pos: [0, -.42, 0], rot: [0, 0, 0], tor: [-24, 30, 0], fL: [.15, .1, -.5], fR: [-.15, .1, .28], hairS: -.2, skW: .2}, 'o'),
     K(12, {...LOW, rot: [0, 0, 0], pos: [0, -.42, 0], tor: [-24, 30, 0], hairS: 0, skW: 0})], {src: 'v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide'});
   // D3 g_drop: the white-violet flash 0 (a tense crouch), dissolves 2 (gone 2-6), rematerialises up-right of the player 7 (sword
   // raised), drops diagonally onto them 7-12, lands 12
@@ -650,9 +650,9 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(24, {...Bz(30, 40, -252, -1, {gL: .52}), tor: [-10, -38, 0], head: [-14, 28, 0], fL: [.13, .6, -.04], fR: [-.14, .72, -.28]}, 'l'), K(27, {...Bz(30, 40, -250, -1, {gL: .52}), tor: [-8, -40, 0]}),
     ...cut(28, 4, 30, 40, -252, -440, -1, [.52, .66], u => ({tor: [mix(-10, -22, u), mix(-38, 30, u), 0], head: [-14, mix(28, -22, u), 0]})),
     // (the blade back up before her the short way, both hands: the chop's wind-up; flat to the viewer)
-    K(33, {...Bz(8, 10, -360, -1, {gF: .4, gB: 0, gE: 16, gD: .55, gL: .56}), tw: 30, tor: [-15, 10, 0], rh: .5}, 'l'),
-    K(34, {...Bz(0, 0, -268, -1, {gF: 0, gB: 0, gE: 28, gD: .56}), tw: 90, tor: [-6, 0, 0], head: [-18, 0, 0], rh: 1, hR: 'grip', fL: [.13, .7, -.2], fR: [-.13, .66, -.1]}, 'l'),
-    K(38, {...Bz(0, 0, -264, -1, {gF: 0, gB: 0, gE: 30, gD: .56}), tw: 90, tor: [-4, 0, 0], pos: [0, .38, 0]}),
+    K(33, {...Bz(14, 18, -388, -1, {gF: .5, gB: 0, gE: 12, gD: .55, gL: .56}), tw: 15, tor: [-17, 14, 0], rh: .4}, 'l'),
+    K(34, {...Bz(0, 0, -266, -1, {gF: 0, gB: 0, gE: 31, gD: .57}), tw: 90, tor: [-5, 0, 0], head: [-18, 0, 0], rh: 1, hR: 'grip', fL: [.13, .7, -.2], fR: [-.13, .66, -.1]}, 'l'),
+    K(38, {...Bz(0, 0, -264, -1, {gF: 0, gB: 0, gE: 31, gD: .57}), tw: 90, tor: [-4, 0, 0], pos: [0, .38, 0]}),
     K(39, {...Bz(0, 0, -312, -1, {gF: .6, gL: .56}), tw: 40, tor: [-14, 0, 0]}, 'i'), K(40, {...Bz(0, 0, -362, -1, {gL: .62}), rh: 1, tor: [-24, 0, 0], head: [-10, 0, 0], pos: [0, .3, 0]}, 'l'),
     K(41, {...Bz(0, 0, -392, -1, {gL: .6}), rh: .8, tor: [-26, 0, 0]}, 'o'),
     K(44, {rot: [-6, 0, 0], pos: [0, .12, 0], lf: .6, fL: [.14, .34, -.16], fR: [-.14, .3, .1], tor: [-18, 0, 0], head: [0, 0, 0], hairS: .5, skW: -.5}, 'l'),

@@ -61,6 +61,7 @@ def _select(self, sel, ctx):
 PV.Scene.select = _select
 
 FOV, CAM_D, PIVOT_Y, CHEST_Y = 70.0, 3.5, 2.3, 1.2
+FLOOR_Y = 201.0                     # the hr_field arena floor (api.CY)
 FIELD = {'p1': dict(floor='96,84,92', bg_top=(34, 26, 48), bg_bottom=(70, 58, 80), grass=(214, 196, 146)),
          'p2': dict(floor='112,26,34', bg_top=(60, 12, 20), bg_bottom=(120, 30, 40), grass=(150, 30, 40))}
 HAT = (236, 233, 244)
@@ -179,6 +180,173 @@ def cmd_strip(st, a):
     sheet(panels, a.cols, a.out)
 
 
+# ----------------------------------------------------------------------------- the real pattern (the module in the H1 world)
+def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
+    """Run pattern `key` through the generated functions in lane H1's world (hr/tests/lib/hrsim.py of the sim copy `sim`) with the
+    player `dist` b before her; per pattern tick a record: her body (pos, yaw), the rig's clip and tick, hidden?, the player's
+    body (pos, yaw) and every live sweep card (pos, yaw, pitch, nbt). The sim keeps no display NBT: this wrapper replays the
+    summon / data merge / data modify lines of the sweep cards beside it."""
+    sys.path.insert(0, str(Path(sim) / 'hr/tests'))
+    import pat_lib as PL
+    H = PL.H
+    api, S_ = PL.load_api(st.wt)
+    base_cmd = H.H1Sim.cmd
+    NB = {}
+
+    def cmd(self, t, ctx):
+        n0 = len(self.ents)
+        r = base_cmd(self, t, ctx)
+        try:
+            if t and t[0] == 'summon' and 'rlk_hr_sw' in ' '.join(t):
+                for e in self.ents[n0:]:
+                    NB[e.id] = PV.parse_snbt(' '.join(t[5:]))
+            elif t and t[0] == 'data' and t[1] == 'merge' and t[2] == 'entity' and ctx.ex is not None and ctx.ex.id in NB:
+                PV.deep_merge(NB[ctx.ex.id], PV.parse_snbt(' '.join(t[4:])))
+            elif t and t[0] == 'data' and t[1] == 'modify' and ctx.ex is not None and ctx.ex.id in NB and 'item_model' in t[4]:
+                NB[ctx.ex.id]['item']['components']['minecraft:item_model'] = t[-1].strip('"')
+        except Exception as ex:      # noqa: BLE001
+            print('replay', ex, t[:4])
+        return r
+    H.H1Sim.cmd = cmd
+    base_call = H.H1Sim.call
+    RIG = dict(clip=None, ct=0, pend=None, hidden=False)
+    RP = 'rlk:boss/scarlet/rig/'
+
+    def call(self, fid, ctx, macro=None):
+        if fid.startswith(RP):
+            k = fid[len(RP):]
+            if k.startswith('play/'):
+                RIG.update(pend=k[5:], hidden=False)
+            elif k.startswith('start/'):
+                RIG.update(clip=k[6:], ct=0, pend=None, hidden=False)
+            elif k == 'tick':
+                if RIG['pend']:
+                    RIG.update(clip=RIG['pend'], ct=0, pend=None)
+                else:
+                    RIG['ct'] += 1
+            elif k == 'state/hidden':
+                RIG['hidden'] = True
+            elif k == 'state/normal':
+                RIG['hidden'] = False
+        return base_call(self, fid, ctx, macro)
+    H.H1Sim.call = call
+    s, pl = H.setup_h1(str(st.wt), seed=seed)
+    assert H.fight_sc(s)
+    if ph == 2:
+        H.test_id(s, 33)
+        H.run_h1(s, 2)
+    H.heal(s)
+    H.facing_setup(s, dist)
+    tid = S_.TID[key]
+    H.start_pattern(s, tid)
+    if key == 'ult':
+        assert H.until_h1(s, lambda s: (H.hr(s, '#pat') or 0) == tid, 160)
+    ids = {v['id']: k for k, v in json.loads((st.wt / 'tools/scarlet_rig_manifest.json').read_text())['clips'].items()}
+    recs = []
+    for _ in range(limit):
+        if (H.hr(s, '#pat') or 0) != tid:
+            break
+        if strafe:
+            p = s.player()
+            H.place_player(s, p.pos[0] + strafe, p.pos[2])
+        H.heal(s)
+        H.world_h1(s)
+        if (H.hr(s, '#pat') or 0) != tid:
+            break
+        b = H.body_of(s)
+        p = s.player()
+        clip_name, ct, hid = RIG['clip'], RIG['ct'], RIG['hidden']
+        n = s.getsc('#sw_n', 'hr') if hasattr(s, 'getsc') else 0
+        cards = []
+        for e in s.ents:
+            if e.alive and e.id in NB:
+                nb = json.loads(json.dumps(NB[e.id], default=float))
+                if 'rlk_hr_swl' in e.tags and n is not None:
+                    nb['transformation']['scale'][2] = 0.5 * (n or 0)
+                cards.append((tuple(e.pos), e.rot[0], e.rot[1], nb))
+        recs.append(dict(pt=H.hr(s, '#pt') or 0, body=(tuple(b.pos), b.rot[0]), clip=clip_name, ct=ct, hidden=bool(hid),
+                         player=(tuple(p.pos), p.rot[0]), cards=cards))
+    H.H1Sim.cmd = base_cmd
+    H.H1Sim.call = base_call
+    return recs
+
+
+def fight_frame(st, rec, cam, field, w=480, look='edge'):
+    """One frame of a recorded pattern tick from the fixed lens cam = (pos, yaw, pitch)."""
+    sc = PV.Scene(st.dbg, (0, 0, 0), scores={}, macros={}, max_depth=4, follow=True)
+    (bp, byaw) = rec['body']
+    if rec['clip'] and not rec['hidden']:
+        c = PV.Ctx(bp, byaw, 0.0)
+        n = st.api.CLIPS[rec['clip']][0]
+        sc.run_file('rlk:boss/scarlet/rig/spawn', c)
+        sc.run_file(f"rlk:hr_dbg/{rec['clip']}/{max(0, min(n, rec['ct'] or 0))}", c)
+        sc.command(f'tp @e[tag=rlk_hr_part] {bp[0]:.3f} {bp[1]:.3f} {bp[2]:.3f} {byaw:.2f} 0', c, 0)
+        for e in sc.entities:
+            if 'rlk_hr_sword_glow' in e.tags and look:
+                e.nbt.setdefault('item', {}).setdefault('components', {})['minecraft:item_model'] = f'rlk:mboss/scarlet/glow_{look}'
+    (pp, pyaw) = rec['player']
+    n0 = len(sc.entities)
+    sc.run_file('rlk:hr_dbg/avatar', PV.Ctx((pp[0] - 1.4, pp[1], pp[2]), 0.0, 0.0))
+    for e in sc.entities[n0:]:
+        e.yaw = pyaw
+    for i, (pos, yaw, pitch, nb) in enumerate(rec['cards']):
+        sc.entities.append(PV.Entity('item_display', pos, yaw, pitch, nb, 9000 + i))
+    view = PV.View('camera', cam[1], cam[2], True, cam[0], FOV)
+    F = FIELD[field]
+    opts = SimpleNamespace(alpha_scale=1.0, bg_top=F['bg_top'], bg_bottom=F['bg_bottom'], flat=False, light='mc', floor=F['floor'],
+                           floor_half=30.0, translucent=True, tex_mode='uv')
+    # the rasteriser's floor is the plane y 0 round the origin: shift the scene so the lens' ground point is the origin
+    org = np.array((cam[0][0], FLOOR_Y, cam[0][2]))
+    for e in sc.entities:
+        e.pos = np.array(e.pos, float) - org
+    view.pos = view.pos - org
+    geo = PV.Geometry(sc, st.assets)
+    for i, (e, baked, tints, M, name) in enumerate(geo.items):
+        cmd = (e.nbt.get('item') or {}).get('components', {}).get('minecraft:custom_model_data')
+        if cmd and cmd.get('colors'):
+            c = int(cmd['colors'][0])
+            geo.items[i] = (e, baked, [np.array([(c >> 16 & 255) / 255, (c >> 8 & 255) / 255, (c & 255) / 255])] * max(1, len(tints)), M, name)
+    h = round(w * 9 / 16)
+    img, z = PV.render_view(geo, view, w, h, opts, st.assets)
+    return img, z, view, geo
+
+
+def fight_cam(rec0):
+    """The F5 lens of the player of record rec0, aiming at her chest as she stands then (fixed for the pattern)."""
+    (pp, _pyaw), (bp, _b) = rec0['player'], rec0['body']
+    dx, dz = bp[0] - pp[0], bp[2] - pp[2]
+    d = math.hypot(dx, dz)
+    yaw = math.degrees(math.atan2(-dx, dz))
+    pitch = math.atan2(PIVOT_Y - CHEST_Y, d)
+    back = CAM_D * math.cos(pitch)
+    pos = (pp[0] - dx / d * back, pp[1] + PIVOT_Y + CAM_D * math.sin(pitch), pp[2] - dz / d * back)
+    return pos, yaw, math.degrees(pitch)
+
+
+def cmd_fight(st, a):
+    recs = run_pattern(st, a.sim, a.key, a.ph, a.dist)
+    cam = fight_cam(recs[0])
+    t0 = a.t0 or 0
+    t1 = a.t1 if a.t1 is not None else recs[-1]['pt']
+    panels = []
+    for r in recs:
+        if not (t0 <= r['pt'] <= t1) or (r['pt'] - t0) % a.step:
+            continue
+        if a.zoom and a.zoom > 1:
+            img = fight_frame(st, r, cam, a.field, w=1920)[0]
+            hw, hh = int(960 / a.zoom), int(540 / a.zoom)
+            cy = 540 - int(120 / a.zoom)
+            img = np.asarray(Image.fromarray((np.clip(img[cy - hh:cy + hh, 960 - hw:960 + hw], 0, 1) * 255).astype(np.uint8)).resize(
+                (a.w, round(a.w * 9 / 16)), Image.LANCZOS)).astype(float) / 255
+        elif a.crop:
+            x0, y0, x1, y1 = (int(v) for v in a.crop.split(','))
+            img = fight_frame(st, r, cam, a.field, w=1920)[0][y0:y1, x0:x1]
+        else:
+            img = fight_frame(st, r, cam, a.field, w=a.w)[0]
+        panels.append(label(img, f"{a.key} P{a.ph} pt{r['pt']} {r['clip']} {r['ct']} D{a.dist:g} {a.field}", img.shape[1]))
+    sheet(panels, a.cols, a.out)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('wt')
@@ -197,10 +365,26 @@ def main():
     s.add_argument('--crop', help='x0,y0,x1,y1 in 1920 x 1080 px: render at 1080p and cut this window (detail strips)')
     s.add_argument('--cols', type=int, default=6)
     s.add_argument('-o', '--out', required=True)
+    f = sub.add_parser('fight')
+    f.add_argument('--sim', required=True, help='the sim copy (tools/dev/sim outside the datapack)')
+    f.add_argument('--key', required=True)
+    f.add_argument('--ph', type=int, default=1)
+    f.add_argument('--dist', type=float, default=7.0)
+    f.add_argument('--field', default='p1', choices=list(FIELD))
+    f.add_argument('--from', dest='t0', type=int)
+    f.add_argument('--to', dest='t1', type=int)
+    f.add_argument('--step', type=int, default=1)
+    f.add_argument('--w', type=int, default=480)
+    f.add_argument('--cols', type=int, default=6)
+    f.add_argument('--crop')
+    f.add_argument('--zoom', type=float, default=2.0, help='render at 1080p and show the middle 1/zoom of the screen (0: the whole screen)')
+    f.add_argument('-o', '--out', required=True)
     a = ap.parse_args()
     st = Stage(a.wt, a.dbg, a.rp)
     if a.cmd == 'strip':
         cmd_strip(st, a)
+    elif a.cmd == 'fight':
+        cmd_fight(st, a)
 
 
 if __name__ == '__main__':

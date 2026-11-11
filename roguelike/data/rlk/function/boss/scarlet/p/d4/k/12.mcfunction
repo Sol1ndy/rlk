@@ -1,9 +1,9 @@
 # D4 pattern tick 12
-tp @e[type=minecraft:item_display,tag=rlk_hr_swr] ~ ~ ~ ~ 0
-execute rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_d414,limit=1] ^-1.613 ^1.003 ^-0.968
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_d414] ~ ~ ~ ~ 0
+execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_d414,limit=1] ^-1.613 ^1.003 ^-0.968
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_d414_10] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_swn","rlk_hr_sw_d414_12"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.2364f,1.1633f,-0.0888f],left_rotation:[0.0294f,0.3918f,-0.0334f,0.919f],scale:[0.8645f,1f,1.9114f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_swn","rlk_hr_sw_d414_12"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0101f,1.1765f,-0.2252f],left_rotation:[0.0361f,0.5848f,-0.0261f,0.8099f],scale:[0.9297f,1f,2.0556f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_swn","rlk_hr_sw_d414_12"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.0793f,1.1746f,-0.2341f],left_rotation:[0.0409f,0.7491f,-0.0175f,0.661f],scale:[0.9517f,1f,2.1042f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn

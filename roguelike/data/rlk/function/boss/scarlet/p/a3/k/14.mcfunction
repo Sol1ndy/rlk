@@ -1,9 +1,9 @@
 # A3 pattern tick 14
-tp @e[type=minecraft:item_display,tag=rlk_hr_swr] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a314] ~ ~ ~ ~ 0
 kill @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a314,limit=1]
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a3","rlk_hr_swn","rlk_hr_sw_a314_14"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.3934f,1.2646f,0.1194f],left_rotation:[-0.3081f,-0.3082f,-0.6364f,0.6364f],scale:[0.8149f,1f,2.2334f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a3","rlk_hr_swn","rlk_hr_sw_a314_14"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.3699f,1.2223f,0.0713f],left_rotation:[-0.189f,-0.189f,-0.6814f,0.6814f],scale:[0.8277f,1f,2.2686f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a3","rlk_hr_swn","rlk_hr_sw_a314_14"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.3463f,1.2567f,0.1625f],left_rotation:[-0.0637f,-0.0636f,-0.7042f,0.7042f],scale:[0.8082f,1f,2.215f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 execute at @s run function rlk:boss/scarlet/fx/snd/a3_h1

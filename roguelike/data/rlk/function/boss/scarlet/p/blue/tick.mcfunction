@@ -16,7 +16,7 @@ execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/blue/k/20
 execute if score #pt hr matches 21 run function rlk:boss/scarlet/p/blue/k/21
 execute if score #pt hr matches 22 run function rlk:boss/scarlet/p/blue/k/22
 execute if score #pt hr matches 23 run function rlk:boss/scarlet/p/blue/k/23
-execute if score #pt hr matches 24 as @e[type=minecraft:item_display,tag=rlk_hr_sw_blue22_20] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
+execute if score #pt hr matches 24 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_m22]
 execute if score #pt hr matches 25 run function rlk:boss/scarlet/p/blue/k/25
 execute if score #pt hr matches 26 run function rlk:boss/scarlet/p/blue/k/26
 execute if score #pt hr matches 27 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_blue22_21]

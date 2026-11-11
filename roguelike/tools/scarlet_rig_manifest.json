@@ -1613,9 +1613,9 @@
     "land": 46
    },
    "owner": "H1",
-   "key_files": 63,
-   "keys": 709,
-   "keys_per_tick": 10.6,
+   "key_files": 64,
+   "keys": 715,
+   "keys_per_tick": 10.7,
    "source": "v 261.00-262.05 (P-n; ref tells_p2 261.20 / 262.05): two huge diagonal bands from above, then a third; video gaps 6-12 t / 8 t -> 10 / 10",
    "note": "",
    "authored": true
@@ -1786,9 +1786,9 @@
     "stop": 9
    },
    "owner": "S2a",
-   "key_files": 11,
-   "keys": 119,
-   "keys_per_tick": 9.2,
+   "key_files": 10,
+   "keys": 90,
+   "keys_per_tick": 6.9,
    "source": "v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide",
    "note": "",
    "authored": true
@@ -2536,7 +2536,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 160085367
+  "version": 217603222
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -8137,7 +8137,7 @@
    "free_r": [
     [
      0,
-     32
+     33
     ],
     [
      48,
@@ -9267,14 +9267,14 @@
    "low_ref": [
     0.006,
     0.004,
-    0.008,
+    0.007,
     0.004,
     0.004,
     0.004,
     0.004,
     0.004,
     0.004,
-    0.004,
+    0.006,
     0.006,
     0.006,
     0.006
@@ -9290,7 +9290,7 @@
    ],
    "feet_r": [
     [
-     5,
+     4,
      12
     ]
    ],
@@ -24740,27 +24740,27 @@
     "passes": 3,
     "corrections": {
      "bPush": 11.18,
-     "bTurn": 24,
-     "gripClear": 72.02,
-     "handClearR": 8.38,
+     "bTurn": 36,
+     "gripClear": 69.71,
+     "handClearR": 7.79,
      "scab": 2.13,
      "scabArm": 40
     },
     "contacts": {
-     "twohand": 0.087
+     "twohand": 0.126
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.047,
     "lift": 0,
     "clear": {
-     "guard.head": -0.012,
+     "guard.head": -0.02,
      "guard.torso": -0.157,
-     "hand_l.head": -0.094,
+     "hand_l.head": -0.049,
      "hand_l.torso": -0.065,
-     "hand_r.head": -0.105,
+     "hand_r.head": -0.089,
      "hand_r.torso": -0.025,
-     "hilt.head": -0.069,
+     "hilt.head": -0.083,
      "hilt.torso": -0.019
     }
    },
@@ -24946,10 +24946,10 @@
    "g_glide": {
     "passes": 3,
     "corrections": {
-     "bPush": 15.13,
+     "bPush": 19.75,
      "bTurn": 36,
-     "gripClear": 37.25,
-     "scab": 11.28
+     "gripClear": 41.13,
+     "scab": 4.94
     },
     "contacts": {},
     "stretch": 1,
@@ -24957,14 +24957,14 @@
     "support_dy": 0.001,
     "lift": 0,
     "clear": {
-     "guard.head": -0.298,
-     "guard.torso": -0.019,
-     "hand_l.head": -0.314,
-     "hand_l.torso": -0.048,
-     "hand_r.head": -0.52,
+     "guard.head": -0.36,
+     "guard.torso": -0.053,
+     "hand_l.head": -0.395,
+     "hand_l.torso": -0.08,
+     "hand_r.head": -0.523,
      "hand_r.torso": -0.185,
-     "hilt.head": -0.298,
-     "hilt.torso": -0.03
+     "hilt.head": -0.421,
+     "hilt.torso": -0.143
     }
    },
    "g_drop": {
@@ -25641,9 +25641,9 @@
   "parts": 29,
   "models": 64,
   "key_files": 3456,
-  "keys": 28875,
+  "keys": 28852,
   "rig_functions": 4216,
-  "rig_bytes": 8838566,
+  "rig_bytes": 8832471,
   "cull_overhang_ticks": 0
  },
  "sprites": {

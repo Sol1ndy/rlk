@@ -2,6 +2,6 @@
 # on the floor. Idempotent.
 tag @s remove rlk_hr_ghost
 function rlk:boss/scarlet/rig/look/form/normal
-function rlk:boss/scarlet/rig/look/blade/off
+function rlk:boss/scarlet/rig/look/blade/edge
 function rlk:boss/scarlet/rig/state/normal
 function rlk:boss/scarlet/g/ground

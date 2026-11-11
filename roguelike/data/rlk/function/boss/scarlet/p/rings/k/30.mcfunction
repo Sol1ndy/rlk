@@ -1,11 +1,11 @@
 # RINGS pattern tick 30
 kill @e[type=minecraft:item_display,tag=rlk_hr_sw_rings24_24]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_rings24_26] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-tp @e[type=minecraft:item_display,tag=rlk_hr_swr] ~ ~ ~ ~ 0
-execute rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_rings34,limit=1] ^1.179 ^1.055 ^-1.456
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_rings34] ~ ~ ~ ~ 0
+execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_rings34,limit=1] ^1.179 ^1.055 ^-1.456
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_rings34] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_rings","rlk_hr_swn","rlk_hr_sw_rings34_30"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.1654f,1.1681f,0.1708f],left_rotation:[0.0407f,-0.8009f,0.0204f,0.5971f],scale:[0.8693f,1f,1.8393f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_rings","rlk_hr_swn","rlk_hr_sw_rings34_30"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0941f,1.1839f,0.1858f],left_rotation:[0.0349f,-0.6421f,0.0292f,0.7653f],scale:[0.9362f,1f,1.9809f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_rings","rlk_hr_swn","rlk_hr_sw_rings34_30"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.1836f,1.1852f,0.1473f],left_rotation:[0.0272f,-0.4489f,0.0365f,0.8924f],scale:[0.9612f,1f,2.0338f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn

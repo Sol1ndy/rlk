@@ -23,9 +23,8 @@ execute if score #pt hr matches 11 run function rlk:boss/scarlet/p/tri/k/11
 execute if score #pt hr matches 12 run function rlk:boss/scarlet/p/tri/k/12
 execute if score #pt hr matches 13 run function rlk:boss/scarlet/p/tri/k/13
 execute if score #pt hr matches 14 run function rlk:boss/scarlet/p/tri/k/14
-execute if score #pt hr matches 15 as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri14_13] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-execute if score #pt hr matches 16 as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri14_12] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute if score #pt hr matches 17 run function rlk:boss/scarlet/p/tri/k/17
+execute if score #pt hr matches 16 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_m14]
+execute if score #pt hr matches 17 run kill @e[type=minecraft:item_display,tag=rlk_hr_swl]
 execute if score #pt hr matches 18 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri14_12]
 execute if score #pt hr matches 19 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri14_13]
 execute if score #pt hr matches 20 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri14_14]

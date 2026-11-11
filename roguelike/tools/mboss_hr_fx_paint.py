@@ -335,6 +335,7 @@ def paint_glint(a, b):
 
 
 CUE_GOLD = hexc('#FFD878')
+SW_INK = hexc('#1C0B2E')               # round V: the dark rim of every tell (a tint multiplies it: it stays dark)
 
 
 def paint_cue(a, b):
@@ -357,14 +358,20 @@ def paint_cue(a, b):
     al = max(core, halo, main, diag)
     if al < 0.04:
         return CLEAR
+    # round V (lane VB; review v C2): a dark rim round the star's body (the core and the rays) - where the old sprite faded out
+    # softly into whatever was behind it (her white hat, the pale straw grass of the P1 field) it now ends in ink
+    shape = max(core, main, diag)
+    if 0.08 <= shape < 0.42:
+        return SW_INK + (0.9,)
     gold = smooth(0.06, 0.22, r) * (1 - smooth(0.3, 0.55, r)) + 0.35 * smooth(0.55, 1.0, r)
-    return mix(WHITE, CUE_GOLD, gold) + (min(1.0, al * 1.15),)
+    if shape >= 0.42:
+        return mix(WHITE, CUE_GOLD, gold) + (1.0,)
+    return mix(WHITE, CUE_GOLD, gold) + (min(1.0, al * 0.6),)
 
 
 # ---- round V (lane VB; v_brief.md §3 VB 2-3): the drawn blade path, its head and the slash sector --------------------------
 # All three are neutral (white, tinted per hit) with a DARK rim: a tell must read on the pale straw grass and her white hat of
 # the P1 field as well as on the crimson P2 field (review v C2: a white-gold star on a white hat over pale grass was lost).
-SW_INK = hexc('#1C0B2E')               # the dark rim (the tint multiplies it: it stays dark)
 SW_CORE = 0.56                         # the path's bright core: this share of the card's width (blade.PATH_CORE)
 SW_ARC_TAN = 0.5                       # the sector's edges: a = +-SW_ARC_TAN b (blade.ARC_TAN)
 SW_ARC_INNER = 0.30                    # it fades out below this radius (blade.ARC_INNER)

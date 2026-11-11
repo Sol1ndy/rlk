@@ -235,7 +235,8 @@ class Swing:
             q = lerp(add(b0, mul(d0, s0)), add(b1, mul(d1, s1)), 0.5)
             r0, r1 = norm(sub(t0, q)), norm(sub(t1, q))
             # an apex beyond the tips or far behind the bases (the blade slid more than it turned): a band of the tip's way
-            if min(dot(sub(t0, q), d0), dot(sub(t1, q), d1)) <= 0.3 or max(r0, r1) > 6.0:
+            # (or the two radii differ: a thrust that turns a little)
+            if min(dot(sub(t0, q), d0), dot(sub(t1, q), d1)) <= 0.3 or max(r0, r1) > 6.0 or abs(r0 - r1) > 0.22:
                 out.append(dict(t=born, kind='line', p0=t0, p1=t1, u0=u0, u1=u1))
                 continue
             z = unit(add(unit(sub(t0, q)), unit(sub(t1, q))))
@@ -284,8 +285,18 @@ def card(key, kind, t, q, s, col, tags=(), bb='fixed', tpd=1):
 
 
 SEL = '@e[type=minecraft:item_display,tag={}]'
-PLACE = [f'tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ 0', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}']   # the executor's place and yaw
-RIDE = f'tp {SEL.format(TAG_RIDE)} ~ ~ ~ ~ 0'                                                    # every tick while a path rides
+AT_BODY = 'at @s'          # the frame of a card: her feet and yaw NOW (the body's place when the command runs, not the place the
+#                            tick function was called at: a glide may have moved her since)
+
+
+def place(at=AT_BODY):
+    """The cards just summoned to the frame `at` (its place, its yaw, pitch 0)."""
+    return [f'execute {at} run tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ 0', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}']
+
+
+def ride_cmd(mine, at=AT_BODY):
+    """Every tick while a path rides its frame."""
+    return f'execute {at} run tp {SEL.format(mine)} ~ ~ ~ ~ 0'
 
 
 def seg_card(key, p0, p1, col, tags, w=PATH_W, kind='sw_path'):
@@ -327,7 +338,7 @@ class Out:
         return self
 
 
-def path_ride(out, key, sw, t0, show, col, uid, head=True, flare=True):
+def path_ride(out, key, sw, t0, show, col, uid, head=True, flare=True, at=AT_BODY):
     """The drawn blade path of swing sw (clip tick 0 = pattern tick t0), riding her, shown from pattern tick `show` (>= 0) to
     the hit; the head arrives at the tip's place of the hit tick on the hit tick; from the swing's start the path burns white
     (the tip's trail) and is gone ARC_LIFE - 2 t after the hit. uid: a short id unique in the pattern (the cards' own tag).
@@ -338,11 +349,11 @@ def path_ride(out, key, sw, t0, show, col, uid, head=True, flare=True):
     mine = f'{TAG}_{uid}'
     sel = SEL.format(mine)
     cmds = [seg_card(key, p0, p1, col, (TAG_RIDE, mine)) for (_u0, p0), (_u1, p1) in zip(pts, pts[1:])]
-    out.at(show, *cmds, *PLACE)
+    out.at(show, *cmds, *place(at))
     # the riding: from the tick after it is made until it is killed
     end = h + ARC_LIFE - 2
     for t in range(show + 1, end):
-        out.at(t, RIDE)
+        out.at(t, ride_cmd(mine, at))
     if head:
         # the head: at pattern tick t it is sent to where it shall be at t + 1 (1 t of client interpolation): it reaches the hit
         # point as tick h is shown. It runs the whole path at an even pace.
@@ -363,9 +374,9 @@ def path_ride(out, key, sw, t0, show, col, uid, head=True, flare=True):
                f'scale:[{f4(HEAD_S)},{f4(HEAD_S)},{f4(HEAD_S)}],right_rotation:[0f,0f,0f,1f]}},'
                f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_head",'
                f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}',
-               f'execute rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] / n))}')
+               f'execute {at} rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] / n))}')
         for t in range(show + 1, h):
-            out.at(t, f'execute rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] * (t + 1 - show) / n))}')
+            out.at(t, f'execute {at} rotated ~ 0 run tp {hsel} {car(at_len(lens[-1] * (t + 1 - show) / n))}')
         out.at(h, f'kill {hsel}')
     if flare:
         out.at(max(show + 1, a + 1), f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
@@ -382,7 +393,7 @@ def slash(out, key, sw, t0, col, uid, a=None, b=None):
         by.setdefault(t0 + pc['t'], []).append(pc)
     for t, row in sorted(by.items()):
         grp = f'{TAG}_{uid}_{t}'
-        out.at(t, *[arc_card(key, pc, col, (grp,)) for pc in row], *PLACE)
+        out.at(t, *[arc_card(key, pc, col, (grp,)) for pc in row], *place())
         sel = SEL.format(grp)
         for dt, frame in ARC_FRAMES[1:]:
             if any(pc['kind'] == 'arc' for pc in row):
@@ -509,3 +520,32 @@ def ride(pb, key, idx, prev=None, t0=0, cond=None, slash_col=api.C_LILAC, path=T
     out.into(pb, cond)
     DRAWN.setdefault(key, []).append(rec)
     return rec
+
+
+MARK_W, MARK_H0, MARK_H1, MARK_HEAD = 0.14, 1.95, 4.35, 0.36
+
+
+def target_mark(out, key, uid, show, h, col, at):
+    """The tall in-air mark over a target (v_brief §3 VB 4: a tell at the target that cannot be missed; never a floor decal): a
+    thin bright column from MARK_H0 to MARK_H1 over the point `at` (execute subcommands: the lock marker's place) from `show`
+    on, a head that comes down it and reaches its foot on the hit tick h. A dash runs straight at the player's lens (its own
+    line is seen end-on, behind the avatar): this mark stands over the avatar's head, across the view."""
+    mine = f'{TAG}_{uid}'
+    sel = SEL.format(mine)
+    hsel = f'@e[type=minecraft:item_display,tag={TAG_HEAD},tag={mine},limit=1]'
+    up = f'{at} positioned ~ ~{MARK_H0} ~ rotated 0 -90'
+    out.at(show, f'execute {up} run ' + card(key, 'sw_path', (0, 0, 0), (0, 0, 0, 1), (MARK_W, MARK_W, MARK_H1 - MARK_H0), col, (mine,), tpd=0),
+           f'execute {up} run tp {SEL.format(TAG_NEW)} ~ ~ ~ ~ ~', f'tag {SEL.format(TAG_NEW)} remove {TAG_NEW}',
+           f'execute {at} positioned ~ ~{MARK_H1} ~ run summon minecraft:item_display ~ ~ ~ {{Tags:' + _tags(key, TAG_HEAD, mine)
+           + ',billboard:"center",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,'
+           f'teleport_duration:1,interpolation_duration:0,transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],'
+           f'scale:[{f4(MARK_HEAD)},{f4(MARK_HEAD)},{f4(MARK_HEAD)}],right_rotation:[0f,0f,0f,1f]}},'
+           f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{KIT}sw_head",'
+           f'"minecraft:custom_model_data":{{colors:[{int(col)}]}}}}}}}}')
+    n = max(1, h - show)
+    for t in range(show, h):
+        y = MARK_H1 + (MARK_H0 - MARK_H1) * (t + 1 - show) / n
+        out.at(t, f'execute {at} run tp {hsel} ~ ~{y:.3f} ~')
+    out.at(h, f'kill {hsel}', f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
+    out.at(h + 2, f'kill {sel}')
+    return dict(show=show, hit=h)

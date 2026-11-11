@@ -23,6 +23,7 @@ execute if score #pt hr matches 18 run function rlk:boss/scarlet/p/q/k/18
 execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/q/k/19
 execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/q/k/20
 execute if score #pt hr matches 21 run function rlk:boss/scarlet/p/q/k/21
+execute if score #pt hr matches 22 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_m20]
 execute if score #pt hr matches 23 run function rlk:boss/scarlet/p/q/k/23
 execute if score #pt hr matches 31 run function rlk:boss/scarlet/p/q/k/31
 execute if score #pt hr matches 32 run function rlk:boss/scarlet/p/q/k/32
@@ -53,9 +54,8 @@ execute if score #pt hr matches 56 run function rlk:boss/scarlet/p/q/k/56
 execute if score #pt hr matches 57 run function rlk:boss/scarlet/p/q/k/57
 execute if score #pt hr matches 58 run function rlk:boss/scarlet/p/q/k/58
 execute if score #pt hr matches 59 run function rlk:boss/scarlet/p/q/k/59
-execute if score #pt hr matches 60 if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_sw_q_air38_58] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
 execute if score #pt hr matches 61 run function rlk:boss/scarlet/p/q/k/61
-execute if score #pt hr matches 62 run function rlk:boss/scarlet/p/q/k/62
+execute if score #pt hr matches 62 if score #q_hit hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_swl]
 execute if score #pt hr matches 63 run function rlk:boss/scarlet/p/q/k/63
 execute if score #pt hr matches 64 if score #q_hit hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_q_air38_58]
 execute if score #pt hr matches 65 if score #q_hit hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_q_air38_59]

@@ -3,3 +3,4 @@ scoreboard players operation #buSub bu = #gau hr
 scoreboard players operation #buSub bu /= #c10 hr
 scoreboard players set #buSubMax bu 5
 scoreboard players set #buSubCol bu 1
+scoreboard players set #buSubSeg bu 5

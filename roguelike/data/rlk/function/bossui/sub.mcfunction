@@ -21,3 +21,4 @@ execute if score #buSubCol bu matches 8 run function rlk:bossui/run_sub {col:"#E
 execute if score #buSubCol bu matches 9 run function rlk:bossui/run_sub {col:"#7BD88F"}
 scoreboard players operation #len bu = #se bu
 function rlk:bossui/run_sub {col:"#1E1E22"}
+execute if score #buSubSeg bu matches 5 run data modify storage rlk:bu line append value {text:"",font:"rlk:bossbar",color:"white"}

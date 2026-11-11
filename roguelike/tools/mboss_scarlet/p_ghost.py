@@ -216,7 +216,7 @@ def body_files(W):
                    f'execute at {ARENA_M} positioned ~ {CY} ~ run tp @s ~ ~ ~'])
     w('g/reset', ['# @s = the body (a cancelled ghost pattern): solid and visible in her normal colours, the blade glow off, no glide,',
                   '# on the floor. Idempotent.',
-                  f'tag @s remove {TAG_GHOST}', api.rig('look/form/normal'), api.rig('look/blade/off'), api.rig('state/normal'),
+                  f'tag @s remove {TAG_GHOST}', api.rig('look/form/normal'), api.rig('look/blade/edge'), api.rig('state/normal'),
                   fn('g/ground')])
     w('g/bolt', [f'# A decoration bolt here (@s any; the floor spot 3-6 b from the player): no hit box (PLAN §4.5, questions.md Q-A12).']
       + S.fx('deco_bolt', [part(DUST['yellow'], 0.05, 1.6, 0.05, 0, 14), part('minecraft:electric_spark', 0.1, 1.2, 0.1, 0.05, 6)],
@@ -442,9 +442,10 @@ class Walk:
         sw = B.Swing(clip, E(clip, 'hit'))
         q = self.st_tick[s]
         out = B.Out()
-        r = B.path_ride(out, self.key, sw, t, max(q, s - B.SHOW_FIRST), B.COL['P'], f'c{s}')
-        for tt in sorted(out.t):                      # the path stands at the station (her place and yaw at the strike)
-            g.at(tt, [S.gate(AT_ST, c) for c in out.t[tt]])
+        # the path stands at the station (her place and yaw at the strike)
+        r = B.path_ride(out, self.key, sw, t, max(q, s - B.SHOW_FIRST), B.COL['P'], f'c{s}', at=f'at {ST_M}')
+        for tt in sorted(out.t):
+            g.at(tt, out.t[tt])
         out2 = B.Out()
         pcs = B.slash(out2, self.key, sw, t, B.SLASH[api.C_LILAC], f'c{s}')
         for tt in sorted(out2.t):
@@ -558,7 +559,7 @@ class Walk:
             g.fx(glow, 'glint', [part(DUST['magenta'], 0.1, 0.1, 0.1, 0, 8)], f'at {S.ANCHOR_M} rotated as @s',
                  src=('g_vert', 'glow'), c=api.C_MAGENTA)
             g.snd(glow, 'g_glow', src=('g_vert', 'glow'))
-            g.look(s, 'blade', 'off', ('g_vert', 'hit'))
+            g.look(s, 'blade', 'edge', ('g_vert', 'hit'))
             g.at(rs, rise(RISE_UP, gone - rs))
             g.moves.append((rs, gone, 'rise out of view'))
             g.at(gone, hide())
@@ -635,6 +636,10 @@ class Walk:
                     f'# ~{num(api.FAIL60_PUSH[0] + 0.5, 1)} b off it); she lands on the impact point (from 1 b above it in {LAND_T} t), g_reform.',
                     f'execute at {PLAYER} positioned ~ {CY} ~ run {api.shield("fail60")}', api.play('g_reform'), FACE] + glide_spot('land', LAND_T)
             g.ev(jt, 'fail', 'fail60', 'JUDGE_T')
+            from . import shield as SH
+            col = B.SEL.format(SH.FAIL_COL_TAG)
+            g.at(jt + SH.FAIL_COL_T, f'kill {col}')
+            g.cancel_lines.append(f'kill {col}')
         g.W.w(f'p/{key}/fail', fail)
         g.at(jt + E('g_reform', 'end'), S.gate(f'if score #gres {OBJ} matches 2', api.play('idle2')))
         g.end(api.FAIL60_P2_T if key == 'a8' else jt + FAIL_END)

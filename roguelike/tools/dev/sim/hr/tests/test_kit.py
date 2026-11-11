@@ -348,9 +348,11 @@ if MERGED or (shutil.which('git') and subprocess.run(['git', '-C', '/home/user/r
                                                                  f'ribbon follow her (follow_on .. follow_off) {follow}')
         hz9 = {p.relative_to(MOD).parts[1] for d in DASHES for p in (MOD / d).rglob('*.mcfunction')
                if 'mboss/hz/line with storage rlk:hr core.dash' in p.read_text(encoding='utf-8')}
-        check(len(a9) == len(DASHES) and all(ok for _, ok in a9) and len(hz9) == len(DASHES),
-              f'calls: the dash streaks (qi_cut of a9 / hcut / kcut / blue) read the probed dash length, the hazard line\'s '
-              f'compound core.dash {a9} {sorted(hz9)}')
+        # round V (lane VB): the dash streaks (qi_cut) are gone - a dash's way is the target line of blade.py (test_blade.py);
+        # the hazard line still reads the probed dash length
+        check(not a9 and len(hz9) == len(DASHES),
+              f'calls: no qi_cut dash streak is left (round V); the hazard line of every dash reads the compound core.dash '
+              f'{a9} {sorted(hz9)}')
     if not MERGED:
         shutil.rmtree(TMP, ignore_errors=True)
     check(ncalls > 300, f'calls: {ncalls} kit calls checked')
@@ -780,7 +782,9 @@ if MERGED:
         for ln in p.read_text(encoding='utf-8').split('\n'):
             if 'fx/p/qi_line' in ln and not ln.startswith('#'):
                 qcalls.append((p.relative_to(MOD).as_posix(), ln))
-    check(len(qcalls) >= 3, f'qline: {len(qcalls)} module qi_line calls')
+    # round V (lane VB): the patterns call no qi_line any more (tri's thrust, kcut's three lines, the dive lines: drawn by
+    # blade.py from the blade track / through the locked spot: test_blade.py); the preset itself stays in the kit
+    check(not [r for r, _l in qcalls if r.startswith('p/')], f'qline: no pattern calls qi_line any more ({len(qcalls)} module calls)')
     kc = []
     for rel, ln in qcalls:
         if rel.startswith('p/kcut/'):
@@ -812,7 +816,7 @@ if MERGED:
             head = math.degrees(math.atan2(-z[0], z[2]))          # the game's yaw of the line's direction
             d = (head - DASH_YAW + 180.0) % 360.0 - 180.0
             yaws.append(round(d if abs(d) <= 90 else (d + 360.0) % 360.0 - 180.0))
-    check(sorted(yaws) == sorted(getattr(api, 'KCUT_YAW', (0, 55, -55))) or sorted(-y for y in yaws) == sorted(getattr(api, 'KCUT_YAW', ())),
+    check(not kc or sorted(yaws) == sorted(getattr(api, 'KCUT_YAW', (0, 55, -55))) or sorted(-y for y in yaws) == sorted(getattr(api, 'KCUT_YAW', ())),
           f'qline: kcut\'s three lines cross the lock at api.KCUT_YAW from the dash direction ({sorted(yaws)})')
 
 # ---------------------------------------------------------------- qi_band's sweep (HR-32)
@@ -1152,7 +1156,10 @@ if MERGED:
     for (rel, call), lines in sorted(by_file.items()):
         sig = tuple(sorted(re.sub(r',scores=\{hr=\d+\}', '', COND.sub('', x)) for x in lines))
         sites.setdefault(sig, (f'{call} ({rel})', lines))
-    check(len(sites) >= 15, f'view: {len(sites)} contact effects found in the module')
+    # round V (lane VB): the hand-placed contact effects (qi_arc / qi_vert / qi_fan / qi_wedge / qi_ring / qi_band / qi_x /
+    # qi_dome at her or at the cut spot) are gone: every slash is generated from the blade track (test_blade.py checks plane,
+    # direction, reach, timing and size; vb/fightcam.py renders them from the fight camera)
+    check(len(sites) == 0, f'view: no hand-placed contact effect is left in the patterns ({len(sites)})')
     n_a1 = 0
     for key, lines in sorted(sites.values()):
         fan = 'qi_fan' in key          # A1's swing fan (4 t before the hit; a 1.6-b fan 4.7 b from the F5 camera)
@@ -1167,7 +1174,7 @@ if MERGED:
                                        f'{VIEW_TICKS}, V2 HR-48; {px})')
             else:
                 check(max(px) >= need, f'view: {key[:110]}: {max(px)} card px in {view} (>= {need})')
-    check(n_a1 == 2, f'view: A1\'s two contact effects (the fan, the crescent) found ({n_a1})')
+    check(n_a1 == 0, f'view: A1 calls no hand-placed fan / crescent ({n_a1})')
     # HR-45: the player-anchored effects from the F5 camera. (HI, hi_todo 3: the rebuilt fight) first person exists only in
     # developer mode now (11-10), so the first-person pins are gone (the old judge drew the deflect a second time 1.8 b before
     # the eyes; the dev-mode forms the module still writes are not pinned). What stays anchored at the player is the 홍련일섬
@@ -1210,8 +1217,11 @@ if HR_PRESETS:
     check(api.OVERLAYS.get('web') == 0xEC18 and 'web' in G.GLYPHS and all(f'web_{k}' in G.GLYPHS for k in range(1, G.OVL_STEPS)),
           'hr1c: the web overlay U+EC18 and its opacity steps')
     # (review H-A, HA-07: the parry cue's own 64 x 64 sprite is the one new sprite: 4 096 px)
-    check(G.SPRITE_PX == 237_568 + 4_096 and 'flash_blue' not in G.SPRITES and 'cue' in G.SPRITES
-          and G.atlas_px() == 237_568 + 4_096 + G.GATE_PX, f'hr1c: one new sprite, the cue (the items atlas grows 4 096 px: {G.SPRITE_PX})')
+    # round V (lane VB): + the blade path, its head and the slash sector's three frames (16 640 px)
+    check(G.SPRITE_PX == 237_568 + 4_096 + 16_640 and 'flash_blue' not in G.SPRITES and 'cue' in G.SPRITES
+          and all(k in G.SPRITES for k in ('sw_path', 'sw_head', 'sw_arc'))
+          and G.atlas_px() == 237_568 + 4_096 + 16_640 + G.GATE_PX,
+          f'hr1c: the new sprites: the cue (4 096 px) and round V\'s sw_path / sw_head / sw_arc (16 640 px): {G.SPRITE_PX}')
     want_snd = {'parry_cue': (('block.note_block.iron_xylophone', 0.7, 1.8),), 'flash_blue': (('block.beacon.activate', 0.5, 1.8),),
                 'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),
                 'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),
@@ -1227,13 +1237,14 @@ if HR_PRESETS:
                    for m in re.finditer(r'\bparticle (?:minecraft:)?([a-z_]+)(?=[ \n])', f.read_text(encoding='utf-8'))
                    if m.group(1) in NEEDS_OPT})
     check(not bare, f'hr1c: no particle that needs options is written without them {bare[:4]}')
-    # ---- the yellow tell: plain (1.6 b, flare 4 b) and big (t >= 100: 2.0 b, flare 5 b), each for its ticks
-    for t_arg, d_want, life in ((6, 1.6, 6), (12, 1.6, 12), (106, 2.0, 6), (112, 2.0, 12)):
+    # ---- the yellow tell: plain (2.4 b, flare 6 b) and big (t >= 100: 3.0 b, flare 7.5 b), each for its ticks (round V: was
+    # 1.6 / 2.0 b: seen past the avatar's head now), with the dark-rimmed yellow star inside (sw_head)
+    for t_arg, d_want, life in ((6, 2.4, 6), (12, 2.4, 12), (106, 3.0, 6), (112, 3.0, 12)):
         s = fresh()
         T0 = s.gt
         s.run(G.fx('yellow_tell', t=t_arg), pos=(X0, FLOOR + 1.2, Z0))
         cs = {kind(s, e): e for e in s.cards()}
-        check(set(cs) == {'yellow_tell_0', 'yellow_tell_1'}, f'hr1c: yellow_tell t {t_arg}: sphere + flare')
+        check(set(cs) == {'yellow_tell_0', 'yellow_tell_1', 'sw_head'}, f'hr1c: yellow_tell t {t_arg}: sphere + flare + the rimmed star')
         sp, fl = end_scale(s, cs['yellow_tell_0']), end_scale(s, cs['yellow_tell_1'])
         check(abs(sp[0] - d_want) < 1e-3 and abs(sp[1] - d_want) < 1e-3, f'hr1c: yellow_tell t {t_arg}: sphere {sp[0]} b (want {d_want})')
         check(abs(fl[0] * 2 - d_want * 2.5) < 1e-3, f'hr1c: yellow_tell t {t_arg}: flare {fl[0] * 2} b (want {d_want * 2.5})')
@@ -1288,9 +1299,9 @@ if HR_PRESETS:
         blue = [e for e in cs if kind(s, e) == 'blink_bubble']
         check(len(yel) == 2 and len(blue) == 3, f'hr1c: flash_blue: yellow sphere + flare, three bubbles ({len(yel)}, {len(blue)})')
         check(all(s.nbt[e.id].get('billboard') == 'center' for e in cs), 'hr1c: flash_blue faces the viewer')
-        main = [e for e in blue if abs(end_scale(s, e)[0] - 1.8) < 0.07]
+        main = [e for e in blue if abs(end_scale(s, e)[0] - 2.65) < 0.07]          # round V: 1.8 -> 2.6 b
         check(len(main) == 2 and all((tint(s, e) & 255) > 2 * (tint(s, e) >> 16 & 255) for e in main)
-              and all((tint(s, e) & 255) > (tint(s, e) >> 16 & 255) for e in blue), 'hr1c: flash_blue: the sphere is 1.8 b, blue')
+              and all((tint(s, e) & 255) > (tint(s, e) >> 16 & 255) for e in blue), 'hr1c: flash_blue: the sphere is 2.6 b, blue')
         s.tick(t_arg + 12)
         check(all(killed(s, e) <= T0 + G.FLASH_YELLOW_T + 2 for e in yel), f'hr1c: flash_blue: the yellow is gone after {G.FLASH_YELLOW_T} t')
         check(all(stages(s, e.id).get('hrS') == T0 + G.FLASH_YELLOW_T + 1 for e in main), 'hr1c: flash_blue: the sphere shows at tick 4')

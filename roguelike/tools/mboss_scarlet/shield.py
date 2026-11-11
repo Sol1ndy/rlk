@@ -25,12 +25,16 @@ The gauge is api.GAUGE_FP (#gau hr, 0-50 = tenths of a segment). Outside the gau
 """
 from . import api
 from . import s3lib as S
+from . import blade as B
 from .s3lib import sset, fn, part
 
 L, K = api.L, api.K
 OBJ = api.OBJ
 GAU = api.GAUGE_FP
 G = api.GAUGE
+
+
+FAIL_COL_W, FAIL_COL_T, FAIL_COL_TAG = 0.3, 5, 'rlk_hr_sw_col'
 
 
 def build(W):
@@ -66,7 +70,12 @@ def build(W):
       + L.pl_dot(api.FAIL60_PM, api.ELEC, 0)
       + [L.push_ring(*api.FAIL60_PUSH)]
       + S.fx('dive_impact', [part(S.DUST['lilac'], 1.2, 0.1, 1.2, 0, 30)], pos='positioned ~ ~0.1 ~', r=30)
-      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos='rotated ~ 0 positioned ~ ~ ~')
+      # round V (v_brief §3 VB 4; review v G2: the kit's 9 b light column - two crossed quads over a block wide on the player's own
+      # spot - filled over half the screen for 7 frames when the push carried the lens through it): a thin column instead (a
+      # blade.py path card, FAIL_COL_W wide, 6 b tall; p/<g>/fail's caller removes it FAIL_COL_T t later)
+      + [f'execute positioned ~ ~0.1 ~ rotated 0 -90 run ' + B.card('a8', 'sw_path', (0, 0, 0), (0, 0, 0, 1), (FAIL_COL_W, FAIL_COL_W, 6.0),
+                                                                  B.SLASH[api.C_LILAC], (FAIL_COL_TAG,), tpd=0),
+         f'execute positioned ~ ~0.1 ~ rotated 0 -90 run tp {B.SEL.format(B.TAG_NEW)} ~ ~ ~ ~ ~', f'tag {B.SEL.format(B.TAG_NEW)} remove {B.TAG_NEW}']
       + S.snd('fail_impact', pos='positioned ~ ~ ~'))
     w('ult/fatal', [
         '# The 5 % instant death (ULT5_LETHAL true; @s = the player; F:boss/raiden/hazard/fatal\'s model): skipped while the player',
@@ -81,4 +90,6 @@ def build(W):
     w('hud/bar_shield', [f'# The under bar = the 5-segment gauge (bars hook): #gau / {G["seg"]} of {api.PIPS}, electro.',
                          f'scoreboard players operation #buSub bu = {GAU} {OBJ}',
                          f'scoreboard players operation #buSub bu /= #c10 {OBJ}',
-                         f'scoreboard players set #buSubMax bu {api.PIPS}', f'scoreboard players set #buSubCol bu {api.BU_SHIELD}'])
+                         f'scoreboard players set #buSubMax bu {api.PIPS}', f'scoreboard players set #buSubCol bu {api.BU_SHIELD}',
+                         # round V (v_brief §3 VB 5): the under bar cut into its 5 segments (bossui: dividers)
+                         f'scoreboard players set #buSubSeg bu {api.PIPS}'])

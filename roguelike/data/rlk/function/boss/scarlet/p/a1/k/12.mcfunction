@@ -1,8 +1,8 @@
 # A1 pattern tick 12
-tp @e[type=minecraft:item_display,tag=rlk_hr_swr] ~ ~ ~ ~ 0
-execute rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a114,limit=1] ^-0.511 ^0.672 ^1.956
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a114] ~ ~ ~ ~ 0
+execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a114,limit=1] ^-0.511 ^0.672 ^1.956
 execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a114] run data merge entity @s {item:{components:{"minecraft:custom_model_data":{colors:[16777215]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a1","rlk_hr_swn","rlk_hr_sw_a114_12"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.1729f,1.0048f,0.4068f],left_rotation:[0.5516f,-0.6973f,-0.3888f,0.2415f],scale:[0.5651f,1f,1.9884f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a1","rlk_hr_swn","rlk_hr_sw_a114_12"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.1064f,0.9939f,0.3828f],left_rotation:[0.6006f,-0.6567f,-0.3079f,0.3366f],scale:[0.5714f,1f,2.0107f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
