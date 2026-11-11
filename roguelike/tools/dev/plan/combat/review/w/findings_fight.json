@@ -1,0 +1,477 @@
+[
+ {
+  "id": "T3-01-parry-sound-thin",
+  "t_start": 78.07,
+  "t_end": 187.12,
+  "category": "sound",
+  "severity": "high",
+  "what": "All parry sounds are short single transients with no low body and no sustain. Perfect parry (anvil.land p1.8 + trident.hit, then a quiet amethyst/bell ring at tick 2): falls 10 dB in 0.14 s and 20 dB in 0.24 s; the reference clang+ring holds for 0.55 s / 1.02 s. Its 100-400 ms level is 11 dB below the reference and its ring partials are 12 dB weaker. Tier 2 (chain.hit p1.7 + amethyst.hit p1.9) and tier 1 (chain.hit p1.25) are 50-90 ms mid-band clinks at 0.75-1.3 kHz. They are 5-6 dB quieter than the loudest other combat sound within 1 s, so they are masked. The reference guard tink is bright (3.7 / 1.9 / 2.3 kHz partials) and lasts about 0.46 s. There is no swing whoosh in the last 0.3 s before contact (the 1.5-12 kHz band is at -64 dBFS, i.e. silence); the reference has a pitched swoosh sweep 0.35-0.2 s before contact.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E1_parry_sound_spectrograms.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/aud_cmp.json"
+  ],
+  "measured": {
+   "method": "5 ms hop STFT, bands 20-150 / 150-500 / 500-1500 / 1500-12000 Hz, dBFS mean power; medians over events",
+   "ours_perfect_n10": {
+    "total_0_100ms": -29.0,
+    "total_100_400ms": -37.4,
+    "hf_0_100": -34.3,
+    "hf_100_400": -42.4,
+    "low20_150_0_100": -42.1,
+    "low_100_400": -46.1,
+    "decay_minus10dB_s": 0.14,
+    "decay_minus20dB_s": 0.24,
+    "tail_partials_hz": [
+     2296,
+     4734,
+     515
+    ],
+    "tail_partial_level_dB_per_bin": -52,
+    "margin_over_bed_dB": 18.6,
+    "margin_over_loudest_other_within_1s_dB": 2.5
+   },
+   "ref_perfect_n10": {
+    "total_0_100ms": -26.1,
+    "total_100_400ms": -26.6,
+    "hf_0_100": -30.5,
+    "hf_100_400": -30.1,
+    "low20_150_0_100": -31.4,
+    "low_100_400": -31.2,
+    "decay_minus10dB_s": 0.55,
+    "decay_minus20dB_s": 1.02,
+    "tail_partials_hz": [
+     2437,
+     2578,
+     2156,
+     3140
+    ],
+    "tail_partial_level_dB_per_bin": -41,
+    "margin_over_bed_dB": 12.3,
+    "margin_over_loudest_other_within_1s_dB": 2.6
+   },
+   "ours_tier2_n4": {
+    "total_0_100ms": -31.5,
+    "hf_0_100": -40.4,
+    "onset_partials_hz": [
+     750,
+     984,
+     1031
+    ],
+    "clink_length_s": "0.05-0.08",
+    "margin_over_loudest_other_within_1s_dB": -4.7
+   },
+   "ours_tier1_n5": {
+    "total_0_100ms": -32.0,
+    "hf_0_100": -44.3,
+    "onset_partials_hz": [
+     938,
+     1078,
+     1266
+    ],
+    "clink_length_s": "0.05-0.07 (dur10 median 0.09)",
+    "margin_over_loudest_other_within_1s_dB": -5.7
+   },
+   "ref_guard_n18": {
+    "total_0_100ms": -31.8,
+    "total_100_400ms": -28.8,
+    "hf_0_100": -39.1,
+    "hf_100_400": -35.8,
+    "decay_minus10dB_s": 0.46,
+    "decay_minus20dB_s": 0.91,
+    "partials_hz": [
+     3703,
+     1968,
+     2343
+    ]
+   },
+   "tier2_tier1_same_family": "both are block.chain.hit at different pitch; tier 2 adds amethyst.hit. By ear they are near-identical short clicks"
+  },
+  "likely_cause": "data/rlk/function/player/def/fx/p1_at, p2_at, p3_at, p3_star: one-shot transient vanilla sounds at volume 0.5-0.9 with no low layer and no sustained ring layer; the ring (p3_star) is at 0.35-0.9 volume and pitched high. Nothing plays the boss swing."
+ },
+ {
+  "id": "T3-02-plain-dodge-is-a-long-dash",
+  "t_start": 72.0,
+  "t_end": 190.0,
+  "category": "dodge",
+  "severity": "high",
+  "what": "Every dodge is the same 3-block dash in 3 ticks (dash_dir: dashMoveT 3, 1 block per tick = 1.67 avatar heights in 0.15 s), whether an attack is coming or not, with the avatar laid flat in a horizontal \"superman\" pose for about 12 frames. About 95 dash-sound matches in the fight (template match on the dash sound). The reference has no such dash. With nothing incoming the character hardly moves: a twist with the sword thrown out, under 0.3 body heights. With an attack incoming it is a quick upright back-step of about 1.5-2.2 body heights. With a direction held it is a low lunge-step. A second press is a cartwheel.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E10_our_plain_dodge_f8742_f10248.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E9_reference_dodge_set.jpg"
+  ],
+  "measured": {
+   "ours": {
+    "travel_blocks": 3,
+    "travel_avatar_heights": 1.67,
+    "move_ticks": 3,
+    "move_frames": 9,
+    "flat_pose_frames": "~12 (10255-10266)",
+    "pose_total_frames": "~18 (10253-10271)",
+    "cooldown_ticks": "18 (12 after an avoided hit)",
+    "same_for_attack_or_not": true,
+    "direction": "movement input, else look direction"
+   },
+   "reference": "see the measured block of T3-03"
+  },
+  "likely_cause": "data/rlk/function/player/dash_dir.mcfunction (fixed dashMoveT 3, step x10); char/motion/dash clip leans the body to horizontal"
+ },
+ {
+  "id": "T3-03-reference-dodge-set",
+  "t_start": 0.8,
+  "t_end": 17.0,
+  "category": "dodge-reference",
+  "severity": "high",
+  "what": "Measurements of the reference dodge.mp4 that an implementer can copy. Travel is floor-compensated: the character position minus the floor flow, divided by the on-screen body height (105-145 px at half resolution). Depth toward or away from the camera is foreshortened, so depth figures are +-40 %. A: plain dodge, no attack, no direction (4.5 s, f258-293). She stays in place, under 0.3 bh. The torso twists and the sword is flung out sideways (f268-276). About 12 frames, no smear. B: dodge against an incoming attack (1.6 s, 2.8 s, 15.4 s; f108-113, f164-206, f918-951). A straight back-step away from the enemy, toward the camera: about 1.9 bh (2.8 s) and 2.2 bh (15.4 s). The move itself is fast, 5-12 frames, with a smear. She stays upright with the legs apart and lands with the arms spread wide; ready about 18-25 frames after the press, settled by about 35. C: directional dodge (8.4 s and 14.0 s; f500-540, f836-876). A low lunge-step in the input direction (sideways here), deep forward lean, trailing leg straight, sword low behind. About 1.4 bh (14.0 s) and up to 2.6 bh (8.4 s, probably including a run-in). 20-25 frames of movement, standing again about 40 frames after the start. D: double dodge (second press 0.55-0.6 s after the first; 10.0-11.3 s, f596-672; log \"SHIFT->SHIFT 더블 닷지\"). The first press is a back-step (about 1.0 bh left and back, f600-632). The second is a sideways cartwheel: about 360 deg around the camera-forward axis, f644-664 (20 frames), inverted with the feet up at f652-656, landing f664-668, about 1.3 screen bh further back, ready by f672. E: the reference normal dodge has no slow motion, tint or vignette, and no distinct sound above the room tone.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E9_reference_dodge_set.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/rf_inplace.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/rf_8s.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/rf_13s.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/rtrack_0_20.json"
+  ],
+  "measured": {
+   "in_place_no_attack": {
+    "event_s": 4.5,
+    "travel_bh": "<0.3",
+    "frames": "~12",
+    "pose": "twist, sword flung out sideways"
+   },
+   "backstep_vs_attack": {
+    "events_s": [
+     1.6,
+     2.8,
+     15.4
+    ],
+    "travel_bh": [
+     "~0.7-1.0 (noisy)",
+     1.88,
+     2.2
+    ],
+    "move_frames": "5-12",
+    "ready_frames": "18-25",
+    "pose": "upright, legs apart, arms spread on landing"
+   },
+   "directional": {
+    "events_s": [
+     8.4,
+     14.0
+    ],
+    "travel_bh": [
+     2.64,
+     1.43
+    ],
+    "move_frames": "20-25",
+    "total_frames": "~40",
+    "pose": "low lunge, deep lean, trailing leg, sword low"
+   },
+   "double_dodge": {
+    "event_s": "10.0-11.3",
+    "second_press_after_first_s": "0.55-0.6",
+    "cartwheel_frames": 20,
+    "inverted_frames": "652-656",
+    "landing_frame": "664-668",
+    "ready_frame": 672,
+    "extra_travel_bh": "~1.3 (screen-measured, back)"
+   },
+   "caveat": "Only one clear in-place example. Whether \"no attack\" or \"enemy too close\" triggers it is an interpretation. The coordinator said the author wants this set to replace the long dash."
+  },
+  "likely_cause": "n/a (reference spec)"
+ },
+ {
+  "id": "T3-04-perfect-dodge-feels-slow",
+  "t_start": 91.45,
+  "t_end": 168.55,
+  "category": "dodge",
+  "severity": "high",
+  "what": "In real time our perfect dodge matches the reference within 2-4 frames (landing at +57..+60 frames in both). It feels slow because nothing moves for long stretches. (1) It opens with the 3-block flat dash (+0..+16). (2) Then 20 frames of \"slow motion\" in which the avatar barely moves; in PD4 the avatar-region frame difference drops from 20-30 to 1-14 (frames 10104-10122). The reference keeps her moving at 1/3 speed (arching back, arms up) and moves the camera (13-15 deg tilt or a 90 deg whip). (3) The flip begins only 0.65-0.68 s after the press. (4) The flip is a rigid rotation of the blocky avatar: 0->90 deg in about 2 frames, held inverted about 5 frames, legs together (no split), landing in a T-pose. (5) Whole sequence about 64-67 frames to tint-off and 81 frames to the beat end, against our normal dodge of 9 frames (7-9x longer). (6) The camera never moves. It reads as a handspring done by a mannequin. Arc height and travel are small: it plays in place after the dash.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E5_perfect_dodge1_f5484-5567.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E6_perfect_dodge4_f10080-10163.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/pd1_flip.jpg"
+  ],
+  "measured": {
+   "PD1_91.45s": {
+    "trigger_audio_frame": 5487,
+    "dash_pink_ghost": "5490-5506",
+    "slow": "5507-5527 (20 f)",
+    "flip": "5528-5543 (rot ~21 deg/frame, inverted 5534-5538)",
+    "landing": 5544,
+    "tint_off": 5551,
+    "vignette_edge_ratio": "0.85->0.67 from 5498 to 5530; corner luma 51->29 5486-5534"
+   },
+   "PD4_168.03s": {
+    "trigger_frame": "~10084-10086",
+    "flat_dash": "10088-10101",
+    "slow": "10102-10122 (20 f)",
+    "flip": "10123-10143",
+    "inverted": "10134-10138",
+    "landing": 10144,
+    "tint_off": 10151
+   },
+   "PD2_PD3_165.9-167.1s": "back-to-back; tint continuous 9968-10150; the camera was inside her model 9958-9980, so not timed",
+   "ours_relative_to_trigger": {
+    "slow": "+18..+40",
+    "flip_start": "+39..+41",
+    "landing": "+57..+60",
+    "tint_off": "+64..+67",
+    "beat_end": "+81"
+   },
+   "reference_relative_to_trigger": {
+    "slow": "+16..+37",
+    "flip_start": "+37",
+    "landing": "+57..+60",
+    "settled": "+72"
+   }
+  },
+  "likely_cause": "player/def/beat/d/clock (slow 6-14, flip 14-21, end 27) with the stand-in rig clip char/motion/beat/dodge: the clip holds the pose during the slow ticks and runs the flip as a rigid rotation; the dash runs before the beat and the camera is untouched"
+ },
+ {
+  "id": "T3-05-tier2-tier1-invisible",
+  "t_start": 93.76,
+  "t_end": 187.12,
+  "category": "parry-feedback",
+  "severity": "high",
+  "what": "Tier-2 and tier-1 parries are now distinct from perfect parries (no box, streak or tint), but they hardly show at all. The spark at the blade is 5-10 px of white dots or tiny sparkle stars, often behind the avatar head or the boss ornament. The only thing that reads is the small purple damage number (-2 for tier 2, -6/-8 for tier 1), next to her other numbers. Together with T3-01 the player cannot tell \"blocked\" from \"hit\".",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E4_tier2_tier1_f5870_f5711_f9373.jpg"
+  ],
+  "measured": {
+   "tier2_events_s": [
+    93.76,
+    97.87,
+    156.27,
+    181.42
+   ],
+   "tier1_events_s": [
+    95.22,
+    95.74,
+    151.59,
+    155.41,
+    187.12
+   ],
+   "spark_px_fullres": "5-10",
+   "hp_loss": {
+    "tier2": "-2 (20 %)",
+    "tier1": "-6/-8 (50 %)"
+   }
+  },
+  "likely_cause": "fx/p1_at, p2_at: g/spark s 0.75 / 1.1 plus 3-4 dust particles, too small at 4-8 blocks"
+ },
+ {
+  "id": "T3-06-camera-inside-boss",
+  "t_start": 165.93,
+  "t_end": 166.3,
+  "category": "camera",
+  "severity": "high",
+  "what": "Her dash-through or arrival still ends at the camera. Her hat and body fill about 40-50 % of the frame for about 22 frames (9958-9980), during a perfect dodge, so the dodge presentation is hidden. \"Stop 2 blocks before the player\" does not help: the third-person camera sits about 4 blocks behind the avatar, and she arrives beside or behind it.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E8_camera_inside_boss_f9946-10064.jpg"
+  ],
+  "measured": {
+   "frames": "9958-9980",
+   "cover": "~40-50 % of the frame width",
+   "event": "unparriable dash-through answered with a perfect dodge"
+  },
+  "likely_cause": "the stop distance is measured to the player, not to the camera line (player position - 4 blocks along the view)"
+ },
+ {
+  "id": "T3-07-perfect-parry-presentation",
+  "t_start": 78.07,
+  "t_end": 185.9,
+  "category": "parry-feedback",
+  "severity": "medium",
+  "what": "Perfect parry: the freeze, the streak and the tint work. Missing or unreadable: (a) in P1 she stands directly behind the avatar on the line of sight, so her rock-back and most of the starburst are hidden behind the avatar head; the starburst reads as a beige multi-point star. (b) The weapon glow is weak: the scythe looks orange-brown for about 8 frames (4687-4694), then dark through the rest of the freeze, not yellow-white. (c) The \"lightning\" reads as small lilac sparkle stars and \"+\" glints around her (10704-10710, 9262-9270), not white-yellow arcs. (d) The tint brightens the frame by +20 % (P1) and +40 % (P2) against +10 % in the reference, and in P2 it is not warm (R-B +1..+4). (e) In P2 a huge translucent pink slash crescent covers about 35-45 % of the frame during the freeze.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E2_perfect_parry_P1_f4682-4711.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E3_perfect_parry_P2_f10672_f9230.jpg"
+  ],
+  "measured": {
+   "events_s": [
+    78.07,
+    79.13,
+    83.23,
+    85.18,
+    148.26,
+    153.97,
+    177.97,
+    183.28,
+    184.72,
+    185.82
+   ],
+   "streak_frames": [
+    14,
+    11,
+    11,
+    13,
+    12,
+    13,
+    13,
+    10,
+    13,
+    9
+   ],
+   "streak_row_fill": "0.85-0.99 (one unbroken line)",
+   "hold_frames": "~15 (4691-4705; ref 12-13)",
+   "avatar_pose_static": "~4696-4706",
+   "luma_pre_during": {
+    "P1": "72-76 -> 87-93",
+    "P2": "49-52 -> 66-73"
+   },
+   "R_minus_B_shift": {
+    "P1": "+6..+7",
+    "P2": "+1..+4"
+   },
+   "tofu_box": "none (edge-white fraction <=0.17 at the old box location, 15 parries)"
+  },
+  "likely_cause": "p3_star / wglow / p3_bolt sizes and colours; the starburst is placed at the contact point, which is behind the avatar head from the fight camera"
+ },
+ {
+  "id": "T3-08-blade-path-line",
+  "t_start": 153.8,
+  "t_end": 185.82,
+  "category": "attack-readability",
+  "severity": "medium",
+  "what": "The blade path line exists. In P2 it is a thin pale-gold arc from her blade over to the avatar, visible about 28-31 frames (about 10 ticks) before the hit; it disappears 1-5 frames before contact. At play size it is 2-7 px wide (column-run median 1-2 px, p90 4-12 px) and no running head is visible: it reads as a static arc, so it shows where but not when. In P1 it is pale gold over golden wheat, and pixel counting cannot separate it from the field; it was not visible in the strips looked at (cannot confirm it shows in P1). At 11115-11143 it lies near the floor to the avatar right, not at blade height.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E7_blade_path_line_P2.jpg"
+  ],
+  "measured": {
+   "P2_case1": {
+    "visible_frames": "9920-9948",
+    "hit_frame": "~9950",
+    "extra_gold_px": "~700-1000"
+   },
+   "P2_case2": {
+    "visible_frames": "11115-11143",
+    "contact_frame": 11149
+   },
+   "width_px_fullres": "2-7 (p90 up to 12)",
+   "head_visible": false,
+   "P1": "cannot tell (wheat is the same hue)"
+  },
+  "likely_cause": "line particle size about 0.12 block gives 2-7 px at 5-8 blocks; the head is not brighter or larger than the line; the colour is the same as the P1 field"
+ },
+ {
+  "id": "T3-09-occlusion-and-clutter",
+  "t_start": 78.0,
+  "t_end": 186.0,
+  "category": "clutter",
+  "severity": "medium",
+  "what": "During many wind-ups the avatar stands on the line of sight to her, so only her hat and blade show (4682-4711, 5870-5881). In P1 a red four-petal ornament about 100 px wide sits on her chest. Player effects bury her: grey smoke blob, flames and \"108\"/\"259\" numbers over her at 5878-5885; white pixel clouds, a light pillar and giant \"11\"/\"110\" numbers at 9593-9656; a huge pink fan crescent next to her at 10019-10043.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E2_perfect_parry_P1_f4682-4711.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E4_tier2_tier1_f5870_f5711_f9373.jpg"
+  ],
+  "measured": {
+   "ornament_px": "~100",
+   "damage_number_px": "up to ~150 wide"
+  },
+  "likely_cause": "fight camera directly behind the avatar; player skill FX and damage-number sizes"
+ },
+ {
+  "id": "T3-10-masking-sounds",
+  "t_start": 72.0,
+  "t_end": 190.0,
+  "category": "sound",
+  "severity": "medium",
+  "what": "Sounds around parries that mask them: (1) the dash sound (wind_charge.wind_burst p1.4 + breeze.slide p1.5) at -20..-30 dBFS total, louder than the perfect parry (-29) and the tier ticks (-31/-32); (2) the boss parry cue (bell.use + beacon.power_select: 656 Hz, 2.0 kHz, 4.0 kHz, about 80 ms) 0.37 s before the hit, at the same level as the parry sound itself (-32 dBFS); (3) player skill and impact sounds with a strong low end (20-150 Hz up to -21 dBFS); (4) in P2 a steady tone around 300-400 Hz raises the bed by about 8-10 dB.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E1_parry_sound_spectrograms.jpg"
+  ],
+  "measured": {
+   "dash_sound_dBFS": "-20..-30",
+   "cue_dBFS": -32,
+   "cue_lead_s": 0.37,
+   "P2_bed_tone_hz": "~300-400"
+  },
+  "likely_cause": "mixing levels; no ducking"
+ },
+ {
+  "id": "T3-11-slash-crescent",
+  "t_start": 148.0,
+  "t_end": 186.0,
+  "category": "slash-effect-alignment",
+  "severity": "medium",
+  "what": "When she is close (the gauntlet ghost next to the avatar), the slash crescent is a huge translucent pink sheet near the camera, about 35-45 % of the frame, lasting about 22 frames (10680-10702, 9238-9262), longer than the about-6-tick target. Its plane against the blade could not be measured at this distance. Away from the camera the scalloped pink fan stands beside her for about 25 frames (10019-10043).",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E3_perfect_parry_P2_f10672_f9230.jpg"
+  ],
+  "measured": {
+   "frames_visible": "~22-25",
+   "cover": "35-45 % of the frame"
+  },
+  "likely_cause": "crescent scale is not limited by camera distance; lifetime counted in world ticks, and the freeze extends it"
+ },
+ {
+  "id": "T3-12-hud-ghost-text",
+  "t_start": 103.0,
+  "t_end": 174.0,
+  "category": "hud",
+  "severity": "low",
+  "what": "A grey text line (it reads like \"... : TTS Disabled\") is drawn behind the boss balance-diamond row in every frame checked (103 s, 151 s, 174 s).",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E11_gauge_dividers.jpg"
+  ],
+  "measured": {
+   "frames_checked": [
+    6200,
+    9100,
+    10450
+   ]
+  },
+  "likely_cause": "unidentified; maybe a second boss bar title or a narrator toast (only a person in-game can identify it)"
+ },
+ {
+  "id": "T3-13-gauge-dividers",
+  "t_start": 72.0,
+  "t_end": 190.0,
+  "category": "hud",
+  "severity": "low",
+  "what": "Confirmed: the gauge shows 4 white dividers (about 3 px wide, about 16 px tall), splitting 5 segments of about 90 px each.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E11_gauge_dividers.jpg"
+  ],
+  "measured": {
+   "dividers": 4,
+   "segment_px": "~90"
+  },
+  "likely_cause": "n/a (fixed)"
+ },
+ {
+  "id": "T3-14-pd-visuals-ok",
+  "t_start": 91.45,
+  "t_end": 168.55,
+  "category": "dodge-feedback",
+  "severity": "low",
+  "what": "Perfect-dodge visuals are present and not stuck. Dark vignette about 32-48 frames (corner luma 51->29). The whole avatar turns pink for about 60 frames. A white-outlined pink ghost stays at the start spot for about 16 frames, with pink embers. The tint ends 64-67 frames after the trigger. The 3.0 s of continuous pink at 165.9-168.5 s is back-to-back perfect dodges, not a stuck tint. The pink avatar reads on the red P2 field. The swap to the stand-in rig (about 5506) and back (5550->5551) is an abrupt model change, but it happens in one frame.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E5_perfect_dodge1_f5484-5567.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E6_perfect_dodge4_f10080-10163.jpg"
+  ],
+  "measured": {
+   "vignette_frames": "32-48",
+   "tint_frames": "~60",
+   "ghost_frames": "~16"
+  },
+  "likely_cause": "n/a"
+ },
+ {
+  "id": "T3-15-windups-held-cue-star",
+  "t_start": 93.4,
+  "t_end": 97.93,
+  "category": "attack-readability",
+  "severity": "low",
+  "what": "The held wind-ups and the blade edge work: there are about 25-frame stretches with almost no motion before hits (93.40-93.80, 97.50-97.93; frame difference 0.4-2). Her blade shows as a bright white-edged bar about 20-25 px wide at 4-6 blocks. The cue star is a white star with a dark rim, about 160 px, above her hat, 2-18 frames before the hit (5870-5872, 9932-9948). Chest colour flashes were not seen in the windows examined (cannot tell). Leaps: in the two windows checked (81.3-82.9 s, 93.9-95.0 s) she stays in frame; not checked exhaustively. The -253 plunge at about 158.3 s had a purple sky beam about 57 frames before.",
+  "evidence": [
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E2_perfect_parry_P1_f4682-4711.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/evidence/E7_blade_path_line_P2.jpg",
+   "/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/cb/video3/rev_fight/work/leaps.jpg"
+  ],
+  "measured": {
+   "static_windup_frames": "~25",
+   "blade_px": "20-25",
+   "cue_star_px": "~160"
+  },
+  "likely_cause": "n/a"
+ }
+]
