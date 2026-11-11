@@ -16,7 +16,7 @@ function rlk:boss/scarlet/rig/look/props/none
 function rlk:boss/scarlet/rig/look/face/calm
 scoreboard players set @s hrRigT 565
 execute unless score #sq_cx hr matches 1 run function rlk:mboss/cam/spawn
-execute unless score #sq_cx hr matches 1 run scoreboard players set #mbCamId mb 2
-execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] ^-0.1 ^1.38 ^0.95
-execute unless score #sq_cx hr matches 1 as @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] run function rlk:mboss/ar/clampw
-execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run rotate @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] facing ^0 ^1.6 ^0
+execute unless score #sq_cx hr matches 1 run scoreboard players set #mbCamId mb 1
+execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] ^-0.1 ^1.38 ^0.95
+execute unless score #sq_cx hr matches 1 as @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] run function rlk:mboss/ar/clampw
+execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run rotate @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] facing ^0 ^1.6 ^0

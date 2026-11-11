@@ -8,6 +8,10 @@ rlk:tick spectates the live stand. A stand is a marker armour stand: its positio
   put at the next shot's eye PRE ticks before the cut (each of those ticks, so a frame that still settles is followed)
   and is in place when it goes live. Consecutive shots therefore alternate A / B (asserted).
 - A move = one tp per tick on the live stand (the client's own interpolation makes it smooth).
+- (HF-B, HB-03) A new entity reaches the client with the pose of its summon (the spawn packet goes out at the summon) and
+  `summon` ignores the execute rotation: a stand summoned at the stage and moved to its eye in the same tick glides (and
+  spins from yaw 0) into its first frame. Track.spawn() makes each stand where its first shot puts it, the rotation in the
+  summon NBT (mboss/cam/spawn_at): the shot of tick 0 shows from its first frame without a glide.
 - Rotation reaches the client in 1.4-degree steps (the entity move packets pack it into a byte), interpolated over 3
   ticks: a pan slower than about 0.4 deg / tick shows single nudges (slow_pans() lists them for the in-game check).
 
@@ -147,37 +151,53 @@ class Track:
     def _sel(self, cam):
         return L.cam_sel(cam)
 
-    def place(self, cam, eye):
-        sel = self._sel(cam)
+    def place(self, cam, eye, sel=None):
+        sel = sel or self._sel(cam)
         if eye[0] == 'W':
             return f'tp {sel} {_xyz(eye)}'
         return f'execute {self._at(eye[0])} run tp {sel} {_local(eye)}'
 
-    def aim(self, cam, look):
-        sel = self._sel(cam)
+    def aim(self, cam, look, sel=None):
+        sel = sel or self._sel(cam)
         if look[0] == 'W':
             return f'rotate {sel} facing {_xyz(look)}'
         if look[0] == 'ENT':
             return f'rotate {sel} facing entity {look[1]} {look[2]}'
         return f'execute {self._at(look[0])} run rotate {sel} facing {_local(look)}'
 
-    def place_aim(self, cam, eye, look, clamp):
-        """The lines that put stand `cam` at `eye` looking at `look` (one command when both are in one frame and unclamped)."""
-        sel = self._sel(cam)
+    def place_aim(self, cam, eye, look, clamp, sel=None):
+        """The lines that put stand `cam` (or the entity `sel`) at `eye` looking at `look` (one command when both are in one
+        frame and unclamped)."""
+        sel = sel or self._sel(cam)
         if not clamp and eye[0] == look[0]:
             if eye[0] == 'W':
                 return [f'tp {sel} {_xyz(eye)} facing {_xyz(look)}']
             return [f'execute {self._at(eye[0])} run tp {sel} {_local(eye)} facing {_local(look)}']
         staged = clamp and eye[0] in ('ST', 'ST2')
-        out = [self.place(cam, eye)] + ([f'execute as {sel} run {CLAMP}'] if clamp else [])
-        out += ([f'execute as {sel} run {self.over}'] if staged and self.over else []) + [self.aim(cam, look)]
+        out = [self.place(cam, eye, sel)] + ([f'execute as {sel} run {CLAMP}'] if clamp else [])
+        out += ([f'execute as {sel} run {self.over}'] if staged and self.over else []) + [self.aim(cam, look, sel)]
         if staged and self.lift and eye[2] < LOW:
-            out += [f'execute as {sel} run {self.lift}', self.aim(cam, look)]
+            out += [f'execute as {sel} run {self.lift}', self.aim(cam, look, sel)]
+        return out
+
+    def spawn(self, helper, summon, cams=(1, 2), first=None):
+        """(HF-B, HB-03) The lines that make the stands where their first shots put them: per stand a one-tick helper
+        (`summon` makes it, `helper` selects it) is placed and aimed as that shot's eye and look (clamp, over, lift as the
+        shot has them), the stand is made there with mboss/cam/spawn_at (its rotation in the summon NBT) and the helper goes.
+        The stand of tick 0's shot is then exactly where tick 0's placement puts it: its first frame on the client neither
+        glides nor spins. `first`: {cam: shot} to use instead of each stand's first shot of this track."""
+        out = []
+        for cam in cams:
+            s = (first or {}).get(cam) or next((x for x in self.shots if x.cam == cam), None)
+            if s is None:
+                continue
+            out += [summon, *self.place_aim(cam, s.eye, s.look, s.clamp, sel=helper),
+                    f'execute at {helper} rotated as {helper} run {L.cam("spawn_at", id=cam)}', f'kill {helper}']
         return out
 
     def lines(self):
         """{tick: [lines]}: the placements before each cut, the cut (the live id), the moves, the per-tick aim of a moving
-        look point. Tick 0's shot has no placement ticks: the stands are made in its tick (a new entity does not glide)."""
+        look point. Tick 0's shot has no placement ticks: its stand is made at its eye in the sequence's start (spawn())."""
         out = {}
 
         def add(t, *ls):

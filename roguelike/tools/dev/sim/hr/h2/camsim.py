@@ -20,6 +20,11 @@ What it adds to ScSim:
 - logs: s.spectates (tick, the stand's tags), s.gm_log (tick, mode), s.attr_log, s.view_rest (ticks view/tick rested).
 - s.cam_req (None | 1 | 2): a stand-in module request: while set, every module tick of the framework (mboss/d/tick,
   d/intro_tick, d/death_tick) sets #mbCam mb 1 and #mbCamId mb, as a module's locked sequence does.
+- (HF-B, HB-03) the client's picture of the camera stands: a new entity reaches the client with the pose of its summon
+  (ChunkMap.addEntity sends the spawn packet at once; `summon` ignores the execute rotation, an NBT Rotation is kept), and
+  each later change of its pose is a move the client interpolates over 3 ticks (LivingEntity: lerp steps 3; 1/3, 1/2,
+  then the rest of the way). e.data['cl'] = [pos, rot] after each world tick; client_view(s) = the pose the held
+  player's picture comes from (the live stand's client pose, or the player's own while they are not spectating).
 """
 import math
 import re
@@ -118,9 +123,36 @@ class CamSim(H.ScSim):
                 i += 1
         return super().execute(t, ctx)
 
+    # ------------------------------------------------------------------ the client's picture of the stands (HB-03)
+    def spawned(self, e):
+        """A camera stand was summoned: the spawn packet carries this pose."""
+        e.data['spawn'] = (list(e.pos), list(e.rot))
+
+    def client_tick(self):
+        """One client tick of every camera stand: a changed server pose is a new interpolation target (3 steps)."""
+        for e in self.stands():
+            d = e.data
+            srv = (tuple(e.pos), tuple(e.rot))
+            if 'cl' not in d:
+                sp = d.get('spawn') or srv
+                d['cl'], d['tgt'], d['steps'] = [list(sp[0]), list(sp[1])], (tuple(sp[0]), tuple(sp[1])), 0
+            if srv != d['tgt']:
+                d['tgt'], d['steps'] = srv, 3
+            if d['steps'] > 0:
+                k = d['steps']
+                d['cl'][0] = [a + (b - a) / k for a, b in zip(d['cl'][0], srv[0])]
+                d['cl'][1] = [a + ((b - a + 180) % 360 - 180) / k for a, b in zip(d['cl'][1], srv[1])]
+                d['steps'] = k - 1
+
     # ------------------------------------------------------------------ commands
     def cmd(self, t, ctx):
         c = t[0]
+        if c == 'summon' and 'armor_stand' in t[1] and CAM_TAG in (t[5] if len(t) > 5 else ''):
+            n0 = len(self.ents)
+            r = super().cmd(t, ctx)
+            if len(self.ents) > n0:
+                self.spawned(self.ents[-1])
+            return r
         if c == 'gamemode':
             assert t[1] in GM, t
             es = self._targets(t[2], ctx) if len(t) > 2 else ([ctx.ex] if ctx.ex else [])
@@ -344,6 +376,16 @@ def world(s):
     pl = s.player()
     if pl is not None:
         s.net_tick(pl)
+    s.client_tick()
+
+
+def client_view(s):
+    """(pos, rot) the held player's picture comes from: the client pose of the stand they spectate (None when not)."""
+    pl = s.player()
+    e = s.ent(s.st(pl)['cam']) if pl is not None and s.st(pl)['cam'] is not None else None
+    if e is None or 'cl' not in e.data:
+        return None
+    return tuple(e.data['cl'][0]), tuple(e.data['cl'][1])
 
 
 def run(s, n, each=None):

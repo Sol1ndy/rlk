@@ -192,7 +192,15 @@ def play(s, name, args=None, then=None, limit=None, each=None, until=None):
     while s.drive is not None and n < lim:
         if each:
             each(s)
+        k = len(s.rec)
         CS.world(s)
+        for r in s.rec[k:]:
+            r['view'] = CS.client_view(s)          # the client's picture after this tick (camsim's spawn / glide model)
+            r['srv'] = None
+            pl = s.player()
+            e = s.ent(s.st(pl)['cam']) if pl is not None and s.st(pl)['cam'] is not None else None
+            if e is not None:
+                r['srv'] = (tuple(e.pos), tuple(e.rot))
         n += 1
         if until and until(s):
             break

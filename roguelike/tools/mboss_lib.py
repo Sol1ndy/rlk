@@ -668,17 +668,24 @@ def bars(on):
 # every tick of a locked sequence with cam_req(live): #mbCam mb 1 (mboss/main zeroes it at its top, so a paused fight, a
 # missing player or body and every exit path drop the request by themselves) and #mbCamId mb = the live camera stand (1 =
 # rlk_mb_cam1, 2 = rlk_mb_cam2). rlk:tick reads the request right after mboss/main: 1 -> mboss/cam/hold (the player in
-# spectator mode on the live stand, `spectate` issued again every tick because sneaking leaves a spectated entity), else
+# spectator mode on the live stand, `spectate` issued again every tick because sneaking leaves a spectated entity; while
+# Shift is held the player is put at the stand's eye with its rotation instead, HF-B), else
 # mboss/cam/release for a player still carrying the hold tag. The stands are marker armour stands (a LivingEntity, so
 # camera_distance 0 holds in F5; eye height 0: ArmorStand.MARKER_DIMENSIONS = fixed(0, 0), so a stand's position is the
 # eye point), tagged rlk_room rlk_mb_aux (they go with the fight's helper entities) and rlk_pet (rlk:tick's mob setup
 # skips them). A hard cut = the other stand made live; a move = one tp per tick on the live stand. The module spawns them
-# with cam('spawn') (idempotent, at the execution position) and removes them with cam('kill').
+# with cam('spawn') (idempotent, at the execution position) or, for a stand whose first frame shows at once, with
+# cam('spawn_at', id=i) at its first eye facing its first look (HF-B: the rotation goes into the summon NBT) and removes
+# them with cam('kill').
 CAM_REQ, CAM_ID = ('#mbCam', 'mb'), ('#mbCamId', 'mb')
 CAM_TAG, CAM_TAGS, CAM_HOLD_TAG = 'rlk_mb_cam', {1: 'rlk_mb_cam1', 2: 'rlk_mb_cam2'}, 'rlk_mb_camh'
 CAM_GM_TAGS = {'survival': 'rlk_mb_cgS', 'creative': 'rlk_mb_cgC'}    # the game mode to give back (neither: adventure)
 CAM_EYE = 0.0                                                          # the stand's eye above its position (b)
-CAM_FNS = ('spawn', 'hold', 'release', 'kill')
+CAM_FNS = ('spawn', 'spawn_at', 'hold', 'release', 'kill')
+# HF-B (HB-02): a held player whose Shift is down is put each tick at the live stand's eye with its rotation (the game ends
+# the spectating after the functions, so the view the client keeps is the player's own): the held player's eye over its
+# feet = the player's 1.62 x the F5 seat's scale 0.0625 (view/ride_mount; spectator mode keeps the scale)
+CAM_SNEAK_DY = 1.62 * 0.0625
 
 
 def cam_sel(i):
@@ -695,9 +702,14 @@ def cam_req(live=None):
     return out
 
 
-def cam(call):
-    """function rlk:mboss/cam/<spawn | kill | release> (hold is rlk:tick's; release: @s = a player, idempotent)."""
+def cam(call, **macro):
+    """function rlk:mboss/cam/<spawn | spawn_at {id} | kill | release> (hold is rlk:tick's; release: @s = a player,
+    idempotent; spawn_at {id:1|2}: stand id at the execution position with the execution rotation in its summon NBT)."""
     assert call in CAM_FNS and call != 'hold', call
+    if call == 'spawn_at':
+        assert set(macro) == {'id'} and int(macro['id']) in CAM_TAGS, macro
+        return f'function rlk:mboss/cam/spawn_at {{id:{int(macro["id"])}}}'
+    assert not macro, macro
     return f'function rlk:mboss/cam/{call}'
 
 

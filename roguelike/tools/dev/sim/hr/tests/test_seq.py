@@ -79,14 +79,17 @@ def want(n):
 
 
 # ---- the design's tables (hr_design §3, written out: the test must not read them back from the code under test) -----------
+# (HF-B, HB-06) every line on a shot close on her: CS0 I10b (690), I12a (790, the silhouette I12 now 820-838), I13 from 838,
+# I14 960-980, I14b (980), I15 tracking; CS1 S4b (110), S11 close on her to 654 (S13 from 654); the ending E9b (420), E14b
+# (910), E15 from 1038; the coda E4 / E30 / E52 (the opposite stand of the ending's last shot first)
 CUTS = {
-    'intro': [(0, 1), (60, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (750, 1), (790, 2),
-              (910, 1), (970, 2), (1040, 1), (1230, 2), (1260, 1), (1290, 2), (1350, 1), (1406, 2)],
-    'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (180, 1), (220, 2), (276, 1), (340, 2), (380, 1), (500, 2), (610, 1), (648, 2)],
+    'intro': [(0, 1), (60, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (690, 1), (750, 2),
+              (790, 1), (820, 2), (838, 1), (960, 2), (980, 1), (1040, 2), (1230, 1), (1260, 2), (1290, 1), (1350, 2), (1406, 1)],
+    'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (110, 1), (180, 2), (220, 1), (276, 2), (340, 1), (380, 2), (500, 1), (610, 2), (654, 1)],
     'repel': [(0, 1), (26, 2), (52, 1), (68, 2), (78, 1), (102, 2), (128, 1), (132, 2)],
     'ending': [(0, 1), (50, 2), (94, 1), (118, 2), (150, 1), (190, 2), (204, 1), (240, 2), (276, 1), (314, 2), (338, 1), (378, 2),
-               (470, 1), (556, 2), (616, 1), (700, 2), (846, 1), (882, 2), (972, 1), (1072, 2), (1212, 1)],
-    'event': [(4, 2)],
+               (420, 1), (470, 2), (556, 1), (616, 2), (700, 1), (846, 2), (882, 1), (910, 2), (1038, 1), (1072, 2), (1212, 1)],
+    'event': [(4, 2), (30, 1), (52, 2)],
 }
 LEN = {'intro': 1440, 'cs1': 720, 'lead60': 56, 'repel': 140, 'lead5': 116, 'lead_re': 60, 'ending': 1372, 'event': 120}
 LOCK = {'intro': (0, 1440), 'cs1': (0, 720), 'repel': (0, 140), 'ending': (0, 1373), 'event': (0, 118)}
@@ -96,11 +99,11 @@ LINE_T = {'intro': {1: 258, 2: 340, 3: 462, 4: 540, 5: 690, 6: 838, 7: 906, 8: 9
 LINE_SPAN = {1: 54, 2: 60, 3: 60, 4: 84, 5: 130, 6: 64, 7: 44, 8: 44, 9: 90, 10: 70, 11: 62, 13: 52, 14: 40, 15: 36, 16: 36,
              17: 58, 18: 66, 19: 42, 20: 118, 21: 128, 22: 128, 23: 88}
 GOLD = 'gold' if api.K.ovl('gold', 0, 1, 1) else 'white'       # the stand-in while lane H2c's glyph is missing
-OVL = {'intro': [], 'cs1': [(0, 'white', 0, 2, 2), (10, GOLD, 0, 1, 2), (642, 'negative', 0, 3, 0), (645, 'pinkwhite', 0, 3, 4),
+OVL = {'intro': [(0, 'black', 0, 2, 6)], 'cs1': [(0, 'white', 0, 2, 2), (10, GOLD, 0, 1, 2), (642, 'negative', 0, 3, 0), (645, 'pinkwhite', 0, 3, 4),
                            (650, 'red_tint', 0, 4, 20)],
        'repel': [(0, GOLD, 0, 4, 3)],
        'ending': [(0, 'white', 0, 2, 1), (70, GOLD, 0, 1, 2), (190, GOLD, 0, 6, 6), (286, GOLD, 0, 3, 6)],
-       'event': [(110, 'black', 10, 12, 0)], 'lead60': [], 'lead5': [], 'lead_re': []}
+       'event': [(110, 'black', 6, 16, 0)], 'lead60': [], 'lead5': [], 'lead_re': []}
 SIGS = {'repel': [(49, 1), (101, 2), (129, 3)], 'lead5': [(60, 4)], 'lead_re': [(10, 4)], 'lead60': [], 'intro': [], 'cs1': [],
         'ending': [], 'event': []}
 # her mark on the stage axis at a tick (f, tolerance) and the distance her <-> the actor the design names
@@ -165,8 +168,15 @@ def static():
         got = [(t, c) for t, c, _nm in TR[n].cuts()]
         ck(f'S2 {n}: the cut ticks and cameras of the design ({len(cuts)} shots)', got == cuts, str([x for x in got if x not in cuts]))
         ck(f'S2 {n}: consecutive shots alternate A / B', all(a[1] != b[1] for a, b in zip(got, got[1:])))
-    ck('S2 CS0 has 20 shots, I18 (the skip target) at 1290 on camera B',
-       len(CUTS['intro']) == 20 and TR['intro'].shot_at(1290).t == 1290 and TR['intro'].shot_at(1290).cam == 2)
+    ck('S2 CS0 has 23 shots, I18 (the skip target) at 1290 on camera A',
+       len(CUTS['intro']) == 23 and TR['intro'].shot_at(1290).t == 1290 and TR['intro'].shot_at(1290).cam == 1)
+    # (HF-B, HB-03) every locked start makes its stands at their first shots (mboss/cam/spawn_at, the rotation in the NBT),
+    # never with the plain spawn at the stage marker
+    sp = {n: fn_lines(SQ / n / 'start.mcfunction') for n in ('intro', 'cs1', 'repel', 'ending')}
+    ck('S2 each locked start makes both stands with mboss/cam/spawn_at {id:1} / {id:2} (not cam/spawn)',
+       all(sum('mboss/cam/spawn_at {id:1}' in ln for ln in ls) == 1 and sum('mboss/cam/spawn_at {id:2}' in ln for ln in ls) == 1
+           and not any(ln.endswith('rlk:mboss/cam/spawn') for ln in ls) for ls in sp.values()), str({n: [ln for ln in ls if 'cam/' in ln] for n, ls in sp.items()}))
+    reveal()
     ck('S2 every stage of a dynamic sequence clamps its eyes into the walk disc; CS0 (fixed, checked in `frames`) does not',
        all(s.clamp for n in ('cs1', 'repel', 'ending', 'event') for s in TR[n].shots) and not any(s.clamp for s in TR['intro'].shots))
     # rules over the generated files
@@ -229,6 +239,59 @@ def static():
     ck('S5 the crimson look request and the rig\'s P2 accents at cs1 660', has('cs1', 660, '#hrLook hr 2') and has('cs1', 660, 'rig/look/phase/p2'))
     ck('S5 intro_end starts at 1290 (the skip target); the rock and the props go at 1052',
        has('intro', 1290, 'rig/play/intro_end') and has('intro', 1052, 'rig/look/props/none'))
+
+
+def reveal():
+    """(HF-B, HB-07) I18 under the brim, from her own points (her_tracks.json: intro_end head, brim) and the built shot: her
+    eyes behind the brim from 1290 until the brim lift (intro_end 40-56 = #sq 1330-1346), seen once it has lifted; the mouth
+    under the brim edge while she speaks; the lens >= 0.3 b from the brim."""
+    T = json.loads((DP / 'tools/dev/sim/hr/cine/her_tracks.json').read_text())
+    c, BR = T['clips']['intro_end'], T['brim_r']
+
+    def v(op, a, b):
+        return [op(x, y) for x, y in zip(a, b)]
+
+    def dot(a, b):
+        return sum(x * y for x, y in zip(a, b))
+
+    def unit(a):
+        n = math.sqrt(dot(a, a))
+        return [x / n for x in a]
+    tr = TR['intro']
+    eyes, mouth, near_b = {}, {}, []
+    for t in range(api.SKIP_T, 1350):
+        ct = t - api.SKIP_T
+        root, head, (ctr, n) = c['root'][ct], c['head'][ct], c['brim'][ct]
+        eye_pt = tr.shot_at(t).at(t)[0]
+        a = math.radians(root[3])
+        fw, rt = (math.sin(a), math.cos(a)), (math.cos(a), -math.sin(a))
+        L = [root[0] + eye_pt[1] * rt[0] + eye_pt[3] * fw[0], root[1] + eye_pt[2], root[2] + eye_pt[1] * rt[1] + eye_pt[3] * fw[1]]
+        up = unit(n)
+        F = [fw[0], 0.0, fw[1]]
+        fwd = unit(v(lambda x, y: x - y, F, [u * dot(F, up) for u in up]))
+
+        def hidden(P):
+            d = v(lambda x, y: x - y, P, L)
+            den = dot(d, up)
+            if abs(den) < 1e-9:
+                return False
+            k = dot(v(lambda x, y: x - y, ctr, L), up) / den
+            return 0 < k < 1 and math.dist([l + x * k for l, x in zip(L, d)], ctr) < BR
+        # the face of the skin (8 x 8 px, 1 px = 1/16 b): the eyes rows 4-5 (the head's centre to 0.125 b under it), the mouth
+        # rows 6-7: hidden = the lowest eye row behind the brim; seen = the eyes' middle in sight
+        eyes[t] = (hidden([h + 0.25 * f - 0.125 * u for h, f, u in zip(head, fwd, up)]),
+                   hidden([h + 0.25 * f - 0.06 * u for h, f, u in zip(head, fwd, up)]))
+        mouth[t] = hidden([h + 0.25 * f - 0.19 * u for h, f, u in zip(head, fwd, up)])
+        w = v(lambda x, y: x - y, L, ctr)
+        hh = dot(w, up)
+        near_b.append(math.hypot(hh, max(0.0, math.dist(w, [u * hh for u in up]) - BR)))
+    lift0, lift1 = api.SKIP_T + api.ev('intro_end', 'brim'), api.SKIP_T + api.ev('intro_end', 'brim') + 16
+    ck(f'F3 I18 (HB-07): her eyes behind her brim from {api.SKIP_T} until the brim lifts ({lift0})',
+       all(eyes[t][0] for t in range(api.SKIP_T, lift0)), str([t for t in range(api.SKIP_T, lift0) if not eyes[t][0]][:6]))
+    ck(f'F3 ... and seen once it has lifted ({lift1}-1349)', not any(eyes[t][1] for t in range(lift1, 1350)), str([t for t in range(lift1, 1350) if eyes[t][1]]))
+    ck('F3 ... her mouth under the brim edge while she speaks before the lift (>= 20 ticks of 1294-1329)',
+       sum(not mouth[t] for t in range(1294, lift0)) >= 20, str(sum(not mouth[t] for t in range(1294, lift0))))
+    ck('F3 ... the lens >= 0.3 b from the brim over the whole shot', min(near_b) >= 0.3, f'{min(near_b):.3f}')
 
 
 # ============================================================================================================ helpers
@@ -372,9 +435,42 @@ def run():
                 sp = CAM.slow_pans(TR[sn], lambda t: frames_of(by[min(t, max(by))]))
                 for _s, nm, t0, t1, dps, _d in sp:
                     print(f'   slow pan (in-game check: rotation is sent in 1.4-degree steps): {tag} {nm} {t0}-{t1}: {dps:.2f} deg / t')
+            if sn in LOCK:
+                # (HF-B, HB-03) the client's picture (camsim: a new stand shows its summon pose, then glides 3 ticks to each
+                # change): at the first held tick and at every cut the live stand shows where the server has it
+                held_t = [t for t in sorted(by) if by[t].get('held')]
+                at = sorted({held_t[0]} | {sh.t for sh in TR[sn].shots}) if held_t else []
+                glide = []
+                for t in at:
+                    r = by.get(t)
+                    if r is None or not r.get('view') or not r.get('srv'):
+                        continue
+                    (vp, vr), (sp, sr) = r['view'], r['srv']
+                    if math.dist(vp, sp) > 0.02 or ang(vr[0], sr[0]) > 0.6 or abs(vr[1] - sr[1]) > 0.6:
+                        glide.append((t, round(math.dist(vp, sp), 3), round(ang(vr[0], sr[0]), 1)))
+                ck(f'R9 {tag}: the first held frame and every cut show the stand where it stands (no spawn glide / spin)', not glide, str(glide[:5]))
+            if sn == 'event':
+                ev_black = [(t, i, h) for t, g, i, h, _o in ov if g == 'black']
+                rel = LOCK['event'][1]
+                ck(f'R10 {tag} (HB-05): the coda\'s black is opaque at least 2 ticks before the hand-back (E{rel}) and still held there',
+                   len(ev_black) == 1 and ev_black[0][0] + ev_black[0][1] <= rel - 2 and ev_black[0][0] + ev_black[0][1] + ev_black[0][2] >= rel + 2,
+                   str(ev_black))
             cm = [r['cmds'] for r in by.values()]
             print(f'   {tag}: {len(by)} ticks, commands per tick avg {sum(cm) / len(cm):.0f} / max {max(cm)} (the sequence\'s own files)')
             ck(f'R6 {tag}: at most 400 commands of its own in a tick', max(cm) <= 400, str(max(cm)))
+        if key in ('intro', 'cs1', 'repel60', 'repel5', 'ending'):
+            # (HF-B, HB-04 / HB-06) the framing of every held tick through the built cameras (hr/h2/framing.py: her rig's
+            # points from her_tracks.json on her body, the actor's head from lane H3's manifest)
+            import framing as FR
+            rows = FR.analyse(DP, key, recs=parts)
+            emp = FR.spans(FR.empty_ticks(rows))
+            ck(f'F1 {key} (HB-04): no tick of a shot with a figure subject shows none of its subjects', not emp, str(emp[:4]))
+            far = FR.spans(FR.far_lines(rows))
+            ck(f'F2 {key} (HB-06): every tick of every line on a shot close on her (her head in the frame\'s middle, the lens <= '
+               f'{FR.CLOSE} b from it)', not far, str(far[:4]))
+            if key == 'ending':
+                n_line = sum(1 for r in rows if r['line'] and not r['gone'])
+                ck('F2 ... the ending\'s lines 17-23 and the coda\'s 24 / 25 (while she is there) were measured', n_line >= 600, str(n_line))
         Q.go(s, 2)
         if key in ('intro', 'cs1', 'repel60', 'repel5', 'ending'):
             bad = [k for k, v in CS.clean(s).items() if not v]

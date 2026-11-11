@@ -6,7 +6,20 @@ function rlk:mboss/mv/stop
 function rlk:boss/scarlet/seq/cs1/m/mark
 execute rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @s ~180 0
 function rlk:mboss/cam/kill
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:mboss/cam/spawn
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^9 ^2.2 ^4.5
+execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/ar/clampw
+execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:boss/scarlet/seq/lib/over
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] facing ^0 ^1.2 ^4.5
+execute at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/cam/spawn_at {id:1}
+kill @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1]
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^2.6 ^1.3 ^0.8
+execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/ar/clampw
+execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:boss/scarlet/seq/lib/over
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] facing ^0 ^1.45 ^0.75
+execute at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/cam/spawn_at {id:2}
+kill @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1]
 execute as @a[tag=player,limit=1] unless entity @s[tag=rlk_body] at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:char/cine/spawn
 function rlk:char/cine/play {clip:"cs1"}
 function rlk:boss/scarlet/rig/play/cs1
