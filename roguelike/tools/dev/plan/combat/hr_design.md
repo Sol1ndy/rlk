@@ -784,5 +784,5 @@ written; where these lines differ, they are the targets the balance pass measure
   raised blade; `g_dive` = 22 t (appear 0, dive 15, hit 18).
 - §2.4 gauntlets: the station = `REAPPEAR['D1']['end']` (2.2 b at +35: the player's front right), fixed 10 t before the strike (an
   approach: at its start) as the marker `rlk_hr_gst`; A8.3 leaps to 1.3 b before the player; the dive reappears 18 t before the
-  judge 4 b over a spot 4.5 b before the player (`A8_SCRIPT` 202, `A13_SCRIPT` 224) and ends 1 b over the spot 2 b before them.
+  judge 3 b over a spot 4.5 b before the player (`A8_SCRIPT` 202, `A13_SCRIPT` 224) and ends 1 b over the spot 2 b before them.
 - §1.2 the gauge's under bar shows its five segments (dividers; `#buSubSeg bu 5`).

@@ -44,7 +44,7 @@ Clip authoring loop: `node tools/build_scarlet_rig.mjs --resourcepack <throwaway
    shown, fading through two frames, gone 6 t later. Every hand-placed qi_* call at a hit is gone from p1.py / p_ghost.py.
 4. **Off-screen / camera**: `LEAP_H` 3.4 (q2 3.6); A4 / A10 stay 3 b from the player in the air; dash-throughs stop 2.0 b before the
    locked spot (`core/near`, `p/<key>/dash`), dives land 1.4 b before it; gauntlet stations 2.2 b at +35 (front right), fixed 10 t
-   before the strike (marker `rlk_hr_gst`), A8.3 leaps to 1.3 b before the player; the dive reappears 18 t before the judge 4 b over
+   before the strike (marker `rlk_hr_gst`), A8.3 leaps to 1.3 b before the player; the dive reappears 18 t before the judge 3 b over
    a spot 4.5 b before the player and ends over the spot 2 b before them; the fail's column is a 0.3-b path card for 5 t.
 5. **The gauge**: `#buSubSeg bu 5` -> four dividers over the under bar (`tools/build_bossbar.py`, glyph U+E440 3 x 7 px).
 6. **Balance**: hit ticks / shapes / tiers / weights untouched; pat_p1 / pat_p2 / pat_ghost / test_bal_hr / test_metro / test_gauge /
