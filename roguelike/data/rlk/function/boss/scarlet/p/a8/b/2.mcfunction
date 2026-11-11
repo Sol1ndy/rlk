@@ -7,5 +7,5 @@ execute if score #pt hr matches 36 run return run function rlk:boss/scarlet/p/a8
 execute if score #pt hr matches 37 run return run function rlk:boss/scarlet/p/a8/k/37
 execute if score #pt hr matches 38 run return run function rlk:boss/scarlet/p/a8/k/38
 execute if score #pt hr matches 39 run return run function rlk:boss/scarlet/p/a8/k/39
-execute if score #pt hr matches 46 run return run function rlk:boss/scarlet/p/a8/k/46
-execute if score #pt hr matches 47 run return run function rlk:boss/scarlet/p/a8/k/47
+execute if score #pt hr matches 40 run return run function rlk:boss/scarlet/p/a8/k/40
+execute if score #pt hr matches 41 run return run function rlk:boss/scarlet/p/a8/k/41

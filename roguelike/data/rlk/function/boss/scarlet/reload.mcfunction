@@ -13,6 +13,7 @@ function rlk:boss/scarlet/core/looks
 execute if score #rp hr matches 1 run function rlk:boss/scarlet/core/replay/end
 execute if score #ph hr matches 1 if score #pat hr matches 1.. run function rlk:boss/scarlet/core/cancel_pat
 execute if score #ph hr matches 7 if score #pat hr matches 1.. run function rlk:boss/scarlet/core/cancel_pat
+execute if score @s grgT matches 1.. run function rlk:boss/scarlet/core/grog_re
 execute if score #ph hr matches 2.. run function rlk:boss/scarlet/core/re/look
 execute if score #ph hr matches 2 run return run function rlk:boss/scarlet/core/re/cs1
 execute if score #ph hr matches 3 run return run function rlk:boss/scarlet/core/re/lead

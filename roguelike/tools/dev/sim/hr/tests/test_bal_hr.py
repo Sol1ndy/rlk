@@ -3,7 +3,11 @@
 bal/tests/test_bal_boss.py): the groggy = grog_in -> down -> kipup in its last 20 t, 100 t, hittable, damage taken x 1.30;
 every bal_ok refusal leaves the break pending and it starts at the first allowed tick; no balance damage in the lead-ins /
 gauntlets (#mbBalOff) and the cutscenes; the floor rule (a pending break is dropped, bal 3); + 3 after the repel {at:60};
-a floor reached while groggy cuts it to its kip-up; the perfect-parry flinch (PP_FLINCH).
+a floor reached while groggy cuts it to its kip-up; the perfect-parry flinch (PP_FLINCH). Review H-A: HA-02 hits during the
+groggy queue no reaction (the counter, the flinch, A6): the first pattern after it starts after the full recovery, as
+without hits; HA-04 /reload during the groggy: she lies in the down loop at once, the kip-up at 20 left (from its tick);
+HA-05 every pattern's airborne ticks (the body = the rig's root above the floor) are refused by bal_ok, so no break drops
+her to the floor (a4's ring hop 28-38 too).
     python3 test_bal_hr.py <roguelike>      (from a copy of tools/dev/sim outside the datapack)
 """
 import sys
@@ -157,6 +161,130 @@ ck(f'the floor reached while groggy: the groggy is cut to its kip-up ({KIP} t)',
    (H.bal(s, 'grgT'), H.hr(s, '#fl')))
 ok = H.until_h1(s, lambda s: H.hr(s, '#ph') == api.PH['cs1'], KIP + api.GROGGY_RECOVER + 10)
 ck('... and the step (CS1) starts when it ended', ok, H.hr(s, '#ph'))
+
+# ---- HA-02 (review H-A, lead ruling): hits during the groggy queue nothing; the first pattern after it waits for the
+#      full recovery (the same tick as a run without hits); a skill hit there does not start A6
+def skill_strike(s, b, dmg):
+    pl = s.player()
+    s.call('rlk:combat/clear_atkflags', H.Ctx(pl, tuple(pl.pos), tuple(pl.rot)))
+    for k, v in (('#dmg', dmg), ('#elem', 0), ('#elU', 0), ('#icd', 0), ('#crit', 0), ('#stunHit', 0), ('#hitLanded', 0),
+                 ('#bowHit', 0), ('#lunar', 0), ('#tfm', 0), ('#trueDmg', 0), ('#skillDmg', 1)):
+        s.setsc(k, 'tmp', v)
+    s.stack.append('rlk:azsim/strike')
+    try:
+        s.call('rlk:combat/apply', H.Ctx(b, tuple(b.pos), tuple(b.rot)))
+    finally:
+        s.stack.pop()
+    s.setsc('#skillDmg', 'tmp', 0)
+
+
+def after_groggy(seed, how):
+    """the groggy (test 19) after 260 t of the phase (A6's grace over), the player 2.5 b away; how: None / 'basic' (a hit
+    every 8 t in its last 60 t) / 'skill' (one skill hit at grgT 30); returns (the first pattern's key, ticks after the
+    groggy's last tick, the queued flags at that tick)"""
+    s, pl = H.setup_h1(DP, seed=seed)
+    assert H.fight_sc(s)
+    H.facing_setup(s, 2.5)
+    H.hold(s)
+    H.run_h1(s, 260, each=H.heal)
+    H.test_id(s, 19)
+    H.hold(s, False)
+    t_end, k = None, 0
+    for _ in range(260):
+        H.heal(s)
+        g = H.bal(s, 'grgT') or 0
+        if 0 < g <= 60 and how == 'basic':
+            if k % 8 == 0:
+                A.strike(s, H.body_of(s), 5)
+            k += 1
+        if g == 30 and how == 'skill':
+            skill_strike(s, H.body_of(s), 5)
+        H.world_h1(s)
+        if t_end is None and g > 0 and (H.bal(s, 'grgT') or 0) == 0:
+            t_end = s.t
+            flags = tuple(H.hr(s, x) or 0 for x in ('#ctr', '#flq', '#a6q', '#hits'))
+        if t_end is not None and (H.hr(s, '#pat') or 0) > 0:
+            return {v: k_ for k_, v in S.TID.items()}.get(H.hr(s, '#pat')), s.t - t_end, flags
+    return None, None, None
+
+
+for seed in (6, 7, 8, 9):
+    base = after_groggy(seed, None)
+    for how in ('basic', 'skill'):
+        got = after_groggy(seed, how)
+        ck(f'HA-02 seed {seed}: {how} hits in the groggy\'s last 60 t: nothing queued at its end, the first pattern '
+           f'after the full recovery ({base[1]} t, as without hits: no counter, no A6 at its end)',
+           got[2] == (0, 0, 0, 0) and got[1] == base[1] and got[1] >= api.GROGGY_RECOVER - 1,
+           (base, got))
+
+# ---- HA-04 (review H-A): /reload during the groggy: the rig respawns in its idle pose; she lies in the down loop at
+#      once, the kip-up at 20 left as without the reload (the clip's tick follows the groggy's clock)
+def rig_after(reload_at):
+    s = fresh()
+    H.run_h1(s, 3)
+    H.test_id(s, 19)
+    log = []
+    b = H.body_of(s)
+    for _ in range(105):
+        g = H.bal(s, 'grgT') or 0
+        if g == reload_at:
+            H.call_sc(s, 'reload')
+            log.append(('reload', g, s.sc(('e', b.id), 'hrRigC'), s.sc(('e', b.id), 'hrRigT')))
+        H.heal(s)
+        H.world_h1(s)
+        g2 = H.bal(s, 'grgT') or 0
+        log.append((g2, s.sc(('e', b.id), 'hrRigC'), s.sc(('e', b.id), 'hrRigT')))
+        if g2 == 0:
+            break
+    return log
+
+
+ref = {x[0]: x[1:] for x in rig_after(-1) if len(x) == 3}
+for at in (95, 60, 12):
+    log = rig_after(at)
+    i = next(i for i, x in enumerate(log) if x[0] == 'reload')
+    after = [x for x in log[i + 1:] if len(x) == 3]
+    want_c = S.clip_id('down') if at > KIP else S.clip_id('kipup')
+    kip = [(x[0], x[1:], ref.get(x[0])) for x in after if 0 < x[0] <= min(at - 1, KIP)]
+    ck(f'HA-04: /reload at grgT {at}: the next tick shows {"down" if at > KIP else "kipup"} (not idle), and from the '
+       f'kip-up on the same clip and tick as without the reload',
+       after and after[0][1] == want_c and kip and all(x[1] == x[2] for x in kip), (after[:2], kip[:3]))
+
+# ---- HA-05 (review H-A): every pattern's airborne ticks (her body = the rig's root above the floor) are refused by bal_ok
+#      (a break there waits for the landing instead of dropping her to the floor); a4's ring hop 28-38 too
+DIST = {'a1': 3.0, 'a2': 3.0, 'a3': 3.0, 'a3s': 3.0, 'a4': 9.0, 'a9': 4.0, 'a10': 6.0, 'd4': 2.6, 'tri': 8.0, 'rings': 2.4,
+        'ult': 2.4, 'hcut': 14.0, 'blue': 5.0, 'kcut': 5.0, 'mx': 3.0, 'nb': 9.0, 'q': 10.0}
+for key in [k for k in api.P1 + api.P2 if k in DIST]:
+    s = fresh(p2=key in api.P2)
+    H.facing_setup(s, DIST[key])
+    tid = S.TID[key]
+    H.start_pattern(s, tid)
+    if key == 'ult':
+        H.until_h1(s, lambda s: (H.hr(s, '#pat') or 0) == tid, 120, each=lambda s: H.heal(s))
+    air, bad = 0, []
+    for _ in range(260):
+        if (H.hr(s, '#pat') or 0) != tid:
+            break
+        H.heal(s)
+        H.world_h1(s)
+        b = H.body_of(s)
+        if (H.hr(s, '#pat') or 0) == tid and b.pos[1] > api.CY + 0.05:
+            air += 1
+            if s.call(H.ROOT_SC + 'bal_ok', H.Ctx(b, tuple(b.pos), tuple(b.rot))):
+                bad.append((H.hr(s, '#pt'), round(b.pos[1] - api.CY, 2)))
+    ck(f'HA-05 {key}: bal_ok refuses every airborne tick ({air} t in the air)', not bad, bad[:6])
+s = fresh()
+H.facing_setup(s, 9.0)
+H.start_pattern(s, S.TID['a4'])
+H.until_h1(s, lambda s: (H.hr(s, '#pt') or 0) >= 31, 60, each=lambda s: H.heal(s))
+y0 = H.body_of(s).pos[1]
+brk(s)
+y1 = H.body_of(s).pos[1]
+ck('HA-05 a4: a break on the ring hop (pt 31) waits (pending): she stays up, then lands, then the groggy',
+   'rlk_bal_pend' in tags(s) and (H.bal(s, 'grgT') or 0) == 0 and y0 > api.CY + 0.3 and abs(y1 - y0) < 1e-6, (sorted(tags(s)), y0, y1))
+H.until_h1(s, lambda s: (H.bal(s, 'grgT') or 0) > 0, 60, each=lambda s: H.heal(s))
+ck('HA-05 a4: ... and starts once she has landed', (H.bal(s, 'grgT') or 0) > 0 and abs(H.body_of(s).pos[1] - api.CY) < 0.06,
+   (H.bal(s, 'grgT'), H.body_of(s).pos[1]))
 
 # ---- + 3 after the repel {at:60}
 s = fresh()

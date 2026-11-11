@@ -77,9 +77,15 @@ def _h(a, b, k=0):
     return ((v ^ (v >> 16)) & 0xFFFF) / 65535.0
 
 
+FIELD = {'p2': [(0.36, 0.10, 0.13), (0.42, 0.12, 0.15), (0.31, 0.08, 0.11), (0.46, 0.15, 0.17)],
+         # HA-07: the P1 moon field (hr_field `moon`: mycelium 70 %, pale moss, coarse dirt, tuff under the night light)
+         'p1': [(0.36, 0.31, 0.34), (0.40, 0.35, 0.38), (0.52, 0.53, 0.47), (0.38, 0.29, 0.22)]}
+FLOOR_LOOK = ['p2']
+
+
 def floor_colour(x, z):
-    """the crimson field (P2): dark red grass blocks, a little noise"""
-    base = np.array([(0.36, 0.10, 0.13), (0.42, 0.12, 0.15), (0.31, 0.08, 0.11), (0.46, 0.15, 0.17)])
+    """the field: P2 crimson (dark red grass blocks) or P1 moon (grey-violet mycelium, moss, dirt), a little noise"""
+    base = np.array(FIELD[FLOOR_LOOK[0]])
     col = base[np.clip((_h(np.floor(x), np.floor(z), 2) * 4).astype(int), 0, 3)]
     return np.clip(col + _h(np.floor(x * 8), np.floor(z * 8), 7)[..., None] * 0.06 - 0.03, 0, 1)
 
@@ -387,14 +393,43 @@ STRIPS = {
                 [(0, 'aim', fx('qi_beam', len=140)), (12, 'blade', fx('qi_beam', len=160))], (1, 2, 5, 13, 14, 17), None),
     'nb_band': ('qi_beam {len:160} as P-n calls it: at the lock point 0.6 b up, level, 30 deg off her aim (her 5 b up, 7 b away): '
                 'the band through the lock', 7, 5, [(0, 'band', fx('qi_beam', len=160))], (1, 2, 3, 5, 7, 9), None),
+    # HA-07 (review H-A): the parry cue at her blade from the F5 camera on both fields, at the near and the far end of a
+    # chain's reach, and beside the three unparriable flashes on her chest (each frame measures the effect's on-screen size)
+    'cue_p1': ('P1 (moon field): the parry cue glint {c:2} at blade_mid, her 6 b away', 6, 0, [(0, 'blade', fx('glint', c=2))],
+               (1, 2, 4, 6), None, 'p1'),
+    'cue_p2': ('P2 (crimson field): the parry cue glint {c:2} at blade_mid, her 6 b away', 6, 0, [(0, 'blade', fx('glint', c=2))],
+               (1, 2, 4, 6), None, 'p2'),
+    'cue_far': ('P2: the parry cue 10 b away (a gauntlet cut seen from afar)', 10, 0, [(0, 'blade', fx('glint', c=2))],
+                (1, 2, 4, 6), None, 'p2'),
+    'flashes': ('P2: the cue at her blade (0), the yellow (10), purple star4 (20) and blue (30) flashes at her chest, 6 b away',
+                6, 0, [(0, 'blade', fx('glint', c=2)), (10, 'chest', fx('yellow_tell', t=6)), (20, 'chest', fx('star4')),
+                       (30, 'chest', fx('flash_blue', t=15))], (1, 12, 21, 37), None, 'p2'),
 }
 
 
 COLS = 3
+EXTENTS = {}
+
+
+def extent(cam, s, bodies, t):
+    """the cards' and motes' on-screen size in blocks at her distance: the bounding box of the pixels they change, over the
+    pixel height of her 2.0-b stand-in"""
+    base = render(cam, [], t, [], bodies)
+    full = render(cam, sim_cards(s), t, dots(s), bodies)
+    m = np.abs(full - base).max(-1) > 0.08
+    nob = render(cam, [], t, [], [])
+    hb = np.abs(base - nob).max(-1) > 0.02
+    rows = np.where(hb.any(1))[0]
+    ys, xs = np.where(m)
+    if not len(ys) or not len(rows):
+        return 0.0, 0.0
+    per_b = (rows.max() - rows.min() + 1) / 2.06          # her box: feet to the brim top (2.06 b)
+    return (xs.max() - xs.min() + 1) / per_b, (ys.max() - ys.min() + 1) / per_b
 
 
 def run_strip(key, pw=560, ph=315):
-    title, dist, up, calls, ticks, ovl = STRIPS[key]
+    title, dist, up, calls, ticks, ovl = STRIPS[key][:6]
+    FLOOR_LOOK[0] = STRIPS[key][6] if len(STRIPS[key]) > 6 else 'p2'
     s = fresh(dist)
     s.run(f'function {G.FN}e/init')
     her = BOSS + np.array((0, up, 0))
@@ -427,7 +462,12 @@ def run_strip(key, pw=560, ph=315):
             if ovl and web_until is not None and k < web_until:
                 im = overlay(im, ovl, 1.0 if web_until - k > 3 else (web_until - k) / 4)
             fr = Image.fromarray((np.clip(im, 0, 1) * 255).astype(np.uint8))
-            ImageDraw.Draw(fr).text((4, 3), f't+{k}  ({len([c for c in sim_cards(s) if not c.dead])} cards)', fill=(255, 255, 120), font=font(11))
+            ex = ''
+            if key.startswith(('cue', 'flashes')):
+                ew, eh = extent(cam, s, [bodies[0], bodies[1]], s.gt)
+                ex = f'  effect {ew:.2f} x {eh:.2f} b on screen'
+                EXTENTS.setdefault(key, []).append((k, round(ew, 2), round(eh, 2)))
+            ImageDraw.Draw(fr).text((4, 3), f't+{k}  ({len([c for c in sim_cards(s) if not c.dead])} cards){ex}', fill=(255, 255, 120), font=font(11))
             frames.append(fr)
         s.tick(1)
     cols = min(COLS, len(frames))
@@ -454,6 +494,8 @@ def main():
     name = OUT / ('hr_fx_' + ('all' if len(keys) == len(STRIPS) else '_'.join(keys)) + '.jpg')
     out.save(name, quality=88)
     print(name, out.size)
+    for k, v in EXTENTS.items():
+        print(f'extent {k}: ' + ', '.join(f't+{t} {w} x {h} b' for t, w, h in v))
 
 
 if __name__ == '__main__':

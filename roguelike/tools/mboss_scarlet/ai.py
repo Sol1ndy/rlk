@@ -10,8 +10,9 @@ module clock #clk (#cd_<key> = #clk + cooldown at the start; A6 #a6cd); the cloc
 reload keeps the scores. Only patterns present in p1.PATTERNS + p_ghost.PATTERNS are ever picked (S4's may be missing).
 The decision order: the test hold (99), the reserved phase step (#fl: CS1 in P1, lead5 in P2), the test lock (#mbLock
 mb), a forced next entry (#ai_nx: A3s after the far fallback's approach), the full gauge (hr_design §1.2: #gau = 50 and the
-player in the near / mid band -> rings with ult to follow, core/ult_go; from far she closes first), the rear rule, the far
-rule (also right after A6), the weighted pick of the band (api.WEIGHTS, cooldowns, no immediate repeat, MID_MAX / MID_MIN).
+player in the near band -> rings with ult to follow, core/ult_go; HA-09: from the mid band she glides in first (ai/ult_close,
+GAUGE_CLOSE) and the rings start in the near band; from far she closes first by the far rule), the rear rule, the far rule
+(also right after A6), the weighted pick of the band (api.WEIGHTS, cooldowns, no immediate repeat, MID_MAX / MID_MIN).
 """
 from . import api
 from . import s3lib as S
@@ -37,6 +38,12 @@ MV_BACK = 6                                               # #ai_mv of the backst
 FB = api.FAR_RULE['fallback'][1]                          # the far fallback's entry after the glide in (a3s)
 GAU = api.GAUGE_FP
 TAIL_OLD = 100                                            # ai/phase: the kept tail's move clock this far in the past
+# HA-09 (review H-A, lead ruling): a full gauge forces rings only in the near band (its rings are discs of 2.6 b round her and
+# she steps 0.3 b/t toward the player until h - 7: from 4.5 b they reach, from 8-11 b none did). From the mid band she first
+# glides in (the far fallback's glide, A3_GLIDE speed) until 'stop' b, at most 't' ticks (a player who keeps away still
+# gets the rings then: the close is not a chase), then the decision starts the rings.
+GAUGE_CLOSE = {'stop': 4.0, 't': 40}
+MV_UC = 7                                                 # #ai_mv of the gauge close (glide clip)
 
 
 def cooldown(key, fp):
@@ -120,7 +127,7 @@ def build(W, ctx):
                    f'# grace {A6["phase_grace"]} t), every cooldown ready now, the dwell counters cleared; F1 (HR-04): a counter /',
                    '# skill trigger left from the floor time of the last phase is dropped (core/fp ignores them while a step is reserved).',
                    sset('#ai_pht', 0), sset('#far', 0), sset('#rear', 0), sset('#ai_ff', 0), sset('#ai_nx', 0),
-                   sset('#ctr', 0), sset('#a6q', 0), sset('#ai_nn', 0), sset('#ai_bs', 0),
+                   sset('#ctr', 0), sset('#a6q', 0), sset('#ai_nn', 0), sset('#ai_bs', 0), sset('#ai_uc', 0),
                    f'scoreboard players operation #a6cd {OBJ} = #clk {OBJ}', f'scoreboard players operation #ai_rcd {OBJ} = #clk {OBJ}',
                    f'scoreboard players remove #ai_rcd {OBJ} {api.REAR_RULE["cd_ignore_every"]}',
                    f'scoreboard players operation #ai_tmc {OBJ} = #clk {OBJ}', f'scoreboard players remove #ai_tmc {OBJ} {TAIL_OLD}']
@@ -130,7 +137,7 @@ def build(W, ctx):
     lo2, hi2 = api.RECOVER[2]
     rs = [f'# Recovery start (@s = body, after a pattern / a transition): idle P1 {lo1}-{hi1} t, P2 {lo2}-{hi2} t (api.RECOVER) facing',
           '# the player - the punish window: farther than 6 b she walks in (P1 0.12 b/t) / glides in (P2 0.18 b/t), else strafes.',
-          sset('#ai_fl', 0), sset('#ai_nn', 0), sset('#ai_bs', 0)]
+          sset('#ai_fl', 0), sset('#ai_nn', 0), sset('#ai_bs', 0), sset('#ai_uc', 0)]
     for fp, ph in FPS.items():
         lo, hi = api.RECOVER[fp]
         rs.append(f'execute if score #ph {OBJ} matches {ph} store result score #rec {OBJ} run random value {lo}..{hi}')
@@ -176,6 +183,7 @@ def build(W, ctx):
                        f'execute if score #ai_mv {OBJ} matches 1 run return run {api.play("walk")}',
                        f'execute if score #ai_mv {OBJ} matches 5 run return run {api.play("glide")}',
                        f'execute if score #ai_mv {OBJ} matches 4 run return run {api.play("glide")}',
+                       f'execute if score #ai_mv {OBJ} matches {MV_UC} run return run {api.play("glide")}',
                        f'execute if score #ai_mv {OBJ} matches 2 run return run {api.play("strafe_l")}',
                        f'execute if score #ai_mv {OBJ} matches 3 run return run {api.play("strafe_r")}',
                        f'execute if score #ai_mv {OBJ} matches {MV_BACK} run return run {api.play("backstep")}',
@@ -201,6 +209,8 @@ def build(W, ctx):
         f'execute if score #ai_mv {OBJ} matches 5 at @s unless entity {S.PLAYER[:-1]},distance=..3] run function rlk:mboss/mv/toward {{d:{api.L.num(api.GLIDE_SPEED, 3)}}}',
         f'execute if score #ai_mv {OBJ} matches 4 at @s unless entity {S.PLAYER[:-1]},distance=..{api.L.num(api.A3_GLIDE[0], 1)}] run function rlk:mboss/mv/toward {{d:{api.L.num(api.A3_GLIDE[1], 3)}}}',
         f'execute if score #ai_mv {OBJ} matches 4 at @s if entity {S.PLAYER[:-1]},distance=..{api.L.num(api.A3_GLIDE[0], 1)}] run {sset("#rec", 0)}',
+        f'execute if score #ai_mv {OBJ} matches {MV_UC} at @s unless entity {S.PLAYER[:-1]},distance=..{api.L.num(GAUGE_CLOSE["stop"], 1)}] run function rlk:mboss/mv/toward {{d:{api.L.num(api.A3_GLIDE[1], 3)}}}',
+        f'execute if score #ai_mv {OBJ} matches {MV_UC} at @s if entity {S.PLAYER[:-1]},distance=..{api.L.num(GAUGE_CLOSE["stop"], 1)}] run {sset("#rec", 0)}',
         f'execute if score #ai_mv {OBJ} matches 2 at @s rotated as @s rotated ~-90 0 positioned ^ ^ ^{sp} if function rlk:mboss/mv/ok run tp @s ~ ~ ~',
         f'execute if score #ai_mv {OBJ} matches 3 at @s rotated as @s rotated ~90 0 positioned ^ ^ ^{sp} if function rlk:mboss/mv/ok run tp @s ~ ~ ~',
         f'execute if score #ai_mv {OBJ} matches {MV_BACK} if score #rec {OBJ} matches {BS_T - bk["move_t"]}.. at @s if entity '
@@ -220,9 +230,14 @@ def build(W, ctx):
             dec.append(f'execute if score #mbLock mb matches {S.TID[k]} run return run {fn(go)}')
     dec.append(f'execute if score #ai_nx {OBJ} matches {S.TID[FB]} run return run {fn("ai/next_fb")}')
     if 'rings' in present and 'ult' in present:
-        # hr_design §1.2 / §2.2: a full gauge overrides the weights in the near / mid band (rings' cooldown ignored)
-        dec.append(f'execute if score {GAU} {OBJ} matches {api.GAUGE["max"]}.. if score #ai_d2 {OBJ} matches ..{MID2} run return run '
+        # hr_design §1.2 / §2.2: a full gauge overrides the weights (rings' cooldown ignored): in the near band the rings now;
+        # HA-09: in the mid band she glides in first (once: a close that ran out of time starts the rings where she is)
+        dec.append(f'execute if score {GAU} {OBJ} matches {api.GAUGE["max"]}.. if score #ai_d2 {OBJ} matches ..{NEAR2} run return run '
                    f'{fn("core/ult_go")}')
+        dec.append(f'execute if score {GAU} {OBJ} matches {api.GAUGE["max"]}.. if score #ai_d2 {OBJ} matches ..{MID2} '
+                   f'if score #ai_uc {OBJ} matches 1 run return run {fn("core/ult_go")}')
+        dec.append(f'execute if score {GAU} {OBJ} matches {api.GAUGE["max"]}.. if score #ai_d2 {OBJ} matches ..{MID2} run return run '
+                   f'{fn("ai/ult_close")}')
     dec += [fn('ai/rear_count'),
             f'execute if score #ai_rc {OBJ} matches {REAR_N}.. if function {api.NS}ai/rear run return 1',
             f'execute if score #ai_ff {OBJ} matches 1 if function {api.NS}ai/after_a6 run return 1',
@@ -235,6 +250,10 @@ def build(W, ctx):
             dec.append(f'execute {cond} run return run {fn(f"ai/pick/p{fp}_{band}")}')
     dec.append(fn('ai/none'))
     w('ai/decide', dec)
+    if 'rings' in present and 'ult' in present:
+        w('ai/ult_close', [f'# HA-09: the gauge is full and the player in the mid band (@s = body): she glides in (A3_GLIDE speed) until',
+                           f'# {api.L.num(GAUGE_CLOSE["stop"])} b from them, at most {GAUGE_CLOSE["t"]} t; the next decision starts the rings (core/ult_go).',
+                           sset('#ai_uc', 1), sset('#ai_mv', MV_UC), sset('#rec', GAUGE_CLOSE['t']), api.play('glide')])
     w('ai/next_fb', [f'# The far fallback\'s approach ended: {FB.upper()} (its cooldown and the no-repeat rule kept; else the normal pick).',
                      sset('#ai_nx', 0), sset(f'#ai_w{FB}', 1)] + allowed(FB, f'#ai_w{FB}', 1)
       + [f'execute if score #ai_w{FB} {OBJ} matches 1 run return run {fn(f"core/start/{FB}")}', fn('ai/decide')])

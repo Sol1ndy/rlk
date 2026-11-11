@@ -130,6 +130,10 @@ def check_key(dp, api, S, key, ph=1, dist=3.0, label=None, end=None, new=False):
     ck(f'{lab}: shapes and sizes = api.HITS', ok_shape, bad)
     ck(f'{lab}: damage tiers = api.HITS', ok_dmg, [(h['h'], h['dmg']) for h in hz])
     ck(f'{lab}: knockback only where the table has it (the last hit of a chain)', ok_kb, [(h['h'], h['kb']) for h in hz])
+    # review H-A, HA-08 (README 0-6, 타키's lesson): whatever the table says, no hit before the chain's last one pushes
+    last = max((h['h'] for h in hz), default=0)
+    early = [(h['h'], h['kb']) for h in hz if h['kb'] and h['h'] < last]
+    ck(f'{lab}: knockback only on the last hit of the chain (README 0-6)', not early, early)
     ck(f'{lab}: #hzNoParry of every hazard = the P / N column', ok_np, [(h['h'], h['np']) for h in hz])
     ck(f'{lab}: every hazard quiet, no framework visual / sound, Electro (no decal, no tele)', ok_q)
     # the parry cue

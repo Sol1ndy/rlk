@@ -10,6 +10,7 @@ scoreboard players set #ctr hr 0
 scoreboard players set #a6q hr 0
 scoreboard players set #ai_nn hr 0
 scoreboard players set #ai_bs hr 0
+scoreboard players set #ai_uc hr 0
 scoreboard players operation #a6cd hr = #clk hr
 scoreboard players operation #ai_rcd hr = #clk hr
 scoreboard players remove #ai_rcd hr 200

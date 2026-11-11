@@ -167,9 +167,12 @@ def p1_each(s):
 t0 = s.t
 H.facing_setup(s, 3.0)
 run_until(s, lambda s: False, 1500, each=p1_each)
-ck('P1 1500 t: patterns ran, cues came, the perfect parrier took no damage from parried hits', s.cues_seen > cue0
-   and all(j['parT'] == 3 or j['np'] or j['dodged'] for j in s.judged if j['t'] > t0 and j['pt'] and j['ph'] == PH['p1'] and j['parT']),
-   (s.cues_seen - cue0, [j for j in s.judged if j['t'] > t0][:3]))
+# review H-A, HA-10: every parryable hit is looked at, also one that landed in full (a refused F: parT 0, not np, not dodged)
+p1_hits = [j for j in s.judged if j['t'] > t0 and j['pt'] and j['ph'] == PH['p1']]
+unparried = [j for j in p1_hits if not (j['parT'] == 3 or j['np'] or j['dodged'])]
+ck(f'P1 1500 t: patterns ran, cues came, the perfect parrier perfect-parried every parryable hit ({len(p1_hits)} judged, '
+   f'{len(unparried)} parryable not perfect)', s.cues_seen > cue0 and p1_hits and not unparried,
+   (s.cues_seen - cue0, unparried[:3]))
 ck(f'P1: the balance broke her at least once (groggy ticks seen: {len(grog)}), the gauge filled to {gau_max[0]}', grog and gau_max[0] > 0,
    (grog[:3], gau_max[0]))
 mark(s, 'P1 played 1500 t')

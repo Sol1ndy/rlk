@@ -77,7 +77,7 @@ her ghost form. Not invulnerable any more: the kip-up (it is the groggy's end, s
 |---|---|
 | shown | from control (CS0 end) to the ending, except CS1 (bars off); the video shows the bar all fight |
 | P1 / P2 charge | +3 when a pattern ends (not A6, not U); +5 per hit of hers that lands (a tier-1 / tier-2 parry is a landed hit; PP and PD are not); cap 50; no charge while groggy, in a lead-in, gauntlet or cutscene. *start* values: full after ≈ 60 s of clean play, ≈ 30 s when hit every 6 s (video: 24.5 s and 31 s) |
-| spent | U (§2.2) is armed at 50: the next near / mid decision is `rings` → `ult` (from far she closes first, far rule); `#gau` → 0 at U's second cut. A PP never lowers it outside a gauntlet (v 127-154: full through 5 PPs) |
+| spent | U (§2.2) is armed at 50: the next near decision is `rings` → `ult` (from mid she glides in first, §8.8 HA-09; from far she closes first, far rule; a floor reached during the rings ends the chain, no `ult`, §8.8 HA-01); `#gau` → 0 at U's second cut. A PP never lowers it outside a gauntlet (v 127-154: full through 5 PPs) |
 | gauntlet start | `lead60` tick 0 (the bars return full, v 203.0) and the lead-ins' `refill` beat: `#gau` = 50 in one step, kit `shield_refill` |
 | gauntlet cut | −10 per cut whose hit on the player is judged tier 3 (`#parT tmp 3`), one per cut, kit `pip_break` + its sound. PD, tier 2, tier 1, walking out: nothing. Never below 0. The cut still deals no damage on PP |
 | judge | at the final dive (`JUDGE_T` G1 220 / G2 242): `#gau` 0 → deflect → repel; else the fail of §2.4 |
@@ -93,7 +93,7 @@ lane C's `PIP_Q` and `PIP_R` go (no distance pad: a parry does not move the body
 |---|---|
 | takes balance | only in `p1` / `p2` with `#mbSt 1`. New framework flag **`#mbBalOff mb`** (FN-bal, H1: one line in `bal/boss/may`, zeroed by `fight_vars` / `cleanup_fight`): the module holds it at 1 through the lead-ins and the gauntlets (bars are on there, so `#mbBarOff` cannot do it). CS0 / CS1 / the ending are covered by `#mbSt` / `#mbBarOff`, the repel by `#mbCine` |
 | sources | lane B's: PP 1 (lane C calls `bal/hit`), burst 2, strong reactions 1-2. Regen as lane B (the video has none; the user's rule) |
-| `bal_ok` (may the groggy start now) | no: a floor step reserved (`#fl`), `#sqn` ≥ 1, replay, revive wait, ghost form, `rlk_mb_inv`, airborne ticks of `a4` (2-20), `a10` (2-22), `nb` (2-46), `q` (16 → its end), `hcut` / `a9` / `kcut` / `blue` from `go` to the cut, `ult` from `cut1` to `cut2`, A6 0-4. Otherwise yes; a refused break is lane B's pending state and starts at the first allowed tick |
+| `bal_ok` (may the groggy start now) | no: a floor step reserved (`#fl`), `#sqn` ≥ 1, replay, revive wait, ghost form, `rlk_mb_inv`, airborne ticks of `a4` (2-20 and its ring hop 28-38, §8.8 HA-05), `a10` (2-22), `nb` (2-46), `q` (16 → its end), `hcut` / `a9` / `kcut` / `blue` from `go` to the cut, `ult` from `cut1` to `cut2`, A6 0-4. Otherwise yes; a refused break is lane B's pending state and starts at the first allowed tick |
 | at a floor step | when CS1 or `lead5` starts with a break pending or `bal` 0: pending dropped, `bal` = 3 (she is not broken inside a cutscene and does not come out of it full) |
 | after repel `{at:60}` | `bal` = min(12, `bal` + 3), `bal/ui/draw` (the video's single refill, +4 of 20); nothing at CS1, at the 5 % floor or after a G1 fail |
 
@@ -127,7 +127,8 @@ No line, no text. A floor reached during the groggy: `grgT` is cut to 20 (kip-up
 - Telegraph, counted from the first visible motion: first hit ≥ 12 t (every new clip ≥ 14 t); ≥ 20 t for big hits (the
   whole arena, an area ≥ 100 b², T4, the yellow dash cuts); chain hits ≥ 10 t apart; aims lock at h − 7 (`LOCK_LEAD`). Only wind-ups are stretched; the video's gap ratios inside chains are kept (table column *video*).
 - **Parry cue (code P)**: at h − 7 of every parryable hit: kit `glint {c:2}` at `blade_mid` + sound `parry_cue`
-  (`block.amethyst_block.chime` 0.6 pitch 1.9). Every parryable hazard is made with `hz_opts(noparry=0)` (the default
+  (`block.amethyst_block.chime` 0.6 pitch 1.9; **§8.8 HA-06 / HA-07: `block.note_block.iron_xylophone` 0.7 pitch 1.8 and its
+  own white-gold sprite `cue_0`**). Every parryable hazard is made with `hz_opts(noparry=0)` (the default
   rule `np_def` would flag the long lines and big discs). Outcome: PP = no damage, balance −1, `PP_FLINCH` on a last hit;
   tier 2 / 1 = damage × 0.2 / × 0.5, no knockback, gauge +5; PD = no damage; hit = full damage, gauge +5.
 - **Unparriable (code N)**: `hz_opts(noparry=1)`; F changes nothing; PD avoids; gauge +5 on a hit. `#mbNpOwn mb 1` for the
@@ -151,7 +152,7 @@ No line, no text. A floor reached during the groggy: `grgT` is cut to 20 (kip-up
 | `d4` 원월 사연 | P-d → new | **`d4`** (80) | chest glint 0 → cue 7 → ring **14** → cue 27 → fan **34** → cue 37 → vertical **44** → cue 47 → slash **54** → 64; video gaps 20 / 8 / 8 → 20 / 10 / 10 | `disc(3.0)`, `sector(4.2, 35)`, `line(5.0, 1.8)`, `sector(3.6, 60)` | T1 ×3, T2 · 3 | P ×4 | 25 / 0 / 0 · 140; 20 / 0 / 0 · 120 |
 | `tri` 돌진 삼월참 | P-i → new | **`tri`** (84) | glint 0 → cue + lock 7 → lunge 12-14 (≤ 6 b), **14** → cue 31 → **38** → cue 41 → **48** → cue 53 → **60** → 70; video 24 / 10 / 12 | `line(6.0, 1.6)` along the lunge, then `sector(5.0, 80)` ×3 | T1 ×3, T2 · 3 | P ×4 | 0 / 30 (≤ 10 b; beyond 6 b she glides in 0.3 b/t during 0-12) / 0 · 140; 0 / 20 / 0 · 120 |
 | `a4` 월하 낙참 + 공중 원륜 | old A4 + A5 (kept) | `a4` (60) reuse | crouch 0, leap 2 → lock 12, cue 13 → **20** → cue + lock 27 → **34** → 46 | `disc(2.6)` at the landing, `disc(3.0)` | T3 · 0, T1 · 2 | P ×2 | 0 / 20 / 25 · 160; 0 / 15 / 15 · 140 |
-| `rings` 회전 월륜 | P-j → new | **`rings`** (78) | glint 0 → cue 7 → **14 / 24 / 34 / 44** (P2 also **54**) → last + 10; cue at each h − 7; video 8-12 t → 10 | `disc(2.6)` round her each (she steps 0.3 b toward the player until h − 7) | T1 each, last T2 · 3 | P ×4 (5) | 20 / 0 / 0 · 160; 20 / 0 / 0 · 140. **Forced** next near / mid pick while `#gau` = 50, then `ult` follows |
+| `rings` 회전 월륜 | P-j → new | **`rings`** (78) | glint 0 → cue 7 → **14 / 24 / 34 / 44** (P2 also **54**) → last + 10; cue at each h − 7; video 8-12 t → 10 | `disc(2.6)` round her each (she steps 0.3 b toward the player until h − 7) | T1 each, last T2 · 3 | P ×4 (5) | 20 / 0 / 0 · 160; 20 / 0 / 0 · 140. **Forced** next near pick while `#gau` = 50 (from mid she glides in first, §8.8 HA-09), then `ult` follows |
 | `ult` 공간 참 (U) | U → new | **`ult`** (86) | starts 6 t after the last ring: **yellow 0** → **purple 12** → cut1 **24** (white) → web 26-44 → **purple 34** → cut2 **46** (white, burst) → 58; video 0 / 8 / 15 / … / 33 | `full` ×2 | T2 · 0, T3 · 3 | N ×2 (yellow + purple); PD only | never by weight; only after `rings` at a full gauge; `#gau` → 0 at 46 |
 | `a9` 황광 원참 | P-c = A9 (kept) | `a9` (64) reuse | ring 4 (cosmetic) → **yellow 8** → **purple 16** (= clip event `star` − 1; PLAN drew it as decoration, it is the warning) → lock 22 → magenta 24 → go 26 → **28** → 40 | `dash_line(2.4)` + `pdisc(4.0)`, one group | T3 · 3 | N | 25 / 10 (≤ 7 b) / 0 · 160; 15 / 10 / 0 · 140 |
 | `a10` 황광 낙참 | P-g = A10 (kept) | `a10` (56) reuse | spring 2 → **yellow 10** (in the air) → lock 14 → dive 20 → **22** → 32 | `disc(3.5)` at the lock | T3 · 3 | N | 20 / 20 / 25 · 120; 0 / 15 / 20 · 100 |
@@ -161,7 +162,7 @@ No line, no text. A floor reached during the groggy: `grgT` is cut to 20 (kip-up
 | `a6` 후방 섬보 | old A6 + line 12 (kept) | `a6` (20) reuse | as now; line 12 at 12; not locked | — | — | — | skill trigger only · 400 / 400 |
 | `mx` 자광 십자참 | P-m (+ P-y as its retreat) → replaces R3 | **`mx`** (60) | (player < 6 b: 12-t leap back to ≈ 9 b first, no flash: P-y) iai crouch 0 → **purple 4** → lock 9 → streak to 1.6 b from the lock 14-16 → X **16** → cue 21 → dome **28** → 40; video 5-7 t and 4-6 t → 12 / 12 | X: `pdisc(2.8)`; dome: `disc(3.2)` | T3 · 0, T2 · 3 | X: N (purple); dome: P | P2 only: 20 / 25 / 20 · 150. At ≤ 30 % HP it may repeat once at once (`NO_REPEAT` exempt), the video's second X |
 | `nb` 낙월 사선 | P-n → new | **`nb`** (66) | crouch 0, leap 2 (5 b up, ≤ 6 b toward the player) → apex 8 → cue + lock 13 → band **20** → 23 → **30** → 33 → **40** → land 46 → 52; video 6-12 t / 8 t → 10 / 10 | `line(16, 3.0)` through the lock, yawed −30° / +30° / 0° to her aim (the diagonal bands) | T2, T2, T3 · 3 | P ×3 | P2 only: 0 / 20 / 25 · 180. In the air 2-46 (44 t, under 2.2 s) |
-| `q` 자영 포박 · 천공 낙월 | P-q → replaces R1 | **`q_grab`** (40) then **`q_air`** (96) | far lilac glint 0 → ghost form 4 → cue + lock 13 → ghost lunge 16-20 (≤ 14 b) → grab **20**. **Missed / PD**: reform, end 34. **PP**: flinch, end 40. **Landed** (also tier 1-2): `q_air` at 20: she throws the player back (kb 5) and rises (2-10) → cue + lock 15 → diagonal beam **22** → cue + lock 31 → dive 34 → **38**, lands 40 → leaps 46, apex 52 → **purple 62** → lock 67 + the sky mark → pillar **74** → drops 78, lands 84 → end 90 (pattern tick 110) | grab `pdisc(2.2)`; beam `line(14, 2.6)`; dive `pdisc(2.6)`; pillar `pdisc(2.4)` | T2 · 5 (the throw), T2 · 0, T3 · 0, T3 · 3 | grab P, beam P, dive P (the video's gold deflect), pillar N (purple) | P2 only: 0 / 20 / 30 · 300. The player is not carried into the sky (no lock in the fight; open question 7) |
+| `q` 자영 포박 · 천공 낙월 | P-q → replaces R1 | **`q_grab`** (40) then **`q_air`** (96) | far lilac glint 0 → ghost form 4 → cue + lock 13 → ghost lunge 16-20 (≤ 14 b) → grab **20**. **Missed / PD**: reform, end 34. **PP**: flinch, end 40. **Landed** (also tier 1-2): `q_air` at 20: she throws the player back (kb 5; **§8.8 HA-08: kb 0, the throw is her pose**) and rises (2-10) → cue + lock 15 → diagonal beam **22** → cue + lock 31 → dive 34 → **38**, lands 40 → leaps 46, apex 52 → **purple 62** → lock 67 + the sky mark → pillar **74** → drops 78, lands 84 → end 90 (pattern tick 110) | grab `pdisc(2.2)`; beam `line(14, 2.6)`; dive `pdisc(2.6)`; pillar `pdisc(2.4)` | T2 · 0 (the throw: HA-08), T2 · 0, T3 · 0, T3 · 3 | grab P, beam P, dive P (the video's gold deflect), pillar N (purple) | P2 only: 0 / 20 / 30 · 300. The player is not carried into the sky (no lock in the fight; open question 7) |
 
 Notes per pattern
 - **`ult`**: clip events `yellow 0, star1 12, cut1 24, web 26, star2 34, cut2 46, settle 56`. cut1: ovl `white` in 0
@@ -182,7 +183,8 @@ Notes per pattern
   **`nb`**: `qi_beam {len:160}` per band; `afterimage` at 2 / 5 / 8.
 - Far rule (player > 8 b for 30 t): P1 `hcut` 45 / `a4` 30 / `a10` 25; P2 `nb` 40 / `q` 30 / `hcut` 30; fallback: glide in
   + `a3s`. Rear rule and the no-empty-band backstep as now. No immediate repeat.
-- A full gauge overrides the weights: the next near / mid decision is `rings` (its cooldown ignored), then `ult`.
+- A full gauge overrides the weights: the next near decision is `rings` (its cooldown ignored), then `ult` (§8.8 HA-09: from
+  the mid band she glides in first).
 
 ### 2.3 Fight clips: reused and new (owner of the new ones: **H1**, in `scarlet_clips.mjs`; a static placeholder `P(name, pose)` of the contract length goes in first so the rig builds on day 1)
 Reused unchanged: `idle idle2 walk glide strafe_l strafe_r backstep flinch a1 a2 a3 a4 a6 a9 a10`, the gauntlet set
@@ -712,3 +714,22 @@ written; where these lines differ, they are the targets the balance pass measure
 6. **The sky mark** stays a line (the light line and the 2-b line at the feet): never an area on the floor.
 7. Commit trailer for every lane from now on:
    `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
+
+## 8.8 Review H-A fixes (lane HFA, 11-11; `review/rulings_HA.md` on `origin/wip/combat`) — binding where they differ from the above
+- **HA-01**: `core/pat_end` starts `ult` after the forced `rings` only `unless #fl` (as `mx`'s repeat): a floor reached during the
+  rings ends the chain there; the recovery, then the decision starts CS1 / `lead5`.
+- **HA-02**: `on_hit` feeds no reaction while `grgT` runs; `core/trig0` clears `#ctr #flq #a6q #hits` at `bal_on` and `bal_off`:
+  after the groggy the 12-t recovery always runs first.
+- **HA-04**: the reload hook calls `core/grog_re` during a groggy: `down` at once (> 20 left), else `kipup` from the tick the
+  groggy has reached.
+- **HA-05**: `bal_ok` refuses `a4` 28-38 too (the ring hop); `test_bal_hr` reads her body height in every pattern.
+- **HA-03**: the gauntlet strikes are re-timed (§2.4 rows moved by a few ticks, see `api.A8_SCRIPT` / `A13_SCRIPT` and
+  `hfa_progress.md`) so that no blind metronome clears them; `tests/test_metro.py` drives the real F functions. G1 strikes
+  30 48 64 91 109 139 163 180 196 (≤ 3 perfect parries for every period 8-30 and start, as ruled); G2 strikes 27 41 58 91 113 128
+  152 169 190 206 220 (deviation: an exhaustive search proved that with 11 cuts, gaps ≥ 14 and the moves' own spacing no set
+  stays at ≤ 3 for every period; this one reaches 4 only at 16 t / 19 t for a few starts, and 5 at no period 2-40). Bolts G1
+  34 99 166 218, G2 70 160 198 240; G2's extra vanish 97.
+- **HA-06 / HA-07**: the cue's sound and sprite (above, §2.1).
+- **HA-08**: `q`'s grab kb 0.
+- **HA-09**: a full gauge forces `rings` in the near band only; from the mid band `ai/ult_close` glides her in (0.3 b/t to 4 b,
+  at most 40 t), then the decision starts the rings.

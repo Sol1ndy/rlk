@@ -781,8 +781,8 @@ def build_nb(W):
 # ------------------------------------------------------------------------------------------------- Q 자영 포박 · 천공 낙월
 def build_q(W):
     """The ghost grab and the sky moon (video P-q; hr_design §8.2: the grab is unparriable). q_grab: a far lilac glint 0, the
-    ghost form 4-20, the purple star 8, the lock 13, the ghost lunge 16-20 (<= 14 b), the grab 20 (a disc at the lock; it
-    throws the player back). The grab strikes after the module tick, so the branch is taken at api.Q_AIR_T0 (21): missed /
+    ghost form 4-20, the purple star 8, the lock 13, the ghost lunge 16-20 (<= 14 b), the grab 20 (a disc at the lock; no
+    knockback: HA-08, the throw is her pose and only the pillar, the chain's last hit, pushes). The grab strikes after the module tick, so the branch is taken at api.Q_AIR_T0 (21): missed /
     perfect-dodged / left the disc -> she reforms, the end at api.Q_MISS_END; landed -> q_air from 21: she rises, the
     diagonal beam (cue, parryable), the dive (cue, parryable), a second leap, the purple star, the sky mark on the locked
     spot (a line from the sky and a short line at the feet: never an area) and the pillar (unparriable). The player stays on

@@ -133,6 +133,8 @@ SPRITES = {
     'qi_dome': [('qi_dome', (128, 64), ARC_BOX, P.paint_dome, 2)],
     'qi_wedge': [('qi_wedge', (64, 128), (-0.25, 0.25, 0, 1), P.paint_wedge, 2)],
     'glint': [('glint_0', (32, 32), UNIT, P.paint_glint, 3), ('glint_1', (32, 32), UNIT, P.paint_star4, 3)],
+    # HA-07 (review H-A): the parry cue's own sparkle (api.KIT_SPRITES_HR 'cue'; 4 096 px), white-gold, rays to the edge
+    'cue': [('cue_0', (64, 64), UNIT, P.paint_cue, 3)],
     'shards': [(f'shards_{k}', (32, 32), UNIT, P.make_shard(k), 3) for k in range(2)],
     'lotus': [('lotus_0', (32, 32), UNIT, P.paint_lotus_bud, 3), ('lotus_1', (32, 32), UNIT, P.paint_lotus_bloom, 3)],
     'yellow_tell': [('yellow_tell_0', (64, 64), UNIT, P.paint_tell_sphere, 2),
@@ -200,6 +202,7 @@ KINDS = {
     'qi_wedge': ('flat', 'qi_wedge', (-0.25, 0.25, 0, 1), False, 'sword-qi wedge, the point at b 1'),
     'glint_0': ('face', 'glint_0', SQ, True, 'four-ray glint (tinted)'),
     'glint_1': ('face', 'glint_1', SQ, True, 'four-point star in a circle (tinted)'),
+    'cue_0': ('face', 'cue_0', SQ, False, 'the parry cue: a white-gold sparkle, rays to the edge (HA-07)'),
     'shards_0': ('face', 'shards_0', SQ, True, 'crystal shard (tinted)'),
     'shards_1': ('face', 'shards_1', SQ, True, 'broken shard splinter (tinted)'),
     'lotus_0': ('face', 'lotus_0', (-0.5, 0.5, 0, 1), False, 'lotus bud on its pads, base at b 0'),
@@ -1069,17 +1072,21 @@ def _p_qi_cut():
 # --- glints, the yellow tell ------------------------------------------------------------------------------------------------
 @preset('glint', 'A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and '
         'turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white). HR rebuild: '
-        'c 2 is the parry cue at blade_mid (api.CUE_KIT): larger (1.8 b) and fuller, three crossed sparkles for 7 t.',
+        'c 2 is the parry cue at blade_mid (api.CUE_KIT): the white-gold cue sparkle (rays to 1.6 b, HA-07) over a pink one, '
+        'for 7 t.',
         split_c=True)
 def _p_glint(c):
     if c == api.CUE_KIT[1]['c']:
-        # H1c (hr_design §2.1, api.CUE_KIT): c 2 is the parry cue (the pink sparkle on her blade 7 t before every parryable hit):
-        # the same sparkle larger and fuller (three crossed glints to 1.8 b, bright motes) so it is seen from the F5 camera
-        # at 10 b; still no ring and no long spikes (the purple star and the yellow tell have those)
-        return [card('glint_0', '~ ~ ~', bb='center', spin=90, s0=0.3, s1=1.8, life=7, fade=3, col=TINT[c]),
-                card('glint_0', '~ ~ ~', bb='center', roll=45, spin=-60, s0=0.25, s1=1.3, life=7, fade=3, col=PINKW),
-                card('glint_0', '~ ~ ~', bb='center', roll=22, spin=40, s0=0.2, s1=0.8, life=5, fade=2, col=WHITE)] + \
-            c_parts(c, '~ ~ ~', (0.12, 0.12, 0.12), 8) + [part('end_rod', '~ ~ ~', (0.1, 0.1, 0.1), 0.02, 4)]
+        # H1c (hr_design §2.1, api.CUE_KIT): c 2 is the parry cue (on her blade 7 t before every parryable hit). HA-07 (review
+        # H-A): glint_0 shows only its central third, so the 1.8-b card read as a 0.5-b pink dot, pink on the crimson P2 field.
+        # Now its own sprite cue_0 (a white-gold core, four rays to the card's edge, painted in colour) at full size from its
+        # first tick (1.5 -> 1.9 b, turning: >= 1.0 b on the F5 screen at once), a smaller white one crossing it at 45 deg and a
+        # pink glint inside (the cue's old colour as an accent); end-rod motes. Unlike the flashes: no ring (yellow, purple),
+        # no horizontal flare (yellow), no sphere (blue), and at her blade, not on her chest.
+        return [card('cue_0', '~ ~ ~', bb='center', spin=60, s0=1.5, s1=1.9, life=7, fade=2, col=WHITE),
+                card('cue_0', '~ ~ ~', bb='center', roll=45, spin=-40, s0=0.6, s1=1.0, life=6, fade=2, col=WHITE),
+                card('glint_0', '~ ~ ~', bb='center', roll=22, spin=-60, s0=0.3, s1=0.6, life=6, fade=2, col=TINT[c])] + \
+            [part('end_rod', '~ ~ ~', (0.15, 0.15, 0.15), 0.02, 6)] + c_parts(c, '~ ~ ~', (0.12, 0.12, 0.12), 4)
     return [card('glint_0', '~ ~ ~', bb='center', spin=90, s0=0.2, s1=1.1, life=6, fade=3, col=TINT[c]),
             card('glint_0', '~ ~ ~', bb='center', roll=45, spin=-60, s0=0.15, s1=0.6, life=5, fade=2, col=WHITE)] + \
         c_parts(c, '~ ~ ~', (0.08, 0.08, 0.08), 4)

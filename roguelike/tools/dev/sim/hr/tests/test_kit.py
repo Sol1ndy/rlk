@@ -1209,9 +1209,10 @@ if HR_PRESETS:
     check(HR_PRESETS == list(api.KIT_PRESETS_HR), f'hr1c: the kit declares every preset of api.KIT_PRESETS_HR ({HR_PRESETS})')
     check(api.OVERLAYS.get('web') == 0xEC18 and 'web' in G.GLYPHS and all(f'web_{k}' in G.GLYPHS for k in range(1, G.OVL_STEPS)),
           'hr1c: the web overlay U+EC18 and its opacity steps')
-    check(G.SPRITE_PX == 237_568 and 'flash_blue' not in G.SPRITES and G.atlas_px() == 237_568 + G.GATE_PX,
-          f'hr1c: no new sprite (the items atlas does not grow: {G.SPRITE_PX})')
-    want_snd = {'parry_cue': (('block.amethyst_block.chime', 0.6, 1.9),), 'flash_blue': (('block.beacon.activate', 0.5, 1.8),),
+    # (review H-A, HA-07: the parry cue's own 64 x 64 sprite is the one new sprite: 4 096 px)
+    check(G.SPRITE_PX == 237_568 + 4_096 and 'flash_blue' not in G.SPRITES and 'cue' in G.SPRITES
+          and G.atlas_px() == 237_568 + 4_096 + G.GATE_PX, f'hr1c: one new sprite, the cue (the items atlas grows 4 096 px: {G.SPRITE_PX})')
+    want_snd = {'parry_cue': (('block.note_block.iron_xylophone', 0.7, 1.8),), 'flash_blue': (('block.beacon.activate', 0.5, 1.8),),
                 'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),
                 'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),
                 'sky_pillar': (('item.trident.thunder', 0.5, 1.9),)}
@@ -1238,20 +1239,45 @@ if HR_PRESETS:
         check(abs(fl[0] * 2 - d_want * 2.5) < 1e-3, f'hr1c: yellow_tell t {t_arg}: flare {fl[0] * 2} b (want {d_want * 2.5})')
         s.tick(20)
         check(all(killed(s, e) == T0 + life + 1 for e in cs.values()), f'hr1c: yellow_tell t {t_arg} lasts {life} t')
-    # ---- the parry cue: glint c 2 is larger and fuller than the other glints, a sparkle only (no ring, no star, no flare)
+    # ---- the parry cue (review H-A, HA-07): its own white-gold sparkle cue_0, whose rays fill the card (glint_0 shows only its
+    #      central third: the old 1.8-b card read as a 0.5-b pink dot), >= 1.0 b visible from its first tick, white-gold, a
+    #      sparkle only (no ring, no flare, no sphere: unlike the yellow / purple / blue flashes); a small pink glint inside
+    def vis_frac(painter, thr=0.3, n=96):
+        """the half-width of the sprite (fraction of the card) out to which some pixel has alpha >= thr"""
+        r = 0.0
+        for i in range(n):
+            for j in range(n):
+                a, b = -1 + (i + 0.5) * 2 / n, -1 + (j + 0.5) * 2 / n
+                if painter(a, b)[3] >= thr:
+                    r = max(r, abs(a), abs(b))
+        return r
+    paint_cue = getattr(G.P, 'paint_cue', lambda a, b: (0.0, 0.0, 0.0, 0.0))
+    f_cue, f_glint = vis_frac(paint_cue), vis_frac(G.P.paint_glint)
+    check(f_cue >= 0.85 and f_glint <= 0.5, f'hr1c: the cue sprite\'s rays reach {f_cue:.2f} of its card (glint_0 only {f_glint:.2f})')
     s = fresh()
     T0 = s.gt
     s.run(G.fx(*[api.CUE_KIT[0]], **api.CUE_KIT[1]), pos=(X0, FLOOR + 1.5, Z0))
     cue = s.cards()
-    s2 = fresh()
-    s2.run(G.fx('glint', c=1), pos=(X0, FLOOR + 1.5, Z0))
-    plain = max(end_scale(s2, e)[0] for e in s2.cards())
-    big = max(end_scale(s, e)[0] for e in cue)
-    check(len(cue) == 3 and {kind(s, e) for e in cue} == {'glint_0'}, f'hr1c: the parry cue is three sparkles ({[kind(s, e) for e in cue]})')
-    check(big >= 1.5 * plain and big >= 1.7, f'hr1c: the parry cue reaches {big} b (a plain glint {plain})')
-    check(tint(s, max(cue, key=lambda e: end_scale(s, e)[0])) == G.TINT[2], 'hr1c: the parry cue is pink-magenta')
+    main = max(cue, key=lambda e: end_scale(s, e)[0])
+    s0 = float(cdata(s, main)['hrS']['transformation']['scale'][0]) if 'hrS' in cdata(s, main) else None
+    check(kind(s, main) == 'cue_0' and tint(s, main) == G.WHITE, f'hr1c: the cue\'s main card is the white-gold cue_0 ({kind(s, main)})')
+    check(s0 is not None and s0 * f_cue >= 1.0 and end_scale(s, main)[0] * f_cue >= 1.3,
+          f'hr1c: the cue is >= 1.0 b visible from its first tick ({s0} x {f_cue:.2f}) and {end_scale(s, main)[0] * f_cue:.2f} b at full size')
+    core, rim = paint_cue(0.0, 0.0), paint_cue(0.18, 0.0)
+    check(min(core[:3]) >= 0.97 and rim[0] >= rim[1] > rim[2] and rim[3] >= 0.8,
+          f'hr1c: the cue is white in the core, warm gold round it ({core}, {rim})')
+    ring = max(paint_cue(0.82 * math.cos(math.radians(a)), 0.82 * math.sin(math.radians(a)))[3] for a in (20, 25, 65, 70, 110, 160))
+    check(ring < 0.05 and f_cue > 0, f'hr1c: the cue sprite has no ring (between its rays at r 0.82: alpha {ring:.2f})')
+    check({kind(s, e) for e in cue} == {'cue_0', 'glint_0'} and any(kind(s, e) == 'glint_0' and tint(s, e) == G.TINT[2] for e in cue),
+          f'hr1c: the cue = cue_0 cards + a pink glint inside ({sorted(kind(s, e) for e in cue)})')
     s.tick(12)
     check(max(killed(s, e) for e in cue) == T0 + 8, 'hr1c: the parry cue lasts 7 t (hit - 7 .. hit)')
+    # ---- the cue's sound (review H-A, HA-06): its own family, none of the flashes' (purple = the amethyst chime)
+    fam = lambda ev: ev.rsplit('.', 1)[0]           # noqa: E731
+    cue_f = {fam(ev) for ev, _v, _p in api.KIT_SOUND_RECIPES[api.CUE_SND]}
+    fl_f = {fam(ev) for snd in api.FLASH_SND.values() for ev, _v, _p in api.KIT_SOUND_RECIPES[snd]}
+    check(not cue_f & fl_f and all(0.5 <= v <= 0.8 for _e, v, _p in api.KIT_SOUND_RECIPES[api.CUE_SND]),
+          f'hr1c: the cue\'s sound family {sorted(cue_f)} is none of the flashes\' {sorted(fl_f)}, short and light')
     # ---- flash_blue {t}: the yellow tell 4 t, then the blue sphere 1.8 b for t ticks
     for t_arg in (15, 20):
         s = fresh()
