@@ -11,7 +11,7 @@ tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
 execute store result storage rlk:hr core.sw.d double 0.0417 run scoreboard players get #sw_n hr
 function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
 function rlk:boss/scarlet/fx/follow_on
-function rlk:boss/scarlet/rig/anchor/chest
+function rlk:boss/scarlet/rig/anchor/head
 execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run function rlk:boss/scarlet/fx/p/star4
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/a9_star

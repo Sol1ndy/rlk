@@ -519,6 +519,7 @@ for (const c of CLIPS) {
       st = Math.max(st, fr.o._stretch.arm, fr.o._stretch.leg); res = Math.max(res, fr.o._support.bladeResidue);
       dyM = Math.max(dyM, Math.abs(fr.o._support.dy)); liftM = Math.max(liftM, fr.o._lift);
     }
+    if (ONLY) console.log(`contacts ${c.name} ${JSON.stringify(cts)} stretch ${st.toFixed(4)}`);      // (authoring aid: a partial build writes no manifest)
     retargetTable[c.name] = {passes: F[0].passes, corrections: Object.fromEntries(Object.entries(mx).filter(([, v]) => v > 0).sort()), contacts: cts,
       stretch: +st.toFixed(4), blade_residue: +res.toFixed(3), support_dy: +dyM.toFixed(3), lift: +liftM.toFixed(3)};
   }

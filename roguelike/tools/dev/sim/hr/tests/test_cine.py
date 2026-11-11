@@ -95,9 +95,10 @@ d = gap('repel', 140, 'idle2', 0, [a for a in MAN['anchors'] if a != 'hand_r'])
 ok(d <= .03, f'handover: repel 140 = idle2 0 (the anchors but the right hand within {d:.3f} b)')
 dr = gap('repel', 140, 'idle2', 0, ('hand_r',))
 ok(dr <= .7, f'handover: repel 140 the right hand {dr:.2f} b from idle2\'s (leaving the brim: hat_on is 139)')
-d = gap('repel', 0, 'g_dive', 10, ('head', 'chest', 'hat_crown'))
+GD = 22        # g_dive's last tick (round V, lane VB: the contract's length 10 -> 22, the same last pose)
+d = gap('repel', 0, 'g_dive', GD, ('head', 'chest', 'hat_crown'))
 ok(d <= .25, f'handover: repel 0 = g_dive\'s last pose (head / chest / crown within {d:.3f} b)')
-print(f'  (repel 0 against g_dive 10: the sword grip {gap("repel", 0, "g_dive", 10, ("hand_l",)):.2f} b, the tip {gap("repel", 0, "g_dive", 10, ("blade_tip",)):.2f} b apart: the dive\'s two-hand grip is re-gripped '
+print(f'  (repel 0 against g_dive {GD}: the sword grip {gap("repel", 0, "g_dive", GD, ("hand_l",)):.2f} b, the tip {gap("repel", 0, "g_dive", GD, ("blade_tip",)):.2f} b apart: the dive\'s two-hand grip is re-gripped '
       'in the left hand on the dive\'s line through KR; the rig blends the first 3 ticks from the shown pose)')
 
 # ---- states: the stored looks the key files set -------------------------------------------------------------------------------------

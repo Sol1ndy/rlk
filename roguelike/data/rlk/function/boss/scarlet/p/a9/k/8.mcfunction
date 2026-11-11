@@ -7,7 +7,7 @@ summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","
 execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
 tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 function rlk:boss/scarlet/fx/follow_on
-function rlk:boss/scarlet/rig/anchor/chest
+function rlk:boss/scarlet/rig/anchor/head
 execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run function rlk:boss/scarlet/fx/p/yellow_tell {t:6}
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/yellow_chime

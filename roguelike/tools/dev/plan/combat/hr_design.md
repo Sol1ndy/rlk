@@ -762,3 +762,27 @@ written; where these lines differ, they are the targets the balance pass measure
 - **HA-08**: `q`'s grab kb 0.
 - **HA-09**: a full gauge forces `rings` in the near band only; from the mid band `ai/ult_close` glides her in (0.3 b/t to 4 b,
   at most 40 t), then the decision starts the rings.
+
+## 9. Round V (11-11, lane VB) — what `v_brief.md` §3 "VB" changed in this design
+`v_brief.md` wins over §2 where they disagree. As built (`vb_progress.md`; `tools/mboss_scarlet/blade.py`):
+- §2.1 tells: every hit keeps its cue (P) / its flash (N) and gains **the drawn blade path** (a line in the air along the tip's
+  way from the wind-up to the hit, its head arriving on the hit tick; white-gold for P, the flash's colour for N) — for a swing
+  riding her, for a dash / a plunge the straight line from her to the locked spot (+ a tall mark over the spot for a dash), for a
+  gauntlet cut standing at the cut's station. The cue star stands on the blade's middle unless that is low or on her hat (then over
+  the hat's crown); the flashes are at her head, larger, with a dark-rimmed star inside.
+- §2.2 the kit effects at the hits (`qi_arc`, `qi_vert`, `qi_fan`, `qi_wedge`, `qi_ring`, `qi_line`, `qi_cut`, `qi_band`, `qi_x`,
+  `qi_dome`, A4's ribbon and slash line) are replaced by **the slash generated from the blade track**: one sector card per
+  <= 45 deg of blade sweep, in the plane of the two blade positions that bound it, born on the tick the sweep is shown, gone 6 t
+  later. Impact effects that are not a blade's trail stay (dive_impact, burst_radial, claw_streaks, qi_beam, sky_mark / sky_pillar,
+  ult_web / ult_burst, the overlays).
+- §2.2 moves: `LEAP_H` a4 / a10 / nb / q 3.4, q2 3.6 (were 6 / 5 / 5 / 5 / 6); A4 and A10 keep 3 b from the player in the air (were
+  2 / 1.5); the dash-throughs (A9, HCUT, BLUE, KCUT) stop 2.0 b before the locked spot (the hazard keeps its probed length
+  through the spot); the dives (A4, A10, q_air's) land 1.4 b before the locked spot. Hit ticks, shapes, tiers, weights: unchanged.
+- §2.3 clips: the wind-ups (reached >= 10 t before a single / first hit, >= 6 t before a chain hit, held): a1 (no fan flourish), a2
+  (blend 2), a3 h1 / h2 / h5, a4's apex, d4 h1 / h4, tri h0 / h2, rings r1, blue, mx's dome, nb b2 / b3; the gauntlet's approaches
+  hold the next cut's wind-up, every cut's tail ends in the next cut's wind-up, g_rise has no spin, g_vert cuts down from the
+  raised blade; `g_dive` = 22 t (appear 0, dive 15, hit 18).
+- §2.4 gauntlets: the station = `REAPPEAR['D1']['end']` (2.2 b at +35: the player's front right), fixed 10 t before the strike (an
+  approach: at its start) as the marker `rlk_hr_gst`; A8.3 leaps to 1.3 b before the player; the dive reappears 18 t before the
+  judge 4 b over a spot 4.5 b before the player (`A8_SCRIPT` 202, `A13_SCRIPT` 224) and ends 1 b over the spot 2 b before them.
+- §1.2 the gauge's under bar shows its five segments (dividers; `#buSubSeg bu 5`).

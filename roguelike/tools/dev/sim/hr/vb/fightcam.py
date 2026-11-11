@@ -168,16 +168,156 @@ def cmd_strip(st, a):
     hp = (0.0, 0.0, float(a.dist))
     cards = st.cards_of(cmds, ticks, hp)
     panels = []
+    look = None if a.look == 'none' else a.look
+    tr = st.blade.track(a.clip) if not a.no_fx or a.tells else None
     for t in ticks:
+        cs = list(cards.get(t, ()))
+        if a.tells and a.flash is None and sw.h - api.CUE_LEAD <= t < sw.h:
+            cs.append(_card('rlk:mboss/hr_kit/cue_0', her_point(st.blade.cue_point(a.clip, sw.h - api.CUE_LEAD), a.dist), 1.9 + 0.4 * (t - sw.h + api.CUE_LEAD) / 6))
+        if a.tells and a.flash is not None and a.flash <= t < a.flash + 8:
+            cs.append(_card('rlk:mboss/hr_kit/yellow_tell_0', her_point(tr['h'][t], a.dist), 2.4))
+            cs.append(_card('rlk:mboss/hr_kit/sw_head', her_point(tr['h'][t], a.dist), 1.3, 0xFFE14A, idx=8001))
         if a.crop:
             x0, y0, x1, y1 = (int(v) for v in a.crop.split(','))
-            img, _z, _v = st.frame(a.clip, t, a.dist, a.field, cards.get(t, ()), w=1920)
+            img, _z, _v = st.frame(a.clip, t, a.dist, a.field, cs, w=1920, look=look)
             img = img[y0:y1, x0:x1]
         else:
-            img, _z, _v = st.frame(a.clip, t, a.dist, a.field, cards.get(t, ()), w=a.w)
+            img, _z, _v = st.frame(a.clip, t, a.dist, a.field, cs, w=a.w, look=look)
         mark = ' HIT' if t == sw.h else ' swing' if sw.a < t <= sw.b else ' wound' if sw.w <= t <= sw.a else ''
         panels.append(label(img, f'{a.clip} {a.event} t{t}{mark} D{a.dist:g} {a.field}', img.shape[1]))
     sheet(panels, a.cols, a.out)
+
+
+# ----------------------------------------------------------------------------- measure: readability on the rendered pixels
+def _mask(a, b, thr=0.06):
+    return np.abs(a - b).max(axis=2) > thr
+
+
+def _card(model, pos, scale, col=0xFFFFFF, bb='center', idx=8000):
+    return PV.Entity('item_display', pos, 0.0, 0.0, {
+        'Tags': ['m_card'], 'billboard': bb, 'item': {'components': {'minecraft:item_model': model, 'minecraft:custom_model_data': {'colors': [col]}}},
+        'transformation': {'translation': [0, 0, 0], 'left_rotation': [0, 0, 0, 1], 'scale': [scale] * 3, 'right_rotation': [0, 0, 0, 1]}}, idx)
+
+
+def her_point(p, dist):
+    """A track point [left, up, forward] of her standing `dist` b before the avatar, facing it (yaw 180) -> world"""
+    return (-p[0], p[1], dist - p[2])
+
+
+def contrast(c1, c2):
+    def lum(c):
+        v = [x / 255 for x in c]
+        v = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in v]
+        return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]
+    a, b = sorted((lum(c1), lum(c2)), reverse=True)
+    return (a + 0.05) / (b + 0.05)
+
+
+def measure_hit(st, clip, event, dist, idle='idle', lead_rule=10):
+    """One hit at one distance (1080p, the p1 field: geometry only): dict of pixel measures."""
+    B, api = st.blade, st.api
+    sw = B.swing_of(clip, event)
+    W = 1920
+    f = (1080 / 2) / math.tan(math.radians(FOV) / 2)
+    pos, _yaw, pitch = camera(dist)
+    out = dict(clip=clip, event=event, h=sw.h, swing=(sw.a, sw.b), wound=sw.w, lead=sw.h - sw.w, dist=dist)
+    # (a) the wind-up pose against the stance: pixels that differ, the avatar in the frame
+    tw = max(0, min(sw.a, sw.h - 1))
+    wind = st.frame(clip, tw, dist, 'p1', w=W)[0]
+    base = st.frame(idle, 0, dist, 'p1', w=W)[0]
+    none = st.frame(idle, 0, dist, 'p1', w=W, her=False)[0]
+    her_px = int(_mask(base, none).sum())
+    out['pose_px'] = int(_mask(wind, base).sum())
+    out['her_px'] = her_px
+    out['pose_share'] = round(out['pose_px'] / max(1, her_px), 2)
+    # (b) the blade (its edge sheath alone) at the wind-up: mean width = area / length on screen
+    with_g = st.frame(clip, tw, dist, 'p1', w=W, avatar=False)[0]
+    no_g = st.frame(clip, tw, dist, 'p1', w=W, avatar=False, look=None)[0]
+    area = int(_mask(with_g, no_g, 0.04).sum())
+    view = PV.View('camera', 0.0, pitch, True, pos, FOV)
+    tr = B.track(clip)
+    pb, pt_ = (view.screen(view.cam(np.array(her_point(tr[k][tw], dist))), 1920, 1080) for k in ('b', 't'))
+    ln = float(np.linalg.norm(pb - pt_))
+    out['blade_len_px'] = round(ln, 1)
+    out['blade_w_px'] = round(area / ln, 1) if ln > 25 else None           # (end-on to the lens: no width to speak of)
+    out['blade_w_min_px'] = round(0.092 * f / math.dist(pos, her_point(tr['t'][tw], dist)), 1)      # the sheath's least width, any side
+    # (c) the path: cards alone, their width = area / the pieces' length on screen
+    o = B.Out()
+    r = B.path_ride(o, 'x', sw, 0, max(0, sw.h - B.SHOW_FIRST), B.COL['P'], 'm', head=False, flare=False)
+    cards = st.cards_of(o.t, [r['show']], (0.0, 0.0, float(dist)))[r['show']]
+    a_ = st.frame(clip, tw, dist, 'p1', cards, w=W, her=False, avatar=False)[0]
+    b_ = st.frame(clip, tw, dist, 'p1', (), w=W, her=False, avatar=False)[0]
+    area = int(_mask(a_, b_, 0.04).sum())
+    pts = [view.screen(view.cam(np.array(her_point(p, dist))), 1920, 1080) for _u, p in r['pts']]
+    ln = float(sum(np.linalg.norm(q - p) for p, q in zip(pts, pts[1:])))
+    out['path_len_px'] = round(ln, 1)
+    out['path_w_px'] = round(area / ln, 1) if ln > 25 else None
+    full = st.frame(clip, tw, dist, 'p1', cards, w=W)[0]
+    nop = st.frame(clip, tw, dist, 'p1', (), w=W)[0]
+    out['path_seen'] = round(int(_mask(full, nop, 0.04).sum()) / max(1, area), 2)        # the share her body / hat / the avatar leave
+    # (d) the cue star (parryable: at blade_mid, hit - 7): the share of it her hat / body / the avatar leave visible
+    tc = max(0, sw.h - api.CUE_LEAD)
+    cue = _card('rlk:mboss/hr_kit/cue_0', her_point(B.cue_point(clip, tc), dist), 2.1)
+    alone = _mask(st.frame(clip, tc, dist, 'p1', [cue], w=W, her=False, avatar=False)[0], b_, 0.04)
+    seen = _mask(st.frame(clip, tc, dist, 'p1', [cue], w=W)[0], st.frame(clip, tc, dist, 'p1', (), w=W)[0], 0.04)
+    out['cue_px'] = int(alone.sum())
+    out['cue_seen'] = round(int((seen & alone).sum()) / max(1, int(alone.sum())), 2)
+    # the star against her hat: the share of the star's pixels that lie over her hat (white on white without the dark rim)
+    hat_only = _mask(st.frame(clip, tc, dist, 'p1', (), w=W, avatar=False)[0], b_, 0.04)
+    out['cue_on_her'] = round(int((alone & hat_only).sum()) / max(1, int(alone.sum())), 2)
+    # (e) the flash of an unparriable hit (the yellow sphere 2.4 b at her head at the wind-up)
+    fl = _card('rlk:mboss/hr_kit/yellow_tell_0', her_point(tr['h'][tw], dist), 2.4)
+    alone = _mask(st.frame(clip, tw, dist, 'p1', [fl], w=W, her=False, avatar=False)[0], b_, 0.04)
+    seen = _mask(st.frame(clip, tw, dist, 'p1', [fl], w=W)[0], nop, 0.04)
+    out['flash_px'] = int(alone.sum())
+    out['flash_seen'] = round(int((seen & alone).sum()) / max(1, int(alone.sum())), 2)
+    # (f) the slash against the blade: the largest angle between a piece's plane and the blade that bounds it
+    worst = 0.0
+    for pc in sw.pieces():
+        if pc['kind'] != 'arc':
+            continue
+        for (b0, t0) in zip(pc['bases'], pc['tips']):
+            worst = max(worst, abs(90 - B.angle(B.sub(t0, b0), pc['n'])))
+    out['slash_deg'] = round(worst, 2)
+    return out
+
+
+def cmd_measure(st, a):
+    api, B = st.api, st.blade
+    rows, seen = [], set()
+    todo = []
+    for key, hs in api.HITS.items():
+        prev = None
+        for row in hs:
+            clip, ev = row[0], row[1]
+            if (clip, ev) in seen:
+                continue
+            seen.add((clip, ev))
+            h = api.ev(clip, ev)
+            first = prev is None or prev[0] != clip or h - prev[1] > 24 or key == 'ult'
+            prev = (clip, h)
+            todo.append((key, clip, ev, row[6], first))
+    if a.clips:
+        todo = [t for t in todo if t[1] in a.clips.split(',')]
+    for key, clip, ev, par, first in todo:
+        idle = 'idle2' if clip in ('mx', 'nb', 'q_grab', 'q_air') or clip.startswith('g_') else 'idle'
+        for d in (4.0, 7.0, 10.0):
+            if a.dist and d != a.dist:
+                continue
+            r = measure_hit(st, clip, ev, d, idle, B.LEAD_FIRST if first else B.LEAD_CHAIN)
+            r.update(key=key, parry=par, first=first)
+            rows.append(r)
+            print(f"{key:6s} {clip:7s} {ev:6s} {par} D{d:<4g} lead {r['lead']:2d} pose {r['pose_px']:6d} px ({r['pose_share']:.2f} of her) "
+                  f"blade {r['blade_w_px']} px (min {r['blade_w_min_px']}) path {r['path_w_px']} px seen {r['path_seen']:.2f} "
+                  f"cue seen {r['cue_seen']:.2f} on her {r['cue_on_her']:.2f} flash seen {r['flash_seen']:.2f} slash {r['slash_deg']} deg", flush=True)
+    ink, core = (0x1C, 0x0B, 0x2E), (255, 233, 168)
+    con = {f: dict(rim_vs_grass=round(contrast(ink, FIELD[f]['grass']), 1), rim_vs_hat=round(contrast(ink, HAT), 1),
+                   rim_vs_floor=round(contrast(ink, tuple(int(v) for v in FIELD[f]['floor'].split(','))), 1),
+                   core_vs_floor=round(contrast(core, tuple(int(v) for v in FIELD[f]['floor'].split(','))), 1),
+                   core_vs_grass=round(contrast(core, FIELD[f]['grass']), 1)) for f in FIELD}
+    print('contrast (WCAG ratio) of the tells\' dark rim / white-gold core:', json.dumps(con))
+    if a.json:
+        Path(a.json).write_text(json.dumps(dict(rows=rows, contrast=con), indent=1))
 
 
 # ----------------------------------------------------------------------------- the real pattern (the module in the H1 world)
@@ -256,7 +396,7 @@ def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
         b = H.body_of(s)
         p = s.player()
         clip_name, ct, hid = RIG['clip'], RIG['ct'], RIG['hidden']
-        n = s.getsc('#sw_n', 'hr') if hasattr(s, 'getsc') else 0
+        n = H.hr(s, '#sw_n')
         cards = []
         for e in s.ents:
             if e.alive and e.id in NB:
@@ -361,6 +501,9 @@ def main():
     s.add_argument('--from', dest='t0', type=int)
     s.add_argument('--to', dest='t1', type=int)
     s.add_argument('--no-fx', action='store_true')
+    s.add_argument('--look', default='edge', help="the blade look (none: a rig built before round V has no `edge`)")
+    s.add_argument('--tells', action='store_true', help='draw the cue star (a parryable hit, h - 7 .. h - 1) / the flash sphere at her head')
+    s.add_argument('--flash', type=int, help='with --tells: the tick the flash of an unparriable hit starts (shown 8 t)')
     s.add_argument('--w', type=int, default=480)
     s.add_argument('--crop', help='x0,y0,x1,y1 in 1920 x 1080 px: render at 1080p and cut this window (detail strips)')
     s.add_argument('--cols', type=int, default=6)
@@ -379,8 +522,14 @@ def main():
     f.add_argument('--crop')
     f.add_argument('--zoom', type=float, default=2.0, help='render at 1080p and show the middle 1/zoom of the screen (0: the whole screen)')
     f.add_argument('-o', '--out', required=True)
+    m = sub.add_parser('measure')
+    m.add_argument('--clips')
+    m.add_argument('--dist', type=float)
+    m.add_argument('--json')
     a = ap.parse_args()
     st = Stage(a.wt, a.dbg, a.rp)
+    if a.cmd == 'measure':
+        return cmd_measure(st, a)
     if a.cmd == 'strip':
         cmd_strip(st, a)
     elif a.cmd == 'fight':

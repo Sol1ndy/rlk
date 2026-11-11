@@ -105,7 +105,7 @@ SPOTS = {
            RE['D1']['dist'], 'D1 far reappear: 14 b at -40 (front-left); else +40 / 0 / +-90 at 10 b'),
     'side': ([('face', RE['D1']['end'][1], RE['D1']['end'][0]), ('face', -RE['D1']['end'][1], RE['D1']['end'][0]),
               ('face', 0, RE['D1']['end'][0]), ('face', 180, RE['D1']['end'][0])], RE['D1']['end'][0],
-             'the station at the player\'s right (1.5 b at +90): the D1 dash end, the chain cuts, the D3 / D4 landings'),
+             'the station before the player (2.2 b at +35, their front right): the D1 dash end, the chain cuts, the D3 / D4 landings'),
     'd2': ([('face', RE['D2']['bearing'], RE['D2']['dist']), ('face', -RE['D2']['bearing'], RE['D2']['dist']),
             ('face', 0, RE['D2']['dist']), ('face', RE['D2']['bearing'], 6.0), ('face', -RE['D2']['bearing'], 6.0)],
            RE['D2']['dist'], f"D2 side reappear: {num(RE['D2']['dist'])} b at {RE['D2']['bearing']:+d} (low, the player's front-right); "
@@ -279,12 +279,13 @@ class GB:
         self.at(t, api.rig(f'look/{ch}/{v}'))
         self.ev(t, 'look', f'{ch}/{v}', src)
 
-    def cut(self, c, count, step):
+    def cut(self, c, count, step, cue_pos=None):
         made, lock, strike, tier, kb = c
         for t, ln in api.cut(made, lock, strike, tier, kb, count):
             self.at(t, ln)
-        # the parry cue at the lock tick (hr_design §2.4): the pink glint at her blade + its chime
-        self.at(lock, S.cue())
+        # the parry cue at the lock tick (hr_design §2.4): the star + its chime (round V: at the cut's station, over the place her
+        # blade is wound at - she may still be on her way there)
+        self.at(lock, S.cue(cue_pos))
         self.ev(lock, 'cue', 'parry', ('cut', strike))
         self.cues.append(lock)
         self.hits.append(dict(kind='cut', t=strike, made=made, lock=lock, tier=tier, kb=kb, n=count, step=step,
@@ -560,10 +561,16 @@ class Walk:
                  src=('g_vert', 'glow'), c=api.C_MAGENTA)
             g.snd(glow, 'g_glow', src=('g_vert', 'glow'))
             g.look(s, 'blade', 'edge', ('g_vert', 'hit'))
-            g.at(rs, rise(RISE_UP, gone - rs))
-            g.moves.append((rs, gone, 'rise out of view'))
-            g.at(gone, hide())
-            g.ev(gone, 'rig', 'state/hidden', ('g_vert', 'gone'))
+            # round V: the dive's reappearance comes before the clip's own `gone` now: she rises until 2 t before it, bursts
+            # and is hidden there (the rise's height in proportion)
+            nxt = self.next_clip_t(t)
+            end = gone if nxt is None or nxt - 2 >= gone else max(rs + 1, nxt - 2)
+            g.at(rs, rise(round(RISE_UP * (end - rs) / (gone - rs), 2), end - rs))
+            g.moves.append((rs, end, 'rise out of view'))
+            if end < gone:
+                g.fx(end, 'ghost_burst', puff_fb(), at_body(0.95), src=('g_vert', 'gone'))
+            g.at(end, hide())
+            g.ev(end, 'rig', 'state/hidden', ('g_vert', 'gone'))
         self.contact_fx(step, s, clip, t)
 
     def s_dive(self, t):                              # A8.9: normal colours, 6 b above the player, the dive (the judge)
@@ -651,6 +658,7 @@ class Walk:
         # leads into, else STATION_LEAD before the strike (never before the tick after the strike before it)
         self.st_tick = {}
         moves = [(t, step, clip) for t, step, clip, _c in self.rows if step in CONTACT]
+        self.cut_clip = {t + E(clip, 'hit'): (clip, t) for t, step, clip in moves}      # strike -> the move that delivers it
         prev_s = None
         for t, step, clip in moves:
             s = t + E(clip, 'hit')
@@ -686,7 +694,9 @@ class Walk:
             else:
                 raise ValueError((key, step))
             if c:
-                g.cut(c, 1 if self.gauntlet else 0, step)
+                cl, ct = self.cut_clip[c[2]]
+                cp = B.cue_point(cl, max(0, B.swing_of(cl, 'hit').a))
+                g.cut(c, 1 if self.gauntlet else 0, step, cue_pos=f'at {ST_M} positioned {B.car(cp)}')
         for t in EXTRA_VANISH.get(key, ()):
             g.fx(t, 'ghost_burst', puff_fb(), at_body(0.95), src=('script', 'vanish'))
             g.at(t, hide())

@@ -1614,8 +1614,8 @@
    },
    "owner": "H1",
    "key_files": 64,
-   "keys": 715,
-   "keys_per_tick": 10.7,
+   "keys": 723,
+   "keys_per_tick": 10.8,
    "source": "v 261.00-262.05 (P-n; ref tells_p2 261.20 / 262.05): two huge diagonal bands from above, then a third; video gaps 6-12 t / 8 t -> 10 / 10",
    "note": "",
    "authored": true
@@ -2536,7 +2536,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 217603222
+  "version": 256086691
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -7986,9 +7986,9 @@
     0.83,
     0.83,
     0.87,
-    0.871,
-    0.875,
-    0.878,
+    0.87,
+    0.872,
+    0.877,
     0.88,
     0.88,
     0.8,
@@ -8148,11 +8148,6 @@
    "lift": {},
    "hat_push": {},
    "contacts": [
-    [
-     34,
-     "twohand",
-     -1
-    ],
     [
      35,
      "twohand",
@@ -24740,28 +24735,28 @@
     "passes": 3,
     "corrections": {
      "bPush": 11.18,
-     "bTurn": 36,
-     "gripClear": 69.71,
-     "handClearR": 7.79,
+     "bTurn": 18,
+     "gripClear": 72.17,
+     "handClearR": 10.01,
      "scab": 2.13,
      "scabArm": 40
     },
     "contacts": {
-     "twohand": 0.126
+     "twohand": 0.083
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.047,
     "lift": 0,
     "clear": {
-     "guard.head": -0.02,
+     "guard.head": -0.01,
      "guard.torso": -0.157,
-     "hand_l.head": -0.049,
+     "hand_l.head": -0.093,
      "hand_l.torso": -0.065,
-     "hand_r.head": -0.089,
+     "hand_r.head": -0.091,
      "hand_r.torso": -0.025,
-     "hilt.head": -0.083,
-     "hilt.torso": -0.019
+     "hilt.head": -0.065,
+     "hilt.torso": -0.02
     }
    },
    "q_grab": {
@@ -25641,9 +25636,9 @@
   "parts": 29,
   "models": 64,
   "key_files": 3456,
-  "keys": 28852,
+  "keys": 28860,
   "rig_functions": 4216,
-  "rig_bytes": 8832471,
+  "rig_bytes": 8834472,
   "cull_overhang_ticks": 0
  },
  "sprites": {

@@ -549,3 +549,21 @@ def target_mark(out, key, uid, show, h, col, at):
     out.at(h, f'kill {hsel}', f'execute as {sel} run data merge entity @s {{item:{{components:{{"minecraft:custom_model_data":{{colors:[{COL["flare"]}]}}}}}}}}')
     out.at(h + 2, f'kill {sel}')
     return dict(show=show, hit=h)
+
+
+# --- the parry cue's place -------------------------------------------------------------------------------------------------------
+CUE_LOW, CUE_HAT_R, CUE_OVER = 1.75, 0.8, 0.9
+
+
+def cue_point(clip, t):
+    """Where the parry cue's star stands at clip tick t (her frame): on the blade's middle - unless that is low (under CUE_LOW:
+    from the F5 camera the avatar's own head covers it) or on her hat (white-gold on white: review v C2): then CUE_OVER above
+    the hat's crown, clear of both."""
+    tr = track(clip)
+    t = max(0, min(len(tr['t']) - 1, t))
+    m = lerp(tr['b'][t], tr['t'][t], 0.5)
+    k = tr['k'][t]
+    on_hat = math.hypot(m[0] - k[0], m[2] - k[2]) < CUE_HAT_R and k[1] - 0.7 <= m[1] <= k[1] + 0.35
+    if m[1] < CUE_LOW or on_hat or not tr['on'][t]:
+        return (k[0], k[1] + CUE_OVER, k[2])
+    return m

@@ -12,7 +12,7 @@ tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_ult","rlk_hr_swh","rlk_hr_sw_ult46"],billboard:"center",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[0.62f,0.62f,0.62f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_head","minecraft:custom_model_data":{colors:[14060543]}}}}
 execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_ult46,limit=1] ^2.188 ^1.415 ^-0.383
 function rlk:boss/scarlet/fx/follow_on
-function rlk:boss/scarlet/rig/anchor/chest
+function rlk:boss/scarlet/rig/anchor/head
 execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run function rlk:boss/scarlet/fx/p/star4
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/a9_star

@@ -161,6 +161,9 @@ ALLOW['combat fix A (11-11): review A (player side), B-05'] = [F + 'combat/rclic
 # ... and its hand-off A-10 (f), done on wip/combat for the 11-11 release (be0016710): the comment of Azhdaha's brand cleanse
 # names the new rule (tools/mboss_azhdaha/brand.py)
 ALLOW['11-11 release (be0016710): Azhdaha brand cleanse comment'] = [F + 'boss/azhdaha/brand/dodge.mcfunction']
+# round V (11-11, lane VB; v_brief.md §3 VB 5): the boss bar's under bar can show segment dividers (#buSubSeg bu; 홍련's 5-segment
+# gauge): one gated line more in bossui/sub, the option's reset in bossui/draw (tools/build_bossbar.py); no other boss sets it
+ALLOW['round V lane VB (11-11): the under bar\'s segment dividers'] = [F + 'bossui/draw.mcfunction', F + 'bossui/sub.mcfunction']
 # 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
 # the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
 # call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's

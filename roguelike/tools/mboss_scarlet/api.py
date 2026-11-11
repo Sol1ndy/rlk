@@ -372,7 +372,9 @@ DARK_SLICES = (-17, -14, -11, -8)                 # the `dark` job's four real s
 # shows them (camera 3.5 b behind the player, FOV 70: half-width 51.2 deg at 16:9, 48.2 at 16:10; D2 8 b at 39.0 deg off
 # the camera axis, D4 12 b at 43.4 deg), so the approach is seen from the reappearance on.
 REAPPEAR = {
-    'D1': {'dist': 14.0, 'bearing': -40, 'fallback': (40, 0, 90, -90), 'fallback_dist': 10.0, 'end': (1.5, 90)},
+    # round V (v_brief §3 VB 4: arrivals in front of the avatar): the station of the chain cuts 2.2 b at +35 (the player's front
+    # right; was 1.5 b at +90, beside them: her blade swung through the lens)
+    'D1': {'dist': 14.0, 'bearing': -40, 'fallback': (40, 0, 90, -90), 'fallback_dist': 10.0, 'end': (2.2, 35)},
     'D2': {'dist': 8.0, 'bearing': 55, 'end': (1.6, 45)},
     'D3': {'dist': 2.5, 'up': 3.0, 'bearing': 60},
     'D4': {'dist': 12.0, 'bearing': -55},
