@@ -549,7 +549,11 @@ for p in MOD.rglob('*.mcfunction'):
     if rel.startswith(('fx/', 'rig/')):
         continue
     txt = p.read_text()
-    if ('rlk_hr_tr' in txt or 'rlk_hr_sw' in txt) and not re.match(r'p/\w+/(k/\d+|start|tick|cancel|fail)$|core/sw/|core/pp$|core/pat_end$|core/g/end$|tick$|ult/fail60$|g/', rel[:-11]):
+    # round W integration: lane WC's sequence starts / skips kill the fight's blade cards (seq.KILL_FIGHT_FX: `kill @e[...,tag=rlk_hr_sw]`),
+    # a clean-up on a sequence's first tick, not a trail command; only the other lines naming the trail's tags count here
+    drawn = [l for l in txt.split('\n') if ('rlk_hr_tr' in l or 'rlk_hr_sw' in l) and not l.startswith('#')
+             and not re.search(r'(?:^|\brun )kill @e\[', l)]
+    if drawn and not re.match(r'p/\w+/(k/\d+|start|tick|cancel|fail)$|core/sw/|core/pp$|core/pat_end$|core/g/end$|tick$|ult/fail60$|g/', rel[:-11]):
         bad.append(rel)
     if ('rlk_hr_tr' in txt or 'rlk_hr_sw' in txt) and 'schedule ' in txt:
         bad.append(rel + ' (schedule)')

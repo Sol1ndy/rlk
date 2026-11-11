@@ -896,3 +896,23 @@ The user, after round V in play: 「보스의 검로가 보이는건 미리 경�
   either gauntlet** (5 clear). No table keeps every period at 3 under these rules and the moves' spacing (the exhaustive search
   `tools/dev/sim/hr/review/metro/dfs.c -DNOLADDER`: G1 none); the G1 table is the one of the 6 364 sets within 14 t of round V's
   with the fewest periods reaching 4 (4, 15, 19, 25, 33 t), the G2 table the nearest found (distance 23 t; 4 at 3-8, 12-23, 31 t).
+
+## 12. Round W, the integration (11-12, lane WI) — what the merge of WC / WP / WB added to this design
+As built: `wi_progress.md`, `tools/dev/sim/hr/tests/test_wi.py` (beside `test_vi.py`).
+- **The player's dodge set against her** (§2.1, `test_wi dodgecam`): with the real `player/dash` / move line / back-step / cartwheel in
+  every pattern and both gauntlets, three views (on her, frozen, 60° off), the F5 camera (4 b behind the eyes) is never inside her
+  and she never moves onto the player; her camera-line step (`core/cam_clear`) was never needed, standing or moving (§11's stops
+  already keep her out of the line at the move's end). Her body comes within 1.3 b of the line only when the player's own double
+  dodge carries them next to her (a direction-less double dodge goes along the view: a forward cartwheel into her) or her hit's
+  knockback throws them across her landing (G1's dive after a missed answer). No rule was changed for it.
+- **A dodge in flight when a locked sequence starts** ends one tick into the lock (`player/tick` -> `player/dodge/cut` while the
+  player carries `rlk_mb_camh`): no travel of the hidden avatar, the crouch and the cartwheel's stand-in rig gone. `rlk:tick` runs
+  the stand-in rig's tick when no beat runs (a mannequin character's plain cartwheel froze it before).
+- **Her damage numbers** (review w T3-09): numbers on her body are 2/3 size, beside her as the player sees her (1.1-1.5 b off the
+  line to the player, 1.9-2.4 b up; `combat/text_normal_side`); every other target keeps the old numbers.
+- **The trail at a sequence start** (`test_wi trailcut`): CS1 (`core/cs1/start`: `kill @e[tag=rlk_hr_p]`), the ending
+  (`death_start` -> `core/stop_all`) and the repel (`core/g/end`) leave no trail entity one tick later, with a beat running or not;
+  lane WC's `seq.KILL_FIGHT_FX` (round V's `rlk_hr_sw` cards) needs no change.
+- **§6.4 on the final tree** (`hrfair2.py`, all 175 runs, log `tools/dev/sim/hr/review/bal/wi_final.log`): every row passes except
+  **T1 on seed 33: 0.97** (1.02 / 1.03 / 0.97, pooled 1.01) — as at the 11-12 release (`DMG['T2']` 42, the lead's reading of HB's
+  per-seed caveat); no balance value was changed. T6 σ0 / σ1 cleared 100 %, T7 0 / 0 / 0, T13 53 / 53.
