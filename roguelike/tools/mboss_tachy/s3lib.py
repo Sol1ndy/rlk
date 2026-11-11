@@ -254,12 +254,13 @@ def hz_tag(key):
             f'function {NS}core/hz_tag/{key}')
 
 
-def hazard(key, hit, grp=False, tell=1, act=None, kb=None):
+def hazard(key, hit, grp=False, tell=1, act=None, kb=None, noparry=None):
     """Lines that create the quiet hazard of api.HITS entry `hit` at the body (floor), aim = body yaw, striking `tell`
-    ticks later."""
+    ticks later. noparry=1: one of her unparriable hits (combat overhaul): her hazards are made at the strike frame, so the
+    pattern calls the warning glint itself at its tell tick (L.np_warn) and the framework draws none (glint=False)."""
     clip, event, shape, dims, tier, el = hit
     assert shape in SHAPE_FN, shape
-    out = L.hz_opts(quiet=1, sfx=0, grp=grp, act=act, kb=kb) + hz_el(el)
+    out = L.hz_opts(quiet=1, sfx=0, grp=grp, act=act, kb=kb, noparry=noparry, glint=not noparry) + hz_el(el)
     call = SHAPE_FN[shape](*dims, tell, api.DMG[tier])
     out.append(f'execute at @s rotated as @s rotated ~ 0 positioned ~ {CY} ~ run {call}')
     out.append(hz_tag(key))

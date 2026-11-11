@@ -33,6 +33,7 @@ CHAPS = L.chapter_bosses(REG)
 SPECS = L.special_bosses(REG)
 ARENAS = L.arenas(REG)                      # [(aid, arena)] plaza first (n 0), then arenas{} by n
 PX_STATES = {}                              # proxy boss id -> [state set names] (filled from the rig manifests, px_build)
+NP_LEAD = L.NP_LEAD                         # the least wind-up for the framework's own warning glint (hz/np_auto)
 CX, CY, CZ = A['cx'], A['cy'], A['cz']
 SAFE, WALK, RAD = A['safe'], A['walk'], A['r']
 # Arena box (also used by the arena generator and room/remove): centre +-24, y 190..240.
@@ -236,7 +237,7 @@ w('init', '\n'.join(
        'execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0',
        'scoreboard players set #mbNoDodge mb 0',
        'scoreboard players set #mbNoParry mb 0',
-       '# combat overhaul C: the unparriable-attack glint spacing (np_glint) and a module that draws its own warnings (#mbNpOwn 1)',
+       '# combat overhaul C: the unparriable-attack glint spacing (np_gate) and a module that draws its own warnings (#mbNpOwn 1)',
        'execute unless score #mbNpAt mb matches -2147483648.. run scoreboard players set #mbNpAt mb -1000000',
        'execute unless score #mbNpOwn mb matches 0..1 run scoreboard players set #mbNpOwn mb 0',
        '# Chapter mode (AZ-CM): the fight arena (#mbAr = arena n, plaza 0) and its walk / safe radius in tenths, the',
@@ -362,7 +363,8 @@ scoreboard players set #hzLinger mb 8
 scoreboard players set #hzQuiet mb 0
 scoreboard players set #hzNoDodge mb 0
 scoreboard players set #hzRearm mb 0
-# combat overhaul C: no-parry options (-1 = the default rule: hz/np_def; props: parryable unless no-dodge)
+# combat overhaul C: no-parry options (-1 = the default rule: hz/np_def; props: parryable unless no-dodge; hazards: 1 =
+# unparriable, 2 = unparriable and the module warns itself: mboss_lib.hz_opts(noparry=1, glint=False))
 scoreboard players set #hzNoParry mb -1
 scoreboard players set #pjNoParry mb -1
 scoreboard players set #pjEl mb -1
@@ -569,7 +571,7 @@ scoreboard players set #mbPause mb 0
 scoreboard players set #mbNoLeash mb 0
 # hr FN-f: no fight starts with the module's bars-off flag (mboss/bars_off / bars_on; world skips mboss/bars while it is 1)
 scoreboard players set #mbBarOff mb 0
-# combat overhaul C: the framework draws the unparriable warning glint (np_glint) unless the module sets #mbNpOwn 1 at its spawn
+# combat overhaul C: the framework draws the unparriable warning glint (np_glint / np_glint_here) unless the module sets #mbNpOwn 1 at its spawn
 scoreboard players set #mbNpOwn mb 0
 # hr FN-bal (hr_design §1.3): no fight starts with a module's balance-off flag (#mbBalOff 1: bal/boss/may refuses balance damage)
 scoreboard players set #mbBalOff mb 0
@@ -1700,7 +1702,8 @@ for kind, keys, body in (
         '# As anything, positioned on the floor point, rotated = aim (pitch ignored). tell = ticks of telegraph',
         '# until the hit is resolved, dmg = % of the boss base hit (0 = telegraph only). Units: tenths of a block.',
         '# Options: opts_reset (#hzGrp = volley group, see mboss/grp_new; #hzNoDodge 1 = no dodge, no i-frames;',
-        '# #hzNoParry 0 / 1 = parryable / not (default -1: hz/np_def, area attacks unparriable, with a warning glint);',
+        '# #hzNoParry 0 / 1 = parryable / not (default -1: hz/np_def: only no-dodge, per-mille, full-arena, mask and re-arming',
+        '# hazards; an unparriable hazard that can be dodged flashes the warning glint: hz/np_auto, or its module at the tell);',
         '# #hzRearm N = a hit disarms it for N ticks only, then it can hit again; live changes: hz/aim, hz/resize).',
         f'# Call: function rlk:mboss/hz/{kind} {{' + ','.join(f'{k}:..' for k in keys) + '}'] + body + [
         '$scoreboard players set #hzW mb $(tell)', '$scoreboard players set #hzD mb $(dmg)',
@@ -1800,10 +1803,11 @@ scoreboard players operation @s mbHzFX -= #ox mb
 scoreboard players operation @s mbHzFZ -= #oz mb
 kill @e[tag=rlk_mb_hzax]
 function rlk:mboss/hz/init_draw
-# combat overhaul C: unparriable (#hzNoParry, else the default rule) and, for a real hit, the warning glint at the boss
+# combat overhaul C: unparriable (#hzNoParry 1 / 2, else the default rule hz/np_def) and, for an unparriable hazard, the
+# warning glint when it is one to dodge and its own wind-up is the tell (hz/np_auto)
 scoreboard players operation @s mbHzNP = #hzNoParry mb
-execute unless score @s mbHzNP matches 0..1 run function rlk:mboss/hz/np_def
-execute if score @s mbHzNP matches 1 if score @s mbHzD matches 1.. run function rlk:mboss/np_glint
+execute unless score @s mbHzNP matches 0..2 run function rlk:mboss/hz/np_def
+execute if score @s mbHzNP matches 1.. run function rlk:mboss/hz/np_auto
 execute if score @s mbHzV matches 1.. run scoreboard players set #hzEv mb 0
 execute if score @s mbHzV matches 1.. run function rlk:mboss/d/hz_vis
 ''')
@@ -2083,21 +2087,36 @@ scoreboard players operation #r2 mb += #t mb
 execute if score #r2 mb > @s mbHzRI run function rlk:mboss/hz/hurt
 ''')
 w('hz/np_def', '''
-# @s = a new hazard without an explicit #hzNoParry (combat overhaul C, the user's 11-10 choice: only some big boss attacks are
-# unparriable - area attacks and grabs). Unparriable by default: no-dodge (#hzNoDodge), per mille (#hzPm), re-arming
-# (#hzRearm: a lingering field), ring (a wave), full arena, mask; a disc of radius >= 4.5 b; a sector or a line reaching
-# >= 8 b. Parryable: the smaller one-shot disc / sector / line (the weapon strikes, sword-qi), and every projectile.
-scoreboard players set @s mbHzNP 1
-execute if score @s mbHzND matches 1 run return 0
-execute if score @s mbHzPm matches 1.. run return 0
-execute if score @s mbHzRA matches 1.. run return 0
-execute if score @s mbHzK matches 1 if score @s mbHzR matches ..4499 run return run scoreboard players set @s mbHzNP 0
-execute if score @s mbHzK matches 3..4 if score @s mbHzR matches ..7999 run return run scoreboard players set @s mbHzNP 0
+# @s = a new hazard without an explicit #hzNoParry (combat overhaul C; the user's 11-10 choice: only some big boss attacks
+# are unparriable - area attacks and grabs; review B-01). Unparriable by default only what a parry cannot answer by its
+# nature: a no-dodge hazard (#hzNoDodge: a jump / safe-zone / position check), a per-mille hit (#hzPm), a re-arming one
+# (#hzRearm: a lingering field or beam), the full arena (kind 5) and a mask (kind 6). Everything else - a line, sector, disc
+# or ring of any size - is parryable unless its module says mboss_lib.hz_opts(noparry=1) (the module's short list of big
+# hits); every projectile is parryable unless it is no-dodge or says pj_opts(noparry=1).
+scoreboard players set @s mbHzNP 0
+execute if score @s mbHzND matches 1 run return run scoreboard players set @s mbHzNP 1
+execute if score @s mbHzPm matches 1.. run return run scoreboard players set @s mbHzNP 1
+execute if score @s mbHzRA matches 1.. run return run scoreboard players set @s mbHzNP 1
+execute if score @s mbHzK matches 5..6 run scoreboard players set @s mbHzNP 1
 ''')
-w('np_glint', '''
-# The unparriable-attack warning (combat overhaul C; the original's yellow flash, video_notes 1.6): a gold sphere-ring with a
-# long horizontal flare on the boss's chest, bright then fading (player/def/fx/glint), and a chime. Once per #npGap tmp ticks
-# (a volley warns once); never while a cutscene runs; a module that draws its own warnings sets #mbNpOwn mb 1.
+w('hz/np_auto', f'''
+# @s = a new unparriable hazard (mbHzNP 1, or 2 = the module warns for it itself: mboss_lib.hz_opts(noparry=1, glint=False);
+# stored as 1). The warning glint means "this cannot be parried: dodge it" (reviews B-02 / B-04), so the framework flashes
+# it here only for a hazard that hits, can be dodged (not #hzNoDodge: those are answered by position and keep their own
+# tells), is a strike (not #hzRearm: a lingering field / beam) and whose own wind-up is the tell: made at least
+# {NP_LEAD} t before its strike. A hazard made later than that (a strike-frame hazard) is announced by its module at the
+# pattern's tell tick (mboss/np_glint or np_glint_here from there), never 1 t before the hit.
+execute if score @s mbHzNP matches 2 run return run scoreboard players set @s mbHzNP 1
+execute unless score @s mbHzD matches 1.. run return 0
+execute if score @s mbHzND matches 1 run return 0
+execute if score @s mbHzRA matches 1.. run return 0
+execute if score @s mbHzW matches ..{NP_LEAD - 1} run return 0
+function rlk:mboss/np_glint
+''')
+w('np_gate', '''
+# The gate of the unparriable-attack warning (np_glint / np_glint_here): #npOk mb 1 = draw it now. Once per #npGap tmp
+# ticks (a volley warns once); never while a cutscene runs; a module that draws its own warnings sets #mbNpOwn mb 1.
+scoreboard players set #npOk mb 0
 execute if score #mbNpOwn mb matches 1 run return 0
 execute if score #mbCine mb matches 1 run return 0
 execute store result score #npNow mb run time query gametime
@@ -2105,12 +2124,37 @@ scoreboard players operation #t mb = #npNow mb
 scoreboard players operation #t mb -= #mbNpAt mb
 execute if score #t mb < #npGap tmp run return 0
 scoreboard players operation #mbNpAt mb = #npNow mb
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s anchored eyes positioned ^ ^-0.35 ^ run function rlk:player/def/fx/glint
+scoreboard players set #npOk mb 1
 ''')
+w('np_glint', '''
+# The unparriable-attack warning (combat overhaul C; the original's yellow flash, video_notes 1.6): a gold sphere-ring with a
+# long horizontal flare, bright then fading (player/def/fx/glint), and a chime: "this attack cannot be parried: dodge it".
+# Drawn on the visible body: the running boss's glint point (mboss/d/np_at: the chest / head of its rig above the body
+# anchor, registry "glint"; never the hit-box husk's eyes - a px boss's husk is 0.2 b tall - and never under the floor).
+# Called by hz/np_auto (a hazard whose wind-up is the tell) and by the modules at the tell tick of an attack whose hazard
+# is made at the strike frame (mboss_lib.np_warn). Any executor. Gate: np_gate.
+function rlk:mboss/np_gate
+execute if score #npOk mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s rotated ~ 0 run function rlk:mboss/d/np_at
+''')
+w('np_glint_here', '''
+# np_glint at the execution position (mboss_lib.np_warn(at=...)): for a tell during which the visible body is not at the
+# body anchor's glint point - the module gives the rig point (a clip's chest / head anchor, a spot above the floor where
+# she will come out). Same gate. The caller keeps it above the floor.
+function rlk:mboss/np_gate
+execute if score #npOk mb matches 1 run function rlk:player/def/fx/glint
+''')
+out.write('mboss/d/np_at', '\n'.join(
+    ['# GENERATED (a table over the enabled entries, like the hook dispatchers of this folder): the warning glint\n'
+     '# (player/def/fx/glint) at the running boss\'s glint point. @s = the body husk, at it,',
+     '# rotated ~ 0. The point is the registry field "glint" [up, forward] in blocks from the body anchor (the chest / head of the',
+     '# visible rig at rest; mboss_lib.glint_of: default = 3/4 of the husk height for a husk-sized rig, 2 b for a px rig).']
+    + [f'execute if score #mbId mb matches {b["n"]} positioned ^ ^{L.num(L.glint_of(b)[0])} ^{L.num(L.glint_of(b)[1])} run return run function rlk:player/def/fx/glint'
+       for b in BOSSES]
+    + ['# (no running registry boss: 2 b over the body)', 'execute positioned ~ ~2 ~ run function rlk:player/def/fx/glint']))
 w('hz/hurt', '''
 # One hit per hazard: an avoided hit (i-frames, a dodge, a perfect parry) also consumes it. #hzRearm hazards arm again
 # mbHzRA ticks later; #hzNoDodge hazards ignore dodges and i-frames (mboss/hurt with #mbNoDodge 1); unparriable ones
-# (mbHzNP) pass #mbNoParry 1.
+# (mbHzNP) pass #mbNoParry 1. Its volley group (mbHzG): one volley / one swing = one answer (mboss/grp_hit).
 # AP-FW (cm.md 13.7, 13.11): refused while #mbCine 1 without being consumed (it can still hit after the cine); a
 # per-mille hazard (#hzPm) hits through mboss/pl_dot (hz/hurt_pm).
 execute if score #mbCine mb matches 1 run return 0
@@ -2130,7 +2174,7 @@ function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
 scoreboard players operation #g mb = @s mbHzG
-execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
+execute if score #g mb matches 1.. run function rlk:mboss/grp_hit
 ''')
 w('hz/rearm_at', '''
 # @s = a #hzRearm hazard that is disarmed now: armed again when the re-arm clock #mbHzClk reaches mbHzRT.
@@ -2352,14 +2396,25 @@ for k in range(1, 41):
     out.write(f'mboss/pj/b/{k}', '\n'.join(lines))
 w('grp_new', '''
 # A new volley group id in #mbGrp mb (never 0). Before each hz/pj create of the volley copy it into the one-shot
-# option: scoreboard players operation #hzGrp mb = #mbGrp mb (or #pjGrp). The first hit of the group that lands
-# (not dodged) makes every other live hazard and prop of the group harmless (mboss/grp_mark).
+# option: scoreboard players operation #hzGrp mb = #mbGrp mb (or #pjGrp). One volley / one swing = one answer: the first
+# member that lands (also parried at tier 1 / 2), is perfect-parried or perfect-dodged makes every other live hazard and
+# prop of the group harmless (mboss/grp_hit -> grp_mark). A swing made of per-tick wedges is one group.
 scoreboard players add #mbGrpN mb 1
 execute if score #mbGrpN mb matches 1000000.. run scoreboard players set #mbGrpN mb 1
 scoreboard players operation #mbGrp mb = #mbGrpN mb
 ''')
+w('grp_hit', '''
+# @s = a hazard / prop of volley group #g mb (>= 1) whose hit was just judged (hz/hurt, pj/hit, hz/hurt_pm). One volley /
+# one swing = one answer (reviews B-10 + A-04): the group is consumed (grp_mark) when the hit landed (#dodged 0: a full
+# hit or a tier-1 / tier-2 parry) and also when it was answered perfectly - a perfect parry (#parT tmp 3) or a perfect
+# dodge (#pdg tmp 1): the later wedges of a swept swing and the rest of a staggered volley do not hit one tick after the
+# press was spent. Burst / revive / fall i-frames (#dodged 1 with neither) do not consume it.
+execute if score #dodged tmp matches 0 run return run function rlk:mboss/grp_mark
+execute if score #parT tmp matches 3 run return run function rlk:mboss/grp_mark
+execute if score #pdg tmp matches 1 run function rlk:mboss/grp_mark
+''')
 w('grp_mark', '''
-# #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
+# #g mb = a volley group that was just answered (grp_hit: a landed hit, a perfect parry or a perfect dodge): its hazards and props stop testing for hits (the strike
 # visuals and the flights go on). #mbGrpL remembers it, so a member made later (hz/init, pj/launch) starts harmless:
 # one hit per group even when a member is created after the hit (e.g. a burst made at a prop's life end).
 # #mbGrpL2 is the same for one-shot hits only: a #hzRearm hazard (a lingering field ticking every 10 t) that lands next
@@ -2423,7 +2478,7 @@ function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
 scoreboard players operation #g mb = @s mbPjG
-execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
+execute if score #g mb matches 1.. run function rlk:mboss/grp_hit
 scoreboard players set #pjEv mb 4
 scoreboard players set #pjKeep mb 1
 function rlk:mboss/d/pj_end
@@ -3502,7 +3557,7 @@ scoreboard players set #hcK tmp 3
 scoreboard players operation #hcND tmp = @s mbHzND
 scoreboard players operation #hcNP tmp = @s mbHzNP
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/def/judge
-execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_dodge
+execute if score #dodged tmp matches 1 run return run function rlk:mboss/hz/hurt_pm_dodge
 scoreboard players set #mbShIn mb 0
 execute if entity @a[tag=player,scores={shieldHP=1..},limit=1] run scoreboard players set #mbShIn mb 1
 execute if entity @a[tag=player,scores={gShield=1..},limit=1] run scoreboard players set #mbShIn mb 1
@@ -3516,6 +3571,13 @@ scoreboard players operation #cmEl tmp = @s mbHzE
 function rlk:mboss/hurt_ev
 scoreboard players operation #g mb = @s mbHzG
 execute if score #g mb matches 1.. run function rlk:mboss/grp_mark
+''')
+w('hz/hurt_pm_dodge', '''
+# @s = a per-mille hazard whose hit was avoided (#dodged 1): the dodge event (hurt_dodge), and a perfect dodge consumes
+# its volley group as on any hazard (grp_hit: one volley = one answer).
+function rlk:mboss/hurt_dodge
+scoreboard players operation #g mb = @s mbHzG
+execute if score #g mb matches 1.. run function rlk:mboss/grp_hit
 ''')
 w('hz/hurt_pm_bol', '''
 # ar FN-1: the rest of hz/hurt_pm for a Bond-of-Life per-mille hazard (@s, mbBol 1..100; #mbBolIn = mbBol for this

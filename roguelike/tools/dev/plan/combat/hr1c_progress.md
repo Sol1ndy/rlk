@@ -1,6 +1,7 @@
 # lane H1c (홍련 rebuild: what the fight looks like) — progress
 
-Branch `wip/combat-hr1c` (from `origin/wip/combat` c7dcc4fbf; merged: `origin/wip/combat` 6522feef5 and
+Branch `wip/combat-hr1c` (from `origin/wip/combat` c7dcc4fbf; merged: `origin/wip/combat` 8fe44f516 (with fix lane FB;
+the one conflict, `tools/build_balance.py` `boss/may`, keeps both new rules: H1's `#mbBalOff` and FB's `rlk_mb_inv`) and
 `origin/wip/combat-hr1` c1e53b116 = lane H1's finished fight core with its interface commit 15fad96a9), worktree `<S>/cb/wt_hr1c`, pack
 copy `<S>/rp_hr1c` (`<S>` = the scratchpad of `h_common.md`). Contract: `hr_design.md` §2.1-§2.3, §5.4, §8.2-§8.6. Owner of
 the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tools/build_mboss_hr_fx.py`.
@@ -61,7 +62,7 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
     them); the pitch section knows the aimed beam.
   - `s1k/render/render_hr.py` (new): effect strips of the kit from the F5 camera (the hr kit had no renderer in the repo).
 
-## Gates (the merged tree = H1's final head + this lane, 11-11)
+## Gates (the merged tree = `wip/combat` 8fe44f516 + H1's final head + this lane, 11-11)
 - Builds: rig 59 clips, 0 stand-ins, 8 cinematic placeholders (H2c's); kit 56 presets, 110 sounds, 36 glyphs;
   `regen_all.sh` 0 failures; `check_mboss_pack.py` 0 problems; `api.py --check` ok.
 - `test_clips_h1c.py` 297 / 297.

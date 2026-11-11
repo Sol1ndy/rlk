@@ -1,6 +1,6 @@
 # One hit per hazard: an avoided hit (i-frames, a dodge, a perfect parry) also consumes it. #hzRearm hazards arm again
 # mbHzRA ticks later; #hzNoDodge hazards ignore dodges and i-frames (mboss/hurt with #mbNoDodge 1); unparriable ones
-# (mbHzNP) pass #mbNoParry 1.
+# (mbHzNP) pass #mbNoParry 1. Its volley group (mbHzG): one volley / one swing = one answer (mboss/grp_hit).
 # AP-FW (cm.md 13.7, 13.11): refused while #mbCine 1 without being consumed (it can still hit after the cine); a
 # per-mille hazard (#hzPm) hits through mboss/pl_dot (hz/hurt_pm).
 execute if score #mbCine mb matches 1 run return 0
@@ -20,4 +20,4 @@ function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
 scoreboard players operation #g mb = @s mbHzG
-execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
+execute if score #g mb matches 1.. run function rlk:mboss/grp_hit

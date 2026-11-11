@@ -28,8 +28,9 @@ scoreboard players operation @e[tag=rlk_rd_hnew,limit=1] rdShape = @e[tag=rlk_rd
 scoreboard players add @e[tag=rlk_rd_hnew,limit=1] rdShape 20
 $scoreboard players set #rdFlag rd $(nd)
 execute if score #rdFlag rd matches 1 run tag @e[tag=rlk_rd_hnew,limit=1] add rlk_rd_nododge
-# combat overhaul C: an unparriable hit (nododge) flashes the warning glint on Raiden (player/def/fx/rd_glint, spaced)
-execute if score #rdFlag rd matches 1 if score @e[tag=rlk_rd_hnew,limit=1] rdDamage matches 1.. run function rlk:player/def/fx/rd_glint
+# combat overhaul (reviews B-04 / B-11): the warning glint means "cannot be parried: dodge it". Raiden's unparriable
+# hazards are her no-dodge ones (돌진, 수천수만의 염원, guard recovery, 만겁 베기: answered by position) and the field /
+# safe-dome kinds 9 / 10 (hazard/land): none of them can be dodged, so none flashes it - they keep their own tells.
 $scoreboard players set #rdFlag rd $(jp)
 execute if score #rdFlag rd matches 1 run tag @e[tag=rlk_rd_hnew,limit=1] add rlk_rd_jump
 $scoreboard players set #rdFlag rd $(det)
