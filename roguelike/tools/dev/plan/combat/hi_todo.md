@@ -18,3 +18,11 @@ The 11-11 release (전투 개편, stamp c9eed47) is on the release branch; HI st
    (0.8-1.5) miss. T1 / T2 have no 타키 baseline in this tool (use T3). T6 σ1 / T12 are unattainable with a 3-t window and a 1-t
    error (max ≈ 86.6 %): restate those targets. Knobs in hr_design §6.4 (a3 weight → a3s, `GAUGE['hit']`, the groggy's pay-off).
 8. Things only the user can check in the game (collect for the final reply): lane reports H1 / H1c / H2 / H3 "only a person in the game".
+
+## From H2c (done: `wip/combat-hr2c` 2fdfa2405; merged H1 + wip/combat b327762e5, not H2 / H1c)
+9. Intro 1290-1296 (shot I18): her low brim passes 0.13 b in front of the lens → lower the eye or start the shot a few ticks later.
+10. test_rig's cinematic rows (states, hand-overs, big-swing spans, the intro stone check) still use the 11-06 events: replace with
+    `test_cine.py`'s §4.1 versions. test_kit's sound-count pin (104 → H1's additions).
+11. Small, reported: hat switch jumps 0.19-0.20 b at repel 84 / 139; the brim 1.7 mm into the head's corner at cs1 236; the sheathed
+    hilt 1-2 cm off the scabbard pivot at intro 787-788; the lying fist 0.046 b off its target (limit 0.04) in the hat pick-up.
+12. H2's white overlay stand-in for the deflect becomes the `gold` glyph now that H2c's kit block exists (check after the merge).
