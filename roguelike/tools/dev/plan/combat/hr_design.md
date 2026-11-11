@@ -822,3 +822,22 @@ reads (request to lane VB in `vp_progress.md`).
   approach: at its start) as the marker `rlk_hr_gst`; A8.3 leaps to 1.3 b before the player; the dive reappears 18 t before the
   judge 3 b over a spot 4.5 b before the player (`A8_SCRIPT` 202, `A13_SCRIPT` 224) and ends 1 b over the spot 2 b before them.
 - §1.2 the gauge's under bar shows its five segments (dividers; `#buSubSeg bu 5`).
+
+## 10. Round V, the integration (11-12, lane VI) — what the merge of VC / VP / VB added to this design
+As built: `vi_progress.md`, `tools/dev/sim/hr/tests/test_vi.py`.
+- **Her kit's card clock is the beat's clock** (`build_mboss_hr_fx.py`: `fx/e/make` and `fx/e/world` read the game time minus
+  `#btLag cb`, `fx/e/world` only re-schedules itself on a held tick): the cue star, the flashes and every preset card stand still
+  with her and stay in step with the hit they announce. The HUD clocks of the kit (the typed line, the overlays) stay on the raw
+  game time: they mirror `title` timers of the client, which no beat holds. The sweep cards of §9 need nothing: they are literal
+  commands on pattern ticks.
+- **Her model after an instant move in the fight** (`s3lib.RIG_NOW` = `rig/follow_now` at the body): the gauntlets' reappearances
+  (`p_ghost.tp_spot`), a cancelled leap's landing (`core/ground_to`; `g/ground` uses it), the revive's placing (`core/place8`),
+  the replay's seat. Before, the model stayed where she vanished for 3-16 ticks after every reappearance (§8.9's finding, in the
+  fight). Incremental moves inside the hook (walk, dash steps) keep the old one-tick trail (<= 0.3 b).
+- **The skip**: the core's parked input (`core/skip`, `core/skip_cs1`) reads the jump key too; `api.SKIP_HINT` = ' · Space 길게'.
+- **§6.4**: `DMG['T2']` 42 -> 44 (raw 6 -> 7). On the merged tree T1 fell to 0.97 on seed 33 (lane VB's moves shift where the next
+  pick starts from); a damage tier changes no pick and no clock, so every other row keeps its measured value (the table in the
+  README's 홍련 section and `vi_progress.md`).
+- **The actor hides lane VP's stand-in rig** (`char/cine/hide`: `rlk_pl` out of view) for the one tick a beat outlives the start of
+  a locked sequence.
+

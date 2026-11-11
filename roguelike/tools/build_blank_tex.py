@@ -12,7 +12,8 @@ What it writes (deterministic, 64 x 64, all transparent):
   assets/minecraft/textures/entity/zombie/husk.png, husk_baby.png
       the husk: in this pack a husk is only ever an invisible hit-box carrier - the body of every boss of the framework
       (mboss: rlk_mb_body), of every custom mob (cm/spawn/*) and the proxies of the chapter bosses; their looks are display
-      rigs. (The one visible husk is the developer fallback `#mobTmp room 1` of room/mob_summon: it loses its look.)
+      rigs. (The one visible husk was the developer fallback `#mobTmp room 1` of room/mob_summon: a zombie since the
+      round V integration.)
   assets/rlk/textures/skin/blank.png
       the skin of a mannequin that must not be seen: the avatar while the cutscene actor stands in for it
       (char/cine/blank: profile.texture "rlk:skin/blank"), the mob lure (cm/lure_new).
