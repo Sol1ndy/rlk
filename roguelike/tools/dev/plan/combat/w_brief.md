@@ -57,7 +57,26 @@ them); every high / medium finding in your area is yours as well as the user's p
    now does (travel, i-frames, cooldown). Do not weaken the dodge as an answer to attacks: the i-frame windows and
    the cooldowns stay.
 
-### WB — the boss in the fight (owner as lane VB), only if the fight review finds high / medium defects there.
+### WB — the boss in the fight (owner as lane VB)
+The user, 11-12, after seeing the round V blade path in play (verbatim): 「보스의 검로가 보이는건 미리 경로를 보여주라는게 아니라
+공격이 좀 더 잘 보이도록 이미 지나온 경로를 표시하라는 거야」 — the lead misread the round V request: the path was never meant
+to be shown ahead of the cut. Ruling:
+1. **Remove every path shown ahead of the blade**: the pre-drawn swing paths and their running heads, the straight target
+   lines of dashes / plunges, the tall mark over a dash's locked spot, kcut's / nb's pre-drawn lines, the gauntlet
+   stations' standing paths. Nothing may show where the blade is going to go. (The cue star, the colour flashes and the
+   wind-up poses are the telegraph and stay as they are.)
+2. **A trail of where the blade has been**: from the first tick of the wind-up to the end of the follow-through the
+   blade leaves a bright ribbon behind it — the surface its edge has swept in the last ticks, generated from the
+   clip's own blade track (`tools/scarlet_blade_track.json`), brightest at the blade and fading out over ~6-8 ticks —
+   so the raise, the hold and the cut can all be followed by eye at the fight camera's distance (the round V size
+   rules hold: ≥ 0.12 b wide where it is narrowest, readable on both fields). During a dash or a plunge the trail is
+   behind her / her blade along the way she has come. The hit-tick slash generated from the same track (round V) is
+   the trail's brightest moment — one coherent effect, not two stacked ones. Colour: keep white-gold for parryable
+   hits and the flash colour for unparriable ones unless it reads worse than one colour.
+3. The trail follows the pattern clock (frozen / slowed with her during the beat, as the round V cards do).
+4. Hit ticks, damage, shapes, weights, the wind-up clips, the blade edge, the cue star, the flashes, leaps, dash stops
+   and gauntlet stations of round V stay. Re-run the balance suites.
+5. Every high / medium finding of the fight review in your area.
 
 ## 3. Common
 Base branch `origin/wip/w`; branches `wip/w-cam`, `wip/w-player`, `wip/w-boss`; worktrees `$S/cb/wt_w<c|p|b>`; pack
