@@ -1,55 +1,43 @@
-"""Ghost patterns of 홍련 (Scarlet), stage S4 (plan S:hr/PLAN.md §4.1-4.5, §5; contract S:hr/contract.md §3.5-3.6):
-R1 자영 돌격, R2 월륜 일섬, R3 자영 활강 (P2 entries cut from the gauntlets' moves) and the gauntlets A8 자영 연참 (60 %) /
-A13 필살 · 자영 연참 (5 %), with the shared ghost helpers g/**. OWNER: S4. Written by S3's tools/build_mboss_scarlet.py
-through api.Writer('S4', api.OWN['S4']) (outputs F:boss/scarlet/p/{r1,r2,r3,a8,a13}/** and F:boss/scarlet/g/**).
+"""P2's entries and the gauntlets of 홍련 on the new combat (hr_design §2.2, §2.4; lane H1): MX 자광 십자참, NB 낙월 사선,
+Q 자영 포박 · 천공 낙월 (P2 only) and the gauntlets G1 = A8 자영 연참 (60 %) / G2 = A13 필살 · 자영 연참 (5 %), with the
+shared ghost helpers g/**. Written by tools/build_mboss_scarlet.py through api.Writer('S4', api.OWN['S4']) (outputs
+F:boss/scarlet/p/{mx,nb,q,a8,a13}/** and F:boss/scarlet/g/**).
 
-Every timing comes from api.SCRIPTS (the rows: a clip's start on the pattern clock, the cut made at that step) and
-api.ev (the clip events: every effect / sound / move at its event, PLAN §4.5 move table); every cut through api.cut()
-(g/cut/make / aim / lock), every disc through api.disc() (g/disc/throw), the shield only through api.shield(); hits
-are the framework's (mboss/hz/disc, mboss/pj/launch), quiet (#hzQuiet 1, no outline / flash / decal), Electro 1U.
+MX / NB / Q are built with s3lib.PB like the P1 kit (api.HITS rows, the parry cue of every P hit, the flashes of every N
+hit). The gauntlets come from api.SCRIPTS (the rows: a clip's start on the pattern clock, the cut made at that step) and
+api.ev (every effect / sound / move at its clip event); every cut through api.cut() (g/cut/make / aim / lock): a quiet,
+parryable Electro disc of api.CUT_R that follows the player until its lock = strike - 7, where the parry cue plays (the
+pink glint at her blade + its chime). The shield is the 5-segment gauge (shield.py): a cut whose hit is judged a perfect
+parry takes one segment (the core's shield/tick after every gauntlet tick); a perfect dodge, a tier 2 / 1 parry or walking
+out takes none.
 
 Runtime (api.Pattern; @s = the body, at it; clock #pt hr = played ticks since start; the shown clip tick == #pt):
-- p/<key>/start (tick 0), p/<key>/tick -> the 16-tick block p/<key>/b/<i> -> the tick file p/<key>/k/<t>,
-  p/<key>/cancel (any executor, idempotent). #done hr 1 on the last tick (R1 67, R2 60, R3 49 - F1 HR-14: R1 / R3 end 12 t
-  after their last hit; A8 REPEL_T 206 after a deflect / FAIL60_P2_T 214 after the fail; A13 270 both).
-- The cut builder (PLAN §5.3): g/cut/make {s,t,dmg,kb,n} makes a quiet Electro disc hazard of api.CUT_R at the player's
-  feet on the floor (hz_opts quiet 1 / sfx 0 / el 3 / act 2, kb along her -> the player: kbdir 1), tagged rlk_hr_cut +
-  rlk_hr_p + rlk_hr_p_<key of #pat>, objective hr = s (its strike tick), rlk_hr_cnt when it counts; g/cut/aim {s} puts it
-  on the player again (mboss/hz/aim, every tick made + 1 .. lock - 1); g/cut/lock {s} the last aim and, for a counting
-  cut, shield/cut {s} as its marker at it (S3's pip window at the lock point). R1 / R3 cuts never count (n 0).
-- The moon disc (PLAN §4.5 A7): g/disc/throw {kb}: one item display card 1 b in front of her, api.DISC y 0.9 b over the
-  floor (the framework's blade rows then cover 0 .. 1.65 b: a jump does not clear it), summoned, then rotated toward its
-  lock (pitch 0; F1 HR-15: g/disc/lock put a marker at the player's feet LOCK_LEAD t before the release and turned her to
-  it), launched (pj/launch blade, hr 1.4, life 16, wall stop, T2 Electro, kb), dressed by the kit (fx/prop/disc) or a flat
-  purple pane stand-in; no homing; never counts for the shield.
+- p/<key>/start (tick 0), p/<key>/tick -> the 16-tick block p/<key>/b/<i> -> the tick file p/<key>/k/<t> (gauntlets),
+  p/<key>/cancel (any executor, idempotent). #done hr 1 on the last tick: G1 at JUDGE_T 220 with a deflect (the core
+  starts seq/repel in that tick) or FAIL60_P2_T 240 after the fail; G2 at 242 with a deflect, 254 after a survived fail.
 - Spots g/spot/<name> (@s = the body): a marker rlk_hr_gsp at the first candidate passing mv/ok (inside MOVE_R 22.5, feet
-  and head free), the candidates relative to the player's facing (api.REAPPEAR bearings / distances and their
-  fallbacks), else the guaranteed fallback: the point on the player -> C line at the move's distance (<= FALLBACK_R from
-  C), walked toward the axis in 0.5 b steps until mv/ok passes (never in blocks).
+  and head free), the candidates relative to the player's facing (api.REAPPEAR), else the guaranteed fallback: the point
+  on the player -> C line at the move's distance (<= FALLBACK_R from C), walked toward the axis until mv/ok passes.
 - The ghost: rlk_hr_ghost on the body + the rig look form/ghost from the lilac switch (T0); the core keeps rlk_mb_inv
-  then. Gauntlets: off at the dive's reappearance (form normal, A8.9). R1 / R3: form normal at g_reform's 'solid' event,
-  the tag off at the script's 'solid' row (R1 62, R3 46: hittable again); from that row to the end (R2: api.TAIL_MOVE t
-  after its last release) she turns to the player and moves as the recovery does (F1 HR-14: ai/tail, ai/tail_step).
-- The gauntlet frame (PLAN §5.4-5.5): the judge at api.JUDGE_T calls shield/judge (S3 plays the deflect staging), the
-  darkness lifts (arena_look crimson) and the warning banner goes; deflect: she drops from 1 b above the player to the
-  floor 1.2 b in front of them (JT + 2 .. JT + 10), #done at REPEL_T; the fail by the gauntlet's switch (question 6):
-  not lethal (A8 by default; A13 with ULT5_LETHAL false) = ult/fail60 at the player's floor spot (the push ring blows them
-  off it), she lands on that impact point, g_reform; lethal (A13 by default; A8 with ULT60_LETHAL true) = the black overlay
-  3 t before the judge when pips are left, at the judge the pink-white overlay + scarlet_line + petal_burst + the slash
-  sound + ult/fatal as the player, she lands 2 b in front of them. #done: A8 at FAIL60_P2_T, A13 at REPEL_T.
+  then; off at the dive's reappearance (form normal, A8.9). Q's grab: ghost 4-20.
+- The gauntlet frame: the judge at api.JUDGE_T calls shield/judge; the warning banner goes. Gauge 0: #done in the same
+  tick (the repel's first frames are the gold deflect; g_deflect is no longer played). Fail by the gauntlet's switch: not
+  lethal (G1 by default) = ult/fail60 at the player's floor spot, she lands on the impact point, g_reform, #done at
+  FAIL60_P2_T; lethal (G2 by default) = the black overlay 3 t before the judge when segments are left, at the judge the
+  pink-white overlay + scarlet_line + petal_burst + the slash sound + ult/fatal as the player, she lands 2 b in front.
 - Cancel (pause / reload / death / cleanup / tests): every entity of the pattern (rlk_hr_p_<key>, rlk_hr_cut, the spot
   marker), the body back to normal (ghost tag off, form normal, blade off, visible, no glide, on the floor); a gauntlet
-  also turns the banner off and requests crimson. Never #ph, the shield or the bars.
+  also turns the banner off. Never #ph, the gauge or the bars. The field stays crimson: no dark look is requested.
 
-TABLE[key] = the recorded hits (cuts / discs) and EVENTS[key] = (tick, kind, name, source) of every effect / sound / rig
-call for the tests (S:hr/tests/pat_ghost.py) and renders (S:hr/s4/render_ghost.py); MOVES[key] = the body moves.
+TABLE[key] = the recorded hits and EVENTS[key] = (tick, kind, name, source) of every effect / sound / rig call of a
+gauntlet for the tests (pat_ghost.py) and renders; MOVES[key] = the body moves; CUES[key] the parry cue ticks.
 """
 import math
 from collections import defaultdict
 
 from . import api
 from . import s3lib as S
-from .s3lib import sset, fn, part
+from .s3lib import PB, sset, fn, part, placed
 
 L, K = api.L, api.K
 E = api.ev
@@ -59,11 +47,9 @@ OK = 'function rlk:mboss/mv/ok'
 FACE = 'function rlk:mboss/mv/face'
 STOP = 'function rlk:mboss/mv/stop'
 TAG_P, TAG_CUT, TAG_GHOST = api.TAGS['pat'], api.TAGS['cut'], api.TAGS['ghost']
-CNT_T = 'rlk_hr_cnt'                 # the hazard marker of a counting cut (g/cut/lock registers its pip window)
+CNT_T = 'rlk_hr_cnt'                 # the hazard marker of a counting cut
 SPOT_T = 'rlk_hr_gsp'                # the transient spot marker of g/spot/<name>
-DISC_T, DISC_NEW = 'rlk_hr_disc', 'rlk_hr_gdn'
-DISC_LOCK_NEW = 'rlk_hr_gln'         # F1 (HR-15): the transient tag of a new disc lock marker (g/disc/lock)
-FACE_LOCK = f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0'   # she faces the disc's lock marker
+FACE_LOCK = f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0'   # she faces the lock marker
 SPOT_M = f'@e[type=minecraft:marker,tag={SPOT_T},limit=1]'
 SPOT_ALL = f'@e[type=minecraft:marker,tag={SPOT_T}]'
 KILL_SPOT = f'kill {SPOT_ALL}'
@@ -71,7 +57,7 @@ BLOCK = 16                           # ticks per dispatch block of p/<key>/tick
 FIRST_PERSON, AVATAR = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=rlk_body]'   # F2 (HR-45): no avatar = first person
 DUST = S.DUST
 GAUNT = api.GAUNTLETS
-TABLE, EVENTS, MOVES = {}, {}, {}
+TABLE, EVENTS, MOVES, CUES, FLASHES, PPW = {}, {}, {}, {}, {}, {}
 
 
 def num(v, nd=3):
@@ -131,20 +117,9 @@ SPOTS = {
             ('face', 0, RE['D4']['dist']), ('face', RE['D4']['bearing'], 8.0), ('face', -RE['D4']['bearing'], 8.0)],
            RE['D4']['dist'], f"D4 far reappear: {num(RE['D4']['dist'])} b at {RE['D4']['bearing']:+d} (the player's front-left); "
            f"else {-RE['D4']['bearing']:+d} / 0 / +-{abs(RE['D4']['bearing'])} at 8 b"),
-    'tell': ([('face', 0, RE['tell']['dist']), ('face', 90, RE['tell']['dist']), ('face', -90, RE['tell']['dist']),
-              ('face', 180, RE['tell']['dist'])], RE['tell']['dist'], 'A13: inside the yellow tell, 3 b in front of the player'),
-    'far': ([('tobody', 0, RE['tell']['retreat']), ('tobody', 0, 9.0), ('tobody', 0, 6.0), ('tobody', 60, 9.0),
-             ('tobody', -60, 9.0)], RE['tell']['retreat'], 'A13: the retreat to 12 b from the player (on the player -> her line)'),
-    'back': ([('away', 0, 6.0), ('away', 0, 4.5), ('away', 0, 3.0), ('away', 90, 4.0), ('away', -90, 4.0)], None,
-             'R2: the retreat 6 b straight away from the player (shorter / sideways when blocked; else she stays)'),
-    'back1': ([('away', 0, 1.0)], None, 'R2: the step back 1 b (else she stays)'),
-    'beyond': ([('frombody', 0, 3.0), ('frombody', 0, 2.0), ('frombody', 0, 1.0), ('face', 0, 0.0)], 3.0,
-               'R1: the landing 3 b beyond the player (her leap over them)'),
     'over': ([('face', 0, 0.0)], 1.5, 'the player\'s own floor spot (the A8.3 leap and the A8.9 dive add the height)'),
     'land': ([('face', 0, 2.0), ('face', 90, 2.0), ('face', -90, 2.0)], 2.0,
              'the A13 fail landing 2 b in front of the player (she dove from straight above them: not toward her)'),
-    'lock': ([('face', 0, 1.2), ('face', 60, 1.2), ('face', -60, 1.2)], 1.2,
-             'the deflect: the blade lock 1.2 b in front of the player'),
 }
 
 
@@ -199,10 +174,11 @@ def cut_files(W):
     w('g/cut/make', [
         '# {s,t,dmg,kb,n} (api.cut; @s = the pattern\'s executor = the body): a ghost cut (PLAN §5.3) = a quiet Electro disc hazard',
         f'# of radius CUT_R {num(api.CUT_R, 1)} b at the player\'s feet on the floor, striking t ticks later (at pattern tick s), active 2 t,',
-        '# dmg % of the base hit, knockback kb along her -> the player (kbdir 1, the marker\'s yaw); no outline, flash or decal.',
+        '# dmg % of the base hit, knockback kb along her -> the player (kbdir 1, the marker\'s yaw); no outline, flash or decal;',
+        '# parryable (#hzNoParry 0): a perfect parry of it takes one gauge segment (shield/tick).',
         '# g/cut/tag stamps it (objective hr = s, rlk_hr_cut, the pattern tags, rlk_hr_cnt when it counts: n 1).',
         f'$scoreboard players set #g_s {OBJ} $(s)', f'$scoreboard players set #g_n {OBJ} $(n)']
-      + L.hz_opts(quiet=1, sfx=0, el=api.ELEC, act=2, kbdir=1)
+      + L.hz_opts(quiet=1, sfx=0, el=api.ELEC, act=2, kbdir=1, noparry=0)
       + ['$scoreboard players set #hzKB mb $(kb)',
          f'$execute at {PLAYER} positioned ~ {CY} ~ facing entity @s feet rotated ~180 0 run function rlk:mboss/hz/disc '
          f'{{r:{r},tell:$(t),dmg:$(dmg)}}',
@@ -220,58 +196,9 @@ def cut_files(W):
         f'$execute at {PLAYER} positioned ~ {CY} ~ facing entity {BODY} feet rotated ~180 0 as @e[type=minecraft:marker,tag={TAG_CUT},'
         f'scores={{{OBJ}=$(s)}}] run {L.hz_aim()}'])
     w('g/cut/lock', [
-        f'# {{s}}: the lock of the cut of strike s (strike - LOCK_LEAD {api.LOCK_LEAD}): the last aim; from now on it stays. A counting cut',
-        '# registers its pip window at this point (S3\'s shield/cut {s}, as the cut marker, at it).',
-        f'$function {NS}g/cut/aim {{s:$(s)}}',
-        f'$execute as @e[type=minecraft:marker,tag={CNT_T},scores={{{OBJ}=$(s)}},limit=1] at @s run function {NS}shield/cut {{s:$(s)}}'])
-
-
-def disc_files(W):
-    w = W.w
-    D = api.DISC
-    kit = bool(K.prop('disc'))
-    if kit:
-        nbt = f'{{Tags:{S.tags_nbt(TAG_P, DISC_T, DISC_NEW)},teleport_duration:1}}'
-    else:
-        nbt = (f'{{Tags:{S.tags_nbt(TAG_P, DISC_T, DISC_NEW)},teleport_duration:1,brightness:{{sky:15,block:15}},'
-               'item:{id:"minecraft:purple_stained_glass_pane",count:1},transformation:{left_rotation:[0.7071f,0f,0f,0.7071f],'
-               f'right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[{num(2 * D["hr"], 2)}f,{num(2 * D["hr"], 2)}f,0.2f]}}}}')
-    new = f'@e[type=minecraft:item_display,tag={DISC_NEW}]'
-    y = 0.9
-    lines = [
-        f'# {{kb}} (api.disc; @s = the body, at it): one A7 moon disc (PLAN §4.5): a blade projectile (#pjShape 1, half width',
-        f'# {num(D["hr"], 1)} b, {num(D["speed"], 2)} b/t asked = {math.ceil(D["speed"] / 0.25 - 1e-9) * 0.25:.2f} b/t flown (0.25 b sub-steps rounded up), life {D["life"]} t, wall stop),',
-        f'# {num(y, 1)} b over the floor (the blade rows cover 0 .. 1.65 b: a jump does not clear it), aimed at its lock (F1 HR-15:',
-        f'# g/disc/lock {api.LOCK_LEAD} t before the release; a throw without one locks now) (no homing), {D["tier"]} Electro, kb; one card:',
-        '# summoned 1 b in front of her, then rotated (pitch 0), then launched and dressed (kit fx/prop/disc; else a flat purple',
-        '# pane). Never counts for the shield. The lock marker goes after the launch.',
-        f'kill {new}',
-        f'execute unless entity {S.LOCK_M} run {fn("g/disc/lock")}',
-        f'execute at @s facing entity {S.LOCK_M} feet rotated ~ 0 positioned ^ ^ ^1 positioned ~ {num(CY + y, 2)} ~ run summon '
-        f'minecraft:item_display ~ ~ ~ {nbt}',
-        f'execute as {new} at @s facing entity {S.LOCK_M} feet rotated ~ 0 run tp @s ~ ~ ~ ~ ~',
-        f'execute as {new} run {fn("g/disc/tag")}']
-    lines += L.pj_opts(el=api.ELEC, wall=1, shape=D['shape'], noparry=1 if api.NOPARRY_DISC else None)
-    lines += ['$scoreboard players set #pjKB mb $(kb)',
-              f'execute as {new} at @s rotated as @s run {L.pj_launch(D["speed"], D["life"], api.DMG[D["tier"]], D["hr"])}']
-    if kit:
-        lines.append(f'execute as {new} run {K.prop("disc")}')
-    lines += [f'tag {new} remove {DISC_NEW}', f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]']
-    w('g/disc/throw', lines)
-    tag = ['# @s = the new disc card / its lock marker: the pattern tags of the running pattern (#pat).']
-    for k in ('r2', 'a13'):
-        tag.append(f'execute if score #pat {OBJ} matches {S.TID[k]} run tag @s add {S.tag_p(k)}')
-    w('g/disc/tag', tag)
-    # F1 (HR-15, lead decision 11-05): the disc's aim locks LOCK_LEAD t before its release (the rule: aims lock 6-8 t before the
-    # hit; PLAN §4.5 A7), so a player walking in still gets the lock + the flight to step out
-    w('g/disc/lock', [
-        f'# The lock of the next disc ({api.LOCK_LEAD} t before its release; @s = the body): a marker at the player\'s feet on the floor',
-        f'# ({S.LOCK_T} + the pattern tags, as p1\'s lock_fn), she faces it from now on; g/disc/throw aims at it and removes it.',
-        f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]',
-        f'execute at {PLAYER} positioned ~ {CY} ~ run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(TAG_P, S.LOCK_T, DISC_LOCK_NEW)}}}',
-        f'execute as @e[type=minecraft:marker,tag={DISC_LOCK_NEW}] run {fn("g/disc/tag")}',
-        f'tag @e[type=minecraft:marker,tag={DISC_LOCK_NEW}] remove {DISC_LOCK_NEW}',
-        FACE_LOCK])
+        f'# {{s}}: the lock of the cut of strike s (strike - LOCK_LEAD {api.LOCK_LEAD}): the last aim; from now on it stays (the',
+        '# parry cue of the cut plays in this tick: the pattern\'s own line).',
+        f'$function {NS}g/cut/aim {{s:$(s)}}'])
 
 
 def body_files(W):
@@ -301,7 +228,6 @@ def g_files(W):
         return
     _G_DONE.add(id(W))
     cut_files(W)
-    disc_files(W)
     spot_files(W)
     body_files(W)
 
@@ -314,7 +240,7 @@ class GB:
     def __init__(self, key, W):
         self.key, self.W = key, W
         self.ticks = defaultdict(list)
-        self.hits, self.events, self.moves = [], [], []
+        self.hits, self.events, self.moves, self.cues = [], [], [], []
         self.start_head, self.cancel_lines = [], []
         self.end_t = None
 
@@ -352,15 +278,12 @@ class GB:
         made, lock, strike, tier, kb = c
         for t, ln in api.cut(made, lock, strike, tier, kb, count):
             self.at(t, ln)
+        # the parry cue at the lock tick (hr_design §2.4): the pink glint at her blade + its chime
+        self.at(lock, S.cue())
+        self.ev(lock, 'cue', 'parry', ('cut', strike))
+        self.cues.append(lock)
         self.hits.append(dict(kind='cut', t=strike, made=made, lock=lock, tier=tier, kb=kb, n=count, step=step,
-                              shape='pdisc', dims=(api.CUT_R,), dmg=api.DMG[tier], tell=made))
-
-    def disc(self, t, kb, step, cond=None):
-        line = api.disc(kb)
-        self.at(t, S.gate(cond, line) if cond else line)
-        self.hits.append(dict(kind='disc', t=t, kb=kb, step=step, tier=api.DISC['tier'], dmg=api.DMG[api.DISC['tier']],
-                              shape='pj_disc', dims=(api.DISC['hr'], api.DISC['speed'], api.DISC['life']), cond=cond,
-                              lock=t - api.LOCK_LEAD))
+                              shape='pdisc', dims=(api.CUT_R,), dmg=api.DMG[tier], tell=made, parry='P', cue=lock))
 
     def end(self, t, cond=None):
         if self.end_t is None or t > self.end_t:
@@ -391,6 +314,7 @@ class GB:
                   f'kill @e[tag={S.tag_p(key)}]', f'kill @e[type=minecraft:marker,tag={TAG_CUT}]', KILL_SPOT,
                   f'execute as {BODY} run {fn("g/reset")}'] + self.cancel_lines
         W.w(f'p/{key}/cancel', cancel)
+        CUES[key] = sorted(self.cues)
         TABLE[key] = sorted(self.hits, key=lambda h: h['t'])
         EVENTS[key] = sorted(self.events, key=lambda e: e[0])
         MOVES[key] = self.moves
@@ -457,13 +381,12 @@ RISE_UP = 8.0                                     # A8.8: she rises 8 b up and o
 LEAP_UP, LEAP_T, LEAP_H = 2.5, 6, 30              # A8.3: mv/leap {t:6,h:30} over the player (gauntlets: to 2.5 b above them)
 DIVE_UP, DIVE_STOP = RE['A8.9']['up'], 1.0        # A8.9: 6 b above the player, the dive to 1 b above them
 RESTATION_T, DROP_T = 3, 2                        # the chain cuts' small glide to the station; A8.5's drop from the hang
-FALL_T = E('g_deflect', 'lock') - E('g_deflect', 'fall')   # the deflect: 1 b above the player -> the blade lock (8 t)
 LAND_T = 2                                        # the fail: her landing from 1 b above the player (A8: on the impact point;
 #                                                   the lethal fail: 2 b in front of the player)
 # Decoration bolts (api.BOLTS): (bearing relative to the player's facing, distance 3-6 b) per bolt
 BOLT_AT = ((-60, 3.6), (75, 4.4), (-130, 5.2), (150, 5.8))
-# A13 U4 "vanishes 89" (PLAN §4.5): g_ring does not end vanished; the vanish before D2's reappearance is the pattern's
-EXTRA_VANISH = {'a13': (89,)}
+EXTRA_VANISH = api.EXTRA_VANISH                    # g_ring does not end vanished: the vanish before D2's reappearance
+FAIL_END = 12                                     # G2: #done this long after a survived fail (-> the revive stance)
 
 
 class Walk:
@@ -589,14 +512,9 @@ class Walk:
             lk, lp = s - api.LOCK_LEAD, s - LEAP_T       # the lock (she faces the player), the leap (coil + 3 -> the hit, 6 t)
             g.at(lk, FACE)
             g.snd(lp, 'g_leap', src=('plan', 'A8.3 breeze.jump at 3'))
-            if self.gauntlet:
-                g.at(lp, leap_spot('over', LEAP_T, LEAP_H, LEAP_UP))
-                g.moves.append((lp, s, 'leap over (2.5 b up)'))
-            else:
-                g.at(lp, leap_spot('beyond', LEAP_T, LEAP_H))
-                g.moves.append((lp, s, 'leap beyond (lands 3 b past the player)'))
-            if self.gauntlet:
-                self.ends_vanished(t, clip, 'gone')
+            g.at(lp, leap_spot('over', LEAP_T, LEAP_H, LEAP_UP))
+            g.moves.append((lp, s, 'leap over (2.5 b up)'))
+            self.ends_vanished(t, clip, 'gone')
         elif step == 'A8.5':
             lk = s - api.LOCK_LEAD
             g.at(lk, FACE)
@@ -642,22 +560,17 @@ class Walk:
     def s_judge(self, jt):
         g = self.gb
         key = self.key
-        g.at(jt, api.shield('judge'), *[x for x in (api.arena_look('crimson'),) if x], *S.hud('warn', on=0))
+        g.at(jt, api.shield('judge'), *S.hud('warn', on=0))
         g.ev(jt, 'shield', 'judge', 'JUDGE_T')
-        g.ev(jt, 'look', 'crimson', 'JUDGE_T')
         g.ev(jt, 'hud', 'warn0', 'JUDGE_T')
         g.at(jt, S.gate(f'if score #gres {OBJ} matches 2', fn(f'p/{key}/fail')))
-        # deflect: she halts 1 b above the player (S3's judge plays g_deflect), drops into the blade lock
-        fall = jt + E('g_deflect', 'fall')
-        g.at(fall, S.gate(f'if score #gres {OBJ} matches 1', fn(f'p/{key}/fall')))
-        g.moves.append((fall, fall + FALL_T, 'deflect: down to the blade lock'))
-        self.gb.W.w(f'p/{key}/fall', [f'# {key.upper()} deflect (T + {fall - jt} after the judge; @s = the body): from 1 b above the player down to the blade lock',
-                                      f'# 1.2 b in front of them in {FALL_T} t (g_deflect fall -> lock), facing them.', FACE]
-                    + glide_spot('lock', FALL_T))
-        # the fail branch by the gauntlet's switch (PLAN §0.1 question 6, §5.5): lethal = the instant death staged as 홍련일섬
-        # (A13 by default; A8 with ULT60_LETHAL), else the 500 per-mille dive hit (A8 by default; A13 with ULT5_LETHAL false:
-        # "5 %도 큰 피해만"). #done: A8 at FAIL60_P2_T (-> P2), A13 at REPEL_T (-> the revive stance -> A13 again); a real
-        # death pauses the fight first (the core cancels the gauntlet).
+        # gauge 0 (#gres 1): no hazard; #done in this tick: the core starts seq/repel {at} at once (REPEL_T = JUDGE_T; the
+        # repel's first frames are the gold deflect: she is 1 b above the player in normal colours, the dive's last pose)
+        g.end(jt, cond=f'if score #gres {OBJ} matches 1')
+        # the fail branch by the gauntlet's switch (hr_design §2.4): lethal = the instant death staged as 홍련일섬 (G2 by
+        # default; G1 with ULT60_LETHAL), else the 500 per-mille dive hit (G1 by default). #done: G1 at FAIL60_P2_T (-> P2),
+        # G2 FAIL_END t after the judge (-> the revive stance -> lead_re -> G2 again); a real death pauses the fight first
+        # (the core cancels the gauntlet).
         lethal = api.ULT60_LETHAL if key == 'a8' else api.ULT5_LETHAL
         F = api.FAIL5_T
         black_t = jt - (F['slash'] - F['black'])
@@ -667,15 +580,12 @@ class Walk:
             black = [x for x in (K.ovl('black', 0, 3, 0),) if x]
             if black:
                 g.at(black_t, S.gate(f'if score {api.PIPS_FP} {OBJ} matches 1..', black[0]))
-            g.ev(black_t, 'hud', 'ovl black (pips left)', 'FAIL5_T black')
+            g.ev(black_t, 'hud', 'ovl black (segments left)', 'FAIL5_T black')
             fail = ([f'# {key.upper()} fail (#gres 2 at T + {jt}; lethal: ULT{60 if key == "a8" else 5}_LETHAL {lethal}; @s = the body): the instant death staged',
-                     '# as 홍련일섬 (PLAN §5.5): the pink-white flash, the scarlet line across the player\'s view (yaw 90, as CS1 C8) rising',
-                     '# 13 deg toward their right through their chest, the petal burst, the slash; ult/fatal as the player (through i-frames',
-                     '# and shields; Ronova\'s revive applies).',
-                     f'# She lands 2 b in front of the player (g_reform).']
+                     '# as 홍련일섬: the pink-white flash, the scarlet line across the player\'s view (yaw 90, as CS1) rising 13 deg',
+                     '# toward their right through their chest, the petal burst, the slash; ult/fatal as the player (through i-frames,',
+                     '# parries and shields; Ronova\'s revive applies). She lands 2 b in front of the player (g_reform).']
                     + [x for x in (K.ovl('pinkwhite', 0, 3, 8),) if x]
-                    # F2 (HR-17): kept cards (ult/fatal kills the player in this tick: the kit's dead clear and the pause clear
-                    # would take them before the client draws them); HR-45: in first person the line at the eye, 1.2 b ahead
                     + [x for x in (K.fixed('keep_on'),) if x]
                     + S.fx('scarlet_line', [part(DUST['crimson'], 3.0, 0.05, 0.05, 0, 60)], pos=f'{AVATAR} {at_player(1.3)}',
                            len=600, yaw=90, roll=13)
@@ -693,104 +603,11 @@ class Walk:
             g.ev(jt, 'fail', 'fail60', 'JUDGE_T')
         g.W.w(f'p/{key}/fail', fail)
         g.at(jt + E('g_reform', 'end'), S.gate(f'if score #gres {OBJ} matches 2', api.play('idle2')))
-        if key == 'a8':
-            g.end(api.REPEL_T['a8'], cond=f'if score #gres {OBJ} matches 1')
-            g.end(api.FAIL60_P2_T)
-        else:
-            g.end(api.REPEL_T['a13'])
-
-    def s_a7_tell(self, t):
-        g = self.gb
-        yel, ret, settle = (t + E('a7_tell', k) for k in ('yellow', 'retreat', 'settle'))
-        g.play(t, 'a7_tell')
-        if self.key == 'a13':
-            # she dissolves at the X and reappears inside the yellow tell 3 b in front of the player, retreats to 12 b
-            g.fx(t + 1, 'ghost_burst', puff_fb(), at_body(0.95), src=('g_x', 'gone'))
-            g.at(t + 1, tp_spot('tell'))
-            g.moves.append((t + 1, t + 1, 'reappear in the tell (3 b)'))
-            g.at(ret, glide_spot('far', settle - ret))
-            g.moves.append((ret, settle, 'retreat 12 b'))
-            g.fx(settle, 'ghost_burst', puff_fb(n=10), at_body(0.2), src=('a7_tell', 'settle'))
-            g.at(settle, FACE)
-        else:
-            g.at(t, FACE, glide_spot('back1', 2))
-            g.moves.append((t, t + 2, 'step back'))
-            g.at(ret, glide_spot('back', settle - ret))
-            g.moves.append((ret, settle, 'retreat 6 b'))
-            g.at(settle, FACE)
-        # F2 (HR-23): the tell's cards follow her (she retreats while it shows: the ring hugs her upper body, C49)
-        g.at(yel, K.fixed('follow_on'))
-        g.fx(yel, 'yellow_tell', [part(DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
-             at_body(1.0), src=('a7_tell', 'yellow'), t=8)
-        g.at(yel, K.fixed('follow_off'))
-        g.snd(yel, 'yellow_chime', src=('a7_tell', 'yellow'))
-
-    def s_a7_throw(self, t, step, kb=0, cond=None):
-        g = self.gb
-        cr, sp, rel = (t + E('a7_throw', k) for k in ('crescent', 'spin', 'release'))
-
-        def at(tt, *lines):
-            g.at(tt, *[S.gate(cond, x) if cond else x for x in lines if x])
-        at(t, api.play('a7_throw'), FACE)
-        g.ev(t, 'clip', 'a7_throw', ('a7_throw', 0))
-        at(cr, *S.fx('qi_vert', [part(DUST['lilac'], 0.2, 1.0, 0.2, 0, 16)], pos=f'{S.AT_BODY} positioned ^0.6 ^0.15 ^0.4',
-                     h=19, yaw=0, c=api.C_LILAC))
-        g.ev(cr, 'fx', 'qi_vert', ('a7_throw', 'crescent'))
-        ring = {'disc2': 16, 'throw2': 12}.get(step, 12)
-        at(sp, *S.fx('qi_ring', ring_fb(ring / 10), pos=at_body(0.8), r=ring, c=api.C_LILAC))
-        g.ev(sp, 'fx', 'qi_ring', ('a7_throw', 'spin'))
-        if step == 'disc1':
-            g.look(sp, 'blade', 'gold', ('a7_throw', 'spin'))
-            g.look(rel, 'blade', 'off', ('a7_throw', 'release'))
-        if step == 'disc3':
-            at(sp, *S.fx('qi_wedge', [part(DUST['lilac'], 0.4, 0.4, 0.4, 0, 12)], pos=at_body(0.85), r=14, roll=30))
-            g.ev(sp, 'fx', 'qi_wedge', ('a7_throw', 'spin'))
-        # F1 (HR-15): the aim locks LOCK_LEAD t before the release (g/disc/lock: the marker at the player's feet, she faces it);
-        # at the release she faces the lock (not the player), g/disc/throw aims there
-        lk = rel - api.LOCK_LEAD
-        at(lk, fn('g/disc/lock'))
-        g.ev(lk, 'lock', 'disc', ('a7_throw', 'release - LOCK_LEAD'))
-        at(rel, FACE_LOCK)
-        g.disc(rel, kb, step, cond)
-        at(rel, *S.snd('disc_release'), *S.snd('disc_fly'))
-        g.ev(rel, 'snd', 'disc_release', ('a7_throw', 'release'))
-        g.ev(rel, 'snd', 'disc_fly', ('a7_throw', 'release'))
-
-    def s_vanish(self, t):                            # A13 vanish 5 (purple glow + white ring)
-        g = self.gb
-        g.fx(t, 'ghost_burst', puff_fb(), at_body(0.95), src=('script', 'vanish'))
-        g.fx(t, 'qi_ring', ring_fb(1.4, 'white'), at_body(0.8), src=('script', 'vanish'), r=14, c=api.C_WHITE)
-        g.at(t, hide())
-        g.ev(t, 'rig', 'state/hidden', ('script', 'vanish'))
-
-    def s_reform(self, t):                            # R1 / R3: she reforms in her normal colours
-        g = self.gb
-        g.play(t, 'g_reform')
-        g.look(t + E('g_reform', 'solid'), 'form', 'normal', ('g_reform', 'solid'))
-        # F1 round 1 (HR-14): from the solid row on her tail moves her with the recovery's clip (s_solid); idle2 only when
-        # the reform clip ends before that row
-        solid = next((r[0] for r in self.rows if r[1] == 'solid'), None)
-        te = t + E('g_reform', 'end')
-        if solid is None or te < solid:
-            g.at(te, api.play('idle2'))
-            g.ev(te, 'clip', 'idle2', ('g_reform', 'end'))
-
-    def s_solid(self, t, end_t):
-        """R1 / R3: hittable again; the reform tail to the end (<= 12 t after the last hit) turns her to the player and
-        (F1 round 1, HR-14 / VF1R-01) moves her as the recovery does (ai/tail at the row, ai/tail_step each later tick)."""
-        g = self.gb
-        g.at(t, f'tag @s remove {TAG_GHOST}')
-        g.ev(t, 'tag', 'ghost-', ('script', 'solid'))
-        g.rng(t, end_t - 1, f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}')
-        assert t < end_t - 1, (self.key, t, end_t)
-        g.at(t, fn('ai/tail'))
-        g.rng(t + 1, end_t - 1, fn('ai/tail_step'))
-        g.moves.append((t + 1, end_t - 1, 'tail move'))
+        g.end(api.FAIL60_P2_T if key == 'a8' else jt + FAIL_END)
 
     # ------------------------------------------------------------------ the whole script
     def build(self):
         g, key = self.gb, self.key
-        end_t = next((r[0] for r in self.rows if r[1] == 'end'), None)
         for t, step, clip, c in self.rows:
             if step == 'A8.T':
                 self.s_tell(t)
@@ -808,18 +625,6 @@ class Walk:
                 self.s_dive(t)
             elif step == 'judge':
                 self.s_judge(t)
-            elif step == 'tell':
-                self.s_a7_tell(t)
-            elif step in ('disc1', 'disc2', 'disc3'):
-                self.s_a7_throw(t, step)
-            elif step == 'vanish':
-                self.s_vanish(t)
-            elif step == 'reform':
-                self.s_reform(t)
-            elif step == 'solid':
-                self.s_solid(t, end_t)
-            elif step == 'end':
-                g.end(t)
             else:
                 raise ValueError((key, step))
             if c:
@@ -837,83 +642,266 @@ class Walk:
                      f'{fn("g/bolt")}', (K.fixed('keep_off') if keep else None))
                 g.ev(bt, 'fx', 'deco_bolt', ('BOLTS', i))
                 g.ev(bt, 'snd', 'deco_bolt', ('BOLTS', i))
-            g.cancel_lines += S.hud('warn', on=0) + [x for x in (api.arena_look('crimson'),) if x]
+            g.cancel_lines += S.hud('warn', on=0)
         return g
 
 
-# ================================================================================================= the patterns
-def build_r1(W):
-    g_files(W)
-    w = Walk('r1', W)
-    w.build().write('P2: the ghost rush, the gauntlets\' opening block without shield or darkness')
-
-
-def build_r3(W):
-    g_files(W)
-    w = Walk('r3', W)
-    w.build().write('P2: the ghost glide, the gauntlets\' second block without shield or darkness')
-
-
-def build_r2(W):
-    """R2 월륜 일섬 (PLAN §4.4): the yellow tell, the retreat, one moon disc (kb 2); at <= R2_TWO_PCT % of her HP a second
-    disc (aimed anew; the first kb 0, the last kb 2). She is solid (no ghost) throughout."""
-    g_files(W)
-    w = Walk('r2', W)
-    g = w.gb
-    two = f'if score #r2_two {OBJ} matches 1'
-    one = f'unless score #r2_two {OBJ} matches 1'
-    g.start_head += [
-        f'# the second disc at <= {api.R2_TWO_PCT} % of her max HP (#r2_two 1): 100 x HP <= {api.R2_TWO_PCT} x max HP',
-        sset('#r2_two', 0), f'scoreboard players operation #r2_a {OBJ} = @s mhpC', f'scoreboard players operation #r2_a {OBJ} *= #c100 {OBJ}',
-        f'scoreboard players operation #r2_b {OBJ} = @s mhpM', sset('#r2_c', api.R2_TWO_PCT),
-        f'scoreboard players operation #r2_b {OBJ} *= #r2_c {OBJ}',
-        f'execute if score #r2_a {OBJ} <= #r2_b {OBJ} run {sset("#r2_two", 1)}']
-    for t, step, clip, c in w.rows:
-        if step == 'tell':
-            w.s_a7_tell(t)
-        elif step == 'throw':
-            w.s_a7_throw(t, 'throw', kb=api.DISC['kb'], cond=two)
-            w.s_a7_throw(t, 'throw', kb=api.DISC['kb_last_r2'], cond=one)
-        elif step == 'throw2':
-            w.s_a7_throw(t, 'throw2', kb=api.DISC['kb_last_r2'], cond=two)
-        elif step == 'end':
-            g.end(t)
-    rel1 = 16 + E('a7_throw', 'release')
-    rel2 = 30 + E('a7_throw', 'release')
-    # F1 (HR-14, lead decision 11-05: "during any tail kept and in the recovery she walks / strafes facing and tracking the
-    # player"): R2's tail after its last release is kept (its end stays); TAIL_MOVE t after it she moves as the recovery
-    # does - glides in beyond 6 b, else strafes (ai/tail, ai/tail_step; the recovery keeps the move) - turning to the player
-    # every tick
-    W.w('p/r2/step', ['# One tick of R2\'s tail (@s = the body): turn to the player, one step of the move (mv/ok-checked).',
-                      f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}', fn('ai/tail_step')])
-    tm = api.TAIL_MOVE
-    g.at(rel1 + tm, S.gate(one, fn('ai/tail')))
-    g.at(rel2 + tm, S.gate(two, fn('ai/tail')))
-    g.rng(rel1 + tm + 1, w.rows[-1][0] - 1, S.gate(one, fn('p/r2/step')))
-    g.rng(rel2 + tm + 1, w.rows[-1][0] - 1, S.gate(two, fn('p/r2/step')))
-    g.moves += [(rel1 + tm, w.rows[-1][0], 'tail move (one disc)'), (rel2 + tm, w.rows[-1][0], 'tail move (two discs)')]
-    g.write('P2: the moon disc after the yellow tell')
-
-
+# ================================================================================================= the gauntlets
 def build_gauntlet(key):
     def build(W):
         g_files(W)
         w = Walk(key, W)
-        w.build().write('the 60 % gauntlet' if key == 'a8' else 'the 5 % ultimate gauntlet')
+        w.build().write('G1: the 60 % gauntlet' if key == 'a8' else 'G2: the 5 % ultimate gauntlet')
     return build
 
 
-BUILD = {'r1': build_r1, 'r2': build_r2, 'r3': build_r3, 'a8': build_gauntlet('a8'), 'a13': build_gauntlet('a13')}
-NOTES = {'r1': 'ghost rush: tell, D1 far dash, ring / rising / leaping cuts (T2, T2, T3 kb 3), reform',
-         'r2': 'yellow tell, retreat, one moon disc (two at <= 30 % HP)',
-         'r3': 'ghost glide: tell, D2 low glide, sweep + X (T2, T3 kb 3), reform',
-         'a8': 'the 60 % gauntlet: 9 counting cuts, the dive = the judge (deflect -> CS2, fail -> fail60 -> P2)',
-         'a13': 'the 5 % ultimate: 9 counting cuts + 3 moon discs, the dive = the judge (deflect -> CS3, fail -> the instant death)'}
+# ================================================================================================= P2's three entries
+TRK = api.TRACK
+P1F = __import__('mboss_scarlet.p1', fromlist=['p1'])     # the P1 kit's helpers (lock_fn, tail, ground, trail, at_anchor)
+
+
+def _finish(pb, key):
+    pb.write()
+    TABLE[key] = pb.hits
+    MOVES[key] = pb.motions
+    CUES[key], FLASHES[key], PPW[key] = sorted(pb.cues), sorted(pb.flashes, key=lambda x: x[1]), pb.pp
+    return pb
+
+
+def face_lock():
+    return FACE_LOCK
+
+
+# ------------------------------------------------------------------------------------------------- MX 자광 십자참
+def build_mx(W):
+    """The purple cross (video P-m, with P-y as its retreat): a player nearer than 6 b -> she leaps back to ~9 b first (12 t,
+    no flash; the pattern clock is held at 0 meanwhile); the iai crouch, the purple star 4, the lock 9, the streak to 1.6 b
+    from the lock 14-16, the X on the lock 16 (unparriable), the cue 21, the dome round her 28 (parryable, kb 3). At
+    <= 30 % HP the core may start it once more at once (api.MX_REPEAT)."""
+    g_files(W)
+    key = 'mx'
+    pb = PB(key, W)
+    pb.owner = 'p_ghost.py'
+    lock, go, x, dome = (E(key, k) for k in ('lock', 'go', 'x', 'dome'))
+    end = api.PAT_END[key]
+    near, far, pre_t = api.MX_RETREAT
+    assert lock == x - S.LOCK
+    w = W.w
+    w(f'p/{key}/retreat', [
+        f'# MX retreat (@s = the body, tick 0; the player nearer than {num(near)} b): a {pre_t}-t leap straight back to about {num(far)} b',
+        '# from them (probed through mv/ok), the backstep clip; the pattern clock waits (#mx_pre).',
+        sset('#mx_pre', pre_t), api.play('backstep'),
+        'function rlk:mboss/mv/dist',
+        sset('#t', int(far * 10)), f'scoreboard players operation #t {OBJ} -= #mbDist mb',
+        f'scoreboard players operation #t {OBJ} /= #c5 {OBJ}',
+        f'execute if score #t {OBJ} matches ..0 run {sset("#t", 1)}',
+        f'execute at @s facing entity {PLAYER} feet rotated ~180 0 run {fn("core/dash/probe")}',
+        f'execute positioned as {S.PROBE_M} run function rlk:mboss/mv/leap {{t:{pre_t},h:10}}',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'] + S.snd('g_leap'))
+    w(f'p/{key}/pre', [
+        '# MX retreat tick (@s = the body): the clock is held at 0; at its end the iai crouch starts (clip mx from its tick 0).',
+        sset('#pt', 0), f'scoreboard players remove #mx_pre {OBJ} 1', FACE,
+        f'execute if score #mx_pre {OBJ} matches ..0 run {api.play(key)}'])
+    pb.tick_head = [f'execute if score #mx_pre {OBJ} matches 1.. run return run {fn(f"p/{key}/pre")}']
+    pb.at(0, FACE, sset('#mx_pre', 0),
+          f'execute at @s if entity {PLAYER[:-1]},distance=..{num(near)}] run return run {fn(f"p/{key}/retreat")}',
+          api.play(key))
+    pb.motions.append((0, pre_t, 'retreat (held clock)'))
+    pb.track(1, lock - 1, TRK['deg'])
+    pb.at(lock, P1F.lock_fn(pb, key), FACE_LOCK)
+    # the streak: to 1.6 b from the lock on her side (mv/ok-checked; else she cuts from where she stands)
+    pb.at(go, f'execute at {S.LOCK_M} facing entity @s feet rotated ~ 0 positioned ^ ^ ^1.6 if function rlk:mboss/mv/ok run '
+              f'function rlk:mboss/mv/glide {{t:{x - go}}}',
+          S.snd('g_dash'), S.fx('afterimage', pos=at_body(1.2), len=90))
+    pb.motions.append((go, x, 'streak'))
+    pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.at(x, S.fx('qi_x', [part(DUST['lilac'], 1.4, 0.1, 1.4, 0, 30)], pos=f'at {S.LOCK_M} rotated as @s positioned ~ ~0.1 ~', r=25),
+          S.snd('g_x'))
+    pb.track(x + 1, dome - S.LOCK, TRK['deg'])
+    pb.hit(1, tell_from=x)
+    pb.at(dome, S.fx('qi_dome', ring_fb(3.2) + [part(DUST['white'], 1.5, 1.3, 1.5, 0, 22)], pos=at_body(0.0), r=35), S.snd('g_dome'))
+    pb.pp_window(dome)
+    P1F.tail(pb, dome, end)
+    return _finish(pb, key)
+
+
+# ------------------------------------------------------------------------------------------------- NB 낙월 사선
+def build_nb(W):
+    """The falling-moon bands (video P-n): she leaps 5 b up and <= 6 b toward the player, hangs, and cuts three long
+    diagonal bands through the player's locked spot (each lock 7 t before its band, the cue there), then lands. In the air
+    2-46 (44 t: the ceiling of hr_design §8.5)."""
+    g_files(W)
+    key = 'nb'
+    pb = PB(key, W)
+    pb.owner = 'p_ghost.py'
+    leap, apex, land = E(key, 'leap'), E(key, 'apex'), E(key, 'land')
+    bs = [E(key, f'b{i}') for i in (1, 2, 3)]
+    end = api.PAT_END[key]
+    h, travel = api.LEAP_H[key], api.NB_TRAVEL
+    ln, wd = api.HITS[key][0][3]
+    assert land - leap <= api.AIR_MAX
+    w = W.w
+    w(f'p/{key}/leap', [
+        f'# NB leap (@s = the body, tick {leap}): the floor point <= {num(travel)} b toward the player (3 b short of them; probe),',
+        f'# then a rise of {num(h)} b to above it in {apex - leap} t.',
+        'function rlk:mboss/mv/dist',
+        f'scoreboard players operation #t {OBJ} = #mbDist mb',
+        f'scoreboard players remove #t {OBJ} 30',
+        f'scoreboard players operation #t {OBJ} /= #c5 {OBJ}',
+        f'execute if score #t {OBJ} matches ..-1 run {sset("#t", 0)}',
+        f'execute if score #t {OBJ} matches {int(travel * 2) + 1}.. run {sset("#t", int(travel * 2))}',
+        f'execute at @s facing entity {PLAYER} feet rotated ~ 0 run {fn("core/dash/probe")}',
+        f'execute positioned as {S.PROBE_M} positioned ~ {CY + h} ~ run function rlk:mboss/mv/glide {{t:{apex - leap}}}',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'])
+    pb.at(0, FACE, api.play(key))
+    pb.track(1, leap - 1, TRK['deg'])
+    pb.at(leap, fn(f'p/{key}/leap'), S.snd('leap'))
+    P1F.trail(pb, (leap, (leap + apex) // 2, apex))
+    pb.motions.append((leap, apex, 'leap'))
+    prev = apex
+    for i, t in enumerate(bs):
+        lk = t - S.LOCK
+        assert lk == E(key, f'lock{i + 1}')
+        pb.track(prev, lk - 1, 20)
+        pb.at(lk, P1F.lock_fn(pb, key), FACE_LOCK)
+        yaw = api.NB_YAW[i]
+        org = f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)}'
+        pb.hit(i, tell_from=0 if i == 0 else prev, pos=f'{org} positioned ~ {CY} ~')
+        pb.at(t, S.fx('qi_beam', [part(DUST['lilac'], 0.5, 0.3, 4.0, 0, 40), part(DUST['white'], 0.3, 0.2, 3.0, 0, 12)],
+                      pos=f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ~ ~0.6 ~', len=int(ln * 10)), S.snd('g_sweep'))
+        prev = t + 1
+    # she drops to the floor below after the last band and lands at `land`
+    pb.at(bs[-1], f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land - bs[-1]}}}')
+    pb.motions.append((bs[-1], land, 'land'))
+    P1F.tail(pb, bs[-1], end, moved=land)
+    P1F.ground(pb)
+    return _finish(pb, key)
+
+
+# ------------------------------------------------------------------------------------------------- Q 자영 포박 · 천공 낙월
+def build_q(W):
+    """The ghost grab and the sky moon (video P-q; hr_design §8.2: the grab is unparriable). q_grab: a far lilac glint 0, the
+    ghost form 4-20, the purple star 8, the lock 13, the ghost lunge 16-20 (<= 14 b), the grab 20 (a disc at the lock; it
+    throws the player back). The grab strikes after the module tick, so the branch is taken at api.Q_AIR_T0 (21): missed /
+    perfect-dodged / left the disc -> she reforms, the end at api.Q_MISS_END; landed -> q_air from 21: she rises, the
+    diagonal beam (cue, parryable), the dive (cue, parryable), a second leap, the purple star, the sky mark on the locked
+    spot (a line from the sky and a short line at the feet: never an area) and the pillar (unparriable). The player stays on
+    the ground and in control."""
+    g_files(W)
+    key = 'q'
+    pb = PB(key, W)
+    pb.owner = 'p_ghost.py'
+    ghost, lock, go, grab = (E('q_grab', k) for k in ('ghost', 'lock', 'go', 'grab'))
+    T0 = api.Q_AIR_T0
+    A = lambda e: T0 + E('q_air', e)          # noqa: E731  a q_air event on the pattern clock
+    HIT, MISS = f'if score #q_hit {OBJ} matches 1', f'unless score #q_hit {OBJ} matches 1'
+    dmax = api.DASH_LEN[key]
+    h1, h2 = api.LEAP_H['q'], api.LEAP_H['q2']
+    assert lock == grab - S.LOCK
+    w = W.w
+    gh = lambda ls: [S.gate(HIT, x) for x in ls if x]      # noqa: E731
+    # ---- q_grab
+    pb.at(0, FACE, sset('#q_hit', 0), api.play('q_grab'),
+          P1F.at_anchor('blade_mid', S.fx_lines('glint', [part(DUST['lilac'], 0.1, 0.1, 0.1, 0, 6)], c=api.C_LILAC)))
+    pb.track(1, lock - 1, TRK['deg'])
+    pb.at(ghost, api.rig('look/form/ghost'), f'tag @s add {TAG_GHOST}', S.snd('g_tell'),
+          S.fx('ghost_burst', puff_fb(n=20), pos=at_body(0.95)))
+    reach = num(dmax + 1.6, 2)
+    pb.at(lock, P1F.lock_fn(pb, key), FACE_LOCK,
+          # a locked spot beyond her reach is pulled in along her aim: the grab lands where she arrives, never farther
+          f'execute at @s positioned ~ {CY} ~ unless entity {S.LOCK_M[:-1]},distance=..{reach}] rotated as @s rotated ~ 0 '
+          f'positioned ^ ^ ^{reach} run tp {S.LOCK_M} ~ ~ ~')
+    w(f'p/{key}/lunge', [
+        f'# Q ghost lunge (@s = the body, tick {go}): along the locked aim to within 2 b of the locked spot, at most {num(dmax)} b',
+        f'# (0.5 b probe steps through mv/ok), in {grab - go} t.',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]',
+        f'execute at @s positioned ~ {CY} ~ run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(TAG_P, S.PROBE_T)}}}',
+        f'execute at @s rotated as @s as {S.PROBE_M} run tp @s ~ ~ ~ ~ 0',
+        sset('#t', int(dmax * 2)), sset('#t2', 0),
+        f'execute as {S.PROBE_M} at @s run {fn(f"p/{key}/lstep")}',
+        f'execute positioned as {S.PROBE_M} run function rlk:mboss/mv/glide {{t:{grab - go}}}',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'])
+    w(f'p/{key}/lstep', [
+        '# Q lunge probe step (@s = the probe, at / rotated as it): 0.5 b on while mv/ok passes, until within 2 b of the lock.',
+        f'execute if score #t2 {OBJ} >= #t {OBJ} run return 0',
+        f'execute if entity {S.LOCK_M[:-1]},distance=..2.0] run return 0',
+        'execute positioned ^ ^ ^0.5 unless function rlk:mboss/mv/ok run return 0',
+        'tp @s ^ ^ ^0.5',
+        f'scoreboard players add #t2 {OBJ} 1',
+        f'execute at @s run {fn(f"p/{key}/lstep")}'])
+    pb.at(go, fn(f'p/{key}/lunge'), S.snd('g_dash'),
+          S.fx('ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], pos=at_body(0.95), len=int(dmax * 10)))
+    pb.motions.append((go, grab, 'ghost lunge'))
+    pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=1)
+    pb.at(grab, api.rig('look/form/normal'), f'tag @s remove {TAG_GHOST}',
+          S.fx('claw_streaks', [part(DUST['lilac'], 0.6, 1.0, 0.6, 0, 16)], pos=f'at {S.LOCK_M} positioned ~ {CY + 1} ~', r=12))
+    # ---- the branch (the grab's result is this tick's #hpp: the hits of hers the core read)
+    pb.at(T0, f'execute if score #hpp {OBJ} matches 1.. run {sset("#q_hit", 1)}',
+          S.gate(MISS, api.play('g_reform')), S.gate(HIT, api.play('q_air')), gh(S.snd('thrown')))
+    turn = f'function rlk:mboss/mv/turn {{max:{TRK["deg"]}}}'
+    pb.rng(T0 + 1, api.Q_MISS_END - 1, S.gate(MISS, turn))
+    pb.at(T0 + E('g_reform', 'end'), S.gate(MISS, fn('ai/tail')))
+    pb.rng(T0 + E('g_reform', 'end') + 1, api.Q_MISS_END - 1, S.gate(MISS, fn('ai/tail_step')))
+    pb.at(api.Q_MISS_END, S.gate(MISS, sset('#done', 1)))
+    # ---- q_air (only when the grab landed)
+    rise, apex, dive, hit, leap2, apex2, lock3, pillar, drop, land2 = (
+        A(k) for k in ('rise', 'apex', 'dive', 'hit', 'leap', 'apex2', 'lock3', 'pillar', 'drop', 'land2'))
+    beam = A('beam')
+    assert hit - rise <= api.AIR_MAX and land2 - leap2 <= api.AIR_MAX
+    pb.at(rise, gh([f'execute at @s positioned ~ {CY + h1} ~ run function rlk:mboss/mv/glide {{t:{apex - rise}}}']),
+          gh(S.snd('leap')), gh(S.fx('afterimage', pos=at_body(1.2), len=20)))
+    pb.motions.append((rise, apex, 'rise'))
+    pb.rng(apex, A('lock1') - 1, S.gate(HIT, f'function rlk:mboss/mv/turn {{max:20}}'))
+    pb.at(A('lock1'), gh([P1F.lock_fn(pb, key), FACE_LOCK]))
+    ln, wd = api.HITS[key][1][3]
+    pb.hit(1, tell_from=T0, t=beam, cond=HIT, pos=f'at @s positioned ~ {CY} ~ facing entity {S.LOCK_M} feet rotated ~ 0')
+    pb.at(beam, gh(S.fx('qi_beam', [part(DUST['lilac'], 0.4, 1.5, 0.4, 0, 40)],
+                        pos=f'at @s positioned ~ ~0.8 ~ facing entity {S.LOCK_M} feet', len=int(ln * 10))), gh(S.snd('g_rise')))
+    pb.rng(beam + 1, A('lock2') - 1, S.gate(HIT, f'function rlk:mboss/mv/turn {{max:20}}'))
+    pb.at(A('lock2'), gh([P1F.lock_fn(pb, key), FACE_LOCK]))
+    pb.at(dive, gh([f'execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:{hit - dive}}}']), gh(S.snd('g_dive')),
+          gh(S.fx('afterimage', pos=at_body(1.2), len=30)))
+    pb.motions.append((dive, hit, 'dive'))
+    pb.hit(2, tell_from=beam, t=hit, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.at(hit, gh(S.fx('dive_impact', [part(DUST['lilac'], 1.0, 0.1, 1.0, 0, 30)], pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~', r=26)),
+          gh(S.snd('a4_impact', pos=f'at {S.LOCK_M}')))
+    pb.rng(hit + 1, leap2 - 1, S.gate(HIT, turn))
+    pb.at(leap2, gh([f'execute at @s positioned ~ {CY + h2} ~ run function rlk:mboss/mv/glide {{t:{apex2 - leap2}}}']),
+          gh(S.snd('leap')), gh(S.fx('afterimage', pos=at_body(1.2), len=20)))
+    pb.motions.append((leap2, apex2, 'leap'))
+    pb.rng(apex2, lock3 - 1, S.gate(HIT, f'function rlk:mboss/mv/turn {{max:20}}'))
+    # the sky mark at the lock tick: the video's only ground mark, a line (never an area)
+    pb.at(lock3, gh([P1F.lock_fn(pb, key), FACE_LOCK]),
+          gh(S.fx('sky_mark', [part(DUST['white'], 0.02, 6.0, 0.02, 0, 40), part(DUST['magenta'], 0.9, 0.02, 0.02, 0, 12)],
+                  pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')))
+    pb.hit(3, tell_from=hit, t=pillar, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.at(pillar, gh(S.fx('sky_pillar', [part(DUST['white'], 0.5, 6.0, 0.5, 0, 80), part(DUST['magenta'], 0.8, 0.3, 0.8, 0, 20)],
+                          pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', r=24)), gh(S.snd('sky_pillar', pos=f'at {S.LOCK_M}')))
+    pb.at(drop, gh([f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land2 - drop}}}']))
+    pb.motions.append((drop, land2, 'drop'))
+    end = T0 + 90
+    pb.rng(pillar + 1, end - 1, S.gate(HIT, turn))
+    pb.at(land2, S.gate(HIT, fn('ai/tail')))
+    pb.rng(land2 + 1, end - 1, S.gate(HIT, fn('ai/tail_step')))
+    pb.motions.append((land2 + 1, end - 1, 'tail move'))
+    pb.end(end)
+    pb.cancel_lines += [f'execute as {BODY} run {fn("g/reset")}']
+    return _finish(pb, key)
+
+
+BUILD = {'mx': build_mx, 'nb': build_nb, 'q': build_q, 'a8': build_gauntlet('a8'), 'a13': build_gauntlet('a13')}
+NOTES = {'mx': 'the purple X on the locked spot (unparriable) + the dome round her (parryable); a leap back first when near',
+         'nb': 'a leap, three long diagonal bands through the locked spots (parryable), the landing',
+         'q': 'the ghost grab (unparriable); landed: the beam, the dive (parryable), the sky pillar (unparriable)',
+         'a8': 'G1, the 60 % gauntlet: 9 parry cuts, the dive = the judge (gauge 0 -> repel {at:60}, else fail60 -> P2)',
+         'a13': 'G2, the 5 % ultimate: 11 parry cuts, the dive = the judge (gauge 0 -> repel {at:5}, else the instant death)'}
+CLIPS_OF = {'mx': ('mx', 'backstep'), 'nb': ('nb',), 'q': ('q_grab', 'q_air', 'g_reform')}
 
 
 def _clips(key):
-    return tuple(sorted({r[2] for r in api.SCRIPTS[key] if r[2] and r[0] >= 0}
-                        | ({'g_reform', 'idle2'} if key in ('r1', 'r3', 'a8', 'a13', 'r2') else set())))
+    if key in CLIPS_OF:
+        return CLIPS_OF[key]
+    return tuple(sorted({r[2] for r in api.SCRIPTS[key] if r[2]} | {'g_reform', 'idle2'}))
 
 
 PATTERNS = [api.Pattern(k, S.TID[k], _clips(k), BUILD[k], notes=NOTES[k]) for k in api.P2]

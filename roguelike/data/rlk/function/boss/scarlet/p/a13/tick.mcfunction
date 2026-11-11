@@ -1,4 +1,4 @@
-# A13 필살 · 자영 연참: one pattern tick (#pt hr 1..270), dispatched by 16-tick blocks to k/<t>.
+# A13 필살 · 자영 연참: one pattern tick (#pt hr 1..254), dispatched by 16-tick blocks to k/<t>.
 execute if score #pt hr matches 0..15 run return run function rlk:boss/scarlet/p/a13/b/0
 execute if score #pt hr matches 16..31 run return run function rlk:boss/scarlet/p/a13/b/1
 execute if score #pt hr matches 32..47 run return run function rlk:boss/scarlet/p/a13/b/2
@@ -15,4 +15,3 @@ execute if score #pt hr matches 192..207 run return run function rlk:boss/scarle
 execute if score #pt hr matches 208..223 run return run function rlk:boss/scarlet/p/a13/b/13
 execute if score #pt hr matches 224..239 run return run function rlk:boss/scarlet/p/a13/b/14
 execute if score #pt hr matches 240..255 run return run function rlk:boss/scarlet/p/a13/b/15
-execute if score #pt hr matches 256..271 run return run function rlk:boss/scarlet/p/a13/b/16

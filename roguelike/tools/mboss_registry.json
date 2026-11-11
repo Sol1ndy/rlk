@@ -154,7 +154,7 @@
       "id": "scarlet", "n": 21, "bal": true, "fn": "boss/scarlet", "kind": "special", "enabled": true, "w": 10,
       "minCh": 1, "maxCh": 99, "name": "홍련", "sub": "월하곡", "color": "#E8466A", "el": 3,
       "hp": 260, "xp": 0, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 1, "lvup": 1,
-      "scale": 1.0, "hit": {"w": 1.2, "h": 2.4}, "intro": 650, "death": 1164, "deathSnd": false,
+      "scale": 1.0, "hit": {"w": 1.2, "h": 2.4}, "intro": 1450, "death": 1494, "deathSnd": false,
       "winWord": "도전 성공", "rwHook": true, "poof": false,
       "arena": "hr_field", "theme": "hr_field", "res": {"*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.overworld.cherry_grove", "len": 7604},

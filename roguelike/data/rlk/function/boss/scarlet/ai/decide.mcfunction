@@ -12,10 +12,19 @@ execute if score #mbLock mb matches 4 run return run function rlk:boss/scarlet/c
 execute if score #mbLock mb matches 5 run return run function rlk:boss/scarlet/core/start/a6
 execute if score #mbLock mb matches 6 run return run function rlk:boss/scarlet/core/start/a9
 execute if score #mbLock mb matches 7 run return run function rlk:boss/scarlet/core/start/a10
-execute if score #mbLock mb matches 11 run return run function rlk:boss/scarlet/core/start/r1
-execute if score #mbLock mb matches 12 run return run function rlk:boss/scarlet/core/start/r2
-execute if score #mbLock mb matches 13 run return run function rlk:boss/scarlet/core/start/r3
-execute if score #ai_nx hr matches 3 run return run function rlk:boss/scarlet/ai/next_a3
+execute if score #mbLock mb matches 8 run return run function rlk:boss/scarlet/core/start/a3s
+execute if score #mbLock mb matches 9 run return run function rlk:boss/scarlet/core/start/d4
+execute if score #mbLock mb matches 10 run return run function rlk:boss/scarlet/core/start/tri
+execute if score #mbLock mb matches 11 run return run function rlk:boss/scarlet/core/start/rings
+execute if score #mbLock mb matches 12 run return run function rlk:boss/scarlet/core/ult_go
+execute if score #mbLock mb matches 13 run return run function rlk:boss/scarlet/core/start/hcut
+execute if score #mbLock mb matches 14 run return run function rlk:boss/scarlet/core/start/blue
+execute if score #mbLock mb matches 15 run return run function rlk:boss/scarlet/core/start/kcut
+execute if score #mbLock mb matches 16 run return run function rlk:boss/scarlet/core/start/mx
+execute if score #mbLock mb matches 17 run return run function rlk:boss/scarlet/core/start/nb
+execute if score #mbLock mb matches 18 run return run function rlk:boss/scarlet/core/start/q
+execute if score #ai_nx hr matches 8 run return run function rlk:boss/scarlet/ai/next_fb
+execute if score #gau hr matches 50.. if score #ai_d2 hr matches ..1210000 run return run function rlk:boss/scarlet/core/ult_go
 function rlk:boss/scarlet/ai/rear_count
 execute if score #ai_rc hr matches 4.. if function rlk:boss/scarlet/ai/rear run return 1
 execute if score #ai_ff hr matches 1 if function rlk:boss/scarlet/ai/after_a6 run return 1

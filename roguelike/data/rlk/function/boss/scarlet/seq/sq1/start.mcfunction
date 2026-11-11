@@ -1,9 +1,0 @@
-# SQ1 (PLAN §3.3): re-hat, stand-off, the darkness (T0 - 17), the hand to the brim; A8 at its end.
-# Start (@s = the body, at it; #sq hr = 0).
-kill @e[type=minecraft:marker,tag=rlk_hr_stage]
-execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_stage"]}
-execute as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] at @s rotated as @e[tag=rlk_body,limit=1] run tp @s ~ ~ ~ ~ 0
-function rlk:boss/scarlet/rig/play/sq1
-function rlk:boss/scarlet/fx/hud/warn {on:0}
-scoreboard players set #sqdone hr 0
-execute positioned ~ ~1.1 ~ rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/p/leaves_swirl

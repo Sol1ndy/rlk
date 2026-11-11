@@ -1,8 +1,0 @@
-data merge entity 524c4b4d-4852-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.01528f,1.43022f,0.08666f],left_rotation:[0.09488f,-0.01718f,0.01258f,0.99526f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.01528f,1.43022f,0.08666f],left_rotation:[0.09488f,-0.01718f,0.01258f,0.99526f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.35041f,1.30676f,0.00771f],left_rotation:[0.53552f,-0.02004f,0.74009f,-0.40631f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.4954f,1.47402f,0.12392f],left_rotation:[0.64856f,-0.29515f,0.67898f,-0.17676f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.24312f,0.8966f,0.28973f],left_rotation:[-0.77106f,0.22514f,-0.37614f,-0.46185f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.24312f,0.8966f,0.28973f],left_rotation:[-0.77106f,0.22514f,-0.37614f,-0.46185f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-function rlk:boss/scarlet/rig/m/forearm_r/brim
-scoreboard players set @s hrRigHat 0

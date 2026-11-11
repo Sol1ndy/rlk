@@ -1,3 +1,5 @@
-# @s = body: the pattern goes (no recovery yet), she falls on her back.
+# @s = body: the break. The pattern goes (hazards, locks, the ghost state, the blade look; an airborne body is put
+# on the floor), the gauge stays; clip grog_in (12 t: the guard is smashed open, she falls onto her back).
 function rlk:boss/scarlet/core/cancel_pat0
-function rlk:boss/scarlet/rig/play/down
+scoreboard players set #ai_fl hr 0
+function rlk:boss/scarlet/rig/play/grog_in

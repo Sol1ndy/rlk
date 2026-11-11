@@ -399,16 +399,33 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
 // ---- the cinematic placeholder (S2b replaces it with tools/scarlet_cine.mjs): every cine clip holds a static pose with the
 // contract's length and events; the looks keyed where the plan's table says (hat / sword / scabbard / face) -----------------------
 const P = (name, pose, extra = {}) => ({name, keys: [K(0, pose), K(1, pose)], placeholder: true, note: 'placeholder (S2b: tools/scarlet_cine.mjs)', ...extra});
+// HR rebuild (hr_design §4.1): the cinematic clips of the new contract (the three lead-ins replace sq1 / lead_down / lead_stand).
+// build_scarlet_rig.mjs uses an entry while scarlet_cine.mjs (lane H2c) does not author that clip at the contract's length.
 export const CINE_PLACEHOLDER = [
-  P('intro', {...H_POSE, hL: 'open', bwL: 0, aL: [0, 8, .97], scB: 0, scE: 80, cup: 'none'}),
+  P('intro', H_POSE),
   P('intro_end', ST),
   P('cs1', {...ST, ...CROUCH}),
-  P('sq1', {...ST, hR: 'brim', bwR: 1, aR: [120, 30, .9], pR: [.7, -.2, .2]}),
+  P('lead60', ST),
+  P('lead5', ST),
+  P('lead_re', ST),
   P('repel', LOCK),
-  P('lead_down', DOWN),
-  P('lead_stand', ST),
   P('ending', H_POSE),
 ];
+// STAND-IN (H1): replaced at the merge by lane H1c's clips. hr_design §2.3: the 12 new fight clips as static poses of the
+// contract length (tools/mboss_scarlet/api.py CLIPS; the events are the contract's), so the rig builds before the motion lands.
+const PF = (name, pose) => clips.push({...P(name, pose), note: 'placeholder (STAND-IN H1: lane H1c authors the motion)'});
+PF('grog_in', DOWN);
+PF('d4', ST);
+PF('tri', {...ST, ...F_LUNGE});
+PF('rings', ST2);
+PF('ult', ST2);
+PF('hcut', {...ST, ...CROUCH});
+PF('blue', {...ST, ...F_LUNGE});
+PF('kcut', {...ST, ...LOW});
+PF('mx', {...ST, ...CROUCH});
+PF('nb', AIR);
+PF('q_grab', {...ST, ...F_LUNGE});
+PF('q_air', AIR);
 // ---- export --------------------------------------------------------------------------------------------------------------------
 export const CLIPS = clips;
 export const accumulate = (c, defaults = DEFAULT_POSE) => accumulateLib(c, defaults);

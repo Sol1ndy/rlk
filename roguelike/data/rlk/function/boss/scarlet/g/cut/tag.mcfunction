@@ -4,8 +4,8 @@ scoreboard players operation @s hr = #g_s hr
 tag @s add rlk_hr_cut
 tag @s add rlk_hr_p
 execute if score #g_n hr matches 1 run tag @s add rlk_hr_cnt
-execute if score #pat hr matches 11 run tag @s add rlk_hr_p_r1
-execute if score #pat hr matches 12 run tag @s add rlk_hr_p_r2
-execute if score #pat hr matches 13 run tag @s add rlk_hr_p_r3
+execute if score #pat hr matches 16 run tag @s add rlk_hr_p_mx
+execute if score #pat hr matches 17 run tag @s add rlk_hr_p_nb
+execute if score #pat hr matches 18 run tag @s add rlk_hr_p_q
 execute if score #pat hr matches 21 run tag @s add rlk_hr_p_a8
 execute if score #pat hr matches 27 run tag @s add rlk_hr_p_a13
