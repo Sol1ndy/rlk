@@ -84,3 +84,47 @@ copies `cp -r $S/rp_rel3 $S/rp_w<c|p|b>` (`rp_rel3` = the 11-12 release pack); p
 Gates, rules, saving and the final report as in `h_common.md` / `v_brief.md` §4 (the Fable 5.2 trailer). Nobody can
 run the client here: verify in the bytecode what you can, render and look at what you build, and list what only the
 user can check.
+
+## 4. Addendum (11-12, the user's fourth recording `$S/cb/video3/t4.mp4`, overview `$S/cb/video3/ov4/`)
+The user's words (verbatim):
+7. 「네번째 테스트 영상도 올렸어. 이건 세번째 컷신을 수정하기 위함이야. 일단 두 아바타의 몸이 너무 겹쳐. 칼싸움중인데 진짜 몸으로
+   대화를하는 느낌이야. 그리고 공중전투가 너무 밋밋해. 뭔 추진기를 달아놨나 아무리 연출이라고 해도 공중에 너무 오래 체류하는걸
+   적나라하게 보여줘서 어색해 보여. 차라리 얼굴-복부 사이를 클로즈업해서 칼을 맞대며 스파크가 튀는 연출이 괜찮을 것 같아.」
+8. 「그리고 대사가 홍련 오른쪽 위에 작고 멀리 표시될 때가 있는데 확인해서 수정해줘」
+9. 「말을 확실하게 안 한 것 같은데, 기존의 '대쉬'는 없어지는거야. 스텔라블레이드의 닷지로 완전히 전환해야 해.」
+
+In t4: gauntlet 2 from ≈ 38 s, the repel cutscene ≈ 50–56 s, the ending from ≈ 57 s (blade locks ≈ 59–60 s and
+≈ 66 s with the two bodies pressed together; the aerial duel ≈ 67–75 s seen from far below; lines from ≈ 78 s).
+
+### WC, added (the "third cutscene" = the repel and the ending's duel)
+5. **Bodies apart**: in every blade lock, clash and exchange of the repel, CS1 and the ending the two figures keep a
+   swordfighter's distance — the blades meet between them, torsos never overlap or touch on screen, no limb of one
+   inside the other's silhouette (except the scripted grab / throw / kick contacts, which must read as such). Add a
+   build-time check on the two rigs' body boxes (a minimum gap between torsos during every lock / clash span) next to
+   the existing contact checks, and frame the shots so the gap is visible.
+6. **The aerial duel goes.** No long hovering in mid-air, no wide shot of two figures floating. Replace the aerial part
+   of the ending with what the user asks for: **close shots between face and abdomen** of the blades meeting — a fast
+   exchange of clashes with **sparks flying at each contact** (bright spark bursts at the blades' crossing point, a
+   flash, vanilla sounds), cut quickly between a few close angles (her side, the actor's side, the crossed blades),
+   feet on the ground or out of frame; any leap is short and seen only as launch or landing. Keep the ending's story
+   beats, lines (verbatim, same order) and its end state; the sequence's length may change — update every dependent
+   number (registry `death`, tests).
+7. **The stray dialogue text** (item 8): sometimes a line shows small and far away at her upper right instead of in
+   the lower-third box. Find it in t3 / t4, find the cause (candidates: the line's text display not riding the live
+   camera after a cut or a camera remake — e.g. after a skip, a re-attach, or on the idle camera; a display left at a
+   stage position; the pre-round-V line path still firing in some sequence or in the lead-ins / fight lines), and fix
+   the class of bug, with a test that every line shown during a lock is on the live camera's text displays and that
+   no other line-text entity exists in the world at that tick. Lines spoken outside a lock (in the fight) must have
+   a deliberate, readable place as well.
+
+### WP, changed (item 9 replaces ruling WP-3)
+3. **The dash is gone; the dodge is the reference game's dodge, completely.** Measure the reference (`dodge.mp4`: the
+   plain dodge, the double dodge = a second press chaining a second evasive move, the perfect dodge) and build exactly
+   that set: a plain dodge is a short, quick evasive step with its i-frames (travel, duration, pose and direction rule
+   from the reference — the user describes it as "just shifting slightly on the spot", not a dash), a second press
+   within the reference's window chains the second move, and the perfect dodge is the (now faster) beat. Nothing of
+   the old long dash remains — not as a fallback, not on a modifier. Re-derive cooldowns and i-frame windows so the
+   dodge is as good an answer to attacks as before (the perfect window and the tiers of the looser windows against
+   normal mobs stay as the user decided on 11-10), and adapt everything that was built on the dash as movement
+   (engravings / items that changed dash distance, cooldown or charges such as 질주; room traversal; boss patterns
+   whose fairness assumed dash travel — check the balance sims' dodging agents) — list each and what became of it.
