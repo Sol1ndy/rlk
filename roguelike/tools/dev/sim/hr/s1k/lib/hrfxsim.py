@@ -44,6 +44,10 @@ class FxSim(mcsim.Sim):
         self.title_to = []
         self.setsc('#true', '__sim', 1)
         self.setsc('#false', '__sim', 0)
+        # round V: the card clock is the game time minus the ticks the perfect parry / dodge beat held the world (#btLag cb;
+        # tools/build_mboss_hr_fx.py "VP beat"). The beat at rest, as rlk:load leaves it (player/def/beat/reset).
+        self.setsc('#btLag', 'cb', 0)
+        self.setsc('#btHold', 'cb', 0)
 
     # ---------------------------------------------------------------- NBT list filters
     def _filtered(self, storage, path):

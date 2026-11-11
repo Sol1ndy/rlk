@@ -4020,7 +4020,7 @@
  },
  "skip": {
   "text": "⊙ 건너뛰기",
-  "hint": " · Shift 길게",
+  "hint": " · Space 길게",
   "steps": [
    "#A8A8B0",
    "#BEBEC5",

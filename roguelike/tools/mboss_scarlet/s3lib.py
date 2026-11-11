@@ -25,6 +25,11 @@ PROBE_T = api.TAGS['probe']
 PROBE_M = f'@e[type=minecraft:marker,tag={PROBE_T},limit=1]'
 ANCHOR_M = f'@e[type=minecraft:marker,tag={api.TAGS["anchor"]},limit=1]'
 AT_BODY = 'at @s rotated as @s rotated ~ 0'
+# Her model after an INSTANT move of the body inside a hook (round V; lane VC's finding, applied to the fight at the integration):
+# rig/tick's follow runs in the execution position the hook was entered with, so a body teleported inside the hook leaves the
+# model at the old place (with the follow's cache already on the new one) until she next moves or turns. rig/follow_now at
+# the body puts the parts there in the same tick (the rig's interpolation is its own). None with the stand-in rig.
+RIG_NOW = f'execute {AT_BODY} run {api.rig("follow_now")}' if api.rig_real() else None
 LOCK = api.LOCK_LEAD
 
 

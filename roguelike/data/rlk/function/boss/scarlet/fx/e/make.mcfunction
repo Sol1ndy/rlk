@@ -32,6 +32,7 @@ execute if score #dly hrFx matches 1.. run data modify storage rlk:hr fx.a.z set
 execute if score #fol hrFx matches 1.. run data modify storage rlk:hr fx.a.tpd set value 1
 function rlk:boss/scarlet/fx/e/spawn with storage rlk:hr fx.a
 execute store result score #now hrFx run time query gametime
+scoreboard players operation #now hrFx -= #btLag cb
 scoreboard players add #now hrFx 1
 execute as @e[type=minecraft:item_display,tag=rlk_hr_fx_new,limit=1] run function rlk:boss/scarlet/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_hr_fx_new] remove rlk_hr_fx_new

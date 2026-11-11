@@ -350,7 +350,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     `execute rotated ~ 0 run tp ${ROOT} ~ ~ ~ ~ 0`, `execute rotated ~ 0 run tp ${PARTSEL} ~ ~ ~ ~ 0`, `function ${NS}/hide`]);
   fn('clear', ['# Internal: the actor\'s entities.', `kill ${PARTSEL}`, `kill @e[type=minecraft:marker,tag=${TAG.root}]`]);
   fn('hide', ['# Internal, every tick while the actor stands: the avatar invisible with empty hands (1 s at a time: it shows again by',
-    '# itself if the ticks stop), a rig character\'s displays and a floating catalyst out of view range until stop.',
+    '# itself if the ticks stop), a rig character\'s displays, a stand-in rig and a floating catalyst out of view range until stop.',
     '# Round V (lane VC): the player watches a locked sequence as a spectator, and a spectator sees an invisible living',
     '# entity as a 15 % ghost drawn with its own texture: the avatar\'s skin is the blank one until stop (blank / show).',
     `execute as @e[tag=rlk_av,tag=!${TAG.hidden},limit=1] run function ${NS}/blank`,
@@ -358,6 +358,10 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     `item replace entity ${AV} weapon.mainhand with minecraft:air`, `item replace entity ${AV} weapon.offhand with minecraft:air`,
     `tag ${AV} add ${TAG.hidden}`,
     `execute as @e[type=minecraft:item_display,tag=rlk_pm,tag=!${TAG.hidden}] run function ${NS}/hide_one`,
+    // round V integration: lane VP's stand-in rig of a mannequin character (char/motion/lite, tag rlk_pl) plays for the rest
+    // of the tick a sequence starts in when a perfect parry / dodge beat was running (player/def/beat/post, after this): out
+    // of view at once; the beat's own end (one tick later: player/def/beat/clock sees the lock) removes it
+    `execute as @e[type=minecraft:item_display,tag=rlk_pl,tag=!${TAG.hidden}] run function ${NS}/hide_one`,
     `execute as @e[type=minecraft:block_display,tag=rlk_rncat,tag=!${TAG.hidden}] run function ${NS}/hide_one`,
     `execute as @e[type=minecraft:block_display,tag=rlk_nfcat,tag=!${TAG.hidden}] run function ${NS}/hide_one`]);
   fn('hide_one', [`data merge entity @s {view_range:0f}`, `tag @s add ${TAG.hidden}`]);

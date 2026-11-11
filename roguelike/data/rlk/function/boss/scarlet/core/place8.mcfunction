@@ -7,3 +7,4 @@ execute as @e[type=minecraft:marker,tag=rlk_hr_pl8,limit=1] at @s run function r
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_pl8,limit=1] run tp @s ~ ~ ~
 kill @e[type=minecraft:marker,tag=rlk_hr_pl8]
 function rlk:mboss/mv/face
+execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now

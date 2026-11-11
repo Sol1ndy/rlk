@@ -220,6 +220,9 @@ ALLOW[LANE_VP] = (
      F + r'(?:boss/(?:apep|azhdaha|tachy|arlecchino)|mboss/(?:butterfly|fieldgen))/fx/.+',
      F + r'boss/azhdaha/(?:ai/sample4|on_hit)\.mcfunction', F + r'mboss/fieldgen/(?:on_hit|field/banner|hud/banner_cut)\.mcfunction',
      r'data/rlk/tags/entity_type/beat_disp\.json'])
+# Round V, the integration (11-12, wip/v-int; tools/dev/plan/combat/vi_progress.md): the developer fallback mob of room/mob_summon
+# (`#mobTmp room 1`) is a zombie (lane VC's blank husk texture hides a husk)
+ALLOW['round V integration (11-12): the developer fallback mob is a zombie'] = [F + r'room/mob_summon\.mcfunction']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
               LANE_R,                               # lane R's removals

@@ -381,14 +381,16 @@ def skip_files(W, ctx):
         go = f'{rel}_go'
         w(rel, [
             f'# The {name} skip input (@s = body, every tick of the sequence; hr_design §3.0): from {lo} to {hi} the prompt',
-            f'# {api.SKIP_TEXT}{api.SKIP_HINT} (hudHold); holding sneak (rlk:in_sneak) brightens it in {api.SKIP_STEPS} steps of 5 t, a release',
+            f'# {api.SKIP_TEXT}{api.SKIP_HINT} (hudHold); holding the jump key (rlk:in_jump; round V: Shift is no input) brightens it in {api.SKIP_STEPS} steps of 5 t, a release',
             f'# resets the count; {api.SKIP_HOLD} t held -> the skip (seq/{name}/skip, then #sq = {to - 1}: the next tick is {to}).',
+            f'# Parked while a sequence of seq.py runs (seq/{name}/skipin holds #skip at -1 and reads the key itself): this input',
+            '# only serves a stand-in sequence.',
             f'execute if score #skip {OBJ} matches ..-1 run return 0',
             f'execute if score #skp {OBJ} matches 1.. if score #sq {OBJ} = #skp {OBJ} run return run {fn(go)}',
             f'execute if score #sq {OBJ} matches {hi + 1}.. run return run {fn("core/skip_clear")}',
             f'execute unless score #sq {OBJ} matches {lo}..{hi} run return 0',
-            f'execute as {S.PL} if predicate rlk:in_sneak run scoreboard players add #skip {OBJ} 1',
-            f'execute as {S.PL} unless predicate rlk:in_sneak run {sset("#skip", 0)}',
+            f'execute as {S.PL} if predicate rlk:in_jump run scoreboard players add #skip {OBJ} 1',
+            f'execute as {S.PL} unless predicate rlk:in_jump run {sset("#skip", 0)}',
             f'execute if score #skip {OBJ} matches {api.SKIP_HOLD}.. run return run {fn(go)}'] + rows)
         w(go, [f'# The {name} skip (@s = body): the prompt gone, the sequence\'s skip (the black, its state at tick {to}), then the',
                f'# clock jumps: the next tick is {to}.',
@@ -780,8 +782,10 @@ def helper_files(W):
                       fn('core/stop_move'),
                       f'execute store result score #t {OBJ} run data get entity @s Pos[1] 100',
                       f'execute if score #t {OBJ} matches ..{CY * 100 + 4} run return 0',
-                      f'execute at @s positioned ~ {CY} ~ if function rlk:mboss/mv/ok run return run tp @s ~ ~ ~',
-                      f'execute positioned as {S.ARENA_M} positioned ~ {CY} ~ run tp @s ~ ~ ~'])
+                      f'execute at @s positioned ~ {CY} ~ if function rlk:mboss/mv/ok run return run {fn("core/ground_to")}',
+                      f'execute positioned as {S.ARENA_M} positioned ~ {CY} ~ run {fn("core/ground_to")}'])
+    w('core/ground_to', ['# @s = body, at the floor spot core/ground found: there at once, her model with her (S.RIG_NOW).',
+                         'tp @s ~ ~ ~'] + ([S.RIG_NOW] if S.RIG_NOW else []))
     w('core/clamp', ['# @s = a marker on the floor: 0.5 b toward the arena axis until mv/ok passes there (at most 60 steps; the',
                      '# guaranteed fallback is the axis itself).',
                      'execute if function rlk:mboss/mv/ok run return 1',
@@ -808,7 +812,8 @@ def helper_files(W):
                       f'minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt("rlk_hr_pl8")}}}',
                       sset('#t4', 0), f'execute as @e[type=minecraft:marker,tag=rlk_hr_pl8,limit=1] at @s run {fn("core/clamp")}',
                       'execute positioned as @e[type=minecraft:marker,tag=rlk_hr_pl8,limit=1] run tp @s ~ ~ ~',
-                      'kill @e[type=minecraft:marker,tag=rlk_hr_pl8]', 'function rlk:mboss/mv/face'])
+                      'kill @e[type=minecraft:marker,tag=rlk_hr_pl8]', 'function rlk:mboss/mv/face']
+      + ([S.RIG_NOW] if S.RIG_NOW else []))
 
 
 # ================================================================================================== hooks
@@ -1026,6 +1031,7 @@ def hooks(W, ctx):
     w('core/replay/start', ['# Test 30 / 35: the intro again in the fight (@s = body, invulnerable), then the fight goes on.',
                             fn('core/cancel_pat0'), fn('core/deco_seat'),
                             f'tp @s {api.xyz(api.SEAT_POS)} {L.num(yaw_to(api.SEAT_POS, api.MOON_POS))} 0',
+                            *([S.RIG_NOW] if S.RIG_NOW else []),
                             sset('#rp', 1), sset('#inv', 1), sset('#sqn', S.SEQ_ID['intro']), sset('#sq', 0), sset('#sqdone', 0),
                             sset('#skip', 0), seq(ctx, 'intro', 'start')])
     w('core/replay/tick', [f'scoreboard players add #sq {OBJ} 1', seq(ctx, 'intro', 'tick'), sset('#sq_sig', 0), fn('core/skip'),

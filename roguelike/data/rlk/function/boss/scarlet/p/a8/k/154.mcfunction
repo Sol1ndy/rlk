@@ -4,6 +4,7 @@ function rlk:mboss/mv/stop
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positioned ~ ~3 ~ run tp @s ~ ~ ~
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
 function rlk:mboss/mv/face
+execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:5}
 function rlk:boss/scarlet/g/cut/aim {s:163}
 execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c163] ~ ~ ~ ~ 0

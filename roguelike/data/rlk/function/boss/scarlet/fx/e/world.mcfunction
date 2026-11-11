@@ -4,10 +4,12 @@
 # reviving player clears every card (fx/clear) but the kept ones (F2, HR-17: the instant death's line and petals);
 # the following cards (F2, HR-23) go to their lead first.
 execute unless entity @e[tag=rlk_hr_fx,limit=1] run return run function rlk:boss/scarlet/fx/e/zero
+execute if score #btHold cb matches 1 run return run schedule function rlk:boss/scarlet/fx/e/world 1t replace
 execute if entity @a[tag=player,scores={dead=1}] run function rlk:boss/scarlet/fx/clear
 execute if entity @a[tag=player,scores={rnDie=1..}] run function rlk:boss/scarlet/fx/clear
 execute as @e[type=minecraft:item_display,tag=rlk_hr_fx_fc] run function rlk:boss/scarlet/fx/e/fcard
 execute store result score #now hrFx run time query gametime
+scoreboard players operation #now hrFx -= #btLag cb
 execute as @e[type=minecraft:item_display,tag=rlk_hr_fx] run function rlk:boss/scarlet/fx/e/age
 execute as @e[type=minecraft:marker,tag=rlk_hr_fx_bm] at @s run function rlk:boss/scarlet/fx/e/beam
 execute store result score #n hrFx if entity @e[type=minecraft:item_display,tag=rlk_hr_fx_c]

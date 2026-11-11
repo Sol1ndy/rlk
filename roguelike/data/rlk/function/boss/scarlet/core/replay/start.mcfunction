@@ -2,6 +2,7 @@
 function rlk:boss/scarlet/core/cancel_pat0
 function rlk:boss/scarlet/core/deco_seat
 tp @s 884.0 201 5.0 187.31 0
+execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
 scoreboard players set #rp hr 1
 scoreboard players set #inv hr 1
 scoreboard players set #sqn hr 1

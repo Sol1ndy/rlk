@@ -42,6 +42,11 @@ fx/uninstall (contract §3.3).
 Run: python3 tools/build_mboss_hr_fx.py --resourcepack <unpacked RP>   (or --skip-rp: the datapack + manifest only)
 """
 from pathlib import Path
+# VP beat (round V; lane VP's request, applied at the integration): the CARD clock is the game time minus the ticks the perfect
+# parry / dodge beat held the world (#btLag cb, player/def/beat/clock), as in the other six kits: while her fight is frozen the
+# cards (the cue star, the flashes, every preset) stand still - fx/e/world only re-schedules itself on a held tick - and a
+# timed card stays in step with the hit it announces. The HUD clocks (the typed line #lnE, the overlay #ovS..#ovE, #now2)
+# stay on the raw game time on purpose: they mirror `title` timers that run on the client in real time, which no beat holds.
 import argparse
 import json
 import math
@@ -517,7 +522,7 @@ def warn_component():
 
 def skip_component(s):
     """the intro's actionbar prompt at brightness step s: 「⊙ 건너뛰기」 (api.SKIP_TEXT, verbatim) brightening, the hint
-    「 · Shift 길게」 (api.SKIP_HINT) grey"""
+    「 · Space 길게」 (api.SKIP_HINT) grey"""
     return (f'{{text:"",extra:[{{text:"{_jstr(api.SKIP_TEXT)}",color:"{SKIP_COLS[s]}",font:"minecraft:default"}},'
             f'{{text:"{_jstr(api.SKIP_HINT)}",color:"{api.SKIP_COLOR}",font:"minecraft:default"}}]}}')
 
@@ -1443,7 +1448,8 @@ def _p_ambient_p1():
         'a firefly low over the grass about every 20 t (particles only).')
 def _p_ambient_p2():
     return [part('crimson_spore', '~ ~2 ~', (8.0, 2.0, 8.0), 0, 2), dust(DUST_PETAL, 1.2, '~ ~2 ~', (8.0, 2.0, 8.0), 1),
-            'execute store result score #g hrFx run time query gametime', 'scoreboard players operation #g hrFx %= #c20 hrFx',
+            'execute store result score #g hrFx run time query gametime', 'scoreboard players operation #g hrFx -= #btLag cb',
+            'scoreboard players operation #g hrFx %= #c20 hrFx',
             'execute if score #g hrFx matches ..5 run ' + part('firefly', '~ ~0.4 ~', (6.0, 0.2, 6.0), 0, 1)]
 
 
@@ -1926,7 +1932,7 @@ def engine(W):
         f'execute if score #dly {OBJ} matches 1.. run data modify storage {STO} fx.a.z set value "0f,0f,0f"',
         f'execute if score #fol {OBJ} matches 1.. run data modify storage {STO} fx.a.tpd set value 1',
         f'function {E}spawn with storage {STO} fx.a',
-        'execute store result score #now ' + OBJ + ' run time query gametime',
+        'execute store result score #now ' + OBJ + ' run time query gametime', 'scoreboard players operation #now ' + OBJ + ' -= #btLag cb',
         f'scoreboard players add #now {OBJ} 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -1989,10 +1995,12 @@ def engine(W):
         '# reviving player clears every card (fx/clear) but the kept ones (F2, HR-17: the instant death\'s line and petals);',
         '# the following cards (F2, HR-23) go to their lead first.',
         f'execute unless entity @e[tag={TAG},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (the pools' counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run function {FN}clear',
         f'execute as @e[type=minecraft:item_display,tag={FCARD}] run function {E}fcard',
-        f'execute store result score #now {OBJ} run time query gametime',
+        f'execute store result score #now {OBJ} run time query gametime', f'scoreboard players operation #now {OBJ} -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute as @e[type=minecraft:marker,tag={BEAM}] at @s run function {E}beam',
         f'execute store result score #n {OBJ} if entity {SEL}_c]',
@@ -2690,7 +2698,7 @@ def hud_funcs(W):
                            f'bossbar set {WARN_BAR} visible false', f'bossbar set {WARN_BAR} players',
                            f'data modify storage {STO} fx.hud.warn set value 0b'])
     skip = [f'# {{s}}: the intro\'s skip prompt on the actionbar (PLAN §3.1): 「{api.SKIP_TEXT}」 (the original\'s, verbatim) at',
-            f'# brightness step s 0..{api.SKIP_STEPS} (grey {api.SKIP_COLOR} -> white while Shift is held) and the hint 「{api.SKIP_HINT}」',
+            f'# brightness step s 0..{api.SKIP_STEPS} (grey {api.SKIP_COLOR} -> white while the jump key is held) and the hint 「{api.SKIP_HINT}」',
             '# (grey); hudHold 2 (the caller sends it every tick, so the regular actionbar HUD rests); s 5 clears it.', INIT,
             f'$scoreboard players set #sk {OBJ} $(s)',
             f'execute if score #sk {OBJ} matches 5.. run return run function {H}e/skip_off']

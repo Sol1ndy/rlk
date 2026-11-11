@@ -10,6 +10,7 @@ function rlk:mboss/mv/stop
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positioned ~ ~3 ~ run tp @s ~ ~ ~
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
 function rlk:mboss/mv/face
+execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.1 ~ run function rlk:boss/scarlet/fx/p/ghost_burst
 kill @e[type=minecraft:item_display,tag=rlk_hr_swl]
 kill @e[type=minecraft:item_display,tag=rlk_hr_swlh]

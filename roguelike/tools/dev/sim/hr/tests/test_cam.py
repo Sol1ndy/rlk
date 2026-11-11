@@ -795,6 +795,20 @@ VC_FILES = ('roguelike/data/rlk/function/combat/sap_absorb.mcfunction', 'rogueli
             'roguelike/data/rlk/advancement/mboss/cam_post.json')
 
 
+def other_lanes():
+    """Round V integration: on the merged tree the other lanes' files differ from the base too. They are the round V groups of
+    ident_hr.py (lane VB: the gauge's dividers; lane VP: the beat and its clock users; the integration's own), read from there."""
+    try:
+        import ident_hr as IH
+    except Exception as e:      # noqa: BLE001
+        print(f'   ident: ident_hr.py not readable ({e}): the other lanes\' files are not excused')
+        return []
+    return [p for g, p in IH.PATS if g.startswith('round V') and g != IH.LANE_VC]
+
+
+BEAT_WORDS = ('#btK cb', '#btAdj cb', '#btHold cb')      # lane VP's lines / conditions in rlk:tick (the beat's clock and gates)
+
+
 def ident():
     repo = DP.parent
     git = lambda *a: subprocess.run(['git', '-C', str(repo), *a], capture_output=True, text=True)  # noqa: E731
@@ -807,17 +821,19 @@ def ident():
     pre = 'roguelike/data/rlk/function/'
     own = (pre + 'boss/scarlet/', pre + 'mboss/cam/', pre + 'char/cine/')
     other = sorted(n for n in set(names) if not n.startswith(own))
-    extra = [n for n in other if n not in VC_FILES]
-    ck(f'D1 against {base[:9]}: outside F:boss/scarlet, F:mboss/cam and F:char/cine only lane VC\'s listed files change', not extra, str(extra))
+    oth = other_lanes()
+    extra = [n for n in other if n not in VC_FILES and not any(p.fullmatch(n[len('roguelike/'):]) for p in oth)]
+    ck(f'D1 against {base[:9]}: outside F:boss/scarlet, F:mboss/cam and F:char/cine only lane VC\'s listed files change '
+       f'(and the files of the other round V lanes: ident_hr.py\'s round V groups)', not extra, str(extra))
     for n in other:
         if not n.endswith('.mcfunction') or n not in VC_FILES:
             continue
         d = git('diff', '-U0', base, '--', n).stdout.split('\n')
         add = [l[1:] for l in d if l[:1] == '+' and not l.startswith('+++') and l[1:].strip() and not l[1:].startswith('#')]
         rem = [l[1:] for l in d if l[:1] == '-' and not l.startswith('---') and l[1:].strip() and not l[1:].startswith('#')]
-        ck(f'D2 {n.rsplit("/", 2)[-2]}/{n.rsplit("/", 1)[-1]}: every added command is a lock line (rlk_mb_camh / #mbCamSap / the blank skin); '
-           'a removed command comes back inside an added one',
-           all(any(w in l for w in ('rlk_mb_camh', 'mbCamSap', 'rlk:skin/blank')) for l in add)
+        ck(f'D2 {n.rsplit("/", 2)[-2]}/{n.rsplit("/", 1)[-1]}: every added command is a lock line (rlk_mb_camh / #mbCamSap / the blank skin) '
+           'or a line of lane VP\'s beat clock (#btK / #btAdj / #btHold cb); a removed command comes back inside an added one',
+           all(any(w in l for w in ('rlk_mb_camh', 'mbCamSap', 'rlk:skin/blank') + BEAT_WORDS) for l in add)
            and all(any(r[:36] in a_ or r[-60:] in a_ for a_ in add) for r in rem), f'{add} {rem}')
 
 

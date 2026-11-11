@@ -212,8 +212,8 @@ def body_files(W):
                    f'execute if entity @s[tag=rlk_mb_mv] run {STOP}',
                    f'execute store result score #g_y {OBJ} run data get entity @s Pos[1] 100',
                    f'execute if score #g_y {OBJ} matches ..{CY * 100 + 4} run return 0',
-                   f'execute at @s positioned ~ {CY} ~ if function {OK[9:]} run return run tp @s ~ ~ ~',
-                   f'execute at {ARENA_M} positioned ~ {CY} ~ run tp @s ~ ~ ~'])
+                   f'execute at @s positioned ~ {CY} ~ if function {OK[9:]} run return run {fn("core/ground_to")}',
+                   f'execute at {ARENA_M} positioned ~ {CY} ~ run {fn("core/ground_to")}'])
     w('g/reset', ['# @s = the body (a cancelled ghost pattern): solid and visible in her normal colours, the blade glow off, no glide,',
                   '# on the floor. Idempotent.',
                   f'tag @s remove {TAG_GHOST}', api.rig('look/form/normal'), api.rig('look/blade/edge'), api.rig('state/normal'),
@@ -336,8 +336,9 @@ def up_pos(up):
 
 
 def tp_spot(name, up=0.0):
-    """The body to spot `name` (+ up) at once, facing the player (a reappearance)."""
-    return [spot(name), STOP, f'execute positioned as {SPOT_M}{up_pos(up)} run tp @s ~ ~ ~', KILL_SPOT, FACE]
+    """The body to spot `name` (+ up) at once, facing the player (a reappearance), her model with her in the same tick
+    (S.RIG_NOW: without it the rig's follow leaves the model where she vanished until she next moves or turns)."""
+    return [spot(name), STOP, f'execute positioned as {SPOT_M}{up_pos(up)} run tp @s ~ ~ ~', KILL_SPOT, FACE] + ([S.RIG_NOW] if S.RIG_NOW else [])
 
 
 def glide_spot(name, t, up=0.0):

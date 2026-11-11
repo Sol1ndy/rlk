@@ -146,7 +146,14 @@ def xyz(p, nd=4):
 
 # =============================================================================================
 # 2. Damage, shapes, hits, telegraph constants (PLAN §4.1-4.5)
-DMG = {'T1': 31, 'T2': 42, 'T3': 54, 'T4': 61}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
+DMG = {'T1': 31, 'T2': 44, 'T3': 54, 'T4': 61}         # % of the base hit (mboss/hurt coefficient)
+# Round V, the integration (11-12; hr_design §6.4's tier knob): T2 42 -> 44 (raw 6 -> 7, 15 -> 17 HP on the item-less Lv15
+# player; 44 is the smallest coefficient of raw 7). hrfair 2.0 on the merged round V tree: lane VB's moves (she stops 2 b
+# before the player after a dash, the dives land short, the lower leaps) leave hit ticks, shapes, tiers and weights alone
+# but shift where the next pick starts from: T1 (the P1 walker's intake / 타키's) fell to 0.97 on seed 33 (1.02 / 1.03 /
+# 0.97, band 1.00-1.15; 1.01 / 1.03 / 1.01 on 11-11b). A damage tier changes no pick, no clock and no hit tick, so every
+# other row stays where it was measured: T1 1.07 / 1.08 / 1.02, T1b 0.51 / 0.60 / 0.59, T2 1.08, T3 1.56, T4 20.1
+# (tools/dev/plan/combat/vi_progress.md).
 # HB (11-11, the balance pass, hr_design §6.4's tier knob +-20 %; mboss/hurt floors 12 x coef x 135 / 10000, so a tier moves in
 # whole raw steps): T1 29 -> 31 (raw 4 -> 5, the chain hits; 31 is the smallest coefficient of raw 5): with fewer ultimates
 # (GAUGE['hit']) the walker's P1 intake fell under 타키's (T1) and the P hits' share of it under T1b's need; T3 62 -> 54 (raw 10
@@ -402,13 +409,13 @@ WARN_TEXT = '베기를 완벽하게 패링해 실드를 모두 깎으세요 — 
 WARN_HL = ('즉사', '#FF3A55')   # bossbar rlk:hr_warn: white text, this word crimson; only while a lethal gauntlet runs
 END_PROFILE = 'std'       # CS4 profile (question 7); only std is built: short (~600 t) / full (~1500 t) = a request
 END_H = {'std': 1372}     # the ending's length H (= clip `ending`, hr_design §3.5); registry death = H + EVENT['len'] + 2
-INTRO_SKIP = True         # hold sneak SKIP_HOLD t at any tick in SKIP_WINDOW -> black -> jump to SKIP_T (intro_end)
+INTRO_SKIP = True         # hold the jump key (round V: Space; Shift ends a spectate) SKIP_HOLD t at any tick in SKIP_WINDOW -> black -> jump to SKIP_T (intro_end)
 SKIP_HOLD, SKIP_T, SKIP_WINDOW = 20, 1290, (20, 1270)
-# hr_design §3.0 / §3.2: CS0 and CS1 may be skipped (sneak held SKIP_HOLD t inside the window -> ovl black, the jump to `to`)
+# hr_design §3.0 / §3.2: CS0 and CS1 may be skipped (the jump key held SKIP_HOLD t inside the window -> ovl black, the jump to `to`)
 SKIP = {'intro': {'window': (20, 1270), 'to': 1290}, 'cs1': {'window': (40, 560), 'to': 566}}
 assert SKIP['intro'] == {'window': SKIP_WINDOW, 'to': SKIP_T}
 SKIP_TEXT = '⊙ 건너뛰기'      # the original's prompt, verbatim (actionbar, hudHold)
-SKIP_HINT = ' · Shift 길게'      # the pack's control hint after it
+SKIP_HINT = ' · Space 길게'      # the pack's control hint after it (round V: the skip is the jump key, never Shift)
 SKIP_COLOR, SKIP_STEPS = '#A8A8B0', 4    # grey; brightens in four 5-t steps while held (fx/hud/skip {s:0..4}, s 5 clears)
 P2_KIT = 'footage'        # question 5: the P1 kit with P2 recoveries + R1-R3 (all footage moves)
 # triggers (PLAN §4.3 A6, §4.7)

@@ -5,5 +5,6 @@ execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/
 particle minecraft:crimson_spore ~ ~2 ~ 8 2 8 0 2 force @a[tag=player]
 particle minecraft:dust{color:[0.84f,0.36f,0.53f],scale:1.2} ~ ~2 ~ 8 2 8 0 1 force @a[tag=player]
 execute store result score #g hrFx run time query gametime
+scoreboard players operation #g hrFx -= #btLag cb
 scoreboard players operation #g hrFx %= #c20 hrFx
 execute if score #g hrFx matches ..5 run particle minecraft:firefly ~ ~0.4 ~ 6 0.2 6 0 1 force @a[tag=player]

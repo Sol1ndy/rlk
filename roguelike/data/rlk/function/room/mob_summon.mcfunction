@@ -1,4 +1,6 @@
-# 임시 몹 1마리 (위치 = 실행 위치). 55% 허스크 / 25% 스켈레톤 / 20% 변명자
+# 임시 몹 1마리 (위치 = 실행 위치). 55% 좀비 / 25% 스켈레톤 / 20% 변명자
+# (11-12 V: 허스크였던 것을 좀비로 — 리소스팩이 허스크 텍스처를 투명하게 바꿔(tools/build_blank_tex.py: 보스 피격 상자의 「유령」 제거) 허스크는
+#  보이지 않는다. 태그 rlk_m_husk 는 그대로(room/mob_init 의 능력치). 햇빛에 타지 않게 스켈레톤처럼 가죽 투구를 씌운다)
 # 1챕터: 커스텀 몹 6종(cm)
 execute if score #chapter room matches ..1 run return run function rlk:cm/summon_c1
 # 테스트 설정: 2챕터 이후에도 1챕터 커스텀 몹을 소환. 예전처럼 임시 몹을 쓰려면 /scoreboard players set #mobTmp room 1
@@ -6,7 +8,7 @@ execute if score #chapter room matches 2 unless score #mobTmp room matches 1 run
 execute if score #chapter room matches 3 unless score #mobTmp room matches 1 run return run function rlk:cm/c3/room_slot
 execute unless score #mobTmp room matches 1 run return run function rlk:cm/summon_c1
 execute store result score #r tmp run random value 1..100
-execute if score #r tmp matches ..55 run summon minecraft:husk ~ ~ ~ {Tags:["rlk_room","rlk_zmob","rlk_newmob","rlk_m_husk"],PersistenceRequired:1b,DeathLootTable:"minecraft:empty"}
+execute if score #r tmp matches ..55 run summon minecraft:zombie ~ ~ ~ {Tags:["rlk_room","rlk_zmob","rlk_newmob","rlk_m_husk"],PersistenceRequired:1b,DeathLootTable:"minecraft:empty",equipment:{head:{id:"minecraft:leather_helmet",count:1,components:{"minecraft:unbreakable":{}}}},drop_chances:{head:0.0f}}
 execute if score #r tmp matches 56..80 run summon minecraft:skeleton ~ ~ ~ {Tags:["rlk_room","rlk_zmob","rlk_newmob","rlk_m_skel"],PersistenceRequired:1b,DeathLootTable:"minecraft:empty",equipment:{mainhand:{id:"minecraft:bow",count:1},head:{id:"minecraft:leather_helmet",count:1,components:{"minecraft:unbreakable":{}}}},drop_chances:{mainhand:0.0f,head:0.0f}}
 execute if score #r tmp matches 81.. run summon minecraft:vindicator ~ ~ ~ {Tags:["rlk_room","rlk_zmob","rlk_newmob","rlk_m_vind"],PersistenceRequired:1b,DeathLootTable:"minecraft:empty",equipment:{mainhand:{id:"minecraft:iron_axe",count:1,components:{"minecraft:attribute_modifiers":[]}}},drop_chances:{mainhand:0.0f}}
 execute as @e[tag=rlk_newmob] run function rlk:room/mob_init
