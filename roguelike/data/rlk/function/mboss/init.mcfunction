@@ -142,7 +142,7 @@ execute unless score #mbCamId mb matches 1..2 run scoreboard players set #mbCamI
 execute as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
-# combat overhaul C: the unparriable-attack glint spacing (np_glint) and a module that draws its own warnings (#mbNpOwn 1)
+# combat overhaul C: the unparriable-attack glint spacing (np_gate) and a module that draws its own warnings (#mbNpOwn 1)
 execute unless score #mbNpAt mb matches -2147483648.. run scoreboard players set #mbNpAt mb -1000000
 execute unless score #mbNpOwn mb matches 0..1 run scoreboard players set #mbNpOwn mb 0
 # Chapter mode (AZ-CM): the fight arena (#mbAr = arena n, plaza 0) and its walk / safe radius in tenths, the

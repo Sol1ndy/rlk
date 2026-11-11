@@ -25,6 +25,7 @@
     "Boss n 12 and arena n 4 (fl_ruins) are Arlecchino's (chapter 4). I1 turned arlecchino enabled and route on (chapter 4 left Raiden). At D0 the arena was out of arenas{} (S1 added arenas.fl_ruins = api.ARENA_SPEC, measures the music.nether.crimson_forest pool into mboss_lib.MUSIC_TRACKS and set music 1 len); px false + shield: one humanoid body, no hit proxies; icon model becomes rlk:mboss/kn_kit/gate_icon with the kit; ",
     "--- special boss 홍련 (D0 of the Scarlet plan, scratchpad hr/PLAN.md §8-9, hr/contract.md) ---",
     "Boss n 21 and arena n 5 (hr_field) are 홍련's (special, fn boss/scarlet). D0 added the entry with enabled false and every number filled (picks 1, lvup 1, xp 0, intro 650, death 1164 = CS4 1042 + the event coda 120 + 2; music 2 crimson_forest 6076; icon vanilla iron_sword until I1 sets rlk:mboss/hr_kit/gate_icon) and arenas.hr_field = tools/mboss_scarlet/api.py ARENA_SPEC (stub functions until S1K's theme tools/mboss_arena_hr_field.py exists). S1 measured the cherry_grove pool into mboss_lib.MUSIC_TRACKS (music 1 len 7604 = mboss_lib.music_len; music 3 stays len 0: played once in the ending) and added three fields with their validation in mboss_lib.load_registry: winWord (special entries only, at most 12 chars: the reward title and the test message say it instead of 처치), rwHook (special entries only, true: F:mboss/sp/reward runs <fn>/reward as the player, mboss_lib.SPECIAL_OPT_HOOKS), poof (any kind, false: no poof particle at F:mboss/death_finish). Enabled since I1 (I1a): rift weight 10; icon = the kit gate icon rlk:mboss/hr_kit/gate_icon since I1b.",
+    "glint: [up, forward] in blocks from the body anchor (any kind; combat overhaul, review B-03) = where the unparriable-attack warning glint is drawn by F:mboss/np_glint (generated table F:mboss/d/np_at): the chest / head of the visible rig at rest, from the rig's own data - Guardian the pelvis track + 0.7 (p56_spear.json), butterfly the butterfly-form core anchor, fieldgen the cruise core anchor, Azhdaha between chest and head of the manifest's rest_anchors, Apep the CROUCH thorax / head, Tachy s3lib.H(1.4), Arlecchino her chest stand-in. Default (mboss_lib.glint_of): 3/4 of the husk height (1.95 b x scale) for a husk-sized rig, 2 b for a proxy boss. A module passes its own rig point (mboss_lib.np_warn(at=...)) when the visible body is away from this point.",
     "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
   ],
   "arena": {
@@ -65,21 +66,21 @@
       "id": "guardian", "n": 1, "bal": true, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
       "name": "파수꾼・타락", "sub": "개안자 · 세계 망루의 파수꾼", "color": "#E0B84A", "el": 5,
       "hp": 250, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
-      "scale": 1.5, "hit": {"w": 1.6, "h": 3.4}, "intro": 90, "death": 90, "deathSnd": false,
+      "scale": 1.5, "glint": [2.8, 0], "hit": {"w": 1.6, "h": 3.4}, "intro": 90, "death": 90, "deathSnd": false,
       "icon": {"item": "minecraft:wither_skeleton_skull", "model": "minecraft:wither_skeleton_skull"}
     },
     {
       "id": "butterfly", "n": 2, "bal": true, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
       "name": "달빛 환영 나비", "sub": "달빛의 화신", "color": "#B6E35A", "el": 7,
       "hp": 240, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
-      "scale": 1.4, "hit": {"w": 1.6, "h": 3.0}, "intro": 140, "death": 100, "deathSnd": false,
+      "scale": 1.4, "glint": [3.2, 0.2], "hit": {"w": 1.6, "h": 3.0}, "intro": 140, "death": 100, "deathSnd": false,
       "icon": {"item": "minecraft:verdant_froglight", "model": "minecraft:verdant_froglight"}
     },
     {
       "id": "fieldgen", "n": 3, "bal": true, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
       "name": "실험성 역장 발생 장치", "sub": "브레게 프로토타입", "color": "#E8C46A", "el": 5,
       "hp": 230, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
-      "scale": 2.4, "hit": {"w": 2.4, "h": 4.6}, "intro": 130, "death": 110, "deathSnd": false,
+      "scale": 2.4, "glint": [4.4, 0], "hit": {"w": 2.4, "h": 4.6}, "intro": 130, "death": 110, "deathSnd": false,
       "icon": {"item": "minecraft:clock", "model": "minecraft:clock"}
     },
     {
@@ -102,7 +103,7 @@
       "id": "azhdaha", "n": 10, "bal": true, "fn": "boss/azhdaha", "kind": "chapter", "ch": [1], "route": true, "enabled": true, "w": 0,
       "minCh": 1, "maxCh": 1, "name": "야타용왕", "sub": "봉인된 바위 용의 왕", "color": "#F2B53A", "el": 5,
       "hp": 135, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
-      "scale": 0.1, "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
+      "scale": 0.1, "glint": [2.6, 3.2], "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
       "arena": "az_cavern", "theme": "az_cavern", "res": {"0": 30, "5": 30, "*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
       "icon": {"item": "minecraft:raw_gold_block", "model": "rlk:mboss/az_kit/gate_icon"}
@@ -111,7 +112,7 @@
       "id": "apep", "n": 11, "bal": true, "fn": "boss/apep", "kind": "chapter", "ch": [3], "route": true, "enabled": true, "w": 0,
       "minCh": 3, "maxCh": 3, "name": "아펩의 오아시스 파수꾼", "sub": "종막 오아시스 파수꾼", "color": "#C9C452", "el": 7,
       "hp": 290, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
-      "scale": 2.0, "hit": {"w": 2.6, "h": 3.6}, "intro": 110, "death": 140, "deathSnd": false,
+      "scale": 2.0, "glint": [3.3, 1.0], "hit": {"w": 2.6, "h": 3.6}, "intro": 110, "death": 140, "deathSnd": false,
       "arena": "ap_oasis", "theme": "ap_oasis", "px": true, "pxBase": 65, "shield": true,
       "res": {"7": 30, "*": 10}, "phases": [53, 47],
       "music": {"1": {"ev": "minecraft:music.overworld.deep_dark", "len": 6870},
@@ -123,7 +124,7 @@
       "id": "tachy", "n": 20, "bal": true, "fn": "boss/tachy", "kind": "special", "enabled": true, "w": 10,
       "minCh": 1, "maxCh": 99, "name": "타키", "sub": "잠식된 제7공수대원", "color": "#F2C230", "el": 1,
       "hp": 250, "xp": 0, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
-      "scale": 1.45, "hit": {"w": 1.4, "h": 3.25}, "intro": 190, "death": 130, "deathSnd": false,
+      "scale": 1.45, "glint": [1.75, 0], "hit": {"w": 1.4, "h": 3.25}, "intro": 190, "death": 130, "deathSnd": false,
       "arena": "tk_lift", "theme": "tk_lift", "res": {"*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.nether.basalt_deltas", "len": 6376},
                 "2": {"ev": "minecraft:music.dragon", "len": 6883}},
@@ -142,7 +143,7 @@
       "id": "arlecchino", "n": 12, "bal": true, "fn": "boss/arlecchino", "kind": "chapter", "ch": [4], "route": true, "enabled": true, "w": 0,
       "minCh": 4, "maxCh": 4, "name": "아를레키노", "sub": "우인단 집행관 서열 4위", "color": "#E0303A", "el": 1,
       "hp": 320, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
-      "scale": 1.4, "hit": {"w": 1.2, "h": 2.9}, "intro": 160, "death": 110, "deathSnd": false,
+      "scale": 1.4, "glint": [2.0, 0], "hit": {"w": 1.2, "h": 2.9}, "intro": 160, "death": 110, "deathSnd": false,
       "arena": "fl_ruins", "theme": "fl_ruins", "px": false, "shield": true,
       "res": {"*": 10}, "phases": [64, 36],
       "music": {"1": {"ev": "minecraft:music.nether.crimson_forest", "len": 6076},

@@ -43,7 +43,7 @@ Commit after each gated step and `git push -u origin wip/combat-<lane>` (retry n
 Keep `roguelike/tools/dev/plan/combat/<lane>_progress.md` current (done / next / decisions / requests to other lanes /
 pack files): a fresh agent must be able to resume from it. No pull request. Every commit message ends with exactly
 ```
-Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G
 ```
 and names no model anywhere else.

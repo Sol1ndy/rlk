@@ -213,19 +213,28 @@ def bol_opts(bol):
     return {api.FN1_OPT: api.BOL_HIT} if bol and FN1 else {}
 
 
-def hz_opts(key, tier_dmg, bol, grp=False, kb=None, back=None):
+def hz_opts(key, tier_dmg, bol, grp=False, kb=None, back=None, noparry=None):
     """The one-shot options of a pattern hazard: quiet (#hzQuiet 1: the floor markings of PLAN §1.5 are the kit decals,
-    vanilla dust stand-ins while the kit is missing), no framework sound, Pyro, the FN-1 bond option."""
-    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.PYRO, back=back, **bol_opts(bol))
+    vanilla dust stand-ins while the kit is missing), no framework sound, Pyro, the FN-1 bond option. noparry=1: one of her
+    unparriable hits (combat overhaul, api.NOPARRY): her hazards are made at the strike frame, so the pattern calls the
+    warning glint itself at the hit's tell tick (np_warn below) and the framework draws none (glint=False)."""
+    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.PYRO, back=back, noparry=noparry, glint=not noparry, **bol_opts(bol))
 
 
-def hazard(key, hit, grp=False, tell=1, kb=None, pos=None, dims=None, back=None, yaw=0):
+def np_warn():
+    """The unparriable-attack warning glint on her chest (@s = body; core/np: the rig's chest anchor of the running clip
+    tick): put it at the tell tick of an unparriable hit that can be dodged (api.NOPARRY and the full-arena / per-mille hits
+    the framework's rule makes unparriable), >= api.TELL_BIG t before the strike."""
+    return fn('core/np')
+
+
+def hazard(key, hit, grp=False, tell=1, kb=None, pos=None, dims=None, back=None, yaw=0, noparry=None):
     """Lines that create the hazard of api.HITS entry `hit` (aim = body yaw + yaw), striking `tell` ticks later.
     pos: execute subcommands for the origin (default the body on the floor); dims: shape args override (line length)."""
     clip, event, shape, hdims, tier, bol = hit
     dims = dims or hdims
     tier_dmg = api.dmg(tier, 1 if key in api.P1 else 2)
-    out = hz_opts(key, tier_dmg, bol, grp=grp, kb=kb, back=back)
+    out = hz_opts(key, tier_dmg, bol, grp=grp, kb=kb, back=back, noparry=noparry)
     if shape == 'full':
         call = L.hz_full(tell, tier_dmg)
     elif shape == 'disc_ahead':

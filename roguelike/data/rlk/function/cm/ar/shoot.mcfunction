@@ -5,5 +5,7 @@ scoreboard players operation @e[tag=rlk_cmpnew] cmD = #cmD_ar tmp
 scoreboard players operation @e[tag=rlk_cmpnew] cmLv = #clv tmp
 scoreboard players set @e[tag=rlk_cmpnew] cmEl 0
 scoreboard players set @e[tag=rlk_cmpnew] cmT 30
+# 주인(@s = 궤적 선, 궁수의 cmId): 화살의 피해 문맥이 궁수를 찾는다(player/def/ctx_cm) — 퍼펙트 패링이 궁수의 균형치 한 칸
+scoreboard players operation @e[tag=rlk_cmpnew] cmId = @s cmId
 tag @e[tag=rlk_cmpnew] remove rlk_cmpnew
 kill @s

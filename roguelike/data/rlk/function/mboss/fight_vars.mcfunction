@@ -4,7 +4,7 @@ scoreboard players set #mbPause mb 0
 scoreboard players set #mbNoLeash mb 0
 # hr FN-f: no fight starts with the module's bars-off flag (mboss/bars_off / bars_on; world skips mboss/bars while it is 1)
 scoreboard players set #mbBarOff mb 0
-# combat overhaul C: the framework draws the unparriable warning glint (np_glint) unless the module sets #mbNpOwn 1 at its spawn
+# combat overhaul C: the framework draws the unparriable warning glint (np_glint / np_glint_here) unless the module sets #mbNpOwn 1 at its spawn
 scoreboard players set #mbNpOwn mb 0
 # hr FN-bal (hr_design §1.3): no fight starts with a module's balance-off flag (#mbBalOff 1: bal/boss/may refuses balance damage)
 scoreboard players set #mbBalOff mb 0

@@ -456,6 +456,11 @@ def build_f(W):
     pb.at(flood, placed([k], f'at {S.ARENA_M} positioned ~ {CY} ~') if k else [], snd('flood'))
     flood_stand_in(pb, flood, hit1)
     pb.hit(0, tell_from=flood, kb=KB0, pos=f'at {S.ARENA_M} positioned ~ {CY} ~')
+    # combat overhaul (rulings B-01 / B-02): both hits cover the whole arena (unparriable by the framework's rule, dodgeable):
+    # the warning glint on her chest when each hit's tell starts (the flood / the wings), >= TELL_BIG t before it
+    assert hit1 - flood >= api.TELL_BIG and hit2 - wings >= api.TELL_BIG
+    pb.at(flood, S.np_warn())
+    pb.at(wings, S.np_warn())
     pb.at(hit1, S.fx('threads', [part(S.DUST[2], 8, 3, 8, 0, 200)], pos=f'at {S.ARENA_M} positioned ~ {num(CY + 0.2)} ~', r=WALK10),
           S.fx('thorns', [], pos=f'at {S.ARENA_M} positioned ~ {CY} ~', r=WALK10), snd('threads'))
     # wings 166: she rises 1 b, wings open; the flood flashes again for hit2
@@ -602,6 +607,10 @@ def build_g(W):
             r = 24.0 * (t - rim + 4) / (field - rim)
             pb.at(t, f'execute at {S.ARENA_M} positioned ~ {num(CY + 0.1)} ~ run {part(S.DUST[2], r * 0.45, 0.02, r * 0.45, 0, 90)}')
     pb.hit(2, tell_from=rim, kb=KB1, pos=f'at {S.ARENA_M} positioned ~ {CY} ~')
+    # combat overhaul (rulings B-01 / B-02): the field covers the whole arena (unparriable by the framework's rule,
+    # dodgeable; the two crosses are parryable): the warning glint on her chest when the rim starts closing
+    assert field - rim >= api.TELL_BIG
+    pb.at(rim, S.np_warn())
     pb.at(field, snd('blast'), S.fx('thorns', [part(S.DUST[2], 9, 1.5, 9, 0, 200)], pos=f'at {S.ARENA_M} positioned ~ {CY} ~', r=240),
           [f'execute as @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}] at @s run {x}'
            for x in S.fx('blade_burst', [part(S.DUST[2], 0.6, 1.0, 0.6, 0, 12)], pos='positioned ~ ~1 ~')],

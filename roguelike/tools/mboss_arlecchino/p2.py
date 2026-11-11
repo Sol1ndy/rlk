@@ -187,13 +187,13 @@ class Stage:
         self.sm.grp_n += 1
         return self.sm.grp_n
 
-    def hit(self, hk, idx, tell, grp=0, kb=KB0, pos=None, dims=None, yaw=0, at=None, cond=None, tag=None):
+    def hit(self, hk, idx, tell, grp=0, kb=KB0, pos=None, dims=None, yaw=0, at=None, cond=None, tag=None, noparry=None):
         """The api.HITS[hk][idx] hazard, made at its event tick - 1 (tell 1) in this stage. tell = the stage tick of the
         first visible motion of this hit (or of the hit it follows). cond: an execute condition (variants)."""
         h = api.HITS[hk][idx]
         t = at if at is not None else E(h[0], h[1])
         assert t >= 1 and tell <= t, (hk, idx, t, tell)
-        lines = S.hazard(self.sm.key, h, grp=bool(grp), kb=kb, pos=pos, dims=dims, yaw=yaw)
+        lines = S.hazard(self.sm.key, h, grp=bool(grp), kb=kb, pos=pos, dims=dims, yaw=yaw, noparry=noparry)
         if tag:
             lines.append(f'execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add {tag}')
         if cond:
@@ -729,8 +729,12 @@ def build_q4(W):
     sh.track(1, lockt - 1, 12)
     sh.at(lockt, fn('core/lockp'), f'execute at @s facing entity {LOCK_M} feet run tp @s ~ ~ ~ ~ 0', snd('beam_aim'), aim_fn)
     # fire 26: the beam line(30, 2.2) from her through the locked point (Bond of Life); the last shot of the cast knocks back
-    sh.hit(key, 0, tell=aim, kb=KB1, cond=f'if score #q4_k {OBJ} = #q4_n {OBJ}')
-    sh.hit(key, 0, tell=aim, kb=KB0, cond=f'unless score #q4_k {OBJ} = #q4_n {OBJ}')
+    # combat overhaul (rulings B-01 / B-02): the beam is unparriable; the warning glint on her chest when each shot's aim
+    # starts, `fire - aim` t before it fires
+    assert fire - aim >= api.TELL_BIG
+    sh.at(aim, S.np_warn())
+    sh.hit(key, 0, tell=aim, kb=KB1, cond=f'if score #q4_k {OBJ} = #q4_n {OBJ}', noparry=1)
+    sh.hit(key, 0, tell=aim, kb=KB0, cond=f'unless score #q4_k {OBJ} = #q4_n {OBJ}', noparry=1)
     sm.hits.pop()
     sm.hits[-1]['kb'] = None
     sm.hits[-1]['cond'] = None
@@ -814,13 +818,18 @@ def build_q5a(W):
                         + placed(dots, f'{at_c} positioned ~ {floor_y(0.1)} ~'))
             for t in range(t0, t1, 4):
                 st.at(t, nm)
-    st.hit(key, 0, tell=ring1, kb=KB0, pos=at_floor(Q5C))
+    # combat overhaul (rulings B-01 / B-02): the three bursts are unparriable; the warning glint on her chest when each
+    # outline appears (its tell), >= TELL_BIG t before the burst
+    for t0, t1 in ((ring1, hit1), (donut, hit2), (ring3, hit3)):
+        assert t1 - t0 >= api.TELL_BIG
+        st.at(t0, S.np_warn())
+    st.hit(key, 0, tell=ring1, kb=KB0, pos=at_floor(Q5C), noparry=1)
     st.at(hit1, S.fx('blast', [part(S.DUST[2], r1 * 0.45, 0.4, r1 * 0.45, 0, 80), part('minecraft:explosion', 2, 0.3, 2, 0, 4)],
                      pos=f'{at_c} positioned ~ {CY} ~', r=int(r1 * 10)), snd('blast', at_c))
-    st.hit(key, 1, tell=donut, kb=KB0, pos=at_floor(Q5C))
+    st.hit(key, 1, tell=donut, kb=KB0, pos=at_floor(Q5C), noparry=1)
     st.at(hit2, S.fx('thorns', [part(S.DUST[2], r2 * 0.4, 0.5, r2 * 0.4, 0, 160)], pos=f'{at_c} positioned ~ {CY} ~', r=int(r2 * 10)),
           snd('threads', at_c))
-    st.hit(key, 2, tell=ring3, kb=KB1, pos=at_floor(Q5C))
+    st.hit(key, 2, tell=ring3, kb=KB1, pos=at_floor(Q5C), noparry=1)
     st.at(hit3, S.fx('blast', [part(S.DUST[2], r3 * 0.45, 0.5, r3 * 0.45, 0, 200), part('minecraft:explosion', 4, 0.4, 4, 0, 8)],
                      pos=f'{at_c} positioned ~ {CY} ~', r=int(r3 * 10)), snd('blast', at_c), snd('final', at_c))
     st.at(hit3 + 8, look('glow', 'normal'))
@@ -873,8 +882,12 @@ def build_q5b(W):
               snd('rapid'))
     # the final: the crimson aura swells 20 t before (both scythes raised from 84), pm_disc(7.5) per mille (api.HITS), non-lethal,
     # Bond of Life, dash-dodgeable
+    # (combat overhaul, ruling Q5b: the nine cuts are parryable discs - the framework's rule, no size threshold any more -
+    # two cuts to a volley group, so five answers 6 t apart; the finisher is a per-mille hit: unparriable by the rule, and its
+    # warning glint comes with the aura, TELL_BIG t before it)
     tell = final - api.TELL_BIG
-    st.at(tell, S.fx('shock_aura', [part(S.DUST[2], 0.8, 1.2, 0.8, 0, 40)], pos=f'at @s positioned ~ ~{S.H(1.4)} ~'), snd('brand'))
+    st.at(tell, S.fx('shock_aura', [part(S.DUST[2], 0.8, 1.2, 0.8, 0, 40)], pos=f'at @s positioned ~ ~{S.H(1.4)} ~'), snd('brand'),
+          S.np_warn())
     if not K._on():
         for t in range(tell + 2, final, 3):
             st.at(t, f'execute at @s positioned ~ ~1.4 ~ run {part(S.DUST[2], 0.9, 1.0, 0.9, 0, 12)}')
@@ -970,19 +983,23 @@ def build_q6(W):
     # the landing disc + every orb's disc, one volley group (Bond of Life), the last hit of the cast
     st.at(lockt, fn('core/lockp'), fn('core/lock_short'), f'execute at @s facing entity {LOCK_M} feet run tp @s ~ ~ ~ ~ 0',
           look('glow', 'crimson'), snd('dash_tell'))
+    # combat overhaul (rulings B-01 / B-02): the landing is unparriable - the landing disc and every orb's disc alike (one
+    # strike = one volley group = one answer); the warning glint on her chest (she hovers) at the lock, impact - lock t before
+    assert impact - lockt >= api.TELL_BIG
+    st.at(lockt, S.np_warn())
     st.at(dive, f'execute positioned as {LOCK_M} run function rlk:mboss/mv/glide {{t:{impact - dive}}}',
           S.fx('dive_streak', [], pos=f'{AT_BODY} positioned ~ ~1 ~', len=int(hy * 10)), snd('fall_dive'))
     if not K._on():
         for t in range(dive + 1, impact):
             st.at(t, f'execute at @s run {part(S.DUST[2], 0.3, 0.8, 0.3, 0, 12)}')
     g = st.group(impact - 1)
-    st.hit(key, 6, tell=lockt, grp=g, kb=KB1, pos=at_floor(LOCK_M))
+    st.hit(key, 6, tell=lockt, grp=g, kb=KB1, pos=at_floor(LOCK_M), noparry=1)
     oh = api.HITS[key][7]
     assert oh[2] == 'orb_discs'
     oh_disc = (oh[0], oh[1], 'disc', (orb_r,), oh[4], oh[5])
     for k in range(n_orb):
         st.at(impact - 1, S.hazard(key, oh_disc, grp=True, kb=KB1, pos=f'at @e[type=minecraft:item_display,tag=rlk_kn_q6o{k},limit=1] '
-                                                                       f'positioned ~ {CY} ~'))
+                                                                       f'positioned ~ {CY} ~', noparry=1))
     sm.hits.append(dict(stage='main', t=impact, hk=key, idx=7, tell=toss, grp=g, kb=KB1, bol=1, shape='orb_discs', cond=None))
     st.at(impact, S.bol_mark())
     burst = (S.fx_impact(4.0, BOL_C, pos=at_floor(LOCK_M)) + snd('fall_impact', f'at {LOCK_M}')

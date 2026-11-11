@@ -40,6 +40,9 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 own groggies' refill lines, the mob / cm / combat / burst hook lines, the cm rig ticks, Raiden's balance stun
   lane H2       the 홍련 rebuild's cinematic lock FN-cam (11-11, wip/combat-hr2): F:mboss/cam/**, the request lines of
                 F:mboss/{main,cleanup_fight,init,uninstall}, F:tick, F:view/tick, F:lvup/tick
+  fix lane FB   the enemy side after review B (11-11, wip/combat-fix-b): the framework's np / grp files, the patterns of the
+                seven bosses that hold an unparriable hit (the glint call, noparry), cm/ar/shoot, cm/cc/flock, cm/ci/r_hit(_own),
+                boss/tachy/{bal_on,core/ground}
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
 file passes only in a group named in ALLOW_GONE.
@@ -175,6 +178,19 @@ ALLOW[LANE_H2] = ([F + r'mboss/cam/.+\.mcfunction']
 # rlk:char/cine/** and its manifest (tools/build_player_cine.mjs, run by build_player_rig.mjs). It changes and removes nothing.
 LANE_H3 = 'scarlet rebuild H3 (11-11): the cutscene actor'
 ALLOW[LANE_H3] = [F + r'char/cine/.+', r'tools/player_motion/cine/manifest\.json']
+# 11-11 combat overhaul, fix lane FB (wip/combat-fix-b; tools/dev/plan/combat/fb_progress.md, review/rulings_B.md): the
+# unparriable rule without size thresholds and its warning glint at the tell (the framework's np / grp files, the seven boss
+# modules' patterns that hold an unparriable hit), one volley = one answer, the archer's arrow / the conjurer's cicins, the
+# Tachy groggy on the floor. It removes nothing. (bal/boss/may and boss/raiden/hazard/new are in the B / C groups.)
+LANE_FB = 'combat overhaul fix B (11-11): unparriable rule, warning glint, volley answer, mob / groggy fixes'
+ALLOW[LANE_FB] = (
+    [F + f'mboss/{n}.mcfunction' for n in (
+        'grp_hit', 'grp_mark', 'grp_new', 'd/np_at', 'np_gate', 'np_glint_here', 'hz/np_auto', 'hz/hurt_pm_dodge')]
+    + [F + r'mboss/guardian/p/(?:flyslam|fail)/.+', F + r'mboss/butterfly/p/release/.+', F + r'mboss/fieldgen/p/burst/.+',
+       F + r'boss/azhdaha/p/(?:frost|burrow3|meteor)/.+', F + r'boss/apep/p/(?:tail|glow|wither)/.+',
+       F + r'boss/tachy/(?:bal_on|core/ground|p/l/.+|p/mantle/nova/.+)\.mcfunction',
+       F + r'boss/arlecchino/(?:core/np|p/(?:f1|g1|q4|q5a|q5b|q6)/.+)\.mcfunction',
+       F + r'cm/(?:ar/shoot|cc/flock|ci/r_hit|ci/r_hit_own)\.mcfunction'])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash

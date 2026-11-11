@@ -38,6 +38,7 @@ def hz_tag_lines(extra=None):
 
 def build(W):
     assert F_LIFE >= api.TELL_MIN and abs(F_H - 8.0) < 1e-6, (F_LIFE, F_H)
+    assert HIT >= L.NP_LEAD_BIG
     assert FEATHER[4] == api.FEATHER_TIER and FEATHER[5] == api.ELECTRO and NOVA[2] == 'full' and NOVA[5] == api.ELECTRO
     W.w('p/mantle/hz_tag', ['# @s = a mantle hazard just made: the pattern tags (p/mantle/cancel kills it).',
                             f'tag @s add {api.TAGS["pat"]}', f'tag @s add {S.tag_p(KEY)}', f'tag @s add {api.TAGS["air"]}'])
@@ -65,7 +66,11 @@ def build(W):
     W.w('p/mantle/nova/start', [
         f'# Nova (G2 failure; @s = body, #pt tk 0): {NOVA_CLIP} {api.CLIPS[NOVA_CLIP][0]} t, the wings swell {SWELL}-{FLASH}, flash {FLASH},',
         f'# the whole-arena hit at {HIT} (dash-dodgeable, {api.NOVA_PM} per mille, non-lethal, Electro).',
-        sset('#done', 0), api.play(NOVA_CLIP)] + swell + snd('nova_swell'))
+        sset('#done', 0), api.play(NOVA_CLIP)] + swell + snd('nova_swell')
+        # combat overhaul (rulings B-01 / B-02): the nova (per mille, the whole arena) is unparriable by the framework's rule
+        # and can be dodged: its warning glint when the charge starts, on her chest, HIT t before the hit (the hazard itself
+        # is made at the strike frame: no framework glint)
+        + [L.np_warn(at=f'~ ~{S.H(1.4)} ~', pre=AT_BODY)])
     tick = [f'# Nova tick (#pt tk 1..{NOVA_END}).']
     if not swell:
         tick.append(f'execute if score #pt {OBJ} matches {SWELL + 1}..{FLASH - 1} run {fn("p/mantle/nova/glow")}')

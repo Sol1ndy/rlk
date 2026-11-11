@@ -262,6 +262,14 @@ def build(W, ctx):
                      f'{{Tags:["rlk_room","rlk_mb_aux","{api.TAGS["pat"]}","rlk_kn_lock"]}}',
                      sset('#t4', 0),
                      f'execute as {S.LOCK_M} at @s run {fn("core/clamp")}'])
+    # combat overhaul (reviews B-02 / B-03): the unparriable-attack warning glint on the visible body
+    anchor = f'@e[type=minecraft:marker,tag={api.TAGS["anchor"]},limit=1]'
+    w('core/np', ['# The warning glint of an unparriable attack (@s = body; the patterns call it at the tell tick of such a hit: Q4 beam,',
+                  '# Q5a, Q5b\'s finisher, Q6\'s landing, and the full-arena hits of F / G): at the rig\'s chest anchor of the running',
+                  '# clip tick - she may be in the air - or 2 b over her feet without the rig (framework gate: mboss/np_glint_here).',
+                  api.rig('anchor/chest'),
+                  f'execute if entity {anchor} at {anchor} run return run function rlk:mboss/np_glint_here',
+                  'execute at @s positioned ~ ~2 ~ run function rlk:mboss/np_glint_here'])
     w('core/lock_short', ['# The dive target (C / E; @s = body): the lock moved 1.5 b toward her (when it stays farther than 2.5 b from',
                           '# her and passes mv/ok), so she lands in front of the player, not on them; the impact is centred there.',
                           f'execute as {S.LOCK_M} at @s unless entity @e[type=minecraft:husk,tag=rlk_mb_body,distance=..2.5] '

@@ -50,6 +50,8 @@ def num(v, nd=3):
 # 41 (B3 clock): circles at 70 + 34 k, icicle comet +18, burst +22 (plan 5 41)
 FROST = [70 + 34 * k for k in range(9)]
 FROST_ICE, FROST_BURST, FROST_R = 18, 22, 7.5
+FROST_GLINT_H = 4.0                                   # the warning glint on the tail pillar (it stands ~12 b at the anchor)
+assert FROST_BURST >= L.NP_LEAD_BIG
 FROST_COMET = (1.5, 12.0, 1.5)                        # the comet starts here (blocks from the centre) and dives 4 t
 # 42 (B3 clock): rounds, markers 48 t ahead, sky bolts at +30 / +42 (rounds 1-3), the safe circles per round
 BOLT_ROUNDS = (123, 201, 279, 357)
@@ -222,7 +224,10 @@ def frost(g):
         '# tell), Cryo (the tail element) + a stack, own volley group; the draw sound.',
         K.tele_heptagram(FROST_R, FROST_BURST, el=4, hold=3, fill=0), K.snd('frost_draw'),
         'scoreboard players operation #aq41B mb = #azB3T mb', f'scoreboard players add #aq41B mb {FROST_BURST}',
-        *hz(g, V41), L.hz_disc(FROST_R, FROST_BURST, DMG['o41']), g.tag_last_hz('rlk_mb_az_p41')])
+        # combat overhaul (rulings B-01 / B-02 / B-03): the frost circle is unparriable; the warning glint when it is drawn
+        # (FROST_BURST t before the burst), on the tail pillar - the only part of her above the floor in the B3 frame
+        *hz(g, V41, noparry=1, glint=False), L.hz_disc(FROST_R, FROST_BURST, DMG['o41']), g.tag_last_hz('rlk_mb_az_p41'),
+        L.np_warn(at=f'~ ~{num(FROST_GLINT_H)} ~', pre='at @s')])
     g.pw(key, 'comet', [
         f'# +{FROST_ICE}: the icicle comet appears high over the circle and dives into its centre in 4 t (the timing cue).',
         f'kill @e[type={ID},tag=rlk_mb_az_p41i]',
