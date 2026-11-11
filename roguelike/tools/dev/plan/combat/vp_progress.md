@@ -11,7 +11,8 @@ javap output). Pack copy `<S>/rp_vp` (from `<S>/rp_fin`, the 11-11b release pack
       `beat` (49 checks) + `beatloop_cb.py` (a real mid-boss fight, beat on = beat off world tick by world tick)
 - [x] 4 the avatar: clips `pparry` / `pdodge` for the three rig characters, the stand-in rig for the four mannequin characters,
       the weapon glow variants, the red-pink body tint; sheets
-- [ ] 5 perf numbers, README / hr_design text, full gates, final report
+- [x] 5 README 3 / 0-4 / 0-6 / 0-8 / 11, hr_design addendum, ident_hr allow group, gates (below)
+- [ ] 6 final report
 
 ## What the user asked (v_brief §1.2, §1.5) -> what is built
 | item | built |
@@ -99,19 +100,27 @@ display's pitch tilts the whole model about its entity position (the feet), so t
 lying body would swing its far end; they still freeze and get the lightning). Core dispatchers `mboss/d/beat_parried` / `beat_release`
 (registry flag `"beat"`, like `"bal"`): a module's own pose replaces the generic tilt when `beat_parried` returns 1.
 
-## Proof (a)-(e) (`tools/dev/sim/cb/tests`)
-- (a) nothing changes without a perfect answer: `test_cb`'s 251 older checks run with `#btOn 0` and pass unchanged; with
-  `#btOn 1` the scripted fights below give the same events; `rlk:tick` pays 3 commands when no beat runs.
-- (b) every later event N ticks later: section `beat` (six scripted fights, beat on = beat off on the combat clock, real length
-  = + 5 per perfect parry + 7 per perfect dodge) and `beatloop_cb.py` (the three mid-bosses, about 1600 world ticks each: identical in every `# mb`
-  score (framework, module and effect kit), the body, every hazard clock, both health pools, the dodge cooldown; held 45 / 90 / 60 =
-  5 x 9 / 18 / 12 perfect parries; with dodges mixed in the two runs still agree).
-- (c) no damage during a beat: melee, an undodgeable unparriable boss hit, a DoT tick; boss strikes 4 and 6 world ticks into a
-  dodge beat; `beatloop` mixed policy: 0 lost on untouchable ticks.
-- (d) back-to-back: chains 10 / 3 / 2 t apart all perfect, seven beats in a row leave nothing, a perfect parry inside a dodge
-  beat starts its own beat.
-- (e) exits: death, revival wait, selection space, map, `#mbCine`, `#mbCam`, `rlk:load`, the lost tag, each during a parry
-  freeze and a dodge slow motion: the next tick nothing is held; a freeze begun during the hold survives the release.
+## Proof (a)-(e) (`tools/dev/sim/cb/tests`: `test_cb.py` sections `beat` and `beatloop` = `test_beat.py`)
+- (a) nothing changes without a perfect answer: the older sections of `test_cb` (251 checks: input, lock, judge, tiers, dodge,
+  cool, context ...) run with `#btOn 0` and pass unchanged; every 홍련 / 아를레키노 / balance suite passes unchanged; with
+  `#btOn 1` and no perfect answer `rlk:tick` pays 3 commands for the beat and `mboss/main` 1.
+- (b) every later event exactly N ticks later: `beat` drives six scripted fights with the beat on and off (chains 10 / 3 / 2 t
+  apart, mistimed presses over all tiers, dodge cooldowns 18 / 12, dodges of normal mobs): identical events on the beat's clock,
+  real length = + 5 per perfect parry + 7 per perfect dodge. `beatloop_cb.py`: the three mid-bosses in the real framework,
+  about 1600 world ticks each: every `# mb` score (framework, module, effect kit), the body, every hazard clock, both health
+  pools and the dodge cooldown identical world tick by world tick; held 45 / 90 / 60 = 5 x 9 / 18 / 12; with dodges mixed in
+  the two runs still agree. `beatloop_hr.py`: 홍련 in the suites' H1 world: gauntlet G1 (9 cuts, the closest 16 t apart),
+  G2 (11 cuts, closest 14 t) and 900 ticks of the free P1 fight (25 perfect parries): the judged strikes, every `# hr` /
+  `# mb` score, her body and both health pools identical world tick by world tick; held = 5 x the perfect parries.
+- (c) no damage during a beat: melee, an undodgeable unparriable boss hit and a DoT tick on each freeze tick; boss strikes 4
+  and 6 world ticks into a dodge beat; `beatloop` mixed policy: 0 health lost on untouchable ticks.
+- (d) back-to-back: chains 10 / 3 / 2 t apart all perfect (the 3-t and 2-t strings need the input buffer: F during the hold
+  counts on the release tick), seven beats in a row leave nothing, a perfect parry inside a dodge beat starts its own beat,
+  the gauntlets' closest cuts (above).
+- (e) exits: death, Ronova's revival wait, the selection space, the map, `#mbCine`, `#mbCam`, `rlk:load`, the lost player tag,
+  each during a parry freeze and during a dodge slow motion (16 cases): on the next tick nothing is held (`#btK` / `#btHold` /
+  `#btInv` 0, the mob has its AI back, a mob frozen before keeps its own NoAI, no tag, no marker, the clock keeps its lag); a
+  freeze the player starts during the hold survives the release and loses the wrong "was NoAI" note.
 
 ## Client facts verified in the bytecode (javap, `<S>/cb/vp/bc`)
 - `Display.readAdditionalSaveData` / `setTransformationInterpolationDelay(.., true)` / `tick()` / `RENDER_STATE_IDS` (above).
@@ -138,8 +147,9 @@ lying body would swing its far end; they still freeze and get the lightning). Co
 - **VB** (optional): her own rocked-back pose instead of the generic tilt: registry entry `scarlet` gets `"beat": 1` and the
   module two functions, `boss/scarlet/beat_parried` (as the body, at it, 2 ticks after the contact; return 1) and
   `boss/scarlet/beat_release` (4 ticks later, before her tick).
-- **Lead**: `tools/dev/sim/hr/tests/ident_hr.py` needs an allow group for this lane's files at the merge (list: `git diff
-  --stat origin/wip/v..wip/v-player`).
+- **Lead**: `tools/dev/sim/hr/tests/ident_hr.py` has this lane's allow group (`LANE_VP`, also in `ALLOW_GONE`); the other
+  lanes will add theirs next to it. The resource pack's own README (font table: `rlk:cb` is now U+EE00-EE0D + two spaces
+  U+EE1E / EE1F) is the lead's at the release.
 
 ## Log
 - 11-11 start; baseline suites on the untouched tree all pass (test_cb 296, test_np 125, test_rm, test_bal 117, test_bal_boss
