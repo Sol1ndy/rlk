@@ -1,7 +1,7 @@
 # lane H2c (홍련 rebuild: her cinematic clips) — progress
 
 Branch `wip/combat-hr2c` (from `origin/wip/combat`; merged: `origin/wip/combat` 1124df33c, H1 interface 15fad96a9, H1 final
-c1e53b116, `origin/wip/combat` 8fe44f516), worktree `<S>/cb/wt_hr2c`, pack copy `<S>/rp_hr2c` (`<S>` = the scratchpad of
+c1e53b116, `origin/wip/combat` 8fe44f516 and b327762e5 = fix lane FA + the 11-11 stamp), worktree `<S>/cb/wt_hr2c`, pack copy `<S>/rp_hr2c` (`<S>` = the scratchpad of
 `h_common.md`). Contract: `hr_design.md` (§8 wins). Owner of `tools/scarlet_cine.mjs` (her 8 cinematic clips, §4.1), her side
 of the §4.3 contacts, the `gold` block of `tools/build_mboss_hr_fx.py`, `tools/dev/sim/hr/cine/**` and
 `tools/dev/sim/hr/tests/{test_cine,test_contact}.py`.
@@ -66,9 +66,9 @@ node $WT/tools/dev/sim/hr/cine/probe.mjs repel 49 88              # her points a
 | kit + `regen_all.sh` twice | identical; `check_mboss_pack` 0 problems |
 | `test_cine.py` | 159 / 159 |
 | `test_contact.py` | 47 / 47 her side; 86 / 86 with H3's manifest (both sides + where they meet) |
-| loadcheck | `hr2c_b` 0, `hr2c_c` 0, `hr2c_d` 0 (the final tree) |
+| loadcheck | `hr2c_b` 0, `hr2c_c` 0, `hr2c_d` 0, `hr2c_e` 0 (the final tree, after the FA merge) |
 | rplint / atlas | 0 / 12.919 M px |
-| `test_kit.py` | 3 rows fail, none of them the overlay: 104 sounds pinned (H1 added 5), the module's preset calls (H2's sequences) |
+| `test_kit.py` | 11 243 / 11 246: the 3 rows that fail are not the overlay's: 104 sounds pinned (H1 added 5), the module's preset calls (H2's sequences are not on this branch) |
 | `test_rig.py` | still pins the 11-06 set (47 clips, the old cine events: crashes at `scab_hand`; lanes H1c / H2 own the update). A scratch copy past those rows: see Decisions |
 
 Contact worst values (her side, b): K1 0, KR 0.007, KW 0.014, KH 0.012, KS 0.098, KT.over 0.008, KT.land 0.079, KK 0.031,
