@@ -34,6 +34,29 @@ Branch `wip/w-boss` (from `origin/wip/w` 2613c47f0, + the brief's §4 / §5 merg
 | test_vi (beatpat on the trail) / ident_hr / gen_check_hr (`--rp`) | 208 / passes / 28 of 28 |
 | hrfair 2.0 `--quick --only p1,p2,kill` (seed 11; `<S>/wb/hrfair/run.log`) | P1 / P2 walker intake 237.7 / 239.9 %/min (= round V's quick run: / 타키 232.3 = 1.02 / 1.03), T1b 0.49, T1c 0, T3 1.43, T4 19.0 %, T8 1, T9 walker Lv15 167 s (150-185), T9b 164 s, T10 1.50 / 0, T12 100 %, T13 ok, W35 35 35 34 35 / 35 35 35 32 |
 
+## Job 2 (11-12, the coordinator): re-time the gauntlets for the parry rule without the whiff ladder
+Merged `origin/wip/w-player` (47ad3b270: every accepted F locks 12 t, a parry of any tier 1 t, an ignored press blocks F 3 t;
+`chainparry.py`). The user chose to re-time the gauntlet cuts only (the lock rule stays). Target: no blind F metronome of any
+period 1-40, from any start, gets 5 perfect parries (clear) in G1 / G2.
+- Model: `tools/dev/sim/hr/review/metro/fm.c` / `dfs.c` built `-DNOLADDER` (and `-DKMIN=1 -DKMAX=40`); it reproduces lane WP's
+  numbers on the old tables (G1 clear by 4 / 6 t; G2 by 3 4 7 13 15 16 t) and test_metro's real-function tables exactly.
+- Constraints (the moves' own spacing, as HFA's): G1 gaps >= 14, the D2 reappearance >= the leap's gone + 2 (s4 - s3 >= 23), the
+  D1 after the X (s6 - s5 >= 24), D3 >= 8 t after the ring's contact (s7 - s6 >= 24); G2 gaps 14 14 23 21 14 24 14 14 14 14
+  (the leap, the ring's vanish, the X); the first cut 22-34, the last <= judge - 24 / - 22 (judges kept).
+- **At most 3 everywhere is impossible** under these rules (G1 exhaustive DFS, every period 1-40: 0 sets). At most 4: G1 231 686
+  sets (6 364 within 14 t of round V's: picked the one with the fewest periods at 4), G2 rare (random sampling 300 000: none;
+  DFS by first-cut range: the nearest found, distance 23 t).
+- **G1 31 45 64 88 108 138 163 181 195** (from 30 48 64 91 109 139 163 180 196): best per period
+  `1:1 2:1 3:3 4:4 5:3 6:3 7:3 8-14:3 3 3 2 2 3 3 3 15:4 16-18:3 19:4 20-24:3 25:4 26-28:2 29-32:3 3 3 2 33:4 34-40:2` (4 at 4 / 15 / 19 /
+  25 / 33 t: 27 / 65 / 39 / 22 / 14 starts).
+- **G2 28 46 66 89 112 127 151 170 189 205 219** (from 27 41 58 91 113 128 152 169 190 206 220): best 4 at 3-8, 12-23, 31 t, 3 or
+  less elsewhere (892 of ~17 000 (period, start) pairs reach 4); never 5.
+- Rows written from the strikes (`api._g1_rows` / `_g2_rows`), judges 220 / 242, dives 202 / 224; G2's extra vanish 96; bolts
+  G1 34 96 166 218, G2 70 160 195 240 (off the locks).
+- test_metro rewritten to the new rule: periods 1-40, starts from T - 200, at most 4 in both (33 / 33).
+- Removed the dead `tag=rlk_hr_sw` line from `player/def/beat/st/tp_on` (lane WP's file, the coordinator's request; the trail's
+  riding cards carry `rlk_mb_part`).
+
 ## Design (as built; `blade.py` header and hr_design.md §11)
 Nothing is drawn where the blade is going. The trail is generated from the sword the rig SHOWS on the pattern clock (`blade.Shown`:
 the clips a pattern plays at their pattern ticks; a clip's ticks before `f0` blend from the transform shown before; hidden ticks

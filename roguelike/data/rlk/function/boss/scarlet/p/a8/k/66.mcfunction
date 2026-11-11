@@ -1,5 +1,5 @@
 # A8 pattern tick 66.
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b19] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3438f,1.5473f,-0.2277f],left_rotation:[-0.9659f,0f,0f,-0.2588f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b20] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3438f,1.5473f,-0.2277f],left_rotation:[-0.9659f,0f,0f,-0.2588f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_60] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_quad_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_62] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
 tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_64] remove rlk_hr_trr

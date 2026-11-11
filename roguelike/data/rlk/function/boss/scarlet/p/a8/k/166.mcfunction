@@ -1,5 +1,5 @@
 # A8 pattern tick 166.
-function rlk:boss/scarlet/g/cut/aim {s:180}
+function rlk:boss/scarlet/g/cut/aim {s:181}
 execute at @e[tag=rlk_body,limit=1] rotated as @a[tag=player,limit=1] rotated ~-130 0 positioned ^ ^ ^5.2 positioned ~ 201 ~ run function rlk:boss/scarlet/g/bolt
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b154] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0495f,0.8557f,0.45f],left_rotation:[-0.482f,0.5482f,0.1701f,-0.6619f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_158]

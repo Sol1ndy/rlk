@@ -2,9 +2,14 @@
    #parGap 12 #parWsMax 3 #parWsT 80 #parWsClr 2 #parRe 3 #parChain 1, windows 3 / 6 / 10) against a gauntlet's strike ticks, for
    every metronome period and start. tests/test_metro.py checks the same thing with the real functions; this is the fast
    model the search tools use (it agreed with test_metro on every period of the old and new G1 / G2).
-   gcc -O2 -shared -fPIC -o fm.so fm.c   (metro.py does it when fm.so is missing) */
+   gcc -O2 -shared -fPIC -o fm.so fm.c   (metro.py does it when fm.so is missing)
+   round W: gcc -O2 -shared -fPIC -DNOLADDER -o fm_w.so fm.c   (the rules without the whiff ladder; metro.py --w) */
 #define GAP 12
+#ifdef NOLADDER          /* round W (lane WP, the user's ruling): no whiff ladder - every accepted press locks GAP, a parry 1 */
+#define WSMAX 0
+#else
 #define WSMAX 3
+#endif
 #define WST 80
 #define WSCLR 2
 #define RE 3

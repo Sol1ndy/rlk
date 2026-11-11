@@ -4,8 +4,6 @@ execute if score #pt hr matches 161 run return run function rlk:boss/scarlet/p/a
 execute if score #pt hr matches 162 run return run function rlk:boss/scarlet/p/a13/k/162
 execute if score #pt hr matches 163 run return run function rlk:boss/scarlet/p/a13/k/163
 execute if score #pt hr matches 164 run return run function rlk:boss/scarlet/p/a13/k/164
-execute if score #pt hr matches 165 run return run function rlk:boss/scarlet/p/a13/k/165
-execute if score #pt hr matches 166 run return run function rlk:boss/scarlet/p/a13/k/166
 execute if score #pt hr matches 167 run return run function rlk:boss/scarlet/p/a13/k/167
 execute if score #pt hr matches 168 run return run function rlk:boss/scarlet/p/a13/k/168
 execute if score #pt hr matches 169 run return run function rlk:boss/scarlet/p/a13/k/169

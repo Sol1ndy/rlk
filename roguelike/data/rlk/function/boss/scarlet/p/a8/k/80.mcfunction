@@ -1,6 +1,7 @@
 # A8 pattern tick 80.
-function rlk:boss/scarlet/g/cut/aim {s:91}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b79] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.1467f,0.6264f,0.2898f],left_rotation:[-0.661f,-0.6609f,0.3358f,0.1168f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_79,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[-0.1805f,0.6824f,0.3318f],left_rotation:[0.6777f,-0.6487f,-0.2613f,0.2271f],scale:[0.4396f,0.22f,1.6113f],right_rotation:[0f,0f,0f,1f]}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a8","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a8_80","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.028f,0.7157f,0.5392f],left_rotation:[0.7128f,-0.6101f,-0.2264f,0.2643f],scale:[0f,0.22f,1.9232f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.245 ^0.579 ^0.167 run function rlk:boss/scarlet/core/sw/rib
+function rlk:boss/scarlet/g/cut/aim {s:88}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b76] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.1384f,0.6229f,0.2905f],left_rotation:[-0.6865f,-0.6215f,0.2292f,0.2998f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_76] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_78] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_79,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[-0.139f,0.6209f,0.2768f],left_rotation:[-0.7265f,-0.5523f,0.3551f,0.2028f],scale:[0.745f,0.22f,1.5419f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.252 ^0.644 ^0.173 run function rlk:boss/scarlet/core/sw/rib

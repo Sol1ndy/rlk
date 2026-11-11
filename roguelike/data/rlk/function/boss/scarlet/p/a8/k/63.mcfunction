@@ -1,5 +1,5 @@
 # A8 pattern tick 63.
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b19] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2128f,1.3197f,0.5687f],left_rotation:[0.0403f,-0.0167f,-0.3823f,0.923f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b20] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2128f,1.3197f,0.5687f],left_rotation:[0.0403f,-0.0167f,-0.3823f,0.923f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_55]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_57] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_62,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.215f,1.3353f,-0.0752f],left_rotation:[-0.829f,-0.3434f,-0.4077f,0.1689f],scale:[0.7108f,0.3f,1.9411f],right_rotation:[0f,0f,0f,1f]}}

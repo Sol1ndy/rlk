@@ -1,7 +1,5 @@
 # A13 pattern tick 43.
-function rlk:boss/scarlet/g/cut/aim {s:58}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b16] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5918f,1.7603f,-0.2434f],left_rotation:[-0.2877f,-0.6946f,-0.6092f,-0.2523f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b17] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3093f,1.0375f,0.0081f],left_rotation:[-0.3696f,-0.8924f,0.2391f,0.099f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_35]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_37] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_39] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
-tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_41] remove rlk_hr_trr
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_42,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3346f,1.4545f,-0.1815f],left_rotation:[-0.25f,0.6034f,0.2898f,0.6996f],scale:[0.4723f,0.3f,2.0364f],right_rotation:[0f,0f,0f,1f]}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a13_43","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2713f,1.4366f,-0.1834f],left_rotation:[-0.2658f,0.6428f,0.275f,0.6639f],scale:[0f,0.3f,2.0645f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16774616]}}}}

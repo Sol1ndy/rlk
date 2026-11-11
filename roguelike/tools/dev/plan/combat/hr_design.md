@@ -879,3 +879,14 @@ The user, after round V in play: 「보스의 검로가 보이는건 미리 경�
   Hit ticks, damage, shapes, weights, the wind-up clips, the blade edge, the cue star, the flashes, leap heights, dash stops and the
   gauntlet stations are §9's.
 - §6.1 tests: `test_blade.py` (rewritten), `test_vi.py` beatpat (the trail cards beat on = off, frozen on held ticks).
+- **§2.4 the gauntlets re-timed** (the user's ruling 11-12, after lane WP removed the whiff ladder: every accepted F locks 12 t, a
+  parry of any tier 1 t, an ignored press blocks F 3 t; the lock rule stays and only the cut ticks move): G1 strikes
+  **31 45 64 88 108 138 163 181 195** (round V 30 48 64 91 109 139 163 180 196), G2 **28 46 66 89 112 127 151 170 189 205 219**
+  (27 41 58 91 113 128 152 169 190 206 220); the judges 220 / 242, the dives' reappearances 202 / 224, the clips and their order
+  unchanged; every move keeps its offset from the strike it delivers (`api._g1_rows` / `_g2_rows`: D -14 (D3 -16), ring / wrap /
+  dome -3, rise / leap -9, X -6, vert -5), every gap >= 14, a reappearance >= 2 t after the vanish before it; G2's extra vanish
+  96 (was 97); bolts G1 34 96 166 218 (99 -> 96: 2 t from c5's lock), G2 70 160 195 240 (198 = c10's lock -> 195). Result
+  (`tests/test_metro.py`, the real F functions, every period 1-40 and every start from T - 200): **at most 4 perfect parries in
+  either gauntlet** (5 clear). No table keeps every period at 3 under these rules and the moves' spacing (the exhaustive search
+  `tools/dev/sim/hr/review/metro/dfs.c -DNOLADDER`: G1 none); the G1 table is the one of the 6 364 sets within 14 t of round V's
+  with the fewest periods reaching 4 (4, 15, 19, 25, 33 t), the G2 table the nearest found (distance 23 t; 4 at 3-8, 12-23, 31 t).

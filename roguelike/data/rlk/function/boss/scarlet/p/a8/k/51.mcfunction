@@ -1,7 +1,5 @@
 # A8 pattern tick 51.
 function rlk:boss/scarlet/g/cut/aim {s:64}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b19] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5802f,1.7525f,-0.2865f],left_rotation:[-0.2998f,-0.7237f,-0.5743f,-0.2379f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_43]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_45] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_47] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
-tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_49] remove rlk_hr_trr
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_50,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.2713f,1.4366f,-0.1834f],left_rotation:[-0.2771f,0.6691f,0.2639f,0.637f],scale:[0.3375f,0.3f,2.0576f],right_rotation:[0f,0f,0f,1f]}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a8","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a8_51","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2681f,1.4385f,-0.1833f],left_rotation:[-0.2876f,0.6948f,0.2523f,0.6092f],scale:[0f,0.22f,2.0574f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}

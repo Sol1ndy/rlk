@@ -1,8 +1,5 @@
 # A13 pattern tick 145.
-execute at @s run function rlk:boss/scarlet/fx/snd/g_step
-function rlk:boss/scarlet/g/cut/lock {s:152}
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] positioned ^0.16 ^2.98 ^0.272 run function rlk:boss/scarlet/fx/p/glint {c:2}
-execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b140] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5855f,1.4446f,-0.2238f],left_rotation:[-0.7697f,0.539f,-0.1962f,0.2802f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_141] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
-execute at @s rotated as @s rotated ~ 0 positioned ^0.685 ^1.481 ^-0.35 run function rlk:boss/scarlet/core/sw/rib
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b139] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5843f,1.3011f,-0.3547f],left_rotation:[-0.7697f,0.539f,-0.1962f,0.2802f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_139] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_trr","rlk_hr_trq","rlk_hr_tr_a13_145","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.7057f,1.4883f,-0.3762f],left_rotation:[-0.523f,0.7807f,-0.0817f,0.3321f],scale:[0f,0.22f,1.435f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_quad_0","minecraft:custom_model_data":{colors:[16771496]}}}}
+execute at @s rotated as @s rotated ~ 0 positioned ^0.684 ^1.337 ^-0.481 run function rlk:boss/scarlet/core/sw/rib

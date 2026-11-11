@@ -1,5 +1,5 @@
 # A8 pattern tick 65.
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b19] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3438f,1.5089f,0.1622f],left_rotation:[-0.496f,-0.0024f,-0.005f,-0.8683f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b20] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3438f,1.5089f,0.1622f],left_rotation:[-0.496f,-0.0024f,-0.005f,-0.8683f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_57]
 tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_63] remove rlk_hr_trr
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_64,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.1878f,1.3618f,0.4306f],left_rotation:[0.1506f,0.0623f,-0.9115f,0.3776f],scale:[0.8204f,0.3f,1.6652f],right_rotation:[0f,0f,0f,1f]}}

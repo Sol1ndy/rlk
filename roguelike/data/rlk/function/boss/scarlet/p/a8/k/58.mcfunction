@@ -1,8 +1,7 @@
 # A8 pattern tick 58.
 execute at @s run function rlk:boss/scarlet/fx/snd/g_leap
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/leap {t:6,h:30}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b19] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3862f,1.358f,-0.4123f],left_rotation:[-0.8727f,0.3615f,-0.1256f,0.3032f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
-kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_50]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b20] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3862f,1.358f,-0.4123f],left_rotation:[-0.8727f,0.3615f,-0.1256f,0.3032f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_56] remove rlk_hr_trr
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_57,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.396f,1.4132f,-0.3673f],left_rotation:[0.1537f,0.9159f,0.2532f,0.271f],scale:[0.5279f,0.22f,1.6151f],right_rotation:[0f,0f,0f,1f]}}
 kill @e[type=minecraft:marker,tag=rlk_hr_trt]

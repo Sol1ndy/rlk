@@ -1,18 +1,5 @@
 # A13 pattern tick 99.
-kill @e[type=minecraft:marker,tag=rlk_hr_gst]
-function rlk:boss/scarlet/g/spot/d2e
-execute as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 run tp @s ~ ~ ~ ~ 0
-tag @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] add rlk_hr_gst
-tag @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] remove rlk_hr_gsp
-function rlk:boss/scarlet/rig/play/g_glide
-function rlk:boss/scarlet/g/spot/d2
-function rlk:mboss/mv/stop
-execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run tp @s ~ ~ ~
-kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
-function rlk:mboss/mv/face
-execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
-execute at @s run function rlk:boss/scarlet/fx/snd/g_appear
-function rlk:boss/scarlet/g/cut/make {s:113,t:14,dmg:37,kb:0,n:1}
+function rlk:boss/scarlet/g/cut/aim {s:112}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_trr","rlk_hr_trb","rlk_hr_tr_a13b100"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.1969f,0.6849f,0.3228f],left_rotation:[-0.6918f,-0.6277f,0.1964f,0.298f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_band","minecraft:custom_model_data":{colors:[16771496]}}}}
 kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_91]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_93] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_95] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"

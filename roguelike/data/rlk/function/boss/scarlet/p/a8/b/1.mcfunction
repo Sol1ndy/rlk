@@ -1,5 +1,4 @@
 # A8 ticks 16..31.
-execute if score #pt hr matches 16 run return run function rlk:boss/scarlet/p/a8/k/16
 execute if score #pt hr matches 17 run return run function rlk:boss/scarlet/p/a8/k/17
 execute if score #pt hr matches 18 run return run function rlk:boss/scarlet/p/a8/k/18
 execute if score #pt hr matches 19 run return run function rlk:boss/scarlet/p/a8/k/19

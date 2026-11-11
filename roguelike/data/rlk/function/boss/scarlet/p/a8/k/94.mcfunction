@@ -1,10 +1,6 @@
 # A8 pattern tick 94.
-function rlk:boss/scarlet/g/cut/aim {s:109}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b79] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4627f,1.6551f,-0.0036f],left_rotation:[-0.8957f,-0.3561f,0.0835f,0.2529f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/g/cut/aim {s:108}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b76] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.4709f,1.6141f,0.0096f],left_rotation:[-0.8881f,-0.3679f,0.1055f,0.2547f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_86]
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_88] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_90] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
-tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_92] remove rlk_hr_trr
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_93,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5628f,1.2139f,0.3968f],left_rotation:[-0.3779f,0.4713f,0.7462f,0.28f],scale:[0.7537f,0.3f,1.8309f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_93,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5496f,1.3904f,0.3887f],left_rotation:[-0.594f,0.4441f,0.5964f,0.3072f],scale:[0.7295f,0.3f,1.779f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_93,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4658f,1.625f,0.3107f],left_rotation:[-0.768f,0.3856f,0.4047f,0.3126f],scale:[0.6832f,0.3f,1.6685f],right_rotation:[0f,0f,0f,1f]}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a8","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a8_94","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.6032f,1.4328f,0.4835f],left_rotation:[-0.6365f,0.6441f,0.3936f,0.1498f],scale:[0f,0.22f,2.1114f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}
