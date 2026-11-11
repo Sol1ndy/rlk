@@ -7,7 +7,7 @@ The world of bossloop_cb.py (the vendored azsim of tools/dev/sim/hr/tests/lib + 
 hold the beat's clock) runs the same fight twice, with the beat's world hold off (#btOn tmp 0) and on (1). The scripted
 player decides once per COMBAT tick (the tick number the pre-pass carries), exactly as the fight looked on that world tick,
 so both runs get the same inputs on the beat's clock. On a held tick the loop does what rlk:tick does: its mboss/main line
-(run here as written) does not call the world, scheduled functions still run (the effect kits, on their lag-corrected clock), the dodge
+(run here as written) calls mboss/main, which returns on its first line (the hook), scheduled functions still run (the effect kits, on their lag-corrected clock), the dodge
 cooldown line is gated. Compared per world tick: every `#... mb` score of the framework and the module (the two raw game-time
 caches #plG / #pxG aside), the body's position, every hazard's clock, the player's health.
 
@@ -103,7 +103,7 @@ def fight(on, policy, n_real=1700):
         if hold:
             st['held'] += 1
             s.t += 1                                        # real time passes; rlk:tick's world lines are gated ...
-            s.cmd(split(MAINL), C0)                         # ... rlk:tick's own mboss/main line: its hold condition
+            s.cmd(split(MAINL), C0)                         # ... rlk:tick's own mboss/main line: main returns on its first line
             s.run_sched()
         else:
             azsim.world(s)
@@ -145,7 +145,7 @@ def first_diff(a, b):
 
 
 def main():
-    ck('beatloop: rlk:tick\'s mboss/main line carries the hold condition', 'unless score #btHold cb matches 1' in MAINL and '#btHold' not in '\n'.join(B.code('mboss/main')))
+    ck('beatloop: mboss/main\'s first command is the hold hook (rlk:tick\'s line calls it as before)', B.code('mboss/main')[0] == 'execute if score #btHold cb matches 1 run return 0' and '#btHold' not in MAINL)
     r0, s0 = fight(0, 'f')
     r1, s1 = fight(1, 'f')
     n = min(len(r0), len(r1))

@@ -955,9 +955,9 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
     사용자가 본 「타이틀에 네모 박스」; `review/v/client_facts.md` 7). 넓은 것은 조각 글리프를 −1 공백으로 이어 붙인다. `rplint` 가 모든 글꼴에서 잡는다.
 - **박자(beat) — 퍼펙트 패링의 멈춤과 퍼펙트 닷지의 느린 화면**(round V, `player/def/beat/**`; `tick rate` 는 싱글 플레이의 함수에서 쓸 수 없어
   게임 안에서 만든다. 기록 · 시계 목록 · 증명은 `tools/dev/plan/combat/vp_progress.md`):
-  - 박자가 **세계를 멈춘 틱**(`#btHold cb 1`)에는 적 쪽이 한 틱도 가지 않는다: 레지스트리 보스 전부(`rlk:tick` 의 `mboss/main` 줄 — 모듈 AI · 패턴 시계 ·
-    리그 · `mv` · 위험 지대 · 투사체 · 끌어당기기 · 보스바 · 대사), 커스텀 몹과 그 투사체(`cm/world` · `cm/pj/world` 줄), 나루카미(`boss/raiden/world` 줄) —
-    네 줄 모두 `unless score #btHold cb matches 1` 한 조건이라 평소의 명령 수는 그대로다, 모든 몹의 경직 · 균형치 · 원소 타이머(`mob/tick` 의 세 줄), 스스로 걷는 몹(멈추는 틱에 `NoAI`, 풀리는 틱에 되돌림), 보스 효과 킷
+  - 박자가 **세계를 멈춘 틱**(`#btHold cb 1`)에는 적 쪽이 한 틱도 가지 않는다: 레지스트리 보스 전부(`mboss/main` 의 첫 줄 — 모듈 AI · 패턴 시계 ·
+    리그 · `mv` · 위험 지대 · 투사체 · 끌어당기기 · 보스바 · 대사; 보스 틱마다 명령 하나), 커스텀 몹과 그 투사체 · 나루카미(`rlk:tick` 의 `cm/world` ·
+    `cm/pj/world` · `boss/raiden/world` 줄에 `unless score #btHold cb matches 1` 한 조건: 명령이 늘지 않는다), 모든 몹의 경직 · 균형치 · 원소 타이머(`mob/tick` 의 세 줄), 스스로 걷는 몹(멈추는 틱에 `NoAI`, 풀리는 틱에 되돌림), 보스 효과 킷
     6종의 시계(`gametime − #btLag`), 그리고 **플레이어에게 불리하게 세는 것**(닷지 재사용 대기, F 잠금 · 헛누름 사다리 · 패링 / 닷지 창 = 전투 시계).
     시간표: 퍼펙트 패링 = 맞은 뒤 1~5틱 멈춤(늘어난 길이 N = 5), 퍼펙트 닷지 = 1틱 멈춤 → 4틱 제 속도 → 9틱 동안 세 틱에 한 번(N = 7).
   - **전투 시계** `#now cb` = gametime − 지금까지 멈춘 틱 = 「다음에 도는 세계 틱의 번호」. 패링 · 닷지의 모든 도장과 물음(`q_pf0` · `q_pf1`)이 이 시계라

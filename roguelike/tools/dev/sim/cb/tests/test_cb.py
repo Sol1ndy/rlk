@@ -1900,13 +1900,16 @@ def t_beat():
     # ---- the gates are where the worlds start
     fns = {n: rd(n) for n in ('mboss/main', 'cm/world', 'cm/pj/world', 'mob/tick', 'player/tick', 'tick', 'player/hurt_elem', 'mboss/pl_dot2',
                               'mboss/np_gate', 'player/def/judge2', 'player/def/q_pf0', 'player/def/q_pf1', 'player/def/dodge_stamp')}
-    ck('beat: rlk:tick gates mboss/main, cm/world, cm/pj/world, Raiden\'s world and the near pass (one condition on each line: no '
-       'command more when no beat runs); mob/tick the stun, balance and element timers; player/tick the dodge cooldown',
+    ck('beat: mboss/main returns first thing on a held tick (before the per-tick requests are cleared; rlk:tick\'s own '
+       'mboss/main line keeps its text: the camera suites find it by it)', code(fns['mboss/main'])[0] == 'execute if score #btHold cb matches 1 run return 0'
+       and 'execute if score #mbLive mb matches 1 run function rlk:mboss/main' in code(fns['tick']))
+    ck('beat: rlk:tick gates cm/world, cm/pj/world, Raiden\'s world and the near pass (one condition on each line: no command '
+       'more); mob/tick the stun, balance and element timers; player/tick the dodge cooldown',
        all(any(k in l and 'unless score #btHold cb matches 1' in l for l in code(fns[n])) for n, k in (
-           ('tick', 'function rlk:mboss/main'), ('tick', 'function rlk:cm/world'), ('tick', 'function rlk:cm/pj/world'),
+           ('tick', 'function rlk:cm/world'), ('tick', 'function rlk:cm/pj/world'),
            ('tick', 'boss/raiden/world'), ('tick', 'mboss/near_all'), ('mob/tick', 'remove @s stunT 1'), ('mob/tick', 'rlk:bal/tick'),
            ('mob/tick', 'rlk:element/tick'), ('player/tick', 'remove @s dashCool 1')))
-       and all('#btHold' not in fns[n] for n in ('mboss/main', 'cm/world', 'cm/pj/world')))
+       and all('#btHold' not in fns[n] for n in ('cm/world', 'cm/pj/world')))
     ck('beat: the untouchable test sits in judge2 after the perfect dodge and the perfect parry, in player/hurt_elem and in '
        'mboss/pl_dot2; the clock users (judge, dodge_stamp, q_pf0 / q_pf1, np_gate) subtract #btAdj',
        code(fns['player/def/judge2']).index('execute if score #btInv cb matches 1 run return run function rlk:player/def/beat/inv')

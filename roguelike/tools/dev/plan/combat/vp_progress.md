@@ -51,7 +51,7 @@ per-tick decrement in `player/tick` and `mob/tick`.
 
 | clock | where | how it follows the beat |
 |---|---|---|
-| registry bosses: module AI and pattern clocks, the rig (clip clock, follow), `mv` glides / leaps, `hz` hazards, `pj` projectiles, `pull`, bars, typed lines, chapter mode (`world_cm_pre/post`), boss DoT, the gauntlet / shield / ULT clocks of 홍련, balance `bal_tick` | `mboss/main` -> `mboss/world` (everything a boss fight ticks hangs under it) | `rlk:tick`'s `mboss/main` line has `unless score #btHold cb matches 1` (no extra command; a held tick does not clear `#mbLowG` / `#mbCam`, so the requests survive). First built as the first line of `mboss/main`; moved because that cost every boss tick one command (`test_m0diff` A) |
+| registry bosses: module AI and pattern clocks, the rig (clip clock, follow), `mv` glides / leaps, `hz` hazards, `pj` projectiles, `pull`, bars, typed lines, chapter mode (`world_cm_pre/post`), boss DoT, the gauntlet / shield / ULT clocks of 홍련, balance `bal_tick` | `mboss/main` -> `mboss/world` (everything a boss fight ticks hangs under it) | hook 1 in `build_mboss_core.py`: `mboss/main`'s first line returns on a held tick, before `#mbLowG` / `#mbCam` are cleared (the requests survive). One command per boss tick. (A condition on `rlk:tick`'s own `mboss/main` line costs none, and was tried: the camera suites' `hr/h2/camsim.py` finds that line by its exact text and lane VC edits the lines next to it, so the hook stays in the core as the brief says.) |
 | the near re-test of the dodge window | `rlk:tick` -> `mboss/near_all` | gated in `rlk:tick` |
 | custom mobs: brains (`cmS` wind-ups, `cmCd` cooldowns), all cm rigs (ch1 / ch2 / ch3), aim markers | `cm/world` | the condition on its `rlk:tick` line |
 | custom-mob projectiles and ground effects | `cm/pj/world` | the condition on its `rlk:tick` line |
@@ -123,12 +123,14 @@ lying body would swing its far end; they still freeze and get the lightning). Co
   freeze the player starts during the hold survives the release and loses the wrong "was NoAI" note.
 
 ## Cost against the budgets
-- Idle (no beat running): `rlk:tick` + 3 commands (the clock test, `#now cb -= #btAdj cb`, the post test); the world gates are
-  conditions on existing lines (+ 0); each effect-kit world + 2 while it has cards (the hold test, the lag), each kit `make` + 1.
-  `az/tests_cm test_m0diff` A (mid-boss tick cost against the 10-20 release, a budget the tree already exceeds: README 0-9):
-  proto + 8.03 -> + 8.03, 파수꾼 unchanged, 나비 + 8.27 -> about + 10.3, 역장 + 8.76 -> about + 10.8 (their kits' two lines). `test_scarlet`: P1 471 / P2 481 commands
-  per tick, the same as on the base tree (budget 830); `test_flow`: the whole fight 361, G1 385, G2 399; the player side
-  (`perf_harness/pmeas.py`, late18): idle 688 -> 688, combat 692 -> 692, the F press 6 ticks 3 875 -> 3 877 (`beat/act`).
+- Idle (no beat running): `rlk:tick` + 3 commands (the clock test, `#now cb -= #btAdj cb`, the post test), `mboss/main` + 1
+  (its first line), the cm and Raiden gates + 0 (conditions on existing lines), each effect-kit world + 2 while it has cards
+  (the hold test, the lag), each kit `make` + 1. `test_scarlet`: P1 471 / P2 481 commands per tick as on the base tree's
+  count (budget 830); `test_flow`: the whole fight 361, G1 385, G2 399; the player side (`perf_harness/pmeas.py`, late18):
+  idle 688 -> 688, combat 692 -> 692, the F press 6 ticks 3 875 -> 3 877 (`beat/act`).
+  `az/tests_cm test_m0diff` A (mid-boss tick cost against the 10-20 release; a relative budget of + 6.5 + lane C 1.2 that the
+  tree already exceeded for three of the four: README 0-9) gets this lane's share `LANE_VP_CMD` 1.0 (the hold test):
+  proto + 8.03 -> + 9.04, 파수꾼 + 7.16 -> + 8.17, 나비 + 8.27 -> + 11.67, 역장 + 8.76 -> + 11.88 (나비 / 역장: + their kits' lines).
 - One perfect parry (17 ticks; measured in `test_cb`'s world, everything real): 1 500 commands with a rig character, 2 050
   with a mannequin character (the stand-in rig's 11 poses per tick), + about 175 for the generic tilt of a 29-part rig = about
   100 - 130 per tick while it runs. One perfect dodge (27 ticks): 1 900 / 2 700, + the stretch passes of a 29-part rig about
@@ -136,7 +138,7 @@ lying body would swing its far end; they still freeze and get the lightning). Co
   tick is tick 5 (the clip start + the first passes: about +700).
 - The worst sustained case is a gauntlet answered perfectly: G2 = 11 beats in 282 world + 55 held ticks: (399 x 282 + 11 x
   2 200) / 337 = about 405 commands per tick with parries, about 440 with dodges (11 x 3 850 over 359 ticks) - half the 830
-  budget. A held tick itself is cheap: the world costs nothing, only the player side runs.
+  budget. A held tick itself is cheap: the world costs 1 command (`mboss/main` returns), only the player side runs.
 - Atlas: 12.940 M -> 13.089 M px (the 31 half-resolution hot sprites + two glow cards; limit 13.2 M). Fonts are not in the atlas.
 
 ## Client facts verified in the bytecode (javap, `<S>/cb/vp/bc`)
