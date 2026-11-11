@@ -194,3 +194,37 @@ final report), with these differences:
 - Another lane's file: do not edit it (the stand-in exception in `h_common.md` holds). The three lanes all regenerate
   shared outputs; the lead regenerates at the merge, so conflicts in generated files are not yours to resolve.
 - Do not push to the release branch or to `wip/v`.
+
+## 5. VP addendum — rulings from the reference (`review/v/ref_pd.md`, strips in `review/v/ref_pd/`)
+The reference analysis has the frame-accurate breakdown and a tick table for each; build to those tables. Rulings on
+what they leave open:
+1. **Perfect parry** = contact hit-stop (1 tick) → the deflect sweep (1 tick) → a **near-freeze of about 4 ticks**
+   (both fighters hold: the avatar in the lunge with the weapon thrown up past the head, the attacker rocked back,
+   weapon arm flung up) → release at full speed in one tick, recovery to a ready guard. It is a freeze, not a long
+   slow-motion. Effects during the freeze: the starburst at the contact point (≈ 0.6 body heights, core `#FDF7D4`,
+   rays `#F5C058`), the full-width thin horizontal streak (the fixed `streak` glyph), a warm screen tint; at release
+   the starburst shatters into spark streaks and thin white-yellow lightning crawls over the attacker for ~8 ticks.
+   **The weapon glows yellow-white** from the contact until ~6 ticks after the release (the user's 「검에서 노란 빛」):
+   a glow on the weapon model itself, whatever the weapon (sword, scythe, claymore, catalyst …), not only a spark
+   beside it. Sound: a sharp clang at contact, then a brighter ring ~0.75 s (vanilla sounds).
+2. **Perfect dodge** = a 1-tick hitch at the trigger → ~4 ticks at normal speed (the dash, the avatar a smeared
+   pink-white ghost, the blade passing through) → **slow motion ×0.33 for ~8 ticks** (the avatar upright, arms up,
+   starting to arch back) → at full speed the **back handspring**: a 360° backward rotation about the left-right
+   axis, inverted with the hands near the floor and the legs split at the apex, landing on the feet facing the
+   attacker (~7 ticks), then the ready stance. Effects: a dark vignette for the slow motion, a red-pink glow on the
+   whole avatar until the landing, drifting embers, a radial pink-red burst at the trigger. The laid-back float +
+   backward roll (variant C) is optional.
+3. **The beat and the game's clocks**: during the freeze / slow motion the attacker's pattern clock and rig, every
+   other enemy's, hazards and projectiles in flight, and the fight's timers that count against the player (the F
+   lock, dodge cooldown, parry / dodge windows of the *next* hit, gauntlet clocks) all run on the slowed clock, so
+   the beat never costs the player an answer: after it, everything is where it would have been, later. The player
+   is untouchable for the whole beat. The player's control returns exactly as today (no longer input lock than the
+   current dodge / parry): the avatar's flip and lunge are presentation on the avatar rig and are cut short by the
+   player's next action. The dodge's travel stays the game's own dash (direction from the input); the handspring
+   plays in place around it — no extra forced travel.
+4. **The camera**: the player keeps control of the view; no forced re-aim. A small punch-in / kick is allowed only
+   if it is exactly undone and cannot disorient (the current 1.5° jolt may stay or go — your call from the
+   reference). Background blur is not required.
+5. **Non-perfect blocks** (tiers 2 and 1) look like the reference's normal guard: a small yellow spark (≈ 0.25 body
+   heights, ~3 ticks) and a thin short "tink"; no freeze, no streak, no tint, no star.
+6. Budget: the beat's cost per tick stays within the fight budget (README 0-5); say what it adds.
