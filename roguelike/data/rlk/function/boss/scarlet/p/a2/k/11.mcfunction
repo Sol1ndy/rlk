@@ -4,7 +4,7 @@ scoreboard players set #hzKB mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNoParry mb 0
-execute at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/sector {r:36,a:70,tell:1,dmg:44}
+execute at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/sector {r:36,a:70,tell:1,dmg:42}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run function rlk:boss/scarlet/core/hz_tag/a2
 execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a212] ~ ~ ~ ~ 0
 execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a212,limit=1] ^0.472 ^1.339 ^2.167

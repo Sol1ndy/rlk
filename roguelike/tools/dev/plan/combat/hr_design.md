@@ -835,6 +835,7 @@ As built: `vi_progress.md`, `tools/dev/sim/hr/tests/test_vi.py`.
   the replay's seat. Before, the model stayed where she vanished for 3-16 ticks after every reappearance (§8.9's finding, in the
   fight). Incremental moves inside the hook (walk, dash steps) keep the old one-tick trail (<= 0.3 b).
 - **The skip**: the core's parked input (`core/skip`, `core/skip_cs1`) reads the jump key too; `api.SKIP_HINT` = ' · Space 길게'.
+- **Lead, at the release (11-12): `DMG['T2']` is back at 42.** The pooled T1 on the merged tree is 1.007 (in band); the per-seed 0.97 is accepted like HB's per-seed caveats. The entry below records what the integration measured with 44.
 - **§6.4**: `DMG['T2']` 42 -> 44 (raw 6 -> 7). On the merged tree T1 fell to 0.97 on seed 33 (lane VB's moves shift where the next
   pick starts from); a damage tier changes no pick and no clock, so every other row keeps its measured value (the table in the
   README's 홍련 section and `vi_progress.md`).

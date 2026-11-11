@@ -146,14 +146,11 @@ def xyz(p, nd=4):
 
 # =============================================================================================
 # 2. Damage, shapes, hits, telegraph constants (PLAN §4.1-4.5)
-DMG = {'T1': 31, 'T2': 44, 'T3': 54, 'T4': 61}         # % of the base hit (mboss/hurt coefficient)
-# Round V, the integration (11-12; hr_design §6.4's tier knob): T2 42 -> 44 (raw 6 -> 7, 15 -> 17 HP on the item-less Lv15
-# player; 44 is the smallest coefficient of raw 7). hrfair 2.0 on the merged round V tree: lane VB's moves (she stops 2 b
-# before the player after a dash, the dives land short, the lower leaps) leave hit ticks, shapes, tiers and weights alone
-# but shift where the next pick starts from: T1 (the P1 walker's intake / 타키's) fell to 0.97 on seed 33 (1.02 / 1.03 /
-# 0.97, band 1.00-1.15; 1.01 / 1.03 / 1.01 on 11-11b). A damage tier changes no pick, no clock and no hit tick, so every
-# other row stays where it was measured: T1 1.07 / 1.08 / 1.02, T1b 0.51 / 0.60 / 0.59, T2 1.08, T3 1.56, T4 20.1
-# (tools/dev/plan/combat/vi_progress.md).
+DMG = {'T1': 31, 'T2': 42, 'T3': 54, 'T4': 61}         # % of the base hit (mboss/hurt coefficient)
+# Round V (11-12): the integration measured T1 (the P1 walker's intake / 타키's) at 1.02 / 1.03 / 0.97 on the merged tree
+# (band 1.00-1.15; lane VB's moves shift where the next pick starts from) and raised T2 to 44 (raw 7) to bring seed 33 in.
+# The lead took that back: the pooled value (1.007) is in band — the same reading as HB's per-seed caveat — and the user's
+# playtest asked for a fight that is easier to read, not one that hits harder. T2 stays 42 (raw 6), as in 11-11b.
 # HB (11-11, the balance pass, hr_design §6.4's tier knob +-20 %; mboss/hurt floors 12 x coef x 135 / 10000, so a tier moves in
 # whole raw steps): T1 29 -> 31 (raw 4 -> 5, the chain hits; 31 is the smallest coefficient of raw 5): with fewer ultimates
 # (GAUGE['hit']) the walker's P1 intake fell under 타키's (T1) and the P hits' share of it under T1b's need; T3 62 -> 54 (raw 10

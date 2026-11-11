@@ -5,7 +5,7 @@ execute if score #ph hr matches 7 run scoreboard players set #hzKB mb 3
 execute if score #ph hr matches 7 run scoreboard players set #hzSfx mb 0
 execute if score #ph hr matches 7 run scoreboard players set #hzQuiet mb 1
 execute if score #ph hr matches 7 run scoreboard players set #hzNoParry mb 0
-execute if score #ph hr matches 7 at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:26,tell:1,dmg:44}
+execute if score #ph hr matches 7 at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:26,tell:1,dmg:42}
 execute if score #ph hr matches 7 as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run function rlk:boss/scarlet/core/hz_tag/rings
 execute if score #ph hr matches 7 at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_rings54] ~ ~ ~ ~ 0
 execute if score #ph hr matches 7 at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_rings54,limit=1] ^-2.002 ^1.03 ^0.533
