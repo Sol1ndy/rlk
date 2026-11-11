@@ -2024,8 +2024,8 @@
     "hat_on": 139
    },
    "owner": "H2",
-   "key_files": 126,
-   "keys": 1662,
+   "key_files": 124,
+   "keys": 1659,
    "keys_per_tick": 11.8,
    "source": "v 215.6-222.6 (ref/hr_repel_5fps.jpg, gauntlet_repel.jpg; hr_design §3.4): the deflected dive, the lock, the seized wrist, the hilt on the hat, two cuts, back to back, the shoulder throw, the kick, up again",
    "note": "",
@@ -2533,7 +2533,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 184711937
+  "version": 19175266
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -10516,28 +10516,28 @@
     0.005,
     0.005,
     0.005,
-    0.024,
-    0.299,
-    0.746,
-    1.129,
-    1.068,
-    1.076,
-    1.05,
-    1.018,
-    0.993,
-    0.989,
-    0.986,
-    0.968,
-    0.932,
-    0.875,
-    0.796,
-    0.696,
-    0.579,
-    0.454,
-    0.331,
-    0.216,
-    0.122,
-    0.057,
+    0.05,
+    0.289,
+    0.529,
+    0.799,
+    1.003,
+    1.21,
+    1.237,
+    1.167,
+    1.113,
+    1.069,
+    1.013,
+    0.966,
+    0.909,
+    0.861,
+    0.804,
+    0.755,
+    0.701,
+    0.656,
+    0.575,
+    0.482,
+    0.447,
+    0.441,
     0.059,
     0.1,
     0.068,
@@ -10582,7 +10582,7 @@
    "seat": [],
    "lie": [
     [
-     98,
+     101,
      132
     ]
    ],
@@ -10624,7 +10624,7 @@
     ],
     [
      80,
-     97
+     100
     ],
     [
      133,
@@ -10728,11 +10728,11 @@
     0,
     0,
     0,
-    0.067,
-    0.882,
-    1,
-    1,
-    1,
+    0,
+    0,
+    0,
+    0,
+    0,
     1,
     1,
     1,
@@ -10792,10 +10792,7 @@
     ]
    ],
    "cuts": [],
-   "lift": {
-    "82": 0.066,
-    "83": 0.152
-   },
+   "lift": {},
    "hat_push": {
     "135": 12.5,
     "136": 20.9,
@@ -25180,12 +25177,11 @@
      "gripClear": 29.44,
      "handClearR": 9.31,
      "hatClear": 20.93,
-     "hatPush": 43.55,
+     "hatPush": 37.43,
      "incl": 19,
      "rock+": 10.33,
-     "rock-": 0.88,
      "sash": 100.66,
-     "scab": 55.56,
+     "scab": 44.34,
      "scabArm": 19,
      "strings": 64.22
     },
@@ -25197,16 +25193,16 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.286,
-    "lift": 0.152,
+    "lift": 0,
     "clear": {
-     "guard.head": -0.029,
-     "guard.torso": -0.037,
-     "hand_l.head": -0.085,
-     "hand_l.torso": -0.064,
+     "guard.head": -0.059,
+     "guard.torso": -0.02,
+     "hand_l.head": -0.107,
+     "hand_l.torso": -0.02,
      "hand_r.head": -0.018,
      "hand_r.torso": -0.09,
      "hilt.head": -0.041,
-     "hilt.torso": -0.02
+     "hilt.torso": -0.009
     }
    },
    "down": {
@@ -25568,10 +25564,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 63,
-  "key_files": 3457,
-  "keys": 29167,
-  "rig_functions": 4216,
-  "rig_bytes": 8911852,
+  "key_files": 3455,
+  "keys": 29164,
+  "rig_functions": 4214,
+  "rig_bytes": 8910825,
   "cull_overhang_ticks": 0
  },
  "sprites": {

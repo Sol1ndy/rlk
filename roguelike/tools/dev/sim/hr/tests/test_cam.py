@@ -21,7 +21,10 @@ prototype `spproto`, the "module" is camsim's stand-in request (s.cam_req: #mbCa
           the kill (won: the player ends at the dungeon return point); uninstall; the two-player guard; a request that
           outlived its fight
   stand   the live stand killed: released at once, held again when the stands are back; the idle stand killed: nothing;
-          sneaking: the game drops the camera every tick, the hold takes it back every tick, never released
+          sneaking (HF-B, HB-02): the game ends any spectating after the functions, so while Shift is held the hold puts the
+          player at the live stand's eye with its rotation every tick (a drift of the free view between ticks is undone at
+          the next one; never released), and spectates it again once Shift is up; cam/spawn_at {id} (HB-03): the stand made
+          at the execution position with the execution rotation in its summon NBT (idempotent per stand)
   idem    release twice / on a player who is not held changes nothing (a creative player stays creative); a developer-mode
           player (no avatar) is never locked; hold with no stands never switches the game mode
   cost    commands per tick: the framework's share without a lock (+1 in mboss/main, +2 in rlk:tick) and while held
@@ -77,8 +80,10 @@ def static():
        and L.cam_req(2) == ['scoreboard players set #mbCam mb 1', 'scoreboard players set #mbCamId mb 2']
        and L.cam('spawn') == 'function rlk:mboss/cam/spawn' and L.cam('kill') == 'function rlk:mboss/cam/kill'
        and L.CAM_EYE == 0.0)
-    for f in ('spawn', 'hold', 'release', 'kill'):
+    for f in ('spawn', 'spawn_at', 'spawn_in', 'hold', 'release', 'kill'):
         ck(f'S1 F:mboss/cam/{f} exists', (F / f'mboss/cam/{f}.mcfunction').exists())
+    ck('S1 (HF-B) L.cam(\'spawn_at\', id=2) and the sneak snap offset (the F5 scale 0.0625 x the player\'s eye 1.62)',
+       L.cam('spawn_at', id=2) == 'function rlk:mboss/cam/spawn_at {id:2}' and abs(L.CAM_SNEAK_DY - 0.10125) < 1e-9)
     # rlk:tick
     t = fn('tick')
     c = [l for l in t if l.strip() and not l.startswith('#')]
@@ -414,21 +419,51 @@ def stand():
     s.ents = [e for e in s.ents if e.alive]
     CS.run(s, 3)
     ck('K3 the idle stand killed: the hold goes on', CS.held(s) and 'rlk_mb_cam1' in CS.watching(s))
-    # sneaking
+    # sneaking (HF-B, HB-02): the game ends the spectating after the functions every tick a sneak is held, so a re-issued
+    # spectate is undone in its own tick; the hold puts the player at the live stand's eye (its position: a marker stand's
+    # eye height is 0; the player's eye = 0.10125 b over its feet at the F5 scale) with the stand's rotation instead. The
+    # client's free view drifts between ticks (the mouse turns it, Shift sinks it): each tick puts it back on the shot.
     s, pl = held_world()
+    cam1 = next(e for e in s.ents if e.alive and 'rlk_mb_cam1' in e.tags)
     pl.data['sneak'] = True
-    seen = []
-    for _ in range(8):
+    seen, n0 = [], len(s.spectates)
+    for k in range(8):
+        cam1.pos = [cam1.pos[0] + 0.3, cam1.pos[1], cam1.pos[2]]          # the shot moves on
+        cam1.rot = [cam1.rot[0] + 4.0, cam1.rot[1]]
+        pl.pos = [pl.pos[0], pl.pos[1] - 0.15, pl.pos[2] + 0.2]           # the free view sank and drifted since the last tick
+        pl.rot = [pl.rot[0] - 25.0, pl.rot[1] + 10.0]
         CS.world(s)
-        seen.append((CS.held(s), CS.gm(s), s.st(pl)['cam']))
-    ck('K4 sneaking: the game drops the camera after every tick ...', all(c is None for _h, _g, c in seen), str(seen))
-    n0 = len(s.spectates)
+        eye = pl.pos[1] + 0.10125
+        seen.append((CS.held(s), CS.gm(s), s.st(pl)['cam'], round(abs(pl.pos[0] - cam1.pos[0]) + abs(eye - cam1.pos[1]) + abs(pl.pos[2] - cam1.pos[2]), 4),
+                     round(abs(pl.rot[0] - cam1.rot[0]) + abs(pl.rot[1] - cam1.rot[1]), 3)))
+    ck('K4 sneaking: the player is at the live stand\'s eye with its rotation after every tick, the drift undone',
+       all(d < 1e-6 and r < 1e-6 for *_x, d, r in seen), str(seen))
+    ck('K4 ... not spectating while Shift is held (the game would end it), no spectate issued; never released',
+       all(c is None and h and g == 'spectator' for h, g, c, _d, _r in seen) and len(s.spectates) == n0, str(seen))
+    s.cam_req = 2
+    cam2 = next(e for e in s.ents if e.alive and 'rlk_mb_cam2' in e.tags)
     CS.world(s)
-    ck('K4 ... and the hold takes it back in every tick; never released', all(h and g == 'spectator' for h, g, _c in seen)
-       and len(s.spectates) == n0 + 1)
+    ck('K4 ... a cut while Shift is held: the snap follows the live stand (B)',
+       abs(pl.pos[1] + 0.10125 - cam2.pos[1]) < 1e-6 and abs(pl.pos[0] - cam2.pos[0]) < 1e-6 and abs(pl.rot[0] - cam2.rot[0]) < 1e-6)
+    s.cam_req = 1
     pl.data['sneak'] = False
     CS.world(s)
     ck('K4 sneak released: watching the stand again', CS.watching(s) is not None and 'rlk_mb_cam1' in CS.watching(s))
+    # cam/spawn_at (HF-B, HB-03): the stand made at the execution position with the execution rotation in its summon NBT
+    s.call('rlk:mboss/cam/kill', C0)
+    b = H.body_of(s).pos
+    s.call('rlk:mboss/cam/spawn_at', Ctx(None, (b[0] + 1.5, b[1] + 2.25, b[2] - 3.0), (-137.25, 12.5)), {'id': 2})
+    st2 = [e for e in s.ents if e.alive and 'rlk_mb_cam2' in e.tags]
+    ck('K6 cam/spawn_at {id:2}: one stand B at the execution point, its rotation in the summon NBT (the spawn packet\'s pose)',
+       len(st2) == 1 and not any('rlk_mb_cam1' in e.tags for e in s.ents if e.alive)
+       and st2[0].data.get('spawn') and all(abs(x - y) < 1e-6 for x, y in zip(st2[0].data['spawn'][0], (b[0] + 1.5, b[1] + 2.25, b[2] - 3.0)))
+       and abs(st2[0].data['spawn'][1][0] + 137.25) < 0.002 and abs(st2[0].data['spawn'][1][1] - 12.5) < 0.002,
+       str([(e.pos, e.rot, e.data.get('spawn')) for e in st2]))
+    ck('K6 ... the helper marker is gone, the stand carries the FN-cam tags',
+       not any('rlk_mb_camr' in e.tags for e in s.ents if e.alive) and {'rlk_mb_cam', 'rlk_mb_aux', 'rlk_room', 'rlk_pet'} <= st2[0].tags)
+    s.call('rlk:mboss/cam/spawn_at', Ctx(None, (b[0], b[1] + 5, b[2]), (0.0, 0.0)), {'id': 2})
+    ck('K6 ... idempotent: a second call leaves the stand where it is', len([e for e in s.ents if e.alive and 'rlk_mb_cam2' in e.tags]) == 1
+       and abs(st2[0].pos[1] - (b[1] + 2.25)) < 1e-6)
     s.cam_req = None
     pl.data['sneak'] = True
     CS.world(s)
@@ -499,10 +534,11 @@ def cost():
     m = cmds('mboss/main')
     ck('C1 mboss/main pays one command for the request', sum(l.startswith('scoreboard') and 'mbCam' in l for l in m) == 1)
     ck('C1 rlk:tick pays two commands in a tick without a lock', len(CS.tick_cam_lines(DP)) == 2 and set(free) == {2}, str(set(free)))
-    ck('C2 a held tick costs at most 12 commands', max(heldc) <= 12, str(max(heldc)))
+    # (HF-B, HB-02: + the two Shift-snap lines of hold)
+    ck('C2 a held tick costs at most 14 commands', max(heldc) <= 14, str(max(heldc)))
     actor_stop = (F / 'char/cine/stop.mcfunction').exists()        # lane H3's actor: the release ends it (its own commands)
-    ck(f'C2 the first held tick at most 30, the release tick at most {50 if actor_stop else 30}'
-       f'{" (with char/cine/stop, the actor\'s own end)" if actor_stop else ""}', first <= 30 and rel <= (50 if actor_stop else 30), f'{first} {rel}')
+    ck(f'C2 the first held tick at most 32, the release tick at most {50 if actor_stop else 30}'
+       f'{" (with char/cine/stop, the actor\'s own end)" if actor_stop else ""}', first <= 32 and rel <= (50 if actor_stop else 30), f'{first} {rel}')
 
 
 # ============================================================================================================ ident

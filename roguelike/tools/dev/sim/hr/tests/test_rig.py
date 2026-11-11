@@ -809,7 +809,11 @@ check('hats: kipup goes world -> hand (crouch) -> worn', seq_h[0] == HATS.index(
 # a fast hat flight / the put-on snap, two contacts on one hand): each is accepted at its clip and ticks up to the bound measured
 # at HI, printed as reported; anything else, or more than the bound, still fails
 KNOWN = {'hilt_pivot': {('intro', 787): .025, ('intro', 788): .025},           # the sheathed hilt 1-2 cm off the scabbard pivot
-         'jump': {('repel', 84): .21, ('repel', 139): .20},                    # the hat thrown off in the throw / set back on
+         'jump': {('repel', 84): .38, ('repel', 139): .20},                    # the hat thrown off in the throw / set back on
+         # (HF-B, HB-01: the throw is now head first over the actor's shoulder, turning her 10 degrees a tick at 82-86; the worn hat
+         # already moves 0.27-0.41 b a tick at 79-83, and on its first flying tick the hatPush guard lifts it 0.37 b clear of her
+         # head box (HI's high throw: 0.21). Measured for other ticks: leaving at 80-83 0.34-0.68, 86 0.29, 88 0.18 (and moves the
+         # clip event, its sound and the state spans), 89 and later the worn hat holds her pelvis off KT.over)
          'floor': {'repel': .05, 'ending': .05}}                               # the lying fist while it reaches for the hat
 # ================================================================ cine (lane H2c: the 8 cinematic clips of tools/scarlet_cine.mjs)
 # (HI, hi_todo 5 / 10: the 11-06 rows - sq1 / lead_down / lead_stand, the 11-06 events, the CS3 -> CS4 seam at repel 102, the

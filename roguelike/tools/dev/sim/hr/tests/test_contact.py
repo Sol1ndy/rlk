@@ -15,6 +15,11 @@ without it (the lane not merged yet) only her side is judged and the mutual rows
   meet     (with --actor) the two sides meet each other, not only the point: blade rows = the two blade lines pass within
            0.12 b of each other at the row's ticks and neither blade enters the other's head box (0.25 b half, reported:
            fails below -0.05 b); KW / KH / KK the two parts within 0.20 b
+  mutual   (with --actor; fix lane HF-B, HB-01) the grab / hold / throw beats on both bodies (hr_design §4.3 "Mutual rows",
+           written out here): KW.grip, KH.hilt, KS.hook, KT.grip_r 78-96 / KT.grip_l 86-91 (the actor's hands on her sword
+           forearm), KT.over (her pelvis 0-0.6 b over the actor's right shoulder, <= 0.5 b off it, at her highest tick of
+           84-92), KK.kick; and through the throw (79-96) the actor's head >= 0.30 b off her torso (pelvis -> head: no head
+           through her body); the builders' own mutual tables are these rows
 """
 import json, math, re, sys
 from pathlib import Path
@@ -128,5 +133,23 @@ else:
             w = min(math.dist(h['hat_crown'][t0], a[x][t0]) for x in ('pommel', 'hilt')); ok(w <= .2, f'meet: KH the actor\'s pommel / hilt {w:.3f} b from her crown top')
         elif kid == 'KK':
             w = math.dist(h['pelvis'][t0], a['foot_r'][t0]); ok(w <= .5, f'meet: KK the actor\'s right foot {w:.3f} b from her pelvis pivot (her hip under it)')
+# ---- the mutual rows (HF-B, HB-01): both figures' points ------------------------------------------------------------------------
+MUTUAL = [('KW.grip', 36, 48, 'hand_l', ('hand_l',), .2), ('KH.hilt', 49, 49, 'hat_crown', ('pommel', 'hilt'), .2),
+          ('KS.hook', 70, 78, ('elbow_l', 'hand_l'), ('shoulder_r',), .3), ('KT.grip_r', 78, 96, ('elbow_l', 'hand_l'), ('hand_r',), .15),
+          ('KT.grip_l', 86, 91, ('elbow_l', 'hand_l'), ('hand_l',), .15), ('KK.kick', 129, 129, 'pelvis', ('foot_r',), .5)]
+if AM is not None:
+    h, a = TR['clips']['repel'], AM['clips']['repel']['tick']
+    for mid, t0, t1, her, act, tol in MUTUAL:
+        worst, at = 0, t0
+        for t in range(t0, t1 + 1):
+            d = min((seg(a[k][t], h[her[0]][t], h[her[1]][t]) if isinstance(her, tuple) else math.dist(a[k][t], h[her][t])) for k in act)
+            if d > worst: worst, at = d, t
+        ok(worst <= tol, f'mutual: {mid} (repel {t0}-{t1}) her {her} to the actor\'s {"/".join(act)} worst {worst:.3f} b at t{at} (<= {tol})')
+    top = max(range(84, 93), key=lambda t: h['pelvis'][t][1])
+    P, Sh = h['pelvis'][top], a['shoulder_r'][top]
+    du, dxz = P[1] - Sh[1], math.hypot(P[0] - Sh[0], P[2] - Sh[2])
+    ok(0 <= du <= .6 and dxz <= .5, f'mutual: KT.over her pelvis at its highest (t{top}) {du:.3f} b over the actor\'s right shoulder (0-0.6), {dxz:.3f} b off it (<= 0.5)')
+    hd = min(seg(a['head'][t], h['pelvis'][t], h['head'][t]) for t in range(79, 97))
+    ok(hd >= .30, f'mutual: the throw 79-96: the actor\'s head stays {hd:.3f} b off her torso axis (>= 0.30: no head through her body)')
 print(f'test_contact: {n - len(fails)} / {n} ok' + ('' if not fails else f', {len(fails)} FAILED'))
 sys.exit(1 if fails else 0)

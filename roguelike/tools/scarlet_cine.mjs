@@ -55,6 +55,9 @@ const E = Object.fromEntries(Object.entries(CONTRACT).map(([n, c]) => [n, {...c.
 // mid-move; a move started at #sq a over n ticks stands at (s - a) / n at #sq s). yaw 0 faces +f, 180 faces the actor.
 // [t0, t1, from, to, h, yaw0, yaw1]: #sq ticks; a row holds its end until the next one starts.
 const R = (t0, t1, from, to = from, h = 0, y0 = 180, y1 = y0) => ({t0, t1, from, to, h, y0, y1});
+// (HF-B, HB-01) the throw's root arc (= seq.py `toss`, leap h in tenths): low, so her body goes over the actor's shoulder, not over
+// its head (her pelvis rides THROW.P, the actor's hands hold her sword forearm on THROW.G)
+export const THROW_H = .6;
 export const ROOTS = {
   // CS0 (§3.1): seated at f 20.73 facing the moon; turned to the actor 840-880; walks 1052-1148 to f 13.5; the leap 1234-1258 to 6.5
   intro: [R(0, 840, [0, 0, 20.73], undefined, 0, 0), R(840, 880, [0, 0, 20.73], undefined, 0, 0, 180), R(880, 1052, [0, 0, 20.73]),
@@ -62,8 +65,9 @@ export const ROOTS = {
   // CS1 (§3.2): f 9.0; the lunge 6-10 to 1.5; the leap back 34-50 (apex 1.2) to 9.0
   cs1: [R(0, 6, [0, 0, 9]), R(6, 10, [0, 0, 9], [0, 0, 1.5]), R(34, 50, [0, 0, 1.5], [0, 0, 9], 1.2), R(50, 720, [0, 0, 9])],
   // the repel (§3.4): 1 b above ST(0, 0, 1.0), down to f 1.3 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-64); thrown 78-101 over
-  // the actor (apex 2.2) to 3.0; kicked 129: slides to 8.0 by 135, on to 9.0 by 140 (at 5 % the sequence ends at 129: the ending)
-  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.3]), R(30, 36, [0, 0, 1.3], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], 2.2),
+  // the actor's shoulder (HF-B: a low arc, apex THROW_H; her pelvis rides its own path over the shoulder) to 3.0; kicked 129:
+  // slides to 8.0 by 135, on to 9.0 by 140 (at 5 % the sequence ends at 129: the ending)
+  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.3]), R(30, 36, [0, 0, 1.3], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], THROW_H),
     R(129, 135, [0, 0, 3], [0, 0, 8]), R(135, 140, [0, 0, 8], [0, 0, 9])],
   // the ending (§3.5; ST, from E8 = 338 on ST2 with her landing mark 9.0 b ahead; = lane H2's seq.py moves): placed on her back at
   // 4.2 at tick 0 (under the seam's white); up to 4.6 (6-22); the lunge to 2.9 (50-54: at the graze tick 52 she is half way, 3.75);
@@ -96,9 +100,22 @@ const rigOf = (clip, t, S) => toRig(rootAt(clip, t), S);
 
 // ---- the contacts (hr_design.md §4.3; her side; tolerance 0.08 b for blades, 0.12 b for hands, feet and her body) -----------------
 export const TOL = {blade: .08, body: .12};
-const KP = {K1: [0, 1.45, .75], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.2, 1.1], KS: [.2, 1.5, 1.6], KT1: [0, 2.95, 1.9], KT2: [0, .25, 3], KK: [0, .35, 2.7],
+const KP = {K1: [0, 1.45, .75], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.2, 1.1], KS: [.2, 1.5, 1.6], KT1: [.28, 1.4, 2.0], KT2: [0, .25, 3], KK: [0, .35, 2.7],
   KG: [0, 2.05, 2.35], KE2: [0, 1.5, 2.1], KE5: [0, 1.5, 3.25], KA1: [0, 6.9, 2.55], KA2: [0, 7.3, 2.6], KA3: [0, 6.8, 2.5], KA4: [0, 6.9, 2.6]};
 const CT = (id, clip, t0, t1, kind, key = id) => ({id, clip, t0, t1, kind, p: KP[key], tol: kind === 'blade' ? TOL.blade : TOL.body});
+// (HF-B, HB-01) the mutual rows: her points against the actor's (lane H3's tools/player_motion/cine/manifest.json), so that
+// neither side can meet a contact on its own. what: [her point | segment, the actor's point], tol (b); `over`: her pelvis no
+// more than `up` b over the actor's right shoulder and within `r` b of it on the floor plane, at its highest tick of t0..t1.
+// The same table is in tools/player_motion/cine/clips.mjs (MUTUAL) and tools/dev/sim/hr/tests/test_contact.py.
+export const MUTUAL = [
+  {id: 'KW.grip', clip: 'repel', t0: 36, t1: 48, her: 'hand_l', actor: 'hand_l', tol: .2},
+  {id: 'KH.hilt', clip: 'repel', t0: 49, t1: 49, her: 'hat_crown', actor: ['pommel', 'hilt'], tol: .2},
+  {id: 'KS.hook', clip: 'repel', t0: 70, t1: 78, her: ['elbow_l', 'hand_l'], actor: 'shoulder_r', tol: .3},
+  {id: 'KT.grip_l', clip: 'repel', t0: 86, t1: 91, her: ['elbow_l', 'hand_l'], actor: 'hand_l', tol: .15},
+  {id: 'KT.grip_r', clip: 'repel', t0: 78, t1: 96, her: ['elbow_l', 'hand_l'], actor: 'hand_r', tol: .15},
+  {id: 'KT.over', clip: 'repel', t0: 84, t1: 92, over: true, up: .6, r: .5},
+  {id: 'KK.kick', clip: 'repel', t0: 129, t1: 129, her: 'pelvis', actor: 'foot_r', tol: .5},
+];
 export const CONTACTS = [
   CT('K1', 'cs1', 10, 30, 'blade'), CT('KR', 'repel', 0, 26, 'blade'), CT('KW', 'repel', 36, 48, 'hand_l'), CT('KH', 'repel', 49, 49, 'hat_crown'),
   CT('KS', 'repel', 70, 78, 'forearm_l'), CT('KT.over', 'repel', 88, 88, 'pelvis', 'KT1'), CT('KT.land', 'repel', 101, 101, 'pelvis', 'KT2'),
@@ -606,34 +623,62 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
   k.k(70, hookPose(70), 'io');
   k.k(74, {...hookPose(74), head: [11, 6, 12], aR: [-10, 50, .9]}, 'io');
   k.k(78, {...hookPose(78), head: [12, 8, 12], aR: [-16, 56, .9]}, 'io');
-  // R6: over the shoulder 78-101 (every tick). The pelvis rides the root's arc (the rig's floor is the root: nothing hangs below
-  // it, so she goes over flat on her back, not head down): pt = the pelvis pitch (backward) 10 -> 96 by 83, 108 over the top (88),
-  // settling to 88 as she falls; the legs fly up over the top and flop down as she lands
-  const PT = t => (t <= 83 ? lerp(6, 96, sm((t - 78) / 5)) : t <= 88 ? lerp(96, 108, sm((t - 83) / 5)) : lerp(108, 88, sm((t - 88) / 11)));
-  const posOf = t => (t <= 88 ? [lerp(-.1, 0, sm((t - 78) / 4)), lerp(-.055, .03, (t - 78) / 10), lerp(.14, -.083, sm((t - 78) / 10))] : [0, lerp(.03, -1.04, sm((t - 88) / 13) ** 1.2), lerp(-.083, 0, (t - 88) / 13)]);
+  // R6 (HF-B, HB-01): the throw as a throw (every tick 79-100). The actor (tools/player_motion/cine/clips.mjs) holds her sword
+  // forearm - its right fist from the hook to 96, its left hand round her wrist 86-91 - and pulls it forward and down over its
+  // right shoulder as it bends: she is levered up onto its back face up and rolled over that shoulder head first, low: her pelvis
+  // on THROW.P (stage frame; 0.35 b over the shoulder at the top, 88: KT.over), pitched back on THROW.PT, her sword hand on
+  // THROW.G (the actor's hands on the forearm behind it: MUTUAL KT.grip_l / _r); let go at 96 she drops off in front onto her back
+  // at f 3.0 (101: KT.land), the blade swung up and down beside her as she falls (97-100). Her root arcs only THROW_H (the rig's
+  // floor is the root: nothing hangs below it).
+  const THROW = {
+    P: {78: [-.10, .71, 1.34], 80: [0, .93, 1.45], 82: [.12, 1.13, 1.58], 84: [.2, 1.28, 1.72], 86: [.26, 1.37, 1.86], 88: [.28, 1.4, 2.0],
+      90: [.28, 1.35, 2.13], 92: [.28, 1.24, 2.26], 94: [.27, 1.07, 2.38], 96: [.24, .85, 2.5], 98: [.15, .53, 2.76], 100: [.05, .3, 2.96]},
+    PT: {78: 6, 80: 35, 82: 62, 84: 82, 86: 95, 88: 102, 90: 106, 92: 108, 94: 108, 96: 106, 98: 100, 100: 94},
+    G: {78: [.33, 1.48, 1.74], 80: [.28, 1.4, 1.84], 82: [.24, 1.31, 1.96], 84: [.21, 1.21, 2.08], 86: [.2, 1.12, 2.19], 88: [.2, 1.04, 2.29],
+      90: [.2, .97, 2.37], 92: [.22, .9, 2.43], 94: [.24, .83, 2.48], 96: [.26, .77, 2.52]},
+    D: [.85, -.2, -.45], E: [-1, 0, 0],
+  };
+  const keyed = (tab, t) => {
+    if (tab[t] !== undefined) return tab[t];
+    const ts = Object.keys(tab).map(Number).sort((x, y) => x - y), b = ts.find(x => x > t), a = ts[ts.indexOf(b) - 1], u = (t - a) / (b - a);
+    return Array.isArray(tab[a]) ? lerp3(tab[a], tab[b], u) : lerp(tab[a], tab[b], u);
+  };
   for (let t = 79; t <= 100; t++) {
-    const u = (t - 78) / 23, pt = PT(t), lf = t === 79 ? .6 : 1, pos = posOf(t), fly = Math.sin(Math.PI * Math.min(1, (t - 78) / 17));
-    // the sword arm: drawn down toward the actor's hands as they pull (79-85: its right fist per H3's manifest; the arm reaches as
-    // far as it can), let go, flung wide past her head, down beside her as she lands
-    const w = sm((t - 85) / 7), w2 = sm((t - 92) / 8), wb = sm((t - 78) / 6);
-    const pullG = toRig(rootAt('repel', t), t <= 82 ? lerp3([.26, 1.6, 1.74], [.28, 1.33, 2.07], (t - 78) / 4) : lerp3([.28, 1.33, 2.07], [.31, .87, 2.49], (t - 82) / 4));
-    // the blade keeps the hook's line over the actor's shoulder while the arm is drawn down (a line nearer her left would bend the
-    // wrist back past the suite's 130 degrees at 82); 86 = the hand let go, the blade thrown up before the arm flings wide
-    const pull = t <= 85 ? blade([pullG[0], Math.max(.45, pullG[1]), pullG[2]], HOOK.d, {pos, yaw: 0}) : t === 86 ? blade([.35, .62, .42], [.2, .97, .1], {pos, yaw: 0}) : null;
-    k.k(t, {rot: [+pt.toFixed(1), 0, 0], pos: pos.map(x => +x.toFixed(4)), lf, tor: [+lerp(17, lerp(-4, 2, w2), wb).toFixed(1), +lerp(-4, 0, wb).toFixed(1), +lerp(30, 0, wb).toFixed(1)],
+    const u = (t - 78) / 23, pt = keyed(THROW.PT, t), lf = t === 79 ? .6 : 1, Rt = rootAt('repel', t), Ps = keyed(THROW.P, t);
+    const posN = [Ps[0] - Rt.p[0], Ps[1] - Rt.p[1] - HIP_Y, Ps[2] - Rt.p[2]];      // (her yaw 180: rig x = stage r, rig z = stage f)
+    // the legs: up as she goes over (78-86), kept up through the fall and flopping down as she lands (98-101)
+    const fly = t <= 86 ? Math.sin(Math.PI / 2 * (t - 78) / 8) : t <= 97 ? 1 : lerp(1, .55, (t - 97) / 3);
+    const wb = sm((t - 78) / 4), w = sm((t - 90) / 6), w2 = sm((t - 96) / 4);
+    // the sword hand: held on THROW.G to 96; 97-98 let go, the blade swung up; 99-100 down beside her as she lands (LIE's blade
+    // at 100 = 101). Held, the blade sticks out to her left past the actor's right side, level and a little back (THROW.D, its
+    // edge THROW.E back and down), turned there from the hook's line over 79-82: across her held forearm (which runs back from
+    // her elbow to the actor's hands), so the wrist is not bent back past the held-prop limit (test_rig: the tip at least the
+    // grip's distance + 0.62 of the blade from the elbow), the hilt keeps out of her own torso (V1 gripClear: pushes <= 0.2 b),
+    // and the point clears both bodies and the root's floor
+    const Gs = keyed(THROW.G, Math.min(t, 96));
+    const bdir = vunit(slerpDir(HOOK.d, THROW.D, wb)), bedge = vunit(vadd(vmul([0, -1, 0], 1 - wb), vmul(THROW.E, wb)));
+    // (97-100: let go, the blade swings up over her and down beside her left side, its edge to her right all the way (no roll),
+    // to where it lies at 101: along the ground at her left, the point toward her feet. It passes 17 degrees to her left of
+    // straight up: through the vertical itself the rig's sword channels turn it over (146 degrees in a tick))
+    const LAND = {G: [.416, .183, 3.035], d: [.1, 0, -.99]}, wl = (t - 96) / 5;
+    const swing = () => { const up = vunit([.3, 1, 0]), d0 = vunit(THROW.D), d = wl <= .5 ? slerpDir(d0, up, wl * 2) : slerpDir(up, LAND.d, wl * 2 - 1);
+      return blade(lerp3(toRig(Rt, Gs), toRig(Rt, LAND.G), sm(wl)), d, {pos: posN, yaw: 0, edge: [-1, 0, 0]}); };
+    const sw = t <= 96 ? blade(toRig(Rt, Gs), bdir, {pos: posN, yaw: 0, edge: bedge}) : swing();
+    k.k(t, {rot: [+pt.toFixed(1), 0, 0], pos: posN.map(x => +(x / kOf(lf)).toFixed(4)), lf,
+      tor: [+lerp(17, lerp(-4, 2, w2), wb).toFixed(1), +lerp(-4, 0, wb).toFixed(1), +lerp(30, 0, wb).toFixed(1)],
       head: [+lerp(12, lerp(-14, -10, w2), wb).toFixed(1), +lerp(8, lerp(0, -18, w2), wb).toFixed(1), +lerp(12, 0, wb).toFixed(1)],
       fL: [.15, +lerp(.1, .62, fly).toFixed(3), +lerp(-.06, -.34, fly).toFixed(3)], fR: [-.15, +lerp(.1, .4, fly).toFixed(3), +lerp(-.02, -.12, fly).toFixed(3)],
-      ...(pull || {gF: 0, gN: 0, gB: +lerp(lerp(-150, -80, w), -90, w2).toFixed(1), gE: +lerp(lerp(40, 10, w), -58, w2).toFixed(1), gD: +lerp(.6, .62, w2).toFixed(2),
-        cB: +lerp(lerp(-150, -70, w), 0, w2).toFixed(1), cR: +lerp(0, 90, w2).toFixed(1), th: +lerp(lerp(30, 30, w), 6, w2).toFixed(1), ed: -1, tw: 0}), aR: [+lerp(-16, lerp(110, 30, w2), w).toFixed(1), +lerp(56, 70, w).toFixed(1), .95], hR: 'open',
+      ...sw, aR: [+lerp(-16, lerp(110, 30, w2), w).toFixed(1), +lerp(56, 70, w).toFixed(1), .95], hR: 'open',
       pL: [.55, -.35, .75], skG: +(u * .5).toFixed(2), skIB: +(u * .08).toFixed(3), scHip: [+lerp(0, -70, Math.min(1, u * 2)).toFixed(1), 0]}, 'l');
   }
-  // the hat: off her head at 84, thrown with her (the rig's floor is the root: it cannot fall below her while she is in the air):
+  // the hat: off her head at 84, thrown with her (the rig's floor is the root: it cannot fall below her while she is in the air;
+  // HF-B: a lower toss over the low throw):
   // up and out to her right, turning over, landing flat at the hold spot as she lands. hwP = the rig-frame path whose bulge the
   // retarget carries between the solved hat at 83 and the spot
   {
     const A1 = [0, 1.6, 1.0], t0 = 84, t1 = 101, B1 = HAT_HOLD, PA = [0, 1.75, 1.0];
     for (let t = t0; t < t1; t++) {
-      const w = (t - t0) / (t1 - t0), lin = lerp3(PA, B1, w), dev = [-.35 * Math.sin(Math.PI * w), .9 * 4 * w * (1 - w) + .25 * (1 - w), .1 * Math.sin(Math.PI * w)];
+      const w = (t - t0) / (t1 - t0), lin = lerp3(PA, B1, w), dev = [-.35 * Math.sin(Math.PI * w), .5 * 4 * w * (1 - w) + .25 * (1 - w), .1 * Math.sin(Math.PI * w)];
       const P = t === t0 ? PA : vadd(lin, vmul(dev, 1 / K_ARC));
       k.k(t, {hat: 'world', hwP: P.map(x => +x.toFixed(3)), hwE: [+(100 * (1 - sm(w * 1.25))).toFixed(1), +lerp(0, 20, w).toFixed(1), +(40 * Math.sin(w * Math.PI * 2) * (1 - w) ** 1.5).toFixed(1)]}, 'l');
     }

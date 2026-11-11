@@ -9,6 +9,6 @@ data merge entity 524c4b4d-4349-4e45-8000-000000000006 {start_interpolation:0,in
 data merge entity 524c4b4d-4349-4e45-8000-000000000007 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.13074f,0.40305f,2.38646f],left_rotation:[0.03507f,-0.01823f,-0.013f,0.99913f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4349-4e45-8000-000000000008 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.13059f,0.62562f,2.03314f],left_rotation:[-0.10736f,0.26972f,0.22743f,0.92952f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4349-4e45-8000-000000000009 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.31085f,0.29806f,2.06198f],left_rotation:[0.58366f,0.35144f,-0.03101f,0.73135f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4349-4e45-8000-00000000000a {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.46f,0.9f,2.1f],left_rotation:[0.51822f,0.30961f,0.61823f,0.50338f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-00000000000a {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.46f,0.9f,2.1f],left_rotation:[-0.51822f,-0.30961f,-0.61823f,-0.50338f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set #cavP cine 180
 scoreboard players set #cavR cine 180

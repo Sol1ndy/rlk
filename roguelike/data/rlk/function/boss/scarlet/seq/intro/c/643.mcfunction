@@ -1,2 +1,2 @@
 # intro: the camera at #sq 643 (@s = the body).
-execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] ^1.351 ^1.459 ^-1.868 facing ^-0.2 ^1.3 ^0.6
+execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] ^1.034 ^1.509 ^-1.351 facing ^-0.15 ^1.3 ^0.5

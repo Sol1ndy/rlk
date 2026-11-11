@@ -18,7 +18,7 @@ are hr/tests/test_seq.py; this suite needs no world for most of it and pins the 
            title at the draw, the crimson look at cs1 recolour, the banner only at the refill beats and only while #warn hr 1,
            #sq_sig only = api.SIG at the repel's api.COUNTER_EV and the refill beats of lead5 / lead_re, the halo's bright looks
   event    (mcsim, both branches x 8 player positions incl. 20 b away): 120 t; the line at E4 cleared at E52 (< E56), the grant
-           + title once at E56, the black at E110 (10 / 12 / 0), ev_leave at E34, state/hidden at E40; the thrown sword: rotated
+           + title once at E56, the black at E110 (6 / 16 / 0: opaque at E116, before the hand-back at E118, HF-B), ev_leave at E34, state/hidden at E40; the thrown sword: rotated
            in its summon tick, one end-over-end turn <= 30 deg / t, never below the floor, at E44 0.9 b before the player's
            chest along their facing, shrinking into the player's hand, gone at E56; the moonlight orb; cancel at every tick
            leaves nothing
@@ -313,7 +313,7 @@ gold0 = [l for l in T['repel'][0] if '/fx/' in l]
 check('repel: its first frame stages the gold deflect (an overlay, the gold burst at the lock point, its sounds; the judge plays nothing)',
       any('fx/hud/ovl' in l for l in gold0) and any('fx/p/clash_gold' in l for l in gold0) and any('playsound' in l or '/fx/snd/' in l for l in T['repel'][0]), gold0[:4])
 blk = [l for l in T['event'][api.EV_T['black']] if 'ovl' in l]
-check('event: the black at E110 = ovl black in 10 hold 12 out 0', any('{g:"black",in:10,hold:12,out:0}' in l for l in blk), blk)
+check('event: the black at E110 = ovl black in 6 hold 16 out 0 (HF-B, HB-05)', any('{g:"black",in:6,hold:16,out:0}' in l for l in blk), blk)
 nl = build(True, {'lines': False})[1]
 cut = [l for l in T['ending'][0] if 'fx/hud/ovl' in l]
 early = sorted(t for t in T['ending'] if 0 < t <= 3 and any('fx/' in l for l in T['ending'][t]))
@@ -547,7 +547,7 @@ for br, code in (('item', 1), ('buff', 2)):
         hidden = [t for t, f, _ in s.log if f == f'{api.NS}rig/state/hidden']
         clip0 = [f for t, f, _ in s.log if t == 0 and f.startswith(f'{api.NS}rig/play/')]
         ok = (lines == want_line and clears == [E['line_clear']] and E['line_clear'] < E['grant'] and grants == [E['grant'], E['grant']]
-              and black == [(E['black'], {'g': 'black', 'in': 10, 'hold': 12, 'out': 0})] and leave == [E['leave']] and hidden == [E['hide']]
+              and black == [(E['black'], {'g': 'black', 'in': 6, 'hold': 16, 'out': 0})] and leave == [E['leave']] and hidden == [E['hide']]
               and clip0 == [f'{api.NS}rig/play/' + ('ev_give' if br == 'item' else 'ev_toast')])
         if not ok:
             seq_bad.append((tag, lines, clears, grants, black, leave, hidden, clip0))
@@ -619,7 +619,7 @@ for br, code in (('item', 1), ('buff', 2)):
             left.append((tag, 'after E120', rest))
 check(f'event: both branches ran from 8 player positions incl. 20 b away ({len(ev_res["item"])} + {len(ev_res["buff"])})',
       len(ev_res['item']) == len(ev_res['buff']) == len(POS))
-check('event: line 24 / 25 at E4, cleared at E52 (< E56), ev/apply + ev/title once at E56, the black at E110 (10 / 12 / 0), '
+check('event: line 24 / 25 at E4, cleared at E52 (< E56), ev/apply + ev/title once at E56, the black at E110 (6 / 16 / 0: opaque at E116, before the hand-back at E118, HF-B), '
       'ev_leave at E34, state/hidden at E40, ev_give / ev_toast at E0', not seq_bad, seq_bad[:2])
 check('event: every kit call a contract name; the branch\'s 6 / 5 ev sounds', not kit_bad, kit_bad[:3])
 check('event: the thrown sword rotated in its summon tick (summoned, then turned)', not rot_bad, rot_bad[:3])

@@ -1,0 +1,2 @@
+# FN-cam: {id, yaw, pitch} (mboss/cam/spawn_at): the stand summoned at the execution position with that rotation.
+$summon minecraft:armor_stand ~ ~ ~ {Rotation:[$(yaw)f,$(pitch)f],Tags:["rlk_room","rlk_mb_aux","rlk_pet","rlk_mb_cam","rlk_mb_cam$(id)"],Marker:1b,Invisible:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,NoBasePlate:1b,DisabledSlots:4144959,attributes:[{id:"minecraft:camera_distance",base:0d}]}

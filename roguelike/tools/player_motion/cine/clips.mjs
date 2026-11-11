@@ -8,7 +8,9 @@
 // Everything a sequence or her clip relies on is data here: LIMIT (api.ACTOR_LIMIT), CONTACT (§4.3, the actor's side of each
 // row), and per clip len / grip / beats / handback / two (two-hand spans) / slides (spans where the soles may drag) / steps
 // (footfall ticks, for the step sounds) / her (where the shot table puts her feet: the sheets' stand-in post, nothing else).
-import {REST, SWORD, Tracks, solve, frames, points, shoulders, groundHip, A, rot} from './lib.mjs';
+import fs from 'node:fs';
+import {REST, SWORD, SK, HIP_Y, Tracks, solve, frames, points, shoulders, groundHip, A, rot} from './lib.mjs';
+import {q as quat, mul as qmul} from '../../mboss_rig_math.mjs';
 
 export const LIMIT = {fwd: 2.5, back: 1.5, side: 1.5, cs0_back: 6.0, air: 7.0};
 const add = (a, b) => a.map((x, i) => x + b[i]);
@@ -40,6 +42,24 @@ export const CONTACT = {
   KA3: {clip: 'ending', ticks: [286, 286], p: K.KA3, what: 'blade', tol: .08},
   KA4: {clip: 'ending', ticks: [298, 304], p: K.KA4, what: 'blade', tol: .08},
 };
+
+// (HF-B, HB-01) the mutual rows (both figures' points; the same table as tools/scarlet_cine.mjs MUTUAL and test_contact.py): her
+// point or segment from lane H2c's tools/dev/sim/hr/cine/her_tracks.json against the actor's point; `over`: her pelvis no more
+// than `up` b over the actor's right shoulder and within `r` b of it on the floor plane at her highest tick of t0..t1
+export const MUTUAL = [
+  {id: 'KW.grip', clip: 'repel', t0: 36, t1: 48, her: 'hand_l', actor: 'hand_l', tol: .2},
+  {id: 'KH.hilt', clip: 'repel', t0: 49, t1: 49, her: 'hat_crown', actor: ['pommel', 'hilt'], tol: .2},
+  {id: 'KS.hook', clip: 'repel', t0: 70, t1: 78, her: ['elbow_l', 'hand_l'], actor: 'shoulder_r', tol: .3},
+  {id: 'KT.grip_l', clip: 'repel', t0: 86, t1: 91, her: ['elbow_l', 'hand_l'], actor: 'hand_l', tol: .15},
+  {id: 'KT.grip_r', clip: 'repel', t0: 78, t1: 96, her: ['elbow_l', 'hand_l'], actor: 'hand_r', tol: .15},
+  {id: 'KT.over', clip: 'repel', t0: 84, t1: 92, over: true, up: .6, r: .5},
+  {id: 'KK.kick', clip: 'repel', t0: 129, t1: 129, her: 'pelvis', actor: 'foot_r', tol: .5},
+];
+// her points per tick in the stage frame (the rig builder writes them; RLK_CINE_HER_TRACKS: an authoring copy, e.g. the her_tracks.json
+// of a `build_scarlet_rig.mjs --only` build)
+export const HER_TRACKS = process.env.RLK_CINE_HER_TRACKS || new URL('../../dev/sim/hr/cine/her_tracks.json', import.meta.url).pathname;
+let HER = null;
+export const herTrack = clip => { HER = HER || JSON.parse(fs.readFileSync(HER_TRACKS, 'utf8')); return HER.clips[clip]; };
 
 // ---- the vocabulary ---------------------------------------------------------------------------------------------------------
 // arms by angles [x, y, z, elbow]: x + swings forward, z lifts outward (right arm -, left arm +)
@@ -94,6 +114,34 @@ function fit(c, {two = c.two > .5, reach = .55, vars = ['hr', 'hf', 'ty', 'tp', 
     }
   }
   return get(x);
+}
+// (HF-B) the throw's fit: as fit(), with both hands on their holds, and the head (the 0.5-b box above the neck) kept `clear` b
+// from the segment `seg` (her pelvis -> her head: she lies over the back) and the right shoulder under her pelvis on the floor plane
+function headAt(c) {
+  const Qroot = quat(c.rot), Qyaw = quat([0, c.rot[1], 0]), Qbody = qmul(Qroot, quat(c.tor)), Qhead = qmul(Qbody, quat(c.head));
+  const hipW = add(add(A(c.root), [0, HIP_Y, 0]), rot(Qyaw, A(c.hip)));
+  return A(add(add(hipW, rot(Qbody, [0, SK.neck, 0])), rot(Qhead, [0, .25, 0])));
+}
+const segPt = (P, a, b) => { const ab = sub(b, a), L = Math.max(1e-9, dot(ab, ab)), u = Math.max(0, Math.min(1, dot(sub(P, a), ab) / L)); return Math.hypot(...sub(P, add(a, mulv(ab, u)))); };
+function throwFit(c, left, seg, pelvis, {reach = .55, clear = .44, vars = ['hr', 'hf', 'ty', 'tr'], prev = null} = {}) {
+  const get = x => ({...c, hip: [c.hip[0] + x.hr, c.hip[1], c.hip[2] + x.hf], tor: [c.tor[0] + x.tp, c.tor[1] + x.ty, c.tor[2] + x.tr]});
+  // `prev`: the last tick's answer: the search starts there and pays for leaving it (the body moves smoothly tick to tick)
+  const cost = x => {
+    const g = get(x), s = shoulders(g), e = (S, T) => { const d = Math.hypot(...sub(S, T)); return Math.max(0, d - reach) ** 2 + Math.max(0, .26 - d) ** 2; };
+    const H = headAt(g), hd = segPt(H, seg[0], seg[1]), sh = Math.hypot(s.R[0] - pelvis[0], s.R[2] - pelvis[2]);
+    const side = 20 * Math.max(0, H[0] - (pelvis[0] - .35)) ** 2;     // the head ducks to the left of her (stage -r of her body)
+    const jump = prev ? 2 * ((x.hr - prev.hr) ** 2 + (x.hf - prev.hf) ** 2) + 4e-4 * ((x.ty - prev.ty) ** 2 + (x.tr - prev.tr) ** 2) : 0;
+    return 60 * (e(s.R, c.hR) + (left ? e(s.L, left) : 0)) + 40 * Math.max(0, clear - hd) ** 2 + 4 * Math.max(0, sh - .3) ** 2 + 3 * (x.hr ** 2 + x.hf ** 2)
+      + 6e-5 * (x.ty ** 2 + 2 * x.tr ** 2) + jump + side;
+  };
+  let x = prev ? {...prev} : {hr: 0, hf: 0, ty: 0, tp: 0, tr: 0}, best = cost(x);
+  for (let step = 1; step > .01; step /= 2) {
+    for (let pass = 0; pass < 4; pass++) for (const v of vars) for (const sg of [1, -1]) {
+      const y = {...x, [v]: x[v] + sg * step * (v[0] === 'h' ? .12 : 14)}, cy = cost(y);
+      if (cy < best - 1e-12) { x = y; best = cy; }
+    }
+  }
+  return {...get(x), _x: x};
 }
 // a step: the sole lifts and lands (a parabola `lift` high) between t0 and t1
 const step = (tr, side, t0, t1, to, lift = .12) => tr.mv(t0, t1, {['f' + side]: [to[0], 0, to[1]]}, 'io', {['f' + side]: [0, lift, 0]});
@@ -356,13 +404,44 @@ function repel(tr) {
   tr.at(70, {head: [0, 20, 0], tor: [8, 0, 0], hip: [0, -.1, -.06]}, 'io');
   tr.at(76, {hip: [0, -.14, -.02], tor: [10, 4, 0], head: [-6, 24, 0], hR: hook.hR, bd: hook.bd, bn: hook.bn, pR: [.9, -.2, .3]}, 'io');
   tr.mv(72, 78, {hL: [-.02, 1.2, 2.12], wL: 1, pL: [-1, -.4, .1]}, 'io');
-  // 78-96 bends and throws: the hips under her, both arms pull her over and down; 96-102 straightens
-  tr.hold(78, 'hip', 'tor', 'head', 'hR', 'bd', 'bn', 'rot');
-  tr.at(84, {hip: [0, -.2, -.14], tor: [-48, 0, 0], head: [-14, 0, 0], hR: [.3, 1.0, 2.48], bd: norm([.8, .55, .2]), hL: [-.12, .84, 2.5]}, 'i');
-  tr.at(90, {hip: [0, -.16, -.2], tor: [-78, 0, 0], head: [-10, 0, 0], hR: [.32, .6, 2.5], bd: norm([.85, -.1, .5]), hL: [-.12, .52, 2.48]}, 'l');
-  tr.at(96, {hip: [0, -.1, -.12], tor: [-58, 0, 0], head: [10, 0, 0], hR: [.38, .62, 2.4], bd: norm([.7, -.28, .66]), hL: [-.24, .6, 2.36], wL: 1}, 'o');
+  // 78-96 (HF-B, HB-01) the throw: the hands hold her sword forearm (her tracks: the right fist with the sword over the forearm
+  // nearer her elbow 78-96, the blade out past the right side; the left hand round her wrist behind her grip 86-91 - before that
+  // it reaches for the wrist, after it lets go: both holds with the head clear of her body are out of reach earlier), the hips
+  // dropped back under her and the back bent forward: she is levered onto the back and rolled over the right shoulder, low
+  // (MUTUAL KT.over: her pelvis <= 0.6 b over that shoulder); the fist keeps hold to 96, pulling down in front; 96-102 lets go
+  // and straightens.
+  // (Before: both hands went to the floor in front while she sailed 2 b over the bent back: no contact 84-96.)
+  tr.hold(78, 'hip', 'tor', 'head', 'hR', 'bd', 'bn', 'rot', 'hL', 'wL', 'pL', 'pR');
+  const arm = herTrack('repel'), out = blade([0, 0, 0], [.38, -.48, .79], [0, -1, 0]);
+  const bd78 = tr.val('bd', 78), bn78 = tr.val('bn', 78);
+  // the body: the bend (hips back and down, the back forward, rolled to the left with the head ducked left: her body goes over
+  // the right shoulder) designed at the key ticks, fitted at every tick 79-96 (her forearm moves tick by tick): the right fist
+  // reaches its hold, the left hand its hold 86-91 (both fitted 0.52 b from the shoulder: the IK's reach with a margin), the head
+  // stays 0.44 b off her body
+  const BEND = [[78, [0, -.14, -.02], [10, 4, 0], [-6, 24, 0]], [79, [0, -.15, -.06], [0, 2, -6], [-12, 0, -8]], [82, [0, -.18, -.14], [-32, 2, -16], [-30, 0, -20]],
+    [84, [0, -.2, -.16], [-42, 2, -18], [-32, 0, -22]], [86, [0, -.21, -.18], [-48, 2, -18], [-30, 0, -22]], [90, [0, -.22, -.2], [-56, 2, -16], [-28, 0, -22]],
+    [92, [0, -.21, -.19], [-56, 2, -14], [-24, 0, -20]], [94, [0, -.19, -.16], [-48, 2, -10], [-14, 0, -12]], [96, [0, -.16, -.12], [-42, 0, -8], [-4, 0, -4]]];
+  let xPrev = null;
+  for (let t = 79; t <= 96; t++) {
+    const g = arm.hand_l[t], d = norm(sub(arm.elbow_l[t], g));                // from her grip toward her elbow
+    const holdL = add(g, mulv(d, .05)), holdR = add(add(g, mulv(d, .22)), [0, .05, 0]), wb = EZ.io(Math.min(1, (t - 78) / 4));
+    const i = BEND.findIndex(([b]) => b >= t), [ta, ha, ra, da] = BEND[Math.max(0, i - 1)], [tb, hb, rb, db] = BEND[i], u = EZ.io((t - ta) / Math.max(1, tb - ta));
+    const hip = mix(ha, hb, u), tor = mix(ra, rb, u), head = mix(da, db, u);
+    const both = t >= 86 && t <= 91;
+    const c = {...tr.sample(t), hR: holdR}, f = throwFit({...c, hip, tor, head}, both ? holdL : null, [arm.pelvis[t], arm.head[t]], arm.pelvis[t], {prev: xPrev, vars: ['hf', 'ty'], reach: .52});
+    xPrev = f._x;
+    // the left hand: 79-85 reaching for her wrist (on the line to it, within reach), 86-91 round it; 92-97 lets go (below)
+    const sL = shoulders(f).L, toL = sub(holdL, sL), dl = Math.hypot(...toL), reachL = add(sL, mulv(toL, Math.min(1, .52 / dl)));
+    tr.at(t, {hip: f.hip, tor: f.tor, head, hR: holdR, bd: norm(slerpDir(bd78, out.bd, wb)), bn: norm(slerpDir(bn78, out.bn, wb)),
+      ...(t <= 91 ? {hL: both ? holdL : reachL} : {})}, 'l');
+  }
+  // the left hand lets go as she slides off in front (92-97, the arm's angles blended in); the right fist keeps its hook to 96
+  tr.hold(91, 'wL', 'aL'); tr.at(92, {aL: [10, 0, 30, 70]}, 'l'); tr.at(98, {wL: 0}, 'io'); tr.at(102, {aL: ARM.balL}, 'io');
   const over = blade(add(A2, [.32, 1.06, .34]), [-.3, -.6, .74], [0, 0, 1]);
-  tr.at(102, {hip: [0, -.02, .02], tor: [-10, 0, 0], head: [16, 0, 0], hR: add(A2, [.4, .9, .2]), bd: norm([.2, -.5, .84]), wL: 0, aL: ARM.balL, pR: REST.pR}, 'io');
+  // 96-101 the left hand lets go of her wrist (the arm's angles blended in, ARM.balL), the right fist comes up off her arm
+
+
+  tr.at(102, {hip: [0, -.02, .02], tor: [-10, 0, 0], head: [16, 0, 0], hR: add(A2, [.4, .9, .2]), bd: norm([.2, -.5, .84]), bn: [0, .86, .51], pR: REST.pR}, 'io');
   // 104-118 stands over her, the point at her
   tr.mv(104, 112, {hR: over.hR, bd: over.bd, bn: over.bn, tor: [-14, 6, 0], head: [26, -4, 0], hip: [0, -.03, .04]}, 'io');
   // 120-128 the right leg goes back; 129 the kick lands on her flank
@@ -570,9 +649,9 @@ export const CLIPS = [
   mk('cs1', 720, cs1, {grip: 'right hand; two hands 6-34', two: [[10, 30]], slides: [[30, 44], [664, 676], [694, 704]], sync: [566], steps: [68, 76, 82, 657, 663, 671, 711, 716],
     beats: 'ready 0-6; guard up 6-10; the cut on the blade at K1 at 10; lock 10-30, pushing 24-30; the shove 30-34; slides back 34-44; recovers, steps forward 60-82; sword lowered by 84; half guard 350-370, held; hit 650-653; stagger 652-664 (f -0.5); on the right knee, the sword planted 664-694; up 694-716; idle 720',
     her: [[0, [0, 0, 9]], [6, [0, 0, 9]], [10, [0, 0, 1.5]], [34, [0, 0, 1.5]], [50, [0, 0, 9]]]}),
-  mk('repel', 140, repel, {keep: [129], grip: 'two hands 0-30; left hand free 30-140 (on her wrist 36-48, on her arm 78-96)', two: [[0, 26]], slides: [[61, 68], [129, 139]], steps: [34, 38, 52, 68, 72, 132, 138],
-    beats: 'high guard at KR 0-4; holds 4-22; heaves 22-26; beats her blade aside 26-30; steps in 30-36; left hand on her wrist at KW 36-48; hilt strike at KH 49; rising cut 56; level cut 62, past her right side 62-68 (r -0.5); back to her 68; hooks her arm over the right shoulder 70-76; throws 78-96; straightens 96-102; the point at her 104-118; leg back 120-128; kick at KK 129; back-flip 132-138; idle 140',
-    her: [[0, [0, 1, 1.0]], [6, [0, 0, 1.3]], [52, [0, 0, 1.1]], [68, [0, 0, 1.2]], [78, [0, 0, 1.2]], [88, [0, 1.9, 1.9]], [101, [0, 0, 3.0]], [129, [0, 0, 3.0]], [135, [0, 0, 8]], [140, [0, 0, 9]]]}),
+  mk('repel', 140, repel, {keep: [129], grip: 'two hands 0-30; left hand free 30-140 (on her wrist 36-48; the throw: the right fist with the sword hooked over her sword forearm 78-96, the left hand round her wrist 86-91)', two: [[0, 26]], slides: [[61, 68], [129, 139]], steps: [34, 38, 52, 68, 72, 132, 138],
+    beats: 'high guard at KR 0-4; holds 4-22; heaves 22-26; beats her blade aside 26-30; steps in 30-36; left hand on her wrist at KW 36-48; hilt strike at KH 49; rising cut 56; level cut 62, past her right side 62-68 (r -0.5); back to her 68; hooks her arm over the right shoulder 70-76; the throw 78-96: the right fist over her sword forearm 78-96, the left hand round her wrist 86-91 (reaching 79-85, letting go 92-97), the hips back under her, the back bent, the head ducked left: she goes over the right shoulder, low (her pelvis 0.35 b over it at 88); lets go 96, straightens 96-102; the point at her 104-118; leg back 120-128; kick at KK 129; back-flip 132-138; idle 140',
+    her: [[0, [0, 1, 1.0]], [6, [0, 0, 1.3]], [52, [0, 0, 1.1]], [68, [0, 0, 1.2]], [78, [0, 0, 1.2]], [88, [0.28, 1.4, 2.0]], [101, [0, 0, 3.0]], [129, [0, 0, 3.0]], [135, [0, 0, 8]], [140, [0, 0, 9]]]}),
   mk('ending', 1372, ending, {start: KICK, after: ['repel', 129], grounded: [[330, 1372]],
     grip: 'right hand; two hands 56-80, 190-204, 260-266, 298-304; left hand free 556-616', two: [[56, 80], [190, 204], [262, 262], [298, 304]],
     slides: [[50, 56], [80, 104], [117, 124]], steps: [8, 12, 16, 54, 123, 172, 180, 187, 189, 330, 343, 348, 386, 392],
