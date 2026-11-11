@@ -3,11 +3,13 @@
 execute if score #sq hr matches 1440.. run scoreboard players set #sqdone hr 1
 scoreboard players set @a[tag=player] hudHold 2
 execute if score #sq hr matches ..1439 unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/intro/lock
-execute if score #sq hr matches 24..151 run return run function rlk:boss/scarlet/seq/intro/kb/24_151
-execute if score #sq hr matches 152..165 run return run function rlk:boss/scarlet/seq/intro/kb/152_165
-execute if score #sq hr matches 166..184 run return run function rlk:boss/scarlet/seq/intro/kb/166_184
-execute if score #sq hr matches 185..214 run return run function rlk:boss/scarlet/seq/intro/kb/185_214
-execute if score #sq hr matches 215..690 run return run function rlk:boss/scarlet/seq/intro/kb/215_690
-execute if score #sq hr matches 712..1076 run return run function rlk:boss/scarlet/seq/intro/kb/712_1076
-execute if score #sq hr matches 1088..1294 run return run function rlk:boss/scarlet/seq/intro/kb/1088_1294
-execute if score #sq hr matches 1352..1440 run return run function rlk:boss/scarlet/seq/intro/kb/1352_1440
+function rlk:boss/scarlet/seq/intro/skipin
+execute if score #sq_skn hr matches 1 run return run scoreboard players set #sq_skn hr 0
+execute if score #sq hr matches 24..160 run return run function rlk:boss/scarlet/seq/intro/kb/24_160
+execute if score #sq hr matches 161..188 run return run function rlk:boss/scarlet/seq/intro/kb/161_188
+execute if score #sq hr matches 189..346 run return run function rlk:boss/scarlet/seq/intro/kb/189_346
+execute if score #sq hr matches 348..612 run return run function rlk:boss/scarlet/seq/intro/kb/348_612
+execute if score #sq hr matches 624..841 run return run function rlk:boss/scarlet/seq/intro/kb/624_841
+execute if score #sq hr matches 842..990 run return run function rlk:boss/scarlet/seq/intro/kb/842_990
+execute if score #sq hr matches 1024..1148 run return run function rlk:boss/scarlet/seq/intro/kb/1024_1148
+execute if score #sq hr matches 1150..1440 run return run function rlk:boss/scarlet/seq/intro/kb/1150_1440

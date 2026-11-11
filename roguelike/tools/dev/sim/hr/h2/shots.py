@@ -265,6 +265,37 @@ def alone_fraction(eye, yaw, pitch, boxes, w, h):
     return float(np.isfinite(tb).mean())
 
 
+# ---- the F5 pull-back (round V, lane VC; Camera.getMaxZoom of the 26.3 client) ------------------------------------------------
+# A spectator in F5 looks from 4 b behind a non-living camera entity along its view; the client shortens that to the first
+# block one of 8 rays hits (from the entity's place +- 0.1 on each axis, ClipContext.Block.VISUAL). Counted as blocking:
+# every solid cell, the barrier ring, and the thin plants that have a shape (bamboo, bars, lily pads, dripleaves).
+F5_THIN = ('bamboo', 'iron_bars', 'lily_pad', 'dripleaf')
+
+
+def f5_clear(arena, pos, rot, back=4.0, step=0.04):
+    """None when the client's pull-back from a camera entity at pos / rot is free; else (what, block name, blocks from the
+    entity): 'entity' = the entity itself is in a block (the client would look from inside it), 'line' = a ray is cut."""
+    y, p = math.radians(rot[0]), math.radians(rot[1])
+    f = np.array([-math.sin(y) * math.cos(p), -math.sin(p), math.cos(y) * math.cos(p)])
+    ts = np.arange(0.0, back + 1e-9, step)
+    worst = None
+    for dx in (-0.1, 0.1):
+        for dy in (-0.1, 0.1):
+            for dz in (-0.1, 0.1):
+                o = np.array(pos, dtype=float) + np.array([dx, dy, dz])
+                P = o[None, :] - f[None, :] * ts[:, None]
+                m = arena.sample(P)
+                cls = np.where(m >= 0, arena.cls[np.maximum(m, 0)], SOLID)
+                thin = np.array([m[i] >= 0 and any(x in arena.names[m[i]] for x in F5_THIN) for i in range(len(m))])
+                bad = np.nonzero((cls == SOLID) | (cls == INVIS) | thin)[0]
+                if len(bad):
+                    i = int(bad[0])
+                    hit = ('entity' if ts[i] < 1e-9 else 'line', arena.names[m[i]] if m[i] >= 0 else 'outside', round(float(ts[i]), 2))
+                    if worst is None or hit[2] < worst[2]:
+                        worst = hit
+    return worst
+
+
 def ray_clear(arena, eye, target, boxes=(), skip_tags=(), margin=0.25, solid_only=False):
     """What a ray from the eye meets before `target`: None when clear, else ('block', name, distance) / ('box', tag, distance).
     The last `margin` blocks before the target are not counted (the target's own surface)."""

@@ -60,6 +60,8 @@ FAIL, OK = [], []
 def owned(gen, rel):
     """Does generator `gen` own the datapack-copy path `rel` (posix, relative to roguelike/)?"""
     if gen == 'core':
+        if rel == 'data/rlk/advancement/mboss/cam_post.json':      # round V (lane VC): FN-cam's tick advancement
+            return True
         if not rel.startswith(FN + 'mboss/'):
             return rel.startswith(FN + 'boss/test/')
         sub = rel[len(FN + 'mboss/'):]

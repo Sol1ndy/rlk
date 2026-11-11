@@ -6,8 +6,9 @@
                             [--rec <cache.json>] [--cols 3] [--w 640] [-o out.jpg]
 
 The camera is the one the sequence functions really place: <roguelike>'s seq/<name>/** run in lane H2's world (hr/h2/
-seqsim.py, the stage placement of hr/h2/sheets.py; `c` = the avatar 12 b south of the centre facing her at it), the live stand's
-pose at each tick (its eye = its position: a marker armour stand). Her figure is her rig as built (the rig builder's
+seqsim.py, the stage placement of hr/h2/sheets.py; `c` = the avatar 12 b south of the centre facing her at it); round V: the
+picture is taken from the live camera's VIEWPOINT as the client has it at each tick (the display entity's interpolated
+pose, 4 b back along its view: seqsim's rec['cam']). Her figure is her rig as built (the rig builder's
 --debug-dp frames hr_dbg/<clip>/<t> of the clip tick the sequence shows) on her body as the sequence moved it; the actor is
 lane H3's (the player rig builder's --cine-debug-dp frames cine_dbg/<clip>/<t> and cine_dbg/spawn_<character>, copied into the
 same debug dp), in the stage frame the actor's root stands in (ST; ST2 from ending 344 and in the coda, char/cine/face).
@@ -110,6 +111,8 @@ def main():
     ap.add_argument('--cols', type=int, default=3)
     ap.add_argument('--w', type=int, default=640)
     ap.add_argument('--fov', type=float, default=70.0)
+    ap.add_argument('--text', action='store_true', help='(round V) draw the dialogue line\'s box where the camera text shows it '
+                    '(mboss_lib.CAM_LINE, the widest page) on the panels of line ticks, and the hint\'s box on all')
     ap.add_argument('-o', '--out', required=True)
     a = ap.parse_args()
     dp = Path(a.dp).resolve()
@@ -211,6 +214,18 @@ def main():
             lab = ''.join(ch for ch in sid if ord(ch) < 128).strip()
             ls = line_at(t)
             txt = f'{a.seq} #{t} {lab} [{clip} {ct}]' + (f' line {ls[0]}' if ls else '') + (f' head d={dist:.2f}' if dist else '')
+            if a.text:
+                import framing as FR
+                import mboss_lib as ML
+                def box(spec, width, col):
+                    ty, tz, k = ML.cam_text_geom(spec)
+                    half = (ML.CAM_BACK - tz) * math.tan(math.radians(a.fov / 2))
+                    px = 0.025 * k
+                    bx, y0, y1 = (width / 2 + 1) * px / (half * 16 / 9), (ty - px) / half, (ty + 10 * px) / half
+                    d.rectangle(((0.5 - bx / 2) * pw, (0.5 - y1 / 2) * ph, (0.5 + bx / 2) * pw, (0.5 - y0 / 2) * ph), outline=col, width=1)
+                if ls:
+                    box(ML.CAM_LINE, 192, (255, 170, 220))
+                box(ML.CAM_HINT, 96, (150, 150, 160))
             d.rectangle((0, 0, pw, 14), fill=(0, 0, 0))
             d.text((3, 1), txt, fill=(255, 235, 120))
             panels.append(im)

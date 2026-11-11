@@ -37,7 +37,19 @@ feet and head; mv/ok's safe disc would refuse a contact point next to a player w
 where the design names it (the stage's forward, her CS1 mark, the ending's landing mark).
 
 World entities a sequence makes: the stage markers, a one-tick helper marker, the kit prop cards (petals: rlk_hr_sqp), the
-event's thrown sword / moonlight orb, the camera stands (the framework's, mboss/cam/spawn), all tagged rlk_room rlk_mb_aux.
+event's thrown sword / moonlight orb, the cameras and their texts (the framework's, mboss/cam/spawn_at), all tagged rlk_room
+rlk_mb_aux.
+
+Round V (lane VC, tools/dev/plan/combat/v_brief.md §3 "VC"; the facts in review/v/client_facts.md and vc_progress.md):
+- the camera: empty item_displays seen from 4 blocks behind (F5), keyframes the client interpolates, every rotation on the
+  360 / 256 grid, cuts between settled cameras (cam.py);
+- her lines in a locked sequence are drawn on the camera's text_display (lower third, dark backdrop; say()); the kit's
+  subtitle line only when no camera holds the player (the developer mode, a run that lost its lock);
+- the skip is the jump key held SKIP_HOLD ticks (seq/<name>/skipin; Shift ends a spectate inside the game and stays
+  free), its prompt the camera's hint text; the core's own Shift input (core/skip) rests while #skip hr is -1;
+- an instant move of her body is followed by RIG_NOW: the rig's follow runs in the tick's stale execution position, so
+  without it her model stays where the body was until the body moves again (the 11-11 test: the CS0 skip showed an empty
+  mark and she popped in when the fight began).
 """
 import json
 import math
@@ -72,9 +84,19 @@ PLANTS = ('minecraft:short_dry_grass', 'minecraft:tall_dry_grass', 'minecraft:cr
 LIFT_TO, LIFT_AHEAD = 1.15, 0.9
 OVER = f'function {SEQ}/lib/over'                                    # a clamped stage eye off the actor (cam.Track over)
 OVER_R, OVER_TO = 1.0, 2.5                                           # nearer than OVER_R to the stage origin -> OVER_TO over the floor
+CAMIN = f'function {SEQ}/lib/camin'                                  # a camera ENTITY of a clamped track (cam.Track inside)
+CAMIN_MIN = 0.3                                                      # ... at least this far over the floor
 DIST = 'function rlk:mboss/mv/dist'                                  # -> #mbDist mb (tenths, horizontal, @s -> the player's body)
 HOLD_TAG = L.CAM_HOLD_TAG
 CAM = {1: L.cam_sel(1), 2: L.cam_sel(2)}
+# her model after an instant move of the body (tp): the rig's parts are put at the body NOW (rig/follow_now resets the
+# follow's cache; rig/tick's own follow later in the tick runs in the stale execution position of the hook)
+RIG_NOW = f'execute at @s rotated as @s rotated ~ 0 run {api.rig("follow_now")}'
+SKIP_FP, SKIP_STEP_FP, SKIP_DONE_FP, SKIP_NOW_FP = '#sq_sk', '#sq_sks', '#sq_skd', '#sq_skn'   # the skip input (skipin)
+SKIP_KEY_HINT = ' · Space 길게'                                       # the pack's control hint after api.SKIP_TEXT
+SKIP_COLS = ('#A8A8B0', '#BEBEC5', '#D3D3D9', '#E9E9EC', '#FFFFFF')   # the prompt brightening in api.SKIP_STEPS steps
+LINE_GAP = 2                                                         # ticks per typing step (two syllables per step)
+TYPE_SND = 'execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ 0.3 1 0'
 CX_FP = '#sq_cx'                                                     # 1: this run of a locked sequence lost its lock
 HELD_FP = '#sq_h'                                                    # 1: this run of a locked sequence has seen the player held
 GRANT_BY = 3                                                         # a run never held by this tick gives the lock up
@@ -170,6 +192,89 @@ HUD_FREE = 'scoreboard players set @a[tag=player] hudHold 0'          # a cancel
 NO_LEASH = ('cs1', 'repel')        # fight-state sequences with contact marks next to the avatar: the arena leash rests
 
 
+# ---- her body on the stage as the sequences move it (the same table as tools/scarlet_cine.mjs ROOTS, which her clips are
+# choreographed to; test_seq compares it with her_tracks.json): [t0, t1, from, to, apex, yaw0, yaw1, frame], a row holds its
+# end until the next one starts; yaw 0 faces +f, 180 faces the actor. cam.Track leads a segment's points in her frame by it.
+def _row(t0, t1, a, b=None, h=0.0, y0=180.0, y1=None, fr='ST'):
+    return (t0, t1, tuple(map(float, a)), tuple(map(float, b or a)), float(h), float(y0), float(y0 if y1 is None else y1), fr)
+
+
+THROW_H = 6                                 # (HF-B) the throw's root apex, tenths (= tools/scarlet_cine.mjs THROW_H)
+_SF = round(math.dist(api.CS0_P0[::2], api.SEAT_POS[::2]), 2)
+HER = {
+    'intro': [_row(0, 840, (0, 0, _SF), y0=0), _row(840, 880, (0, 0, _SF), y0=0, y1=180), _row(880, 1052, (0, 0, _SF)),
+              _row(1052, 1148, (0, 0, _SF), (0, 0, 13.5)), _row(1234, 1258, (0, 0, 13.5), (0, 0, 6.5), 4.5), _row(1258, 1440, (0, 0, 6.5))],
+    'cs1': [_row(0, 6, (0, 0, 9)), _row(6, 10, (0, 0, 9), (0, 0, 1.5)), _row(34, 50, (0, 0, 1.5), (0, 0, 9), 1.2), _row(50, 720, (0, 0, 9))],
+    'repel': [_row(0, 6, (0, 1, 1), (0, 0, 1.3)), _row(30, 36, (0, 0, 1.3), (0, 0, 1.1)), _row(56, 64, (0, 0, 1.1), (0, 0, 1.2)),
+              _row(78, 101, (0, 0, 1.2), (0, 0, 3), THROW_H / 10), _row(129, 135, (0, 0, 3), (0, 0, 8)), _row(135, 140, (0, 0, 8), (0, 0, 9))],
+    'ending': [_row(0, 6, (0, 0, 4.2)), _row(6, 22, (0, 0, 4.2), (0, 0, 4.6)), _row(50, 54, (0, 0, 4.6), (0, 0, 2.9)),
+               _row(80, 86, (0, 0, 2.9), (0, 0, 6)), _row(116, 136, (0, 0, 6), (0, 0, 11), 1.2), _row(150, 188, (0, 0, 11), (0, 0, 4)),
+               _row(204, 216, (0, 0, 4), (0, 6, 3.6)), _row(222, 228, (0, 6, 3.6), (0, 6, 3.2)), _row(250, 262, (0, 6, 3.2), (0, 6.4, 3.4)),
+               _row(276, 286, (0, 6.4, 3.4), (0, 6, 3.3)), _row(314, 334, (0, 6, 3.3), (0, 0, 9), 4),
+               _row(334, 650, (0, 0, 9), fr='ST2'), _row(650, 700, (0, 0, 9), y0=180, y1=360, fr='ST2'),
+               _row(700, 1072, (0, 0, 9), y0=0, fr='ST2'), _row(1072, 1094, (0, 0, 9), y0=0, y1=180, fr='ST2'),
+               _row(1094, 1154, (0, 0, 9), (0, 0, 4.5), fr='ST2'), _row(1154, 1500, (0, 0, 4.5), fr='ST2')],
+    'event': [_row(0, 200, (0, 0, 4.5), fr='ST2')],
+}
+
+
+def her_of(name):
+    """tick -> (frame, r, u, f, yaw): her body on the stage at a tick of sequence `name` (HER)."""
+    rows = HER[name]
+
+    def at(t):
+        r = rows[0]
+        for x in rows:
+            if t >= x[0]:
+                r = x
+        u = max(0.0, min(1.0, (t - r[0]) / max(1, r[1] - r[0])))
+        p = [a + (b - a) * u for a, b in zip(r[2], r[3])]
+        p[1] += 4 * r[4] * u * (1 - u)
+        return (r[7], p[0], p[1], p[2], r[5] + (r[6] - r[5]) * u)
+    return at
+
+
+# ---- her lines in a locked sequence: on the camera's text (mboss_lib.cam_line): typed two syllables per LINE_GAP ticks with
+# the kit's own typing sound, held for api.LINE_AT's ticks on screen, a line of api.LINE_PAGES as consecutive pages (the hold
+# split by their lengths). The text is in the world, 0.3 b before the lens: a full-screen overlay (a title) covers it, so
+# nothing is ever typed over the black of a skip. Without a held player (the developer mode, a run that lost its lock)
+# there is no camera text: the kit's subtitle line plays instead.
+def line_steps(lid, hold):
+    """[(dt, text | None)]: the camera-text steps of line `lid` on its own clock (None = cleared at its end)."""
+    pages = api.LINE_PAGES.get(lid) or (api.LINES[lid],)
+    assert ' '.join(pages) == api.LINES[lid] and all('"' not in p and '\\' not in p for p in pages), lid
+    total = sum(len(p) for p in pages)
+    out, t0 = [], 0
+    for i, pg in enumerate(pages):
+        t1 = hold if i == len(pages) - 1 else t0 + max(round(hold * len(pg) / total), LINE_GAP * ((len(pg) + 1) // 2) + 10)
+        idx = [k for k, ch in enumerate(pg) if ch != ' ']                # two syllables a step, spaces come along
+        cuts = [idx[k + 1] + 1 for k in range(0, len(idx), 2) if k + 1 < len(idx)]
+        if not cuts or cuts[-1] != len(pg):
+            cuts.append(len(pg))
+        for j, c in enumerate(cuts):
+            assert t0 + j * LINE_GAP < t1 - 8, (lid, pg, t0, t1)
+            out.append((t0 + j * LINE_GAP, pg[:c]))
+        t0 = t1
+    return out + [(hold, None)]
+
+
+def say(s, t, lid, cond=''):
+    """Line `lid` from tick t of timeline s (cond: an execute condition for both drawings, e.g. the coda's branch)."""
+    hold = api.LINE_AT[lid][2]
+    held = f'entity @a[tag=player,tag={HOLD_TAG}]'
+    kit = line(lid)
+    pre = f'{cond} ' if cond else ''
+    if kit:
+        s.at(t, f'execute {pre}unless {held} run {kit}')
+    for dt, text in line_steps(lid, hold):
+        comp = None if text is None else f'{{text:"{text}",color:"{api.LINE_COLOR}"}}'
+        cl = L.cam_line(comp)
+        s.at(t + dt, f'execute {cond} {cl[8:]}' if cond else cl)
+        if text is not None:
+            s.at(t + dt, f'execute {pre}if {held} {TYPE_SND[8:]}')
+    return s
+
+
 def _tree(W, name, kind, ticks, lines_of, head):
     """A dispatch tree over `ticks`: consecutive ticks with the same lines share one leaf (<kind>/<t> or <kind>/<a>_<b>),
     branch files <kind>b/<a>_<b>, at most 8 children a level. Returns the root's lines. kind 'k' (the timeline) / 'c' (the
@@ -206,12 +311,65 @@ def _tree(W, name, kind, ticks, lines_of, head):
     return node(leaves)
 
 
-def stands(tr):
-    """(HF-B, HB-03) A locked sequence's start: the old stands gone, both made where their first shots put them (cam.Track.spawn:
-    a one-tick helper at the stage placed and aimed as the shot, mboss/cam/spawn_at with the rotation in the summon NBT). The
-    first frame anyone sees is tick 2: every locked sequence opens on a full mask over ticks 0-1 (CS0 black, CS1 and the ending
-    white, the repel gold), and the stand has stood at that shot's eye since tick 0."""
-    return [L.cam('kill'), *tr.spawn(HELP, f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(HELP_T)}}}')]
+HELP_SUMMON = f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(HELP_T)}}}'
+
+
+def stands(tr, first=None):
+    """A locked sequence's start (and a skip's landing): the old cameras gone, both made where their first shots put them
+    (cam.Track.spawn: a one-tick helper at the stage placed and aimed as the shot, mboss/cam/spawn_at: the rotation on the
+    grid in the summon NBT, the entity 4 blocks before the viewpoint). The first frame anyone sees is tick 2 or later: every
+    locked sequence opens on a full mask (CS0 black, CS1 and the ending white, the repel gold). `first`: {cam: shot}."""
+    return [L.cam('kill'), *tr.spawn(HELP, HELP_SUMMON, first=first)]
+
+
+def skip_cams(tr, shot):
+    """A skip's cameras (under its black): both made anew on `shot` (new entities: nothing still glides), `shot`'s live at
+    once; only while the run still has its lock."""
+    out = [*stands(tr, first={A: shot, B: shot}), f'scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {shot.cam}']
+    return gate(f'unless score {CX_FP} {OBJ} matches 1', out)
+
+
+def skip_files(W, name, tr):
+    """seq/<name>/skipin (+ skipgo, skipoff): the skip input of a locked sequence, every tick of it (@s = the body): the jump
+    key held api.SKIP_HOLD ticks inside api.SKIP[name]['window'] (Shift ends a spectate inside the game: it is no input
+    here); the prompt 「⊙ 건너뛰기 · Space 길게」 on the camera's hint text, brightening in api.SKIP_STEPS steps (on the action
+    bar when no camera holds the player). The core's own Shift input rests (#skip hr -1: core/skip returns at once); its test
+    hook #skp hr (the skip at that tick) is honoured here."""
+    base = f'{SEQ}/{name}'
+    (lo, hi), to = api.SKIP[name]['window'], api.SKIP[name]['to']
+    held = f'entity @a[tag=player,tag={HOLD_TAG}]'
+    comp = lambda k: (f'{{text:"",extra:[{{text:"{api.SKIP_TEXT}",color:"{SKIP_COLS[k]}"}},'      # noqa: E731
+                      f'{{text:"{SKIP_KEY_HINT}",color:"{SKIP_COLS[0]}"}}]}}')
+    rows = []
+    for k in range(api.SKIP_STEPS + 1):
+        a, b = (0, 0) if k == 0 else ((k - 1) * 5 + 1, k * 5 if k < api.SKIP_STEPS else api.SKIP_HOLD - 1)
+        rng = f'{a}..{b}' if a != b else str(a)
+        rows += [f'execute if score {SKIP_FP} {OBJ} matches {rng} unless score {SKIP_STEP_FP} {OBJ} matches {k} {L.cam_hint(comp(k))[8:]}',
+                 f'execute if score {SKIP_FP} {OBJ} matches {rng} unless {held} run title @a[tag=player] actionbar {comp(k)}',
+                 f'execute if score {SKIP_FP} {OBJ} matches {rng} run {sset(SKIP_STEP_FP, k)}']
+    W.w(f'seq/{name}/skipin', [
+        f'# The {name} skip input (@s = the body, every tick of the sequence; v_brief VC 5): from {lo} to {hi} the prompt',
+        f'# {api.SKIP_TEXT}{SKIP_KEY_HINT}; holding the jump key (rlk:in_jump) brightens it in {api.SKIP_STEPS} steps of 5 t, a release',
+        f'# resets the count; {api.SKIP_HOLD} t held -> the skip (skipgo: seq/{name}/skip, then #sq = {to - 1}: the next tick is {to}).',
+        '# The core\'s Shift input (core/skip) rests while #skip is -1.',
+        sset('#skip', -1),
+        f'execute if score {SKIP_DONE_FP} {OBJ} matches 1 run return 0',
+        f'execute if score #skp {OBJ} matches 1.. if score #sq {OBJ} = #skp {OBJ} run return run function {base}/skipgo',
+        f'execute if score #sq {OBJ} matches {hi + 1}.. run return run function {base}/skipoff',
+        f'execute unless score #sq {OBJ} matches {lo}..{hi} run return 0',
+        f'execute as {PL} if predicate rlk:in_jump run scoreboard players add {SKIP_FP} {OBJ} 1',
+        f'execute as {PL} unless predicate rlk:in_jump run {sset(SKIP_FP, 0)}',
+        f'execute if score {SKIP_FP} {OBJ} matches {api.SKIP_HOLD}.. run return run function {base}/skipgo',
+        *rows, HUD_HOLD])
+    W.w(f'seq/{name}/skipoff', [f'# The {name} skip prompt off for good (the window ended, the skip).',
+                                sset(SKIP_DONE_FP, 1), L.cam_hint(None),
+                                f'execute unless {held} run title @a[tag=player] actionbar ""'])
+    W.w(f'seq/{name}/skipgo', [
+        f'# The {name} skip (@s = the body): the prompt gone, the sequence\'s skip (the black, its state at tick {to}), then the',
+        f'# clock jumps: the next tick is {to}. {SKIP_NOW_FP}: the rest of this tick\'s timeline is not played.',
+        f'function {base}/skipoff', sset('#skp', 0), f'function {base}/skip', sset('#sq', to - 1), sset(SKIP_NOW_FP, 1)])
+    return [f'function {base}/skipin',
+            f'execute if score {SKIP_NOW_FP} {OBJ} matches 1 run return run {sset(SKIP_NOW_FP, 0)}']
 
 
 def actor_lines(call, **macro):
@@ -256,7 +414,7 @@ def actor_spawn(clip, carry=False, chained=False):
             *[(f'execute {cx}run {x}' if cx else x) for x in actor_lines('play', clip=clip)]]
 
 
-def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track=None, chain=False, fin=True, keep=False):
+def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track=None, chain=False, fin=True, keep=False, skip=False):
     """seq/<name>/{start,tick,cancel} + k/<t> + kb/<a>_<b>; for a locked sequence (LOCK) also lock / unlock / fin / cam +
     c/<t> + cb/<a>_<b>. start = its head lines, #sqdone 0, the lock of tick 0, then the tick-0 lines. `chain`: the lock is
     inherited from the sequence before (the coda after the ending): the interrupt flag is not reset. `fin`: the stands,
@@ -312,19 +470,23 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
     # a cancel releases everything at once (the core cancels on a pause / reload and goes to the end state itself): the lock
     # request of this tick taken back (the framework then releases the player in this tick), the kit's line / overlay off,
     # the HUD hold ended
-    release = [x for x in (f'scoreboard players set {L.CAM_REQ[0]} {L.CAM_REQ[1]} 0', K.hud('clear'), HUD_FREE) if x]
+    release = [x for x in (f'scoreboard players set {L.CAM_REQ[0]} {L.CAM_REQ[1]} 0', K.hud('clear'), L.cam_line(None), L.cam_hint(None),
+                           HUD_FREE) if x]
+    skipin = skip_files(W, name, track) if skip else []
+    skip0 = [sset(SKIP_FP, 0), sset(SKIP_STEP_FP, -1), sset(SKIP_DONE_FP, 0), sset(SKIP_NOW_FP, 0), sset('#skip', -1)] if skip else []
     stop_lines = actor_lines('stop')
     if keep and stop_lines:
         stop_lines = [f'execute unless score {KEEP_FP} {OBJ} matches 1 run {x}' for x in stop_lines] + [sset(KEEP_FP, 0)]
     W.w(f'seq/{name}/start', [f'# {head}', f'# Start (@s = the body, at it; #sq {OBJ} = 0){" — macro" if macro else ""}.',
                               *[c for c in start_head if c], sset('#sqdone', 0),
-                              *([sset(CX_FP, 0), sset(HELD_FP, 0)] if lock and not chain else []), *hold, *blank, *lock0, *s.t.get(0, [])])
+                              *([sset(CX_FP, 0), sset(HELD_FP, 0)] if lock and not chain else []), *skip0, *hold, *blank, *lock0,
+                              *s.t.get(0, [])])
     ticks = sorted(t for t in s.t if t > 0)
     assert all(t <= length for t in ticks), (name, max(ticks), length)
     root = _tree(W, name, 'k', ticks, lambda t: s.t[t], 'the timeline')
     W.w(f'seq/{name}/tick', [f'# {head}',
                              f'# Tick (@s = the body; #sq {OBJ} 1.. = the clip tick shown this game tick); #sqdone at {length}.',
-                             f'{sq(f"{length}..")} run scoreboard players set #sqdone {OBJ} 1', *hold, *lockn, *root])
+                             f'{sq(f"{length}..")} run scoreboard players set #sqdone {OBJ} 1', *hold, *lockn, *skipin, *root])
     W.w(f'seq/{name}/cancel', [f'# {head}', '# Cancel (no executor; idempotent): what this sequence made.',
                                f'kill @e[type=minecraft:marker,tag={STAGE_T}]', f'kill @e[type=minecraft:marker,tag={STAGE2_T}]',
                                f'kill @e[type=minecraft:marker,tag={HELP_T}]',
@@ -350,6 +512,14 @@ def lib(W):
         f'# view holds one -> the stand goes to {num(LIFT_TO)} b over the floor (the caller aims it again).',
         *[f'execute at @s if block ~ ~ ~ {b} run return run {up}' for b in PLANTS],
         *[f'execute at @s rotated ~ 0 positioned ^ ^ ^{num(LIFT_AHEAD)} if block ~ ~ ~ {b} run return run {up}' for b in PLANTS]])
+    W.w('seq/lib/camin', [
+        '# @s = a camera entity of a dynamic stage after mboss/cam/fix (4 b before its viewpoint along its view): pulled into',
+        f'# the walk disc as the viewpoint was, and not left lower than {num(CAMIN_MIN)} b over the floor (a lens that looks down at',
+        '# something near it: the client looks along the 4-block line from the viewpoint to the entity; in the ground the game',
+        '# would cut that line short). The rotation stays: the viewpoint moves by as much as the entity.',
+        'function rlk:mboss/ar/clampw',
+        f'execute store result score #sq_cy {OBJ} run data get entity @s Pos[1] 100',
+        f'execute if score #sq_cy {OBJ} matches ..{round((CY + CAMIN_MIN) * 100) - 1} at @s run tp @s ~ {num(CY + CAMIN_MIN)} ~'])
     W.w('seq/lib/over', [
         '# @s = a camera stand placed on a stage eye point and pulled into the walk disc: when the actor stands with its back',
         f'# at the wall, an eye meant to be behind it lands on it. A lens nearer than {num(OVER_R)} b (on the floor plane) to the stage',
@@ -490,26 +660,33 @@ def sig(name):
     return f'scoreboard players set {api.SEQ_SIGNAL} {OBJ} {api.SIG[name]}'
 
 
-# ---- the big petal (kit prop petal_big): an item_display the sequence carries, turned to the live camera -----------------------
-def petal_summon(tag, pos, cam, look='whole'):
+# ---- the big petal (kit prop petal_big, about 0.4 b of petal on a 0.8-b card): an item_display the sequence carries. It
+# faces the lens by itself (billboard "center": the kit dresses it "fixed", so the billboard is set again after each look).
+# Round V (T1-STAGE-1): a petal is never nearer than 1.5 b to the lens (petal-sized on the screen) and during a line it
+# passes BEHIND her, never across her face.
+PETAL_BB = 'data merge entity @s {billboard:"center"}'
+
+
+def petal_summon(tag, pos, cam=None, look='whole'):
     c = K.prop('petal_big', look=look)
     if not c:
         return []
     sel = f'@e[type=minecraft:item_display,tag={tag},limit=1]'
     return [f'kill @e[type=minecraft:item_display,tag={tag}]',
             f'execute {pos} run summon minecraft:item_display ~ ~ ~ {{Tags:{tags(PROP_T, tag)},teleport_duration:1,view_range:2f}}',
-            f'execute as {sel} at @s facing entity {CAM[cam]} feet run tp @s ~ ~ ~ ~ ~', f'execute as {sel} run {c}']
+            f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}']
 
 
-def petal_move(tag, pos, cam):
+def petal_move(tag, pos, cam=None):
     if not K.prop('petal_big', look='whole'):
         return None
-    return f'execute as @e[type=minecraft:item_display,tag={tag},limit=1] {pos} facing entity {CAM[cam]} feet run tp @s ~ ~ ~ ~ ~'
+    return f'execute as @e[type=minecraft:item_display,tag={tag},limit=1] {pos} run tp @s ~ ~ ~'
 
 
 def petal_look(tag, look):
     c = K.prop('petal_big', look=look)
-    return f'execute as @e[type=minecraft:item_display,tag={tag},limit=1] run {c}' if c else None
+    sel = f'@e[type=minecraft:item_display,tag={tag},limit=1]'
+    return [f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}'] if c else None
 
 
 def petal_kill(tag):
@@ -517,8 +694,9 @@ def petal_kill(tag):
 
 
 def before_cam(cam, x, y, d):
-    """A point d b before camera stand `cam` (x to its left, y up, in its own view frame)."""
-    return f'at {CAM[cam]} positioned ^{num(x)} ^{num(y)} ^{num(d)}'
+    """A point d b before the LENS of camera `cam` (x to its left, y up, in its view frame): the camera entity stands
+    mboss_lib.CAM_BACK = 4 b before the lens, so the point is d - 4 along the entity's own view."""
+    return f'at {CAM[cam]} positioned ^{num(x)} ^{num(y)} ^{num(d - L.CAM_BACK)}'
 
 
 PETAL = tuple(f'{PROP_T}_{i}' for i in range(1, 6))
@@ -533,7 +711,12 @@ SEAT_F = round(math.dist(P0[::2], api.SEAT_POS[::2]), 2)             # 20.73
 YAW0 = math.degrees(math.atan2(-(api.SEAT_POS[0] - P0[0]), api.SEAT_POS[2] - P0[2]))
 assert abs(SEAT_F - 20.73) < 0.01, SEAT_F
 WALK_F, END_F = 13.5, api.CS0_END_DIST                               # she walks to f 13.5, leaps to f 6.5 (control)
-CS0_MASK = ('black', 0, 2, 6)                                        # (HF-B) CS0's opening cut mask (ovl g, in, hold, out)
+# CS0's opening mask (ovl g, in, hold, out). Round V (T1-START-1, T1-GHOST-3): the arena is still arriving on the client for
+# about 1.4 s after tick 0 (missing chunk columns show the sky; a camera entity in a chunk that is not sent yet is not
+# known to the client): the black holds 34 t and is gone by 42; I1 and I2 are timed after it.
+CS0_MASK = ('black', 0, 34, 8)
+CS0_RESEND = 44                                                      # ticks the hold re-sends the camera for real (the arrival)
+I2_T = 76                                                            # the cut to the side track
 
 
 def build_intro(W):
@@ -541,21 +724,27 @@ def build_intro(W):
     e = lambda k, d=0: ev('intro', k, d)                              # noqa: E731
     x = lambda k, d=0: api.SKIP_T + ev('intro_end', k, d)             # noqa: E731  intro_end events on the intro clock
     # ---- the camera: 20 shots (the stage is fixed and every eye is checked offline: no clamp)
-    tr = C.Track('intro', {'ST': STAGE, 'HR': BODY}, LOCK['intro'][1], clamp=False)
+    tr = C.Track('intro', {'ST': STAGE, 'HR': BODY}, LOCK['intro'][1], clamp=False, her=her_of('intro'))
     # (the design's start f -9.0 is in the barrier ring, 26.6 b from the axis: f -7.4 is the walk disc's edge)
-    tr.cut(0, A, ST(0.6, 1.9, -7.4), ST(0, 1.4, -3.0), 'I1 arrival', ('actor',))
-    tr.move(20, 59, ST(0.6, 1.7, -4.5), ST(0, 1.4, 0.0))
-    tr.cut(60, B, ST(-7.0, 1.2, -3.5), ST(0, 1.2, -3.5), 'I2 side track', ('actor',))
-    tr.move(60, 100, ST(-7.0, 1.2, -0.5), ST(0, 1.2, -0.5))
+    # round V: the black of the arrival covers ticks 0-41 (CS0_MASK): I1 pushes in behind the walking actor 24-74, the side
+    # track follows the last of the walk (the actor's f = -6 + 0.075 (t - 20), at the origin at 100)
+    # (round V: the client's 4-b line from the viewpoint must clear the barrier ring by its 0.1-b corner rays: f -7.0)
+    tr.cut(0, A, ST(0.6, 1.9, -7.0), ST(0, 1.4, -3.0), 'I1 arrival', ('actor',))
+    tr.move(24, 74, ST(0.6, 1.7, -4.5), ST(0, 1.4, 0.0))
+    tr.cut(I2_T, B, ST(-7.0, 1.2, -2.0), ST(0, 1.2, -2.0), 'I2 side track', ('actor',))
+    tr.move(I2_T, 102, ST(-7.0, 1.2, -0.2), ST(0, 1.2, -0.2))
     tr.cut(110, A, ST(-3.0, 1.5, 14.0), WP(MOON[1] - 6, MOON[2], MOON[3]), 'I3 moon', ('moon',))
     tr.move(110, 169, look=MOON)
     tr.cut(170, B, HR(0.9, 0.75, 0.9), HR(0.25, 0.62, 0.35), 'I4 petal on her hand', ('her',))
     tr.move(220, 236, look=HR(0.3, 0.8, 0.1))
     tr.move(236, 249, look=HR(0, 1.55, 0))
-    tr.cut(250, A, HR(1.1, 1.45, 0.25), HR(0, 1.6, 0.05), 'I5 profile', ('her',))
-    tr.move(250, 319, eye=HR(1.1, 1.45, 0.35))
+    # (round V, VC 10: line 1 sits in the lower third; the lens looks at her shoulder so her face is in the upper half)
+    tr.cut(250, A, HR(1.1, 1.42, 0.25), HR(0, 1.2, 0.05), 'I5 profile', ('her',))
+    tr.move(250, 319, eye=HR(1.1, 1.42, 0.35))
     tr.cut(320, B, HR(-0.55, 0.5, -0.7), HR(-0.35, 1.05, 0.5), 'I6 bottle', ('her',))
-    tr.cut(410, A, HR(0.9, 0.6, 0.5), HR(0.45, 0.28, 0), 'I7 cup', ())
+    # (round V: level with the cup. The client looks from 4 b behind the camera entity, so the entity of a lens that looks
+    # down at something low would be under the floor: the design's eye 0.6 b up looking 25 degrees down)
+    tr.cut(410, A, HR(1.15, 0.42, 0.6), HR(0.45, 0.4, 0), 'I7 cup', ())
     tr.cut(460, B, HR(0.75, 1.0, -0.9), MOON, 'I8 cup to the moon', ('her', 'moon'))
     # (HF-B, HB-06: every line on a shot close on her, lines 4-10) I9 pushed in: the design's 2.4 b from her head -> 2.0-1.7
     tr.cut(536, A, HR(-1.2, 1.55, -1.6), HR(0.15, 1.3, 0.5), 'I9 over her shoulder', ('her',))
@@ -575,9 +764,11 @@ def build_intro(W):
     # lines 9 and 10: a close shot before her that walks back with her (an HR eye moved onto itself is placed in her frame
     # every tick): the walk with the hand on the brim, the stop, the hat tipped back
     tr.cut(1040, B, HR(-0.45, 1.65, 1.75), HR(0, 1.65, 0), 'I15 walk, hat tipped', ('her',))
-    tr.move(1040, 1229, eye=HR(-0.45, 1.65, 1.75))
-    # (the design's r 0.8 is a dry-grass cell of the fixed stage: its mirror r -0.8 is free)
-    tr.cut(1230, A, ST(-0.8, 0.3, 8.5), ENT(BODY, 'eyes'), 'I16 leap', ('her',))
+    tr.track(e('walk'), e('stop'), every=24)                         # the lens walks back before her (0.075 b/t, four segments)
+    # round V (T1-STAGE-4: from under her path she was a 40-px speck in the dome): the leap from the side, 4.6 b off the
+    # axis at her landing's depth: she crosses the frame a third of its height tall; the lens follows her (chase)
+    tr.cut(1230, A, ST(-4.6, 1.3, 9.2), HR(0, 1.0, 0), 'I16 leap', ('her',))
+    tr.chase(e('leap'), e('land') + 1)
     tr.cut(1260, B, ST(1.6, 0.5, 4.2), HR(0, 0.9, 0), 'I17 landing', ('her',))
     # (HF-B, HB-07) under the brim: the lens a little over her eye line, so her low, forward-tipped brim (intro_end 0-40, head
     # about 25-44 degrees down) lies between it and her eyes (every eye pixel: the face's rows 4-5). It opens 2.0 b out on the
@@ -602,20 +793,20 @@ def build_intro(W):
     s.at(0, K.ovl(*CS0_MASK))
     s.at(0, K.p('ambient_p1'), (f'execute at {PL} run {snd("cs0_wind")}' if snd('cs0_wind') else None))   # at the listener (HR-46)
     stop_wind = 'stopsound @a[tag=player] * minecraft:item.elytra.flying' if snd('cs0_wind') else None
-    s.at(60, stop_wind)
+    s.at(I2_T, stop_wind)
     for t, f in actor_steps('cs0', 0, api.SEQ_LEN['intro'], [(t, -api.CS0_WALK_BACK + 0.075 * (t - 20)) for t in range(20, 100, 12)]):
         s.st(t, ST(0, 0, round(f, 2)), snd('grass_step'))     # the actor's footfalls (lane H3's manifest; the design's 12 t without it)
     # ---- lines 1-10 at api.LINE_AT (their clip events l1..l10)
     for i in range(1, 11):
         assert api.LINE_AT[i][0] == 'intro' and api.LINE_AT[i][1] == e(f'l{i}'), i
-        s.at(api.LINE_AT[i][1], line(i))
+        say(s, api.LINE_AT[i][1], i)
     # ---- I3-I4: one big petal falls through the moon shot (150-170, 1.5 b before the lens), then settles on her right hand
     # (176 -> 190, follows the anchor), rolls off 206-216
     p1 = PETAL[0]
-    s.at(150, petal_summon(p1, before_cam(A, 0.4, 0.9, 1.5), A), snd('cs0_petals'))
+    s.at(150, petal_summon(p1, before_cam(A, 0.4, 0.9, 1.5)), snd('cs0_petals'))
     for t in range(151, 170):
         u = (t - 150) / 20
-        s.at(t, petal_move(p1, before_cam(A, 0.4 - 0.6 * u, 0.9 - 1.8 * u, 1.5), A))
+        s.at(t, petal_move(p1, before_cam(A, 0.4 - 0.6 * u, 0.9 - 1.8 * u, 1.5)))
     s.at(170, petal_kill(p1))
     if K.prop('petal_big', look='whole'):
         on_hand = lambda h, dx=0.0: f'at {ANCHOR} positioned ~{num(dx)} ~{num(h)} ~'   # noqa: E731
@@ -659,7 +850,7 @@ def build_intro(W):
     # music 1
     assert api.LINE_AT[11] == ('intro_end', ev('intro_end', 'l11'), api.LINE_AT[11][2])
     s.at(api.SKIP_T, api.play('intro_end'), FACE_ACTOR)
-    s.at(x('l11'), line(11))
+    say(s, x('l11'), 11)
     s.at(x('draw', -4), snd('draw_spin'))
     s.at(x('draw'), L.title(*api.TITLE), snd('draw'))
     s.fx(x('draw'), 'blade_tip', K.p('glint', c=api.C_WHITE)).me(x('draw'), K.p('qi_arc', r=18, yaw=0, pitch=0, roll=0, c=api.C_LILAC))
@@ -674,22 +865,23 @@ def build_intro(W):
               '# arrival blindness',
               f'execute as {PL} at {STAGE} run tp @s ~ ~ ~ ~ 0', f'execute as {PL} run function rlk:view/sync',
               f'execute at {STAGE} run tp @e[tag=rlk_safe,limit=1] ~ ~ ~']
-    write(W, 'intro', s, head, api.SEQ_LEN['intro'], track=tr,
-          start_head=stage0 + [*stands(tr), *actor_spawn('cs0'), api.play('intro')],
+    write(W, 'intro', s, head, api.SEQ_LEN['intro'], track=tr, skip=True,
+          start_head=stage0 + [*stands(tr), L.cam_resend(CS0_RESEND), *actor_spawn('cs0'), api.play('intro')],
           cancel=[stop_wind, KILL_PROPS] + halo(False))
     # ---- the skip (the core calls it after api.SKIP_HOLD t of sneak, then sets #sq to SKIP_T - 1: the next tick is I18)
     b18 = tr.shot_at(api.SKIP_T)
+    assert b18.t == api.SKIP_T and b18.name.startswith('I18'), b18.name
     W.w('seq/intro/skip', [
-        '# The intro skip (@s = the body; hr_design §3.1): the black falls; under it the intro is cleared (the line, the wind, the',
-        '# rock and the props, a move in progress, the petal), she stands at f 6.5 facing the actor (the landing\'s place), camera B',
-        '# is put where I18 wants it; the core then sets #sq to 1289 and the next tick plays intro_end from its tick 0 (line 11',
-        '# typed on the black). The actor shows its tick 1290 by itself (#cavT cine follows #sq).',
-        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False), HUD_HOLD, KILL_PROPS,
+        '# The intro skip (@s = the body; hr_design §3.1, v_brief VC 8): the black falls; under it the intro is cleared (the line,',
+        '# the wind, the rock and the props, a move in progress, the petal), she stands at f 6.5 facing the actor (the',
+        '# landing\'s place) and her model with her (RIG_NOW: the rig\'s own follow runs in the tick\'s stale position, so without',
+        '# it she stayed on the rock until the fight began), both cameras are made anew on I18; seq/intro/skipgo then sets #sq to',
+        '# 1289 and the next tick plays intro_end from its tick 0. The actor shows its tick 1290 by itself (#cavT cine follows',
+        '# #sq). Line 11 is typed on the camera text, under the black until that has faded.',
+        *[c for c in (K.hud('clear'), L.cam_line(None), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False), HUD_HOLD, KILL_PROPS,
         STOP, rock_kill(), api.rig('look/props/none'),
-        f'execute {floor_pt(END_F)} run {TP}', FACE_ACTOR,
-        f'execute unless score {CX_FP} {OBJ} matches 1 run {L.cam("spawn")}',
-        *[f'execute unless score {CX_FP} {OBJ} matches 1 {c[8:]}' if c.startswith('execute ') else
-          f'execute unless score {CX_FP} {OBJ} matches 1 run {c}' for c in tr.place_aim(b18.cam, b18.eye, b18.look, False)]])
+        f'execute {floor_pt(END_F)} run {TP}', FACE_ACTOR, RIG_NOW,
+        *skip_cams(tr, b18)])
     mv.write(W)
 
 
@@ -697,7 +889,10 @@ def build_intro(W):
 # CS1 — the 60 % cutscene (hr_design §3.2; clip cs1 720) and its skip (-> #sq 566)
 HER_F = 9.0                                                          # her mark: 9 b ahead of the actor
 S13_T = 654                                                          # (HF-B) the wide of 홍련일섬 after line 16 (618 + 36)
-S11_PETAL = HR(0.0, 1.05, 0.95)                                      # (HF-B) the S11 petal: 0.7 b before the lens, low left
+S11_T = 608                                                          # the cut to S11: two ticks before she sinks into the iai
+#                                                                      stance (609: in S10's close frame her face would dip under line 15)
+S11_EYE = HR(-0.5, 1.2, 2.05)                                        # the S11 lens: 2.15 b from her head
+S11_PETAL = HR(-0.1, 1.0, 0.62)                                      # the S11 petal: 1.5 b before the lens, under her face
 K1 = ST(*api.CONTACT['K1'][2])                                       # the blade lock
 
 
@@ -712,7 +907,7 @@ def her_mark(mv):
 def build_cs1(W):
     s, mv = Seq('cs1'), Moves('cs1')
     e = lambda k, d=0: ev('cs1', k, d)                                # noqa: E731
-    tr = C.Track('cs1', {'ST': STAGE, 'HR': BODY}, LOCK['cs1'][1], lift=LIFT, over=OVER)
+    tr = C.Track('cs1', {'ST': STAGE, 'HR': BODY}, LOCK['cs1'][1], lift=LIFT, over=OVER, her=her_of('cs1'), inside=CAMIN)
     tr.cut(0, A, ST(-9.0, 2.2, 4.5), ST(0, 1.2, 4.5), 'S1 apart', ('her', 'actor'))
     tr.cut(6, B, ST(-2.6, 1.3, 0.8), K1, 'S2 clash', ('her', 'actor'))
     tr.move(10, 22, eye=ST(-1.3, 1.4, 0.8))
@@ -730,7 +925,8 @@ def build_cs1(W):
     tr.cut(500, A, HR(0.1, 1.38, 0.95), HR(0, 1.6, 0), 'S10 under the brim', ('her',))
     # (HF-B, HB-06) line 16 (618-653): S11 is a close shot of her in the iai stance with the petal held in the foreground
     # (the video's ECU of the petal had her out of focus behind it); it holds through the draw and the slash to the line's end
-    tr.cut(610, B, HR(-0.5, 1.15, 1.6), HR(0, 1.35, 0), 'S11 the petal, her iai', ('her',))
+    # (round V: the petal 1.5 b before the lens, at her waist: petal-sized and under her face)
+    tr.cut(S11_T, B, S11_EYE, HR(0, 1.3, 0), 'S11 the petal, her iai', ('her',))
     # (the design's eye r 0.4 hides her behind the actor: 1.2 b to the right shows both, the actor near, her beyond)
     tr.cut(S13_T, A, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor?'))
     TRACKS['cs1'] = tr
@@ -758,28 +954,26 @@ def build_cs1(W):
     # ---- S4: line 13; S5: the grass (petals on the wind, a few dark leaves); she sheathes and takes the bottle off screen
     for i in (13, 14, 15, 16):
         assert api.LINE_AT[i][:2] == ('cs1', e(f'l{i}')), i
-        s.at(e(f'l{i}'), line(i))
+        say(s, e(f'l{i}'), i)
     s.st(180, ST(0, 0.8, 4.5), K.p('petals_wind')).st(200, ST(0, 0.8, 4.5), K.p('petals_wind'))
     s.st(186, ST(0, 4.0, 4.5), K.p('leaves_dark', n=8))
     # ---- S6: the hat swept off and back on (240 / 260); S9: she drinks from the bottle (464, 478); S10: the props gone 500
     s.at(e('hat_off'), snd('hat_swing')).at(e('hat_on', 2), snd('hat_swing'))
     s.at(e('drink', 6), snd('cs0_sip')).at(e('drink', 20), snd('cs0_sip'))     # (HI) the kit's sip, was a raw stand-in
     s.at(e('props_off'), api.rig('look/props/none'))
-    # ---- S10: a big petal drifts across her face from frame-left (590-606, 0.6 b before it)
+    # ---- S10: a petal drifts past BEHIND her head from frame-left (590-606, 2 b behind her: about 3 b from the lens). Round
+    # V (T1-STAGE-1): 0.6 b before her face it was a 690-px blob over her face for the whole of line 15
     p1, p2 = PETAL[1], PETAL[2]
-    face = lambda r, u: at_pt(HR(r, u, 0.6))                          # noqa: E731
-    c10 = tr.shot_at(590).cam
-    s.at(590, petal_summon(p1, face(0.75, 1.74), c10), snd('petal_drift'))
+    face = lambda r, u: at_pt(HR(r, u, -2.0))                         # noqa: E731
+    s.at(590, petal_summon(p1, face(1.5, 2.0)), snd('petal_drift'))
     for t in range(591, 606):
         u = (t - 590) / 16
-        s.at(t, petal_move(p1, face(0.75 - 1.5 * u, 1.74 - 0.2 * u), c10))
+        s.at(t, petal_move(p1, face(1.5 - 3.0 * u, 2.0 - 0.3 * u)))
     s.at(606, petal_kill(p1))
     # ---- S11: the second petal held before her, low in the close frame (610-649): a faint glint 620, its glowing line 624
     # (look cut); it turns to the live lens every tick
-    pp, c11 = S11_PETAL, tr.shot_at(610).cam
-    s.at(610, petal_summon(p2, at_pt(pp), c11))
-    for t in range(611, 649):
-        s.at(t, petal_move(p2, at_pt(pp), c11))
+    pp = S11_PETAL
+    s.at(610, petal_summon(p2, at_pt(pp)))
     s.at(620, f'execute {at_pt(pp)} run {K.p("glint", c=api.C_WHITE)}' if K.p('glint', c=api.C_WHITE) else None)
     s.at(624, petal_look(p2, 'cut'), snd('petal_cut'))
     # ---- S12: the draw at 642: negative 3 t, pink-white 3 + 4 t
@@ -790,7 +984,7 @@ def build_cs1(W):
     s.at(649, petal_look(p2, 'split'))
     for t in range(650, 664):
         u = (t - 649) / 15
-        s.at(t, petal_move(p2, at_pt(HR(pp[1] - 0.9 * u, pp[2] - 1.0 * u * u, pp[3] + 0.5 * u)), tr.shot_at(t).cam))
+        s.at(t, petal_move(p2, at_pt(HR(pp[1] - 0.9 * u, pp[2] - 1.0 * u * u, pp[3] + 0.5 * u))))
     s.at(664, petal_kill(p2))
     s.st(e('slash'), ST(0, 1.3, 0), K.p('scarlet_line', len=600, yaw=90, roll=13))
     s.at(e('slash'), K.ovl('red_tint', 0, 4, 20), snd('iai_slash'))      # (HI) the kit's 홍련일섬 recipe, was a raw stand-in
@@ -801,8 +995,8 @@ def build_cs1(W):
     mv.stage(api.STAGE_FMAX['cs1'])
     head = ('CS1 (hr_design §3.2): the clash, pushed apart, the hat and the bottle, the petal, 홍련일섬, the crimson field; '
             'locked 0-720, skippable 40-560 -> 566.')
-    write(W, 'cs1', s, head, api.SEQ_LEN['cs1'], track=tr,
-          start_head=[mv.ref('stage'), 'scoreboard players set #mbNoLeash mb 1', STOP, mark, FACE_ACTOR, *stands(tr),
+    write(W, 'cs1', s, head, api.SEQ_LEN['cs1'], track=tr, skip=True,
+          start_head=[mv.ref('stage'), 'scoreboard players set #mbNoLeash mb 1', STOP, mark, FACE_ACTOR, RIG_NOW, *stands(tr),
                       *actor_spawn('cs1'), api.play('cs1')],
           cancel=[KILL_PROPS])
     # ---- the skip (the core counts the hold, calls this, then sets #sq to 565: the next tick is 566, inside S10)
@@ -813,15 +1007,14 @@ def build_cs1(W):
     W.w('seq/cs1/skip', [
         '# The CS1 skip (@s = the body; hr_design §3.2): the black falls; under it the line and the petals go, she stands on her',
         f'# mark facing the actor with the sword sheathed, the hat on and the bottle gone (the state of tick {to}), her clip is',
-        f'# moved to tick {to - 1} (the rig shows {to} at the next rig/tick: the clip keys every part there), camera B is put on',
-        f'# S10; the core then sets #sq to {to - 1}. Line 15, line 16 and the slash follow.',
-        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6)) if c], HUD_HOLD, KILL_PROPS, STOP, mark, FACE_ACTOR,
+        f'# moved to tick {to - 1} (the rig shows {to} at the next rig/tick: the clip keys every part there), her model put at the',
+        f'# mark now (RIG_NOW), both cameras made anew on S10; seq/cs1/skipgo then sets #sq to {to - 1}. Line 15, line 16 and the',
+        '# slash follow.',
+        *[c for c in (K.hud('clear'), L.cam_line(None), K.ovl('black', 0, 20, 6)) if c], HUD_HOLD, KILL_PROPS, STOP, mark, FACE_ACTOR,
+        RIG_NOW,
         api.rig('look/sword/sheathed'), api.rig('look/hat/worn'), api.rig('look/scabbard/hip'), api.rig('look/props/none'),
         api.rig('look/face/calm'), *seek,
-        f'execute unless score {CX_FP} {OBJ} matches 1 run {L.cam("spawn")}',
-        f'execute unless score {CX_FP} {OBJ} matches 1 run scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {s10.cam}',
-        *[f'execute unless score {CX_FP} {OBJ} matches 1 {c[8:]}' if c.startswith('execute ') else
-          f'execute unless score {CX_FP} {OBJ} matches 1 run {c}' for c in tr.place_aim(s10.cam, s10.eye, s10.look, True)]])
+        *skip_cams(tr, s10)])
     mv.write(W)
 
 
@@ -896,7 +1089,6 @@ def build_lead_re(W):
 # =============================================================================================================================
 # The repel counter repel {at:60|5} (hr_design §3.4; clip repel 140): locked, the bars stay on
 KR = ST(*api.CONTACT['KR'][2])
-THROW_H = 6                                 # (HF-B) the throw's root apex, tenths (= tools/scarlet_cine.mjs THROW_H)
 
 
 def build_repel(W):
@@ -905,7 +1097,7 @@ def build_repel(W):
     assert [e(k) for k in api.COUNTER_EV] == [49, 101, 129]
     at60 = f'if score #sq_at {OBJ} matches 60'
     at5 = f'if score #sq_at {OBJ} matches 5'
-    tr = C.Track('repel', {'ST': STAGE, 'HR': BODY}, LOCK['repel'][1], lift=LIFT, over=OVER)
+    tr = C.Track('repel', {'ST': STAGE, 'HR': BODY}, LOCK['repel'][1], lift=LIFT, over=OVER, her=her_of('repel'), inside=CAMIN)
     tr.cut(0, A, ST(-1.2, 0.9, 0.65), KR, 'R0 deflect / R1 blade lock', ('her', 'actor'))
     tr.move(4, 26 - 1, eye=ST(-1.0, 1.0, 0.65))
     # R2 / R3: further round to the actor's right than the design's ST(1.9, 1.5, -0.4): from there the actor, stepping in to
@@ -970,7 +1162,7 @@ def build_repel(W):
             'the throw, the kick; HP steps at 49 / 101 / 129; locked 0-140, the bars on.')
     write(W, 'repel', s, head, api.SEQ_LEN['repel'], macro=True, track=tr, keep=True,
           start_head=[f'$scoreboard players set #sq_at {OBJ} $(at)', sset(KEEP_FP, 0), mv.ref('stage'), 'scoreboard players set #mbNoLeash mb 1', STOP,
-                      drop, FACE_ACTOR, land, *stands(tr), *actor_spawn('repel'), api.play('repel')],
+                      drop, FACE_ACTOR, RIG_NOW, land, *stands(tr), *actor_spawn('repel'), api.play('repel')],
           cancel=[KILL_PROPS])
 
 
@@ -989,7 +1181,7 @@ KA = [ST(*api.CONTACT[k][2]) for k in ('KA1', 'KA2', 'KA3', 'KA4')]
 def build_ending(W):
     s, mv = Seq('ending'), Moves('ending')
     e = lambda k, d=0: ev('ending', k, d)                             # noqa: E731
-    tr = C.Track('ending', {'ST': STAGE, 'ST2': STAGE2, 'HR': BODY}, LOCK['ending'][1], lift=LIFT, over=OVER)
+    tr = C.Track('ending', {'ST': STAGE, 'ST2': STAGE2, 'HR': BODY}, LOCK['ending'][1], lift=LIFT, over=OVER, her=her_of('ending'), inside=CAMIN)
     tr.cut(0, A, ST(-3.2, 1.3, 2.6), ST(0, 1.1, 3.0), 'E1 she rises', ('her', 'actor'))
     tr.cut(50, B, ST(1.3, 1.5, 2.2), KE2, 'E2 clash', ('her', 'actor'))
     # (HF-B, HB-04) the shove (80-90: she to f 6.0, the actor to -0.6) left the close frame empty from 84: B pulls back and
@@ -1003,7 +1195,8 @@ def build_ending(W):
     tr.move(204, 216, look=ST(0, 6.3, 2.8))                         # the tilt up with the spring
     tr.cut(240, B, ST(2.6, 6.8, 5.6), ST(0, 6.4, 2.6), 'E6 aerial duel (level)', ('her', 'actor'))
     tr.cut(276, A, ST(-1.6, 6.2, 0.2), ST(0, 6.5, 2.8), 'E6 aerial duel (behind the actor)', ('her', 'actor'))
-    tr.cut(314, B, ST(-16.0, 3.0, 2.0), ENT(BODY, 'eyes'), 'E7 apart', ('her',))
+    tr.cut(314, B, ST(-16.0, 3.0, 2.0), HR(0, 1.74, 0), 'E7 apart', ('her',))
+    tr.chase(314, 336)                                              # her arc back to the landing mark (314-334)
     tr.cut(338, A, WP(880, 206, 30), MOON, 'E8 the field', ('moon',))
     tr.cut(378, B, ST2(0.8, 1.2, 4.6), HR(0, 1.3, 0), 'E9 sheathe', ('her',))
     # (HF-B, HB-06: lines 17-22 on shots close on her) line 17 (420-477): the sheathe from 1.3 b, her face over the hands at
@@ -1098,15 +1291,16 @@ def build_ending(W):
     # ---- E9: the scabbard, the sheathe (click 452), line 17 + music 3 at 420, a big petal crosses the frame 430-438
     for i in range(17, 24):
         assert api.LINE_AT[i][:2] == ('ending', e(f'l{i}')), i
-        s.at(e(f'l{i}'), line(i))
+        say(s, e(f'l{i}'), i)
     assert e('music') == e('l17')
     s.at(e('music'), api.music(3)).at(e('sheathed'), snd('sheathe_click'))
-    p3, c9 = PETAL[3], tr.shot_at(430).cam            # (HF-B) the live close shot E9b: the petal 0.7 b before its lens
-    s.at(430, petal_summon(p3, before_cam(c9, 0.6, 0.2, 0.7), c9))
-    for t in range(431, 438):
-        u = (t - 430) / 8
-        s.at(t, petal_move(p3, before_cam(c9, 0.6 - 1.2 * u, 0.2 - 0.15 * u, 0.7), c9))
-    s.at(438, petal_kill(p3))
+    # (round V, T1-STAGE-1: line 17 is up: the petal crosses BEHIND her, 3.2 b before the lens of the close shot E9b)
+    p3, c9 = PETAL[3], tr.shot_at(430).cam
+    s.at(430, petal_summon(p3, before_cam(c9, 1.5, 0.55, 3.2)))
+    for t in range(431, 446):
+        u = (t - 430) / 16
+        s.at(t, petal_move(p3, before_cam(c9, 1.5 - 3.0 * u, 0.55 - 0.3 * u, 3.2)))
+    s.at(446, petal_kill(p3))
     # ---- E12: she turns away toward the moon (650-700, <= 4 deg / t; the feet step)
     tm = mv.turn('turn_moon', api.xyz(mp, 3), 4, 'the moon (api.MOON_POS)')
     for t in range(e('turn'), e('turn', 50)):
@@ -1128,7 +1322,7 @@ def build_ending(W):
     head = ('The ending (hr_design §3.5): she rises, the clash, the aerial duel, the landing, the sheathe, lines 17-23, the hat '
             'tip; H at its end; locked from tick 0 into the coda.')
     write(W, 'ending', s, head, api.SEQ_LEN['ending'], track=tr, fin=False,
-          start_head=[mv.ref('stage'), STOP, lie, FACE_ACTOR, *stands(tr), *actor_spawn('ending', carry=True), api.play('ending')],
+          start_head=[mv.ref('stage'), STOP, lie, FACE_ACTOR, RIG_NOW, *stands(tr), *actor_spawn('ending', carry=True), api.play('ending')],
           cancel=[KILL_PROPS] + halo(False))
 
 
@@ -1146,7 +1340,7 @@ TH0, TH1 = 40.0, -180.0                              # the end-over-end turn: ti
 S0 = S1 = api.ITEM_SWORD_SCALE                       # display scale: the rig's own at the hand; she is player-size, no shrink in flight
 # E30 the toss: the item's centre from her right hand (^left ^up ^forward), measured by the rig builder at the toss (S2d)
 TOSS_OFF = tuple((api.rig_manifest().get('item_sword') or {}).get('toss_offset') or (0, 0.13, 0.11))
-CODA_CUT = 4                                         # the coda's stand goes live at E4 (placed from E0: the stand glides 3 t)
+CODA_CUT = 4                                         # the coda's camera goes live at E4 (prepared from E1: cam.PRE)
 CODA_BLACK = ('black', 6, 16, 0)                     # (HF-B, HB-05) the coda's black at E110: opaque E116, the hand-back E118
 
 
@@ -1210,7 +1404,7 @@ def build_event(W):
     # until then). (HF-B, HB-06) Line 24 / 25 (E4-E51) on shots close on her: her face from before her (E4-E29: the glint
     # along the scabbard), then over her right shoulder, the gift flying from her hand to the actor (E30-E51); from E52 (the
     # line cleared) the design's static shot over the actor's right shoulder (the grant, the title, the black)
-    tr = C.Track('event', {'ST': STAGE, 'ST2': STAGE2, 'HR': BODY}, LOCK['event'][1], lift=LIFT, over=OVER)
+    tr = C.Track('event', {'ST': STAGE, 'ST2': STAGE2, 'HR': BODY}, LOCK['event'][1], lift=LIFT, over=OVER, her=her_of('event'), inside=CAMIN)
     y_cam = tracks_built('ending').shots[-1].cam
     x_cam = B if y_cam == A else A
     coda_eye, coda_look = ST2(0.55, 1.75, -1.3), HR(0, 1.3, 0)
@@ -1224,9 +1418,7 @@ def build_event(W):
                              f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(STAGE2_T)}}}',
                              f'execute as {STAGE2} at @s rotated as {STAGE} run tp @s ~ ~ ~ ~ 0',
                              sset(CX_FP, 0), sset(HELD_FP, 0), L.cam('kill'),
-                             *tr.spawn(HELP, f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(HELP_T)}}}',
-                                       first={A: first, B: first}),
-                             *tr.place_aim(x_cam, first.eye, first.look, True),
+                             *tr.spawn(HELP, HELP_SUMMON, first={A: first, B: first}),
                              f'scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {x_cam}'],
                    'The coda without the ending before it: its own stage (ST2 = ST) and stands, its first shot\'s stand live at once')
     # E0: she faces the avatar; the branch's clip (ev_give / ev_toast) from the ending's last pose; the lift / chime
@@ -1234,8 +1426,9 @@ def build_event(W):
          gate(f'unless score {api.EV_FP[0]} {OBJ} matches {api.EV_BRANCH["item"]}', api.play('ev_toast')), gate(buff, snd('ev_chime')))
     # E4 the line (24 item / 25 buff; api.EVENT['lines']), cleared at E52 (before the title)
     if api.EVENT['lines']:
-        s.at(E['line'], gate(item, line(24)), gate(buff, line(25)))
-        s.at(E['line_clear'], K.hud('clear'))
+        say(s, E['line'], 24, item)
+        say(s, E['line'], 25, buff)
+        s.at(E['line_clear'], K.hud('clear'), L.cam_line(None))
     # item: E12 the glint along the scabbard; E30 the toss: the display at the hand (scale api.ITEM_SWORD_SCALE, the rig's
     # scabbard hidden by the clip), its yaw toward the target, the end-over-end turn and the arc (apex 1.2 b) to 0.9 b before the
     # avatar's chest along its facing (re-aimed every tick), never below the floor; E44 upright (scabbard down), the moonbeam,

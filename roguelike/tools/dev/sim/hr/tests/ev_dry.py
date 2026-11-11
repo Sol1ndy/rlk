@@ -139,8 +139,10 @@ kit_ok = {f'{api.NS}fx/p/{n}' for n in api.KIT_PRESETS} | {f'{api.NS}fx/prop/{n}
 ev_ok = {f'{api.NS}ev/apply', f'{api.NS}ev/title'}
 actor_ok = {f'rlk:char/cine/{c}' for c in api.ACTOR_CALLS}
 fw = {r for r in refs if r.startswith('rlk:mboss/') or r == 'rlk:view/sync'}
-bad = sorted(r for r in refs - own - rig_ok - kit_ok - ev_ok - fw - actor_ok)
-check('refs: only seq/**, rig/** (contract calls), the kit (contract names), ev/apply / ev/title, the actor and the framework', not bad, bad)
+# round V: rig/follow_now (the rig's own "follow now" entry) after an instant move of her body (seq.RIG_NOW)
+rig_now = {f'{api.NS}rig/follow_now'}
+bad = sorted(r for r in refs - own - rig_ok - kit_ok - ev_ok - fw - actor_ok - rig_now)
+check('refs: only seq/**, rig/** (contract calls + follow_now), the kit (contract names), ev/apply / ev/title, the actor and the framework', not bad, bad)
 fw_missing = sorted(r for r in fw if not (FN / (r.split(':', 1)[1] + '.mcfunction')).exists() and not r.startswith('rlk:mboss/arena/'))
 check(f'refs: every framework function exists ({len(fw)})', not fw_missing, fw_missing)
 rig_missing = sorted(r for r in refs if r.startswith(f'{api.NS}rig/') and not (FN / (r.split(':', 1)[1] + '.mcfunction')).exists())
@@ -171,18 +173,29 @@ unrot = []
 for r, L in F.items():
     for i, l in enumerate(L):
         m = re.search(r'summon minecraft:item_display .*Tags:\[[^\]]*"(rlk_hr_(?:sqp_\d|ev_sword))"', l)
-        if m and not any(f'tag={m.group(1)}' in x and ' tp @s ' in x for x in L[i + 1:i + 3]):
+        # (round V: a petal faces the lens by itself: billboard "center", set again after the kit dressed it "fixed")
+        if m and not any(f'tag={m.group(1)}' in x and (' tp @s ' in x or 'billboard:"center"' in x) for x in L[i + 1:i + 4]):
             unrot.append(r)
-check('static: every summoned display is rotated right after its summon (summon ignores the execute rotation)', not unrot, unrot)
+check('static: every summoned display is rotated right after its summon (summon ignores the execute rotation) or is a billboard',
+      not unrot, unrot)
 BLANK = getattr(seq, 'HUD_BLANK', None)
-txt = [l for l in ALL.split('\n') if re.search(r'^(?:execute .* run )?(tellraw|title @|say )', l) and l != BLANK]
-check('static: no raw on-screen text (lines, overlays, the banner only through the kit; the empty actionbar aside)', not txt, txt[:2])
+# round V: the skip prompt's action bar when no camera holds the player (seq/<name>/skipin, skipoff) is the one other title
+txt = [l for l in ALL.split('\n') if re.search(r'^(?:execute .* run )?(tellraw|title @|say )', l) and l != BLANK
+       and not (f'unless entity @a[tag=player,tag={seq.HOLD_TAG}] run title @a[tag=player] actionbar ' in l)]
+check('static: no raw on-screen text (overlays, the banner only through the kit; the empty actionbar and the unheld skip prompt aside)', not txt, txt[:2])
 blank_bad = {n: len([l for l in F.get(f'seq/{n}/start', []) if l == BLANK]) for n in seq.HUD_OFF}
 blank_more = sorted(r for r, L in F.items() if not re.match(r'seq/(%s)/start$' % '|'.join(seq.HUD_OFF), r) and any(l == BLANK for l in L))
 check(f'static: the HUD-off sequences {seq.HUD_OFF} blank the actionbar once at their start, nowhere else',
       all(v == 1 for v in blank_bad.values()) and not blank_more, (blank_bad, blank_more[:3]))
 korean = sorted({x for l in ALL.split('\n') for x in re.findall(r'"([^"\n]*[가-힣][^"\n]*)"', l)})
-check(f'static: the only literal on-screen words are the title / sub ({korean})', set(korean) <= {api.NAME, api.SUB})
+# round V: her lines are typed on the camera's text: every literal is a prefix of a page of api.LINES (verbatim), or the
+# skip prompt (api.SKIP_TEXT verbatim + the pack's key hint)
+pages = [pg for i in api.LINES for pg in (api.LINE_PAGES.get(i) or (api.LINES[i],))]
+typed = {x for x in korean if any(pg.startswith(x) for pg in pages)}
+rest = set(korean) - typed
+check(f'static: the only literal on-screen words are the title / sub, her lines (prefixes of api.LINES pages, {len(typed)}) and the skip prompt',
+      rest <= {api.NAME, api.SUB, api.SKIP_TEXT, seq.SKIP_KEY_HINT} and all(any(pg in typed for pg in (api.LINE_PAGES.get(i) or (api.LINES[i],)))
+                                                                            for i in api.LINES if i != 12), sorted(rest))
 cam = [l for l in ALL.split('\n') if re.search(r'(^| run )(spectate|gamemode)\b|inputPermission|attribute .*movement_speed', l)]
 check('static: the control lock is only the framework\'s (no spectate, game mode or input command in a sequence)', not cam, cam[:2])
 req = sorted(r for r, L in F.items() if any('#mbCam mb 1' in l for l in L if not l.startswith('#')))
@@ -377,8 +390,16 @@ class Sim(mcsim.Sim):
 
     def execute(self, t, ctx):
         """`facing <x> <y> <z>` (absolute; mcsim knows `facing entity`): rewritten in place to `facing entity` of a fixed marker
-        at that point, so the subcommands keep their order."""
+        at that point, so the subcommands keep their order. `if | unless predicate rlk:in_<key>` (round V: the skip input of
+        seq/<name>/skipin reads the jump key): no key is down in this suite."""
         t = list(t)
+        i = 0
+        while i < len(t) and t[i] not in ('run', 'as'):
+            if t[i] in ('if', 'unless') and i + 2 < len(t) and t[i + 1] == 'predicate':
+                if t[i] == 'if':
+                    return 0
+                return self.execute(t[:i] + t[i + 3:], ctx)
+            i += 1
         i = 0
         while i < len(t) and t[i] != 'run':
             if t[i] == 'facing' and t[i + 1] != 'entity':

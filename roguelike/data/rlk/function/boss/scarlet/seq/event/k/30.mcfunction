@@ -1,4 +1,6 @@
 # event: the timeline at #sq 30 (@s = the body).
+execute if score #hrEv hr matches 1 as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:{text:"그 검",color:"#F2D0E8"},background:-1207959552}
+execute if score #hrEv hr matches 1 if entity @a[tag=player,tag=rlk_mb_camh] as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ 0.3 1 0
 execute if score #hrEv hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_ev_sword]
 execute if score #hrEv hr matches 1 run function rlk:boss/scarlet/rig/anchor/hand_r
 execute if score #hrEv hr matches 1 at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s rotated ~ 0 positioned ^-0.02 ^0.02 ^0.04 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_ev","rlk_hr_ev_sword"],item:{id:"minecraft:iron_sword",count:1,components:{"minecraft:item_model":"rlk:mboss/scarlet/item_sword"}},item_display:"none",billboard:"fixed",teleport_duration:1,interpolation_duration:1,view_range:2f,brightness:{block:13,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0.31599f,0.13089f,-0.3596f,0.86816f],scale:[1.375f,1.375f,1.375f],right_rotation:[0f,0f,0f,1f]}}

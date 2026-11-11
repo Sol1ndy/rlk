@@ -6,8 +6,18 @@ framework's mboss/d/tick), before the core's own tick, whose state is parked (#p
 own: it only runs the rig tick, the looks and the ambience), so the suites stay valid while lane H1 rebuilds the core.
 Scratch tool, never shipped; reads hr/tests/lib and hr/h2/camsim.py.
 
-Recorded per driven tick in s.rec (a dict per tick): sq, live (camera id), cam {1, 2: (pos, rot)}, body (pos, yaw), stage /
-stage2 (pos, yaw), avatar pos, held, gm, sig, kit [(sub, args)], cmds.
+Recorded per driven tick in s.rec (a dict per tick): sq, live (camera id), body (pos, yaw), stage / stage2 (pos, yaw),
+avatar pos, held, gm, sig, kit [(sub, args)], cmds; and, filled in when the world tick is over (the client's tick):
+  ent {1, 2: (pos, rot)}    the camera ENTITIES on the server (a display stands 4 b before its viewpoint);
+  cam {1, 2: (pos, rot)}    the VIEWPOINT of each camera as the client shows it (its interpolated pose, 4 b back along it):
+                            what the picture is taken from - the shot sheets and the framing read this;
+  cl {1, 2: (pos, rot, steps left, known)}  the client's entity pose and its running interpolation;
+  view / srv                the picture's viewpoint through the camera the CLIENT is on / the same from the server pose;
+  con                       the camera the client looks through (1 / 2, None: its own player);
+  text / hint               the line and the hint on the live camera's texts;
+  rig                       where her model stands (the rig's follow: see SeqSim.rig_follow);
+  living                    the living entities in the world (type, their framework tags): a spectator sees every
+                            invisible one of them as a ghost unless its texture is blank.
 """
 import math
 import sys
@@ -26,6 +36,10 @@ CX, CY, CZ = 880.0, 201.0, 8.0
 PARK_PH = 2                 # the core's cs1 phase: with #sqn 0 its state function does nothing
 HUSK_EYE = 1.74             # her body: a husk at scale 1 (api.BOSS)
 TRACE = []                  # the function path at a crash (see SeqSim.call)
+# entity types a spectator never sees a ghost of (displays draw only their content, the others have no renderer; the local
+# player is drawn only when it is the camera entity)
+NOT_LIVING = ('marker', 'item_display', 'block_display', 'text_display', 'interaction', 'item', 'player', 'experience_orb')
+LIVING_KEYS = ('rlk_av', 'rlk_vseat', 'rlk_mb_body', 'rlk_lure', 'rlk_mb_cam', 'rlk_mb_px')
 
 
 class SeqSim(CS.CamSim):
@@ -37,6 +51,56 @@ class SeqSim(CS.CamSim):
         self.done = []              # (sequence, #sq at #sqdone)
         self.actor_log = []         # (world tick, call, executor etype, pos, rot, macro, #cavT) of rlk:char/cine/*
         self.titles_log = []
+        self.rig_pos, self.rig_cache = None, None
+        self._fresh = []            # the records of this world tick (client_tick fills in the client's side)
+
+    def rig_follow(self, fid, ctx):
+        """Her model's place as the rig keeps it (boss/scarlet/rig/follow): rig/tick moves the parts to the EXECUTION position
+        of its call when the body's place or yaw differs from the cached one (and caches the body's); rig/follow_now always.
+        The hook's execution position is the body's place when the hook was entered: a body teleported inside the hook
+        leaves her model behind unless rig/follow_now runs at the body afterwards (seq.RIG_NOW)."""
+        b = H.body_of(self)
+        if b is None:
+            return
+        cur = (tuple(math.floor(v * 100) for v in b.pos), math.floor(b.rot[0] * 100))
+        if fid.endswith('/follow_now') or cur != self.rig_cache:
+            self.rig_pos, self.rig_cache = tuple(ctx.pos), cur
+
+    def client_tick(self):
+        super().client_tick()
+        pl = self.player()
+        d = self.st(pl) if pl is not None else {}
+        for r in self._fresh:
+            ent, cam, cl = {}, {}, {}
+            for i in (1, 2):
+                e = next((e for e in self.ents if e.alive and f'rlk_mb_cam{i}' in e.tags), None)
+                ent[i] = (tuple(e.pos), tuple(e.rot)) if e else None
+                if e is not None and 'cl' in e.data:
+                    cp, cr = tuple(e.data['cl'][0]), tuple(e.data['cl'][1])
+                    f = CS.forward(cr)
+                    cam[i] = (tuple(cp[k] - CS.BACK * f[k] for k in range(3)), cr)
+                    cl[i] = (cp, cr, e.data['steps'], e.data.get('known', True))
+                else:
+                    cam[i], cl[i] = None, None
+            r['ent'], r['cam'], r['cl'] = ent, cam, cl
+            r['view'] = CS.client_view(self)
+            e = self.ent(d.get('cam')) if d.get('cam') is not None else None
+            r['srv'] = None
+            if e is not None:
+                f = CS.forward(e.rot)
+                r['srv'] = (tuple(e.pos[k] - CS.BACK * f[k] for k in range(3)), tuple(e.rot))
+            ce = self.ent(d.get('ccam')) if d.get('ccam') is not None else None
+            r['con'] = next((i for i in (1, 2) if ce is not None and f'rlk_mb_cam{i}' in ce.tags), None)
+            live = next((e for e in self.ents if e.alive and f'rlk_mb_cam{r["live"]}' in e.tags), None)
+            tx = {t: next((x.data.get('text', '') for x in self.ents if x.alive and t in x.tags and live is not None
+                           and x.data.get('riding') == live.id), None) for t in (CS.LINE_TAG, CS.HINT_TAG)}
+            r['text'], r['hint'] = tx[CS.LINE_TAG], tx[CS.HINT_TAG]
+            r['rig'] = self.rig_pos
+            r['living'] = sorted({(e.etype, tuple(sorted(t for t in e.tags if t in LIVING_KEYS))) for e in self.ents
+                                  if e.alive and e.etype not in NOT_LIVING})
+            b = H.body_of(self)
+            r['body1'] = (tuple(b.pos), b.rot[0]) if b else None      # her body when the tick is over
+        self._fresh = []
 
     def call(self, fid, ctx, macro=None):
         TRACE.append(fid)                   # the function path of a crash (a suite prints it; popped on a normal return)
@@ -60,6 +124,8 @@ class SeqSim(CS.CamSim):
     def call2(self, fid, ctx, macro=None):
         if fid == 'rlk:mboss/d/tick' and self.drive:
             self.step()
+        if fid in (ROOT + 'rig/tick', ROOT + 'rig/follow_now'):
+            self.rig_follow(fid, ctx)
         if fid.startswith('rlk:char/cine/'):
             call = fid.rsplit('/', 1)[1]
             ex = ctx.ex
@@ -104,6 +170,7 @@ class SeqSim(CS.CamSim):
             self.sigs.append((d['name'], self.sc('#sq', 'hr'), sg))
             self.setsc('#sq_sig', 'hr', 0)
         self.rec.append(self.snap(d['name'], sg, [(c, a) for _t, c, a in self.kitl[k0:]], self.ncmd - n0))
+        self._fresh.append(self.rec[-1])
         if (self.sc('#sqdone', 'hr') or 0) == 1:
             self.done.append((d['name'], self.sc('#sq', 'hr')))
             self.setsc('#sqdone', 'hr', 0)
@@ -194,13 +261,6 @@ def play(s, name, args=None, then=None, limit=None, each=None, until=None):
             each(s)
         k = len(s.rec)
         CS.world(s)
-        for r in s.rec[k:]:
-            r['view'] = CS.client_view(s)          # the client's picture after this tick (camsim's spawn / glide model)
-            r['srv'] = None
-            pl = s.player()
-            e = s.ent(s.st(pl)['cam']) if pl is not None and s.st(pl)['cam'] is not None else None
-            if e is not None:
-                r['srv'] = (tuple(e.pos), tuple(e.rot))
         n += 1
         if until and until(s):
             break
@@ -221,7 +281,7 @@ def stop(s):
 def leftovers(s):
     """What a sequence may leave behind: {what: [...]} of the entities and flags that must be gone after a hand-back."""
     out = {}
-    tags = ('rlk_hr_stage', 'rlk_hr_stage2', 'rlk_hr_sqh', 'rlk_hr_sqp', 'rlk_mb_cam', 'rlk_hr_ev')
+    tags = ('rlk_hr_stage', 'rlk_hr_stage2', 'rlk_hr_sqh', 'rlk_hr_sqp', 'rlk_mb_cam', 'rlk_mb_camx', 'rlk_hr_ev')
     ents = [(e.etype, sorted(t for t in e.tags if t in tags)) for e in s.ents if e.alive and any(t in e.tags for t in tags)]
     if ents:
         out['entities'] = ents

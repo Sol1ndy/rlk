@@ -182,6 +182,10 @@ LANE_H2 = '홍련 rebuild H2 (11-11): the cinematic lock FN-cam'
 ALLOW[LANE_H2] = ([F + r'mboss/cam/.+\.mcfunction']
                   + [F + f'{n}.mcfunction' for n in ('mboss/main', 'mboss/cleanup_fight', 'mboss/init', 'mboss/uninstall', 'tick',
                                                      'view/tick', 'lvup/tick')])
+# round V, lane VC (wip/v-cam; tools/dev/plan/combat/vc_progress.md): FN-cam on display cameras - beyond LANE_H2's files the
+# tick advancement of mboss/cam/post, the sapphire chat line held back during a lock and the mob lure's blank skin
+LANE_VC = 'round V lane VC (11-11): the display camera, the lock\'s loot line and blank skins'
+ALLOW[LANE_VC] = [r'data/rlk/advancement/mboss/cam_post\.json', F + r'combat/sap_absorb\.mcfunction', F + r'cm/lure_new\.mcfunction']
 # 11-11 홍련 rebuild, lane H3 (wip/combat-hr3; tools/dev/plan/combat/h3_progress.md): the cutscene actor — the generated
 # rlk:char/cine/** and its manifest (tools/build_player_cine.mjs, run by build_player_rig.mjs). It changes and removes nothing.
 LANE_H3 = 'scarlet rebuild H3 (11-11): the cutscene actor'

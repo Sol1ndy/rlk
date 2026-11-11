@@ -1,6 +1,5 @@
 # FN-cam, from rlk:tick right after mboss/main while #mbCam mb is 1 (@s = the tagged player): the player watches the
-# live camera stand (#mbCamId mb 1 = rlk_mb_cam1, 2 = rlk_mb_cam2) in spectator mode. `spectate` is issued every tick (it
-# sends nothing while the camera is already that stand); while Shift is held the player is snapped to the stand instead.
+# live camera (#mbCamId mb 1 = rlk_mb_cam1, 2 = rlk_mb_cam2) in spectator mode.
 # No fight any more (the request outlived it): the request is dropped and the player released.
 execute unless score #mbLive mb matches 1 run scoreboard players set #mbCam mb 0
 execute unless score #mbLive mb matches 1 run return run function rlk:mboss/cam/release
@@ -8,16 +7,27 @@ execute unless score #mbLive mb matches 1 run return run function rlk:mboss/cam/
 # leave behind): never locked, and a player who still carries the hold from before is released.
 execute if entity @s[tag=rlk_body] run return run function rlk:mboss/cam/release
 execute unless entity @e[tag=rlk_av,limit=1] run return run function rlk:mboss/cam/release
-# The live stand is gone (killed): the player is not left a free spectator; the lock comes back with the stand.
-execute if score #mbCamId mb matches 2 unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] run return run function rlk:mboss/cam/release
-execute unless score #mbCamId mb matches 2 unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] run return run function rlk:mboss/cam/release
+# The live camera is gone (killed): the player is not left a free spectator; the lock comes back with the camera.
+execute if score #mbCamId mb matches 2 unless entity @e[type=minecraft:item_display,tag=rlk_mb_cam2,limit=1] run return run function rlk:mboss/cam/release
+execute unless score #mbCamId mb matches 2 unless entity @e[type=minecraft:item_display,tag=rlk_mb_cam1,limit=1] run return run function rlk:mboss/cam/release
 execute unless entity @s[tag=rlk_mb_camh] run function rlk:mboss/cam/hold_in
-# Shift held (HF-B, HB-02): the game ends the spectating after this function every tick (ServerPlayer.tick:
-# wantsToStopRiding -> setCamera(self)), so a re-issued spectate is undone in the same tick and the player keeps their own
-# spectator view there. Instead the player is put at the live stand's eye with its rotation (a teleport ends a spectate:
-# nothing else runs): the view the client is snapped back to every tick is the shot's. Holding Shift loosens the view
-# between those snaps (the mouse turns it, Shift sinks it) until it is released; the next tick spectates again.
-execute if predicate rlk:in_sneak if score #mbCamId mb matches 2 at @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] rotated as @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] run return run tp @s ~ ~-0.10125 ~ ~ ~
-execute if predicate rlk:in_sneak unless score #mbCamId mb matches 2 at @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] rotated as @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] run return run tp @s ~ ~-0.10125 ~ ~ ~
-execute if score #mbCamId mb matches 2 run return run spectate @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1]
-spectate @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1]
+# The game's own player tick runs after every function and ends a spectate while Shift is down (ServerPlayer.tick:
+# wantsToStopRiding -> setCamera(self)); right after that it fires the `tick` advancement trigger. Revoking the
+# advancement arms it for this tick: its reward mboss/cam/post spectates again in the same server tick.
+advancement revoke @s only rlk:mboss/cam_post
+# A movement key held (a client that is not on the camera could fly with it): the camera is re-sent for real on the
+# first tick and then every fourth tick of the press (mboss/cam/post). Shift needs nothing here: the game itself takes the
+# camera away and post gives it back, every tick.
+scoreboard players set #mbCamK mb 0
+execute if predicate rlk:in_f run scoreboard players set #mbCamK mb 1
+execute if predicate rlk:in_b run scoreboard players set #mbCamK mb 1
+execute if predicate rlk:in_l run scoreboard players set #mbCamK mb 1
+execute if predicate rlk:in_r run scoreboard players set #mbCamK mb 1
+execute if predicate rlk:in_jump run scoreboard players set #mbCamK mb 1
+execute if score #mbCamK mb matches 0 run scoreboard players set #mbCamIn mb 0
+execute if score #mbCamK mb matches 1 run scoreboard players add #mbCamIn mb 1
+execute if score #mbCamIn mb matches 5.. run scoreboard players set #mbCamIn mb 1
+execute if score #mbCamIn mb matches 1 unless score #mbCamRe mb matches 1.. run scoreboard players set #mbCamRe mb 1
+# `spectate` every tick: it sends nothing while the camera is already that entity; a cut (the other id) switches.
+execute if score #mbCamId mb matches 2 run return run spectate @e[type=minecraft:item_display,tag=rlk_mb_cam2,limit=1]
+spectate @e[type=minecraft:item_display,tag=rlk_mb_cam1,limit=1]

@@ -72,7 +72,7 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
              non-cut switch; strings: idle t0 >= 0.005 outside the head's outer layer
   angles     node tools/scarlet_retarget.mjs --dump all: every angle channel == the source outside the declared patches
   retarget   every correction within its bound, IK stretch <= 1.0005, contact shortfalls per kind (the per-clip table printed)
-  couplings  the cs1 petal (S10, 590-605) passes before her face at the built head anchor's height; seq.S0 / SWORD_R == api / manifest
+  couplings  the cs1 petal (S10, 590-605) passes behind her head at about the built head anchor's height (round V); seq.S0 / SWORD_R == api / manifest
   cine       (HI: hr_design §4.1, test_cine.py's versions on this replay) the 8 clips authored from tools/scarlet_cine.mjs, no
              placeholder, the hat / sword / scabbard / prop states at the §4.1 ticks, the §4.1 hand-overs (repel kick -> ending 0,
              repel 140 -> idle2, the lead-ins -> g_brim, ending -> ev_give / ev_toast), the lethal kick's seam under the ending's
@@ -1871,10 +1871,12 @@ if RET and DIMS:
                 if m:
                     ys[t] = (float(m.group(2) or 0), float(m.group(3) or 0))
     hd = {t: AN[(cid('cs1'), 'head')][t] for t in range(P_T0, P_T1 + 1)}
+    # round V (lane VC, T1-STAGE-1): the petal passes BEHIND her head (1.5 b or more behind the head anchor, within 0.5 b of
+    # its height): 0.6 b before her face it was a 690-px blob over her face for the whole of line 15
     bad_p = [(t, ys.get(t), hd[t][1]) for t in range(P_T0, P_T1 + 1)
-             if t not in ys or abs(ys[t][0] - hd[t][1]) > .2 or ys[t][1] < hd[t][2] + .3]
-    check(f'couplings: the cs1 petal (S10, {P_T0}-{P_T1}) passes before her face at the built head anchor\'s height (within 0.2 b; '
-          f'{len(ys)} ticks found)', len(ys) == P_T1 - P_T0 + 1 and not bad_p, bad_p[:4])
+             if t not in ys or abs(ys[t][0] - hd[t][1]) > .5 or ys[t][1] > hd[t][2] - 1.5]
+    check(f'couplings: the cs1 petal (S10, {P_T0}-{P_T1}) passes behind her head at about the built head anchor\'s height (within '
+          f'0.5 b, 1.5 b or more behind it; {len(ys)} ticks found)', len(ys) == P_T1 - P_T0 + 1 and not bad_p, bad_p[:4])
     check(f'couplings: seq.S0 {_sq.S0} == api.ITEM_SWORD_SCALE == the manifest item_sword display scale',
           _sq.S0 == api.ITEM_SWORD_SCALE == MAN['item_sword']['display_scale'])
     check(f'couplings: seq.SWORD_R {_sq.SWORD_R} == ITEM_SWORD_LEN / 2 / ITEM_SWORD_SCALE', abs(_sq.SWORD_R - api.ITEM_SWORD_LEN / 2 / api.ITEM_SWORD_SCALE) <= .001)

@@ -762,3 +762,31 @@ written; where these lines differ, they are the targets the balance pass measure
 - **HA-08**: `q`'s grab kb 0.
 - **HA-09**: a full gauge forces `rings` in the near band only; from the mid band `ai/ult_close` glides her in (0.3 b/t to 4 b,
   at most 40 t), then the decision starts the rings.
+
+## 8.9 Round V, lane VC (11-11 playtest; `v_brief.md` §3 "VC", `review/v/client_facts.md`) — binding where it differs from §3.0 / §5.2
+What §3.0 "Camera", §3.1-§3.5 (shot tables) and §5.2 say about camera STANDS is replaced; the lock's request protocol
+(`#mbCam` / `#mbCamId`, hold / release in `rlk:tick`, every exit path) is unchanged. As built: `vc_progress.md`.
+- **Camera entity**: an empty `item_display` (no ghost), not a marker armour stand. The game is played in F5: the client looks
+  from 4 b behind a non-living camera entity. Every shot is authored as a VIEWPOINT ("eye"); `mboss/cam/fix` puts the placed
+  rotation on the 360 / 256 grid and moves the entity 4 b forward. First person and F5-front are not supported in a cutscene.
+- **Motion**: keyframes; the client interpolates (`teleport_duration` <= 59, set a tick ahead), one placement per segment.
+  `cam.Track.move` (straight segments, <= 59 t, <= 12 degrees each), `track` (her walk / turn: led by `seq.HER`, her moves on
+  the stage), `chase` (per tick at 3-tick interpolation, only I16 and E7). No per-tick re-aim anywhere else.
+- **Cuts**: the idle camera is prepared 3 ticks ahead (duration 0, the snap at t - 2, the first segment's duration at t - 1)
+  and has stood settled for 2 ticks when it goes live; every shot lasts >= 3 ticks.
+- **The 4-block line**: for every locked tick the camera entity is in air and the 8-ray pull-back to the viewpoint meets no
+  block (test_seq `stages` G5, CS0's fixed stage and five placements of the dynamic one); on a dynamic stage the entity is
+  also pulled into the walk disc and kept 0.3 b over the floor (`seq/lib/camin`). Shots that looked steeply down at
+  something near were re-aimed (I7 the cup: level; I1 starts at f -7.0).
+- **Hold**: interaction ranges 0 by a modifier, the sidebar off, the F5 seat removed for the lock (made again at the
+  hand-back with an empty action bar after the mount), `mboss/cam/post` (the reward of a tick advancement, armed per held
+  tick) spectating again after the game's own player tick, real re-sends of the camera while asked.
+- **Skip**: the jump key held `SKIP_HOLD` ticks (`seq/<name>/skipin`); Shift is no input. The skip's landing = the unskipped
+  state (test_seq `skip` K1: her place, yaw and MODEL, the client's picture, the texts, the props, the stage, the actor's
+  clock); `seq.RIG_NOW` after every instant move of her body.
+- **Lines**: in a locked sequence on the camera's `text_display` (lower third, dark backdrop, >= 28 px at 1080p for a field
+  of view of 70-90), typed two syllables per 2 t; the kit's subtitle line only without a held player. The skip prompt on
+  the hint text under it.
+- **Shot table changes**: CS0 opening mask black 0 / 34 / 8 (the arrival); I1 0-75 (push 24-74), I2 76-109; I5 aimed at her
+  shoulder (her face above the line); I7 level; I15 tracked; I16 from the side at r -4.6 (chase); CS1 S10's petal passes
+  behind her, S11 cut at 608 with the petal at her waist 1.5 b from the lens; the ending's E7 chased, E9b's petal behind her.
