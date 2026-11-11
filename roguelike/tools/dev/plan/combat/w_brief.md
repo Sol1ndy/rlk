@@ -128,3 +128,10 @@ In t4: gauntlet 2 from ≈ 38 s, the repel cutscene ≈ 50–56 s, the ending fr
    normal mobs stay as the user decided on 11-10), and adapt everything that was built on the dash as movement
    (engravings / items that changed dash distance, cooldown or charges such as 질주; room traversal; boss patterns
    whose fairness assumed dash travel — check the balance sims' dodging agents) — list each and what became of it.
+
+## 5. Commit trailer from 11-12 03:40 KST (the session's model changed; this replaces v_brief §4's trailer for round W)
+```
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G
+```
+Commits made before this point keep the trailer they have.
