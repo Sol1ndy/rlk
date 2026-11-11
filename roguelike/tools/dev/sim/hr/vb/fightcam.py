@@ -337,7 +337,7 @@ def run_pattern(st, sim, key, ph, dist, strafe=0.0, seed=7, limit=260):
         n0 = len(self.ents)
         r = base_cmd(self, t, ctx)
         try:
-            if t and t[0] == 'summon' and 'rlk_hr_sw' in ' '.join(t):
+            if t and t[0] == 'summon' and '"rlk_hr_sw"' in ' '.join(t):         # (the tag itself: not the rig's rlk_hr_sword part)
                 for e in self.ents[n0:]:
                     NB[e.id] = PV.parse_snbt(' '.join(t[5:]))
             elif t and t[0] == 'data' and t[1] == 'merge' and t[2] == 'entity' and ctx.ex is not None and ctx.ex.id in NB:

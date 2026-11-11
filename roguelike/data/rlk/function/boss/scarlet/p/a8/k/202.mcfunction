@@ -6,7 +6,7 @@ function rlk:boss/scarlet/rig/look/form/normal
 tag @s remove rlk_hr_ghost
 function rlk:boss/scarlet/g/spot/dv
 function rlk:mboss/mv/stop
-execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positioned ~ ~4 ~ run tp @s ~ ~ ~
+execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positioned ~ ~3 ~ run tp @s ~ ~ ~
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
 function rlk:mboss/mv/face
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.1 ~ run function rlk:boss/scarlet/fx/p/ghost_burst

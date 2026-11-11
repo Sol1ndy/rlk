@@ -378,7 +378,8 @@ REAPPEAR = {
     'D2': {'dist': 8.0, 'bearing': 55, 'end': (1.6, 45)},
     'D3': {'dist': 2.5, 'up': 3.0, 'bearing': 60},
     'D4': {'dist': 12.0, 'bearing': -55},
-    'A8.9': {'up': 4.0},                             # round V: 4 b over a spot 4.5 b before the player (was 6 b over them: out of view)
+    'A8.9': {'up': 3.0},                             # round V: 3 b over a spot 4.5 b before the player (was 6 b over them: out of view;
+    #                                                  at 4 b her head left the top of the frame of a lens aimed 7 b ahead)
 }
 P2_RECOVER, GROGGY_RECOVER = 20, 12   # P2's first decision after the repel {at:60}; the recovery after the balance groggy
 # The counter cinematic's scripted HP steps (true damage, per mille of mhpM via mboss/true_hit, at repel events
