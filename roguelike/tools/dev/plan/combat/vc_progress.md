@@ -99,7 +99,8 @@ it in that tick. test_seq R11: the client is on the live camera on every held ti
 transparent `textures/entity/zombie/husk.png` + `husk_baby.png` (audit: every husk of the pack is an invisible hit-box
 carrier - the framework body, `cm/spawn/*`, the proxies; the one visible husk is the developer fallback `#mobTmp room 1`).
 (c) the avatar (an invisible mannequin while the actor stands in): `char/cine/blank` sets `profile.texture` to
-`rlk:skin/blank` (kept in `rlk:cine av`, put back by `show`). (d) the F5 seat (an armour stand; armour stands are visible
+`rlk:skin/blank`; the profile it had is kept in `rlk:cine av` (`{}` for an avatar without one: `data remove entity ... profile`
+does not reset a mannequin's profile on the real server, so `show` always writes the stored value back). (d) the F5 seat (an armour stand; armour stands are visible
 elsewhere, so no blank texture): removed in `hold_in`, made again by `mboss/cam/seat` at the hand-back. (e) the mob lure
 mannequin: blank skin in `cm/lure_new`. (f) the "two tall slabs" of the arrival were not entities: chunk columns of the
 dome not yet on the client, with the sky behind (they stand exactly where the dome wall is in t2 6.20 s); CS0's black now
@@ -150,11 +151,34 @@ T1-START-1: I1 is visible 34-75 (black before), I2 76-109. T1-STAGE-2 (three fra
 - the line merge: `text {color:"#F2D0E8", text:"낭자 생각은 어떤가?"}`, `background -1207959552`, `translation [0, -0.13989, 3.7]`.
 - `mboss/cam/spawn` twice: 6 entities; `teleport_duration:77` is stored as 59; `mboss/cam/kill`: none left.
 - loadcheck: `Loaded 1871 advancements` (+ 1).
+- the avatar's skin (`probe2.sh`, logs p2 / p3): a mannequin without a profile -> `char/cine/blank` -> `profile {texture:"rlk:skin/blank"}`
+  -> `char/cine/show` -> `profile {}`; one with a character skin gets that profile back. p2 showed that `data remove entity
+  <mannequin> profile` leaves the blank texture in place (the reason for the stored `{}`). The lure's NBT could not be read
+  back (it is cleaned at once in a room without mobs): its blank profile is checked in the file only.
 The first loadcheck of the tree found what no simulator did (`... run as @a ...` in the typing-sound line, 168 files): fixed,
 and test_seq S3 now refuses an execute subcommand after `run`.
 
 ## Gates
-GATES_PLACEHOLDER
+(the final tree; the suites run from a copy of `tools/dev/sim` outside the tree)
+
+| gate | result |
+|---|---|
+| `test_cam.py` | ALL (157 checks: static, hold, lock, grid, client, post, text, paths, stand, idem, cost, ident vs `origin/wip/v`) |
+| `test_seq.py` | ALL (555 checks: static, run, stages, skip, life, actor, frames; 692-756 s) |
+| `ev_dry.py` | 82 / 82 |
+| `test_flow.py` | 40 / 40 |
+| `test_cine.py` / `test_contact.py` / `test_actor.py` | 159 / 159, 94 / 94, 158 / 158 |
+| `test_rig.py` | 162 / 162 (the S10 petal coupling now asks for "behind her head") |
+| `test_scarlet.py` | 48 / 48 (the CS0 skip by the jump key; Shift skips nothing) |
+| lane VB's suites on this tree | pat_p1 559 / 559, pat_p2 70 / 70, pat_ghost 65 / 65, test_gauge 33 / 33, test_bal_hr 79 / 79, test_special_hr all, test_reward all, test_moon 55 / 55, test_hwamu 283 / 283, test_arena_hr 94 / 94, test_input_hr 17 / 17, test_metro 30 / 30, test_clips_h1c 297 / 297, test_kit 15818 / 15818 |
+| `ident_hr.py` | passes (new group `LANE_VC`: the advancement, `combat/sap_absorb`, `cm/lure_new`) |
+| `gen_check_hr.py --rp` | 28 / 28 (1443 s; started before the last edit - the stored `{}` profile in `build_player_cine.mjs` and `char/cine/{blank,show}`, files none of its six generators own; that edit is covered by the regeneration row below and by test_actor / test_seq / ev_dry / loadcheck `vc_c`, all rerun after it) |
+| `python3 tools/check_mboss_pack.py` | 0 problems |
+| loadcheck (26.3 server) | `vc_c` (the final tree): 0 function load failures, 1871 advancements (`vc_a` had 168: the typing-sound line, fixed; `vc_b` 0) |
+| `rplint.py $S/rp_vc` / `atlas_px.py $S/rp_vc` | 0 problems / 12 939 520 px (12.940 M <= 13.2 M) |
+| regeneration twice (`build_player_rig.mjs`, `build_blank_tex.py`, `regen_all.sh --mobs`) | the same tree and pack hashes after both rounds; a third run on the committed tree: `git status` empty |
+| the pack | `diff -r rp_fin rp_vc`: only the three blank textures |
+| tick cost | FN-cam: a held tick 24 commands (post included), the first held tick 52, the release tick 58, without a lock 2 (+ 1 in mboss/main); the sequences' own files: intro avg 70 / max 141, cs1 59 / 371, repel 39 / 401, ending 45 / 357, coda 42 / 123 (the maxima are the start ticks) |
 
 ## Deviations (and why)
 - **The skip input lives in the sequence, not in the core**: `core.py` (the Shift input) is lane VB's file. `seq/<name>/skipin`

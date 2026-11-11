@@ -361,10 +361,10 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     `execute as @e[type=minecraft:block_display,tag=rlk_rncat,tag=!${TAG.hidden}] run function ${NS}/hide_one`,
     `execute as @e[type=minecraft:block_display,tag=rlk_nfcat,tag=!${TAG.hidden}] run function ${NS}/hide_one`]);
   fn('hide_one', [`data merge entity @s {view_range:0f}`, `tag @s add ${TAG.hidden}`]);
-  fn('blank', ['# Internal (@s = the avatar, once per hide): its profile kept in storage rlk:cine av (none: it wears the default skin),',
+  fn('blank', ['# Internal (@s = the avatar, once per hide): its profile kept in storage rlk:cine av ({} when it has none: the default skin),',
     `# the skin texture replaced by the fully transparent ${BLANK_SKIN} (tools/build_blank_tex.py writes it into the pack): the`,
     '# ghost a spectator would see of the invisible avatar has nothing to draw.',
-    'data remove storage rlk:cine av',
+    'data modify storage rlk:cine av set value {}',
     'data modify storage rlk:cine av set from entity @s profile',
     `data modify entity @s profile.texture set value "${BLANK_SKIN}"`]);
   fn('play', ['# function rlk:char/cine/play {clip:"cs0"|"cs1"|"repel"|"ending"|"coda"}: selects the clip; #cavT is the module\'s.',
@@ -402,7 +402,6 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
   fn('show', ['# Internal (@s = the player): the avatar the actor hid shows again. A rig character\'s avatar stays hidden under its rig.',
     `execute unless entity @e[tag=rlk_av,tag=${TAG.hidden},limit=1] run return 0`,
     `execute if data storage rlk:cine av run data modify entity ${AV} profile set from storage rlk:cine av`,
-    `execute unless data storage rlk:cine av run data remove entity ${AV} profile`,
     'data remove storage rlk:cine av',
     'execute if score @s pmVisible matches 1 run return 0', 'execute if score @s pmActive matches 1 run return 0',
     `effect clear ${AV} minecraft:invisibility`,
