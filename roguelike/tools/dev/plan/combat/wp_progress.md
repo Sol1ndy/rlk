@@ -20,7 +20,12 @@ the downloaded .ogg / .wav of ~150 candidate events: untrusted data, read with `
 - [x] 3c (review T3-05 / T3-07 / T3-10) tier sparks bigger, coloured, beside the head; star above the head line; tint warmer
       and half as strong; bolts 1.5x with white-yellow dust; weapon glow hotter and re-applied on beat ticks 1-2; guard whoosh
 - [x] 4 README 2 / 3 / 10 / 12-1 and the rig notes; checkpoint a68b795d2 pushed
-- [ ] 5 gates on the final tree, commit, push, report
+- [x] 5 (w_brief §6) the whiff ladder removed: press = #parGap 12 always, any parry #parChain 1; test_cb lock / test_input_hr /
+      hrsim notes; README 3; c_progress / fa_progress notes
+- [x] 6 (the user: chains parryable in full) the rule checked in the core (nothing to fix: every tier -> par_use = #parChain 1;
+      the beat stamps presses on the combat clock; the dodge never blocks F); test_cb lock gains the chain lemma; new
+      tools/dev/sim/cb/tests/chainparry.py (every pattern of 7 bosses + 홍련's chains / gauntlets)
+- [x] 7 gates on the final tree, the suites, test_metro / hrfair numbers without the ladder, commit, push, report
 - [ ] 5 dash dependents: the list below checked in the code; balance sims; final gates; report
 
 ## Item 1 — sounds (what was measured, what is built)
@@ -71,6 +76,28 @@ Windows unchanged: perfect 0-2 t (every class), loose 3-6 t (normal / elite); ev
 energy). Cooldown 18 / 12 after an avoided attack (질주 2: 14 / 10); the cartwheel adds 18 (a set = 2 windows per 36 t, the
 old rate). The old dash: 3 b / 3 t every time (1 b a tick), a flat "superman" pose.
 
+## The whiff ladder (w_brief §6) and the chain guarantee
+- Removed: `#parWs` / `#parWsMax` / `#parWsT` / `#parWsClr` (load, press, par_use, reset). Every accepted press locks `#parGap` 12;
+  a parry of any tier sets the lock to `#parChain` 1 (par1 / par2 / par3 -> par_use); a refused press still blocks every F for
+  `#parRe` 3 (A-01 (1) as fix A built it, `#parMl cb`).
+- What the ladder guarded, measured without it (test_cb `lock`): blind F at a fixed period gets a press in once per 12 t, so at most
+  3 / 12 = 25 % of the ticks are in a perfect window (period 3 t is the worst: 25.0 %, a strike would still do 38 % of its damage);
+  against 229 real strikes (20-60 t gaps): F every 4 / 12 / 13 t = 20.1 / 20.5 / 21.4 % perfect, 42 / 38 / 44 % of the damage taken
+  (with the ladder: <= 7.6 % / >= 79.8 %). test_metro / hrfair: see the gate results below.
+- The chain lemma (test_cb `lock`): 135 chains (fixed gaps 1-40 and 120 random), the ideal press (h - 1, or h after a 1-t gap):
+  every hit perfect, no press refused; after a tier-1 / tier-2 parry of the first hit every later hit still perfect; F while
+  the dodge cooldown runs and a step / double dodge moves: every press taken. The beat: test_cb `beat` (b) chains 10 / 3 / 2 t
+  apart with the beat on (presses during a hold count on the resume tick).
+- `tools/dev/sim/cb/tests/chainparry.py` (the ideal parrier through the REAL f_key in hzlog's boss worlds and 홍련's H1 world, two
+  passes until the hit set is stable): 117 patterns (106 with 2+ parryable hits), **624 / 624 parryable hits perfect, 0 presses
+  refused**; per boss (patterns / parryable hits / smallest gap): 파수꾼 8 / 19 / 13 t, 나비 9 / 51 / 18, 역장 9 / 90 / 6, 야타용왕 20 /
+  99 / 4, 아펩 14 / 41 / 13, 타키 12 / 91 / 10, 아를레키노 21 / 154 / 10, 홍련 chains 22 (11 keys x 2 phases) / 59 + G1 9 / 9 (16 t) +
+  G2 11 / 11 (14 t). Unparriable hits of the same runs (dodge-only) counted apart. Not simulated: 나루카미 and the custom mobs (no
+  simulator of their AI in tools/dev/sim) - covered by the lemma.
+- test_metro without the ladder (the lead decides; the ladder is not brought back): G1 (a8) is cleared (5+ perfect) by mashers of
+  period 4 and 6 t (6 perfect); 12 / 15 / 18 / 19 t reach 4. G2 (a13) is cleared by periods 13 / 15 / 16 t (5) and mashers 3 / 7 t
+  (5) and 4 t (6). test_metro's 4 checks fail for that reason (reported, not changed).
+
 ## Dash dependents checked (and what became of them)
 | what read the dash | where | now |
 |---|---|---|
@@ -88,10 +115,27 @@ old rate). The old dash: 3 b / 3 t every time (1 b a tick), a flat "superman" po
 ## Requests to other lanes
 - none yet
 
-## Pack files
-- none changed (no new textures; clips are display transforms only)
+## Pack files (all written by generators in git; no new texture, same sizes: items atlas 13.108 M px unchanged)
+- `assets/rlk/textures/font/cb/tint.png` - `tools/build_combat_fx.py --resourcepack` (warmer, half the cover)
+- `assets/rlk/textures/player_motion/weapons/<31 sprites>_hot.png` - `node tools/build_player_rig.mjs` (90 % yellow-white, alpha 235)
+- the rig's item models / clips are datapack functions (display transforms): no pack change for the dodge clips
 
 ## Log
 - 11-12 start (base origin/wip/w 540f5f68c, merged f4187dbd3 for §4-§5). Baseline suites on the untouched tree: test_cb
   383, test_np 125, test_rm, test_bal 117, test_bal_boss 117, test_input_hr 17 (the later ones of that run read a tree
   that was being edited and do not count).
+- 11-12 checkpoints a68b795d2 (sounds, faster perfect dodge, dodge set v1), 9a0218329 (dodge by context, parry visuals, ladder
+  removed), merge 07f7de0bd (w_brief §6), then the final commit (chainparry, suites, docs).
+
+## Gates on the final tree (11-12)
+- Generators twice in the release order (scarlet rig, hr fx, bossbar, combat fx, player rig, player audio, blank tex, regen_all
+  --mobs, bf / fg fx): tree 1c7fb1e2a after both rounds, pack hash df5f66cc both rounds. check_mboss_pack 0, rplint 0, items
+  atlas 13.108 M px, loadcheck wpg2: 0 function load failures, Done, 1871 advancements.
+- Suites (copy of tools/dev/sim): test_cb 400/400 (double 17, lock with the chain lemma, beat, beatloop), test_np 125/125,
+  test_rm, test_bal 117, test_bal_boss 117, test_input_hr 19/19, pat_p1 559, pat_p2 70, pat_ghost 65, test_flow 40, test_bal_hr
+  79, test_vi 208/208, ident_hr (group LANE_WP), test_scarlet 48, chainparry 624/624 (0 exceptions). test_metro 15/19: the four
+  metronome checks fail because the ladder is gone (reported above, the lead decides).
+- hrfair2 `--only g,chain` (3 seeds): T5 40.3 / T5b 49.3 PASS; T6 s0 100 % perfect, 100 % cleared; T6 s1 87.9 % (101 % of the
+  86.6 ceiling) / 100 % in the window, 100 % cleared; **T7 sloppy 0 %, masher (F every 4 t) 50 % (G2 cleared in all 3 seeds,
+  G1 in none), dodger 0 % (0 damage) - miss on the masher** (the ladder's job); T13 53 / 53 perfect, 0 refused PASS.
+

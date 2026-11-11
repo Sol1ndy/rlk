@@ -98,8 +98,10 @@ def same(name, rel, **kw):
 
 
 # whiffs only (no attack in reach)
-got, _p, s = same('whiffs 20 t apart (the streak: 12 -> 24 -> 36 -> 48 t)', [1 + 20 * i for i in range(8)])
-ck('... and the streak reaches the cap: refused presses 3, 5, 7, 8', got == [True, True, False, True, False, True, False, False], got)
+got, _p, s = same('whiffs 20 t apart (round W: no whiff ladder, the lock is 12 t each time)', [1 + 20 * i for i in range(8)])
+ck('... every one of them is taken (before round W the ladder refused presses 3, 5, 7, 8)', got == [True] * 8, got)
+got, _p, s = same('whiffs 11 t apart (inside the 12-t lock)', [1 + 11 * i for i in range(8)])
+ck('... every other one is refused (the base lock and #parRe only)', got == [True, False] * 4, got)
 same('whiffs 70 t apart (no ladder: 12 t each)', [1, 71, 141, 211, 281])
 same('whiffs 13 t apart (no ladder: every one taken)', [1, 14, 27, 40, 53])
 same('a held key (every 4 t)', list(range(1, 81, 4)))
