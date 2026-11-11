@@ -1,14 +1,14 @@
 # Weighted pick, P1, far (api.WEIGHTS; zeroed while cooling down / repeating / beyond MID_MAX).
 scoreboard players set #ai_sum hr 0
-scoreboard players set #ai_wa4 hr 25
+scoreboard players set #ai_wa4 hr 50
 execute if score #cd_a4 hr > #clk hr run scoreboard players set #ai_wa4 hr 0
 execute if score #last hr matches 4 run scoreboard players set #ai_wa4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa4 hr
-scoreboard players set #ai_wa10 hr 25
+scoreboard players set #ai_wa10 hr 12
 execute if score #cd_a10 hr > #clk hr run scoreboard players set #ai_wa10 hr 0
 execute if score #last hr matches 7 run scoreboard players set #ai_wa10 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa10 hr
-scoreboard players set #ai_whcut hr 40
+scoreboard players set #ai_whcut hr 14
 execute if score #cd_hcut hr > #clk hr run scoreboard players set #ai_whcut hr 0
 execute if score #last hr matches 13 run scoreboard players set #ai_whcut hr 0
 scoreboard players operation #ai_sum hr += #ai_whcut hr

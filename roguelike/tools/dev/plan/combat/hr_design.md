@@ -686,6 +686,14 @@ written; where these lines differ, they are the targets the balance pass measure
 - **The input rules are the game's**: hrsim's world now runs the real `player/f_key` and `dashCool` (review H-A), checked by
   `tests/test_input_hr.py`.
 
+**Relaxed by the lead, 11-11** (binding; next to HB's restatement above):
+- **T10**: an average parrier (σ 1.5) may break her **0.8-1.6** times per minute of P1 / P2 overall (the groggy is the parry
+  reward; 0.8-1.3 was the lead's design number, not the user's). The walker's ≤ 0.4 is unchanged.
+- **The unparriable share of the pick weight**: in every band (near / mid / far) of both phases, and in the far rule, the
+  unparriable entries (`a9 a10 hcut blue kcut`; `mx` and `q` count half: one of their two kinds of hit is flashed) take at
+  most **35 %** of the weight; the parried chains keep the majority (the user: 「패링 불가 공격: 보스의 일부 큰 공격만」). The
+  gauge-forced `rings` → `ult` stays outside the weights. `api.NP_SHARE` / `NP_SHARE_MAX`, checked at every build.
+
 ---------------------------------------------------------------------------------------------------------------------
 
 ## 7. Open questions (each has the default the build proceeds with)

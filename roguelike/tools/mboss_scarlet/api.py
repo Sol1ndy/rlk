@@ -420,41 +420,48 @@ MID_MAX = {'a3': 8.0, 'a3s': 8.0, 'a9': 7.0, 'tri': 10.0, 'blue': 7.0, 'kcut': 8
 MID_MIN = {'hcut': 8.0}                          # its mid weight only from this distance
 # WEIGHTS[key][fight phase 1 = P1 / 2 = P2] = (near, mid, far); renormalised over the entries off cooldown and allowed.
 # hr_design §2.2 *start* values (hrfair 2.0 tunes them, §6.4); a1 / a2 are trigger-only in P2; ult is never weighted.
-# HB (11-11, hrfair2 per seed; hb_progress.md): an average parrier (sigma 1.5) broke her 1.56 times / min (T10 0.8-1.3): about
-# 20 perfect parries / min of ~32 parryable hits. P1's mix is pinned by T1 (the walker's intake >= 타키's) and T1b (the
-# sigma-3 parrier <= 0.60 of it: every P1 weight moved to the unparriable singles raised T1b over 0.60), so P1 only loses
-# the free rings (near 20 -> 5; the gauge still forces them) and a little of its unparriable weight (a9 25 -> 20, a10 / kcut
-# 20 -> 16), and P2 carries the reduction: its near band moves from the parried chains (a3 25 -> 5, a3s 30 -> 10, d4 20 ->
-# 4, free rings 20 -> 0) to the flashed attacks (a9 15 -> 35, blue 15 -> 30, kcut 20 -> 35, mx 20 -> 35). P1 groggies of the
-# sigma-1.5 parrier ~1.5 / min, P2 ~0.67, together 1.0-1.17 per seed. COOLDOWN (P1): the counter A1 / A2 100 -> 200 (its
-# single parried hits) and the near band x ~1.4 (a3 / d4 140 -> 200, a3s 80 -> 110, rings 160 -> 220, a9 160 -> 220, a10
-# 120 -> 170, blue 180 -> 250, kcut 200 -> 280).
+# HB (11-11, hrfair2 per seed; hb_progress.md), under the lead's rule (11-11, binding; the user: 「패링 불가 공격: 보스의 일부 큰
+# 공격만」): in every band of both fight phases the unparriable entries (a9 a10 hcut blue kcut; mx and q count half: one of
+# their two kinds of hit is flashed) take at most 35 % of the pick weight, the parried chains keep the majority (the
+# design's start values had 40-72 %). Inside that: the parried weight leans on the short chain a3s (2 hits in 40 t) over a3
+# (5) / d4 (4), and the free rings (4-5 parried hits) are gone: rings still come before every ult (the full gauge forces
+# them). An average parrier (sigma 1.5) then breaks her ~1.33 times / min (the lead's relaxed T10 0.8-1.6; it was 1.67),
+# the walker still takes 타키's intake (T1), the sigma-3 parrier <= 0.60 of it (T1b). Shares (near / mid / far / FAR_RULE):
+# P1 35.0 / 34.8 / 34.2 / 35.0 %, P2 35.0 / 34.6 / 34.6 / 31.6 %. COOLDOWN (P1): the counter A1 / A2 100 -> 200 (its single
+# parried hits) and the near band x ~1.4 (a3 / d4 140 -> 200, rings 160 -> 220, a9 160 -> 220, a10 120 -> 170, blue 180 ->
+# 250, kcut 200 -> 280); a3s P1 80 -> 140, P2 70 -> 100 (it is picked most now: without it the walker's ultimates rose
+# over T11's 1.5 / min).
 WEIGHTS = {
     'a1': {1: (8, 0, 0)},
     'a2': {1: (8, 0, 0)},
-    'a3': {1: (30, 10, 0), 2: (5, 10, 0)},
-    'a3s': {1: (30, 15, 0), 2: (10, 15, 0)},
-    'd4': {1: (25, 0, 0), 2: (4, 0, 0)},
+    'a3': {1: (20, 10, 0), 2: (12, 10, 0)},
+    'a3s': {1: (45, 15, 0), 2: (50, 15, 0)},
+    'd4': {1: (12, 0, 0), 2: (8, 0, 0)},
     'tri': {1: (0, 30, 0), 2: (0, 20, 0)},
-    'a4': {1: (0, 20, 25), 2: (0, 15, 15)},
-    'rings': {1: (5, 0, 0), 2: (0, 0, 0)},
-    'a9': {1: (20, 10, 0), 2: (35, 10, 0)},
-    'a10': {1: (16, 20, 25), 2: (0, 15, 20)},
-    'hcut': {1: (0, 10, 40), 2: (0, 10, 30)},
-    'blue': {1: (15, 15, 0), 2: (30, 15, 0)},
-    'kcut': {1: (16, 15, 0), 2: (35, 15, 0)},
-    'mx': {2: (35, 25, 20)},
-    'nb': {2: (0, 20, 25)},
-    'q': {2: (0, 20, 30)},
+    'a4': {1: (0, 20, 50), 2: (0, 15, 20)},
+    'rings': {1: (0, 0, 0), 2: (0, 0, 0)},
+    'a9': {1: (14, 6, 0), 2: (11, 6, 0)},
+    'a10': {1: (12, 12, 12), 2: (0, 9, 10)},
+    'hcut': {1: (0, 8, 14), 2: (0, 7, 12)},
+    'blue': {1: (11, 7, 0), 2: (11, 7, 0)},
+    'kcut': {1: (13, 7, 0), 2: (11, 6, 0)},
+    'mx': {2: (20, 15, 10)},
+    'nb': {2: (0, 20, 35)},
+    'q': {2: (0, 16, 20)},
 }
-COOLDOWN = {'a1': {1: 200, 2: 85}, 'a2': {1: 200, 2: 85}, 'a3': {1: 200, 2: 120}, 'a3s': {1: 110, 2: 70},
+COOLDOWN = {'a1': {1: 200, 2: 85}, 'a2': {1: 200, 2: 85}, 'a3': {1: 200, 2: 120}, 'a3s': {1: 140, 2: 100},
             'd4': {1: 200, 2: 120}, 'tri': {1: 140, 2: 120}, 'a4': {1: 160, 2: 140}, 'rings': {1: 220, 2: 140},
             'a6': {1: 400, 2: 400}, 'a9': {1: 220, 2: 140}, 'a10': {1: 170, 2: 100}, 'hcut': {1: 160, 2: 140},
             'blue': {1: 250, 2: 150}, 'kcut': {1: 280, 2: 170}, 'mx': {2: 150}, 'nb': {2: 180}, 'q': {2: 300}}
+NP_SHARE = {'a9': 1, 'a10': 1, 'hcut': 1, 'blue': 1, 'kcut': 1, 'mx': 0.5, 'q': 0.5}   # the unparriable part of an entry
+NP_SHARE_MAX = 0.35       # the lead (11-11): their share of the pick weight in any band / the far rule (see above)
 TRIGGER_ONLY = ('a6', 'ult')                     # never picked by weight: the skill trigger; ult only after rings at a full
 #                                                  gauge (A1 / A2: the counter trigger, the rear rule, small P1 near weights)
-FAR_RULE = {'dist': 8.0, 'dwell': 30, 1: {'hcut': 45, 'a4': 30, 'a10': 25}, 2: {'nb': 40, 'q': 30, 'hcut': 30},
+FAR_RULE = {'dist': 8.0, 'dwell': 30, 1: {'hcut': 20, 'a4': 65, 'a10': 15}, 2: {'nb': 50, 'q': 30, 'hcut': 15},   # HB: <= NP_SHARE_MAX
             'fallback': ('glide', 'a3s')}        # also the decision 16 t after A6
+for _fp in (1, 2):                               # the lead's 35 % rule (NP_SHARE above), checked at every build
+    for _w in [{k: w[_fp][b] for k, w in WEIGHTS.items() if _fp in w} for b in range(3)] + [FAR_RULE[_fp]]:
+        assert sum(v * NP_SHARE.get(k, 0) for k, v in _w.items()) <= NP_SHARE_MAX * sum(_w.values()), (_fp, _w)
 ULT_FORCE = {'key': 'rings', 'then': 'ult', 'bands': (0, 1)}   # #gau = max: the next near / mid decision is rings (its cooldown
 #                                                                ignored), then ult; from far she closes first (the far rule)
 REAR_RULE = {'deg': 60, 'dwell': (20, 30), 'key': 'a1', 'cd_ignore_every': 200}

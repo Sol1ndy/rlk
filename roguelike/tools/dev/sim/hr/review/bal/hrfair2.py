@@ -569,7 +569,8 @@ def rows_of(res, seed, base):
     kp = mean(r['fight_s'] for r in kl('parrier') if r['killed'])
     row('T9b', 'parrier s1.5 kill, fighting s', f'{kp:.0f}', '125-170', 125 <= kp <= 170)
     gp, gw = mean(r['grog'] for r in ph(1, 'parrier', 1.5) + ph(2, 'parrier', 1.5)), mean(r['grog'] for r in ph(1, 'walker') + ph(2, 'walker'))
-    row('T10', 'groggies / min: parrier s1.5; walker', f'{gp:.2f}; {gw:.2f}', '0.8-1.3; <= 0.4', 0.8 <= gp <= 1.3 and gw <= 0.4)
+    row('T10', 'groggies / min: parrier s1.5; walker (band relaxed by the lead 11-11: was 0.8-1.3)', f'{gp:.2f}; {gw:.2f}', '0.8-1.6; <= 0.4',
+        0.8 <= gp <= 1.6 and gw <= 0.4)
     uw, um = mean(r['ult'] for r in ph(1, 'walker') + ph(2, 'walker')), mean(r['ult'] for r in ph(1, 'mixed') + ph(2, 'mixed'))
     row('T11', 'U / min: walker; mixed s0', f'{uw:.2f}; {um:.2f}', '0.8-1.5; 0.6-1.0', 0.8 <= uw <= 1.5 and 0.6 <= um <= 1.0)
     dd = ph(1, 'dodger', 1) + ph(2, 'dodger', 1)
@@ -582,6 +583,19 @@ def rows_of(res, seed, base):
     got, want, ref = sum(r['p_pp'] for r in ch), sum(r['want'] for r in ch), sum(r['f_refused'] for r in ch)
     row('T13', 'parrier s0, every chain in reach (F at h - 1): perfect; refused F (one run, no seed)',
         f'{got} / {want}; {ref}', '100 %; 0', got == want and ref == 0)
+    dp_ = next((r['dp'] for r in res if r.get('dp')), None)
+    if dp_ and (Path(dp_) / 'tools/mboss_scarlet/api.py').exists():
+        api, _S = api_of(dp_)
+        if hasattr(api, 'NP_SHARE'):
+            sh = []
+            for fp in (1, 2):
+                for b in range(3):
+                    w = {k: v[fp][b] for k, v in api.WEIGHTS.items() if fp in v}
+                    sh.append(sum(x * api.NP_SHARE.get(k, 0) for k, x in w.items()) / max(1, sum(w.values())))
+                w = api.FAR_RULE[fp]
+                sh.append(sum(x * api.NP_SHARE.get(k, 0) for k, x in w.items()) / max(1, sum(w.values())))
+            row('W35', 'unparriable share of the pick weight, P1 / P2 near-mid-far-far rule (the lead 11-11)',
+                ' '.join(f'{100 * x:.0f}' for x in sh), '<= 35 % each', max(sh) <= api.NP_SHARE_MAX + 1e-9)
     pp = ph(1, 'parrier', 0) + ph(2, 'parrier', 0)
     v = 100.0 * sum(r['timed_p_pp'] for r in pp) / max(1, sum(r['timed_p'] for r in pp))
     row('T13f', '... free fight: perfect of the P hits that found it; refused F of presses',

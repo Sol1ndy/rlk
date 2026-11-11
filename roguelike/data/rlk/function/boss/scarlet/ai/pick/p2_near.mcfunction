@@ -1,30 +1,30 @@
 # Weighted pick, P2, near (api.WEIGHTS; zeroed while cooling down / repeating / beyond MID_MAX).
 scoreboard players set #ai_sum hr 0
-scoreboard players set #ai_wa3 hr 5
+scoreboard players set #ai_wa3 hr 12
 execute if score #cd_a3 hr > #clk hr run scoreboard players set #ai_wa3 hr 0
 execute if score #last hr matches 3 run scoreboard players set #ai_wa3 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3 hr
-scoreboard players set #ai_wa3s hr 10
+scoreboard players set #ai_wa3s hr 50
 execute if score #cd_a3s hr > #clk hr run scoreboard players set #ai_wa3s hr 0
 execute if score #last hr matches 8 run scoreboard players set #ai_wa3s hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3s hr
-scoreboard players set #ai_wd4 hr 4
+scoreboard players set #ai_wd4 hr 8
 execute if score #cd_d4 hr > #clk hr run scoreboard players set #ai_wd4 hr 0
 execute if score #last hr matches 9 run scoreboard players set #ai_wd4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wd4 hr
-scoreboard players set #ai_wa9 hr 35
+scoreboard players set #ai_wa9 hr 11
 execute if score #cd_a9 hr > #clk hr run scoreboard players set #ai_wa9 hr 0
 execute if score #last hr matches 6 run scoreboard players set #ai_wa9 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa9 hr
-scoreboard players set #ai_wblue hr 30
+scoreboard players set #ai_wblue hr 11
 execute if score #cd_blue hr > #clk hr run scoreboard players set #ai_wblue hr 0
 execute if score #last hr matches 14 run scoreboard players set #ai_wblue hr 0
 scoreboard players operation #ai_sum hr += #ai_wblue hr
-scoreboard players set #ai_wkcut hr 35
+scoreboard players set #ai_wkcut hr 11
 execute if score #cd_kcut hr > #clk hr run scoreboard players set #ai_wkcut hr 0
 execute if score #last hr matches 15 run scoreboard players set #ai_wkcut hr 0
 scoreboard players operation #ai_sum hr += #ai_wkcut hr
-scoreboard players set #ai_wmx hr 35
+scoreboard players set #ai_wmx hr 20
 execute if score #cd_mx hr > #clk hr run scoreboard players set #ai_wmx hr 0
 execute if score #last hr matches 16 run scoreboard players set #ai_wmx hr 0
 scoreboard players operation #ai_sum hr += #ai_wmx hr

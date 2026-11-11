@@ -19,26 +19,26 @@ scoreboard players set #ai_wa4 hr 20
 execute if score #cd_a4 hr > #clk hr run scoreboard players set #ai_wa4 hr 0
 execute if score #last hr matches 4 run scoreboard players set #ai_wa4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa4 hr
-scoreboard players set #ai_wa9 hr 10
+scoreboard players set #ai_wa9 hr 6
 execute if score #cd_a9 hr > #clk hr run scoreboard players set #ai_wa9 hr 0
 execute if score #last hr matches 6 run scoreboard players set #ai_wa9 hr 0
 execute if score #ai_d2 hr matches 490001.. run scoreboard players set #ai_wa9 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa9 hr
-scoreboard players set #ai_wa10 hr 20
+scoreboard players set #ai_wa10 hr 12
 execute if score #cd_a10 hr > #clk hr run scoreboard players set #ai_wa10 hr 0
 execute if score #last hr matches 7 run scoreboard players set #ai_wa10 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa10 hr
-scoreboard players set #ai_whcut hr 10
+scoreboard players set #ai_whcut hr 8
 execute if score #cd_hcut hr > #clk hr run scoreboard players set #ai_whcut hr 0
 execute if score #last hr matches 13 run scoreboard players set #ai_whcut hr 0
 execute if score #ai_d2 hr matches ..639999 run scoreboard players set #ai_whcut hr 0
 scoreboard players operation #ai_sum hr += #ai_whcut hr
-scoreboard players set #ai_wblue hr 15
+scoreboard players set #ai_wblue hr 7
 execute if score #cd_blue hr > #clk hr run scoreboard players set #ai_wblue hr 0
 execute if score #last hr matches 14 run scoreboard players set #ai_wblue hr 0
 execute if score #ai_d2 hr matches 490001.. run scoreboard players set #ai_wblue hr 0
 scoreboard players operation #ai_sum hr += #ai_wblue hr
-scoreboard players set #ai_wkcut hr 15
+scoreboard players set #ai_wkcut hr 7
 execute if score #cd_kcut hr > #clk hr run scoreboard players set #ai_wkcut hr 0
 execute if score #last hr matches 15 run scoreboard players set #ai_wkcut hr 0
 execute if score #ai_d2 hr matches 640001.. run scoreboard players set #ai_wkcut hr 0

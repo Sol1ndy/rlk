@@ -8,35 +8,31 @@ scoreboard players set #ai_wa2 hr 8
 execute if score #cd_a2 hr > #clk hr run scoreboard players set #ai_wa2 hr 0
 execute if score #last hr matches 2 run scoreboard players set #ai_wa2 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa2 hr
-scoreboard players set #ai_wa3 hr 30
+scoreboard players set #ai_wa3 hr 20
 execute if score #cd_a3 hr > #clk hr run scoreboard players set #ai_wa3 hr 0
 execute if score #last hr matches 3 run scoreboard players set #ai_wa3 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3 hr
-scoreboard players set #ai_wa3s hr 30
+scoreboard players set #ai_wa3s hr 45
 execute if score #cd_a3s hr > #clk hr run scoreboard players set #ai_wa3s hr 0
 execute if score #last hr matches 8 run scoreboard players set #ai_wa3s hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3s hr
-scoreboard players set #ai_wd4 hr 25
+scoreboard players set #ai_wd4 hr 12
 execute if score #cd_d4 hr > #clk hr run scoreboard players set #ai_wd4 hr 0
 execute if score #last hr matches 9 run scoreboard players set #ai_wd4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wd4 hr
-scoreboard players set #ai_wrings hr 5
-execute if score #cd_rings hr > #clk hr run scoreboard players set #ai_wrings hr 0
-execute if score #last hr matches 11 run scoreboard players set #ai_wrings hr 0
-scoreboard players operation #ai_sum hr += #ai_wrings hr
-scoreboard players set #ai_wa9 hr 20
+scoreboard players set #ai_wa9 hr 14
 execute if score #cd_a9 hr > #clk hr run scoreboard players set #ai_wa9 hr 0
 execute if score #last hr matches 6 run scoreboard players set #ai_wa9 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa9 hr
-scoreboard players set #ai_wa10 hr 16
+scoreboard players set #ai_wa10 hr 12
 execute if score #cd_a10 hr > #clk hr run scoreboard players set #ai_wa10 hr 0
 execute if score #last hr matches 7 run scoreboard players set #ai_wa10 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa10 hr
-scoreboard players set #ai_wblue hr 15
+scoreboard players set #ai_wblue hr 11
 execute if score #cd_blue hr > #clk hr run scoreboard players set #ai_wblue hr 0
 execute if score #last hr matches 14 run scoreboard players set #ai_wblue hr 0
 scoreboard players operation #ai_sum hr += #ai_wblue hr
-scoreboard players set #ai_wkcut hr 16
+scoreboard players set #ai_wkcut hr 13
 execute if score #cd_kcut hr > #clk hr run scoreboard players set #ai_wkcut hr 0
 execute if score #last hr matches 15 run scoreboard players set #ai_wkcut hr 0
 scoreboard players operation #ai_sum hr += #ai_wkcut hr
@@ -54,8 +50,6 @@ execute if score #ai_r hr < #ai_wa3s hr run return run function rlk:boss/scarlet
 scoreboard players operation #ai_r hr -= #ai_wa3s hr
 execute if score #ai_r hr < #ai_wd4 hr run return run function rlk:boss/scarlet/core/start/d4
 scoreboard players operation #ai_r hr -= #ai_wd4 hr
-execute if score #ai_r hr < #ai_wrings hr run return run function rlk:boss/scarlet/core/start/rings
-scoreboard players operation #ai_r hr -= #ai_wrings hr
 execute if score #ai_r hr < #ai_wa9 hr run return run function rlk:boss/scarlet/core/start/a9
 scoreboard players operation #ai_r hr -= #ai_wa9 hr
 execute if score #ai_r hr < #ai_wa10 hr run return run function rlk:boss/scarlet/core/start/a10

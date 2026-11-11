@@ -1,6 +1,6 @@
 # The far rule, P2.
 scoreboard players set #ai_sum hr 0
-scoreboard players set #ai_wnb hr 40
+scoreboard players set #ai_wnb hr 50
 execute if score #cd_nb hr > #clk hr run scoreboard players set #ai_wnb hr 0
 execute if score #last hr matches 17 run scoreboard players set #ai_wnb hr 0
 scoreboard players operation #ai_sum hr += #ai_wnb hr
@@ -8,7 +8,7 @@ scoreboard players set #ai_wq hr 30
 execute if score #cd_q hr > #clk hr run scoreboard players set #ai_wq hr 0
 execute if score #last hr matches 18 run scoreboard players set #ai_wq hr 0
 scoreboard players operation #ai_sum hr += #ai_wq hr
-scoreboard players set #ai_whcut hr 30
+scoreboard players set #ai_whcut hr 15
 execute if score #cd_hcut hr > #clk hr run scoreboard players set #ai_whcut hr 0
 execute if score #last hr matches 13 run scoreboard players set #ai_whcut hr 0
 scoreboard players operation #ai_sum hr += #ai_whcut hr

@@ -1,26 +1,26 @@
 # Weighted pick, P2, far (api.WEIGHTS; zeroed while cooling down / repeating / beyond MID_MAX).
 scoreboard players set #ai_sum hr 0
-scoreboard players set #ai_wa4 hr 15
+scoreboard players set #ai_wa4 hr 20
 execute if score #cd_a4 hr > #clk hr run scoreboard players set #ai_wa4 hr 0
 execute if score #last hr matches 4 run scoreboard players set #ai_wa4 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa4 hr
-scoreboard players set #ai_wa10 hr 20
+scoreboard players set #ai_wa10 hr 10
 execute if score #cd_a10 hr > #clk hr run scoreboard players set #ai_wa10 hr 0
 execute if score #last hr matches 7 run scoreboard players set #ai_wa10 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa10 hr
-scoreboard players set #ai_whcut hr 30
+scoreboard players set #ai_whcut hr 12
 execute if score #cd_hcut hr > #clk hr run scoreboard players set #ai_whcut hr 0
 execute if score #last hr matches 13 run scoreboard players set #ai_whcut hr 0
 scoreboard players operation #ai_sum hr += #ai_whcut hr
-scoreboard players set #ai_wmx hr 20
+scoreboard players set #ai_wmx hr 10
 execute if score #cd_mx hr > #clk hr run scoreboard players set #ai_wmx hr 0
 execute if score #last hr matches 16 run scoreboard players set #ai_wmx hr 0
 scoreboard players operation #ai_sum hr += #ai_wmx hr
-scoreboard players set #ai_wnb hr 25
+scoreboard players set #ai_wnb hr 35
 execute if score #cd_nb hr > #clk hr run scoreboard players set #ai_wnb hr 0
 execute if score #last hr matches 17 run scoreboard players set #ai_wnb hr 0
 scoreboard players operation #ai_sum hr += #ai_wnb hr
-scoreboard players set #ai_wq hr 30
+scoreboard players set #ai_wq hr 20
 execute if score #cd_q hr > #clk hr run scoreboard players set #ai_wq hr 0
 execute if score #last hr matches 18 run scoreboard players set #ai_wq hr 0
 scoreboard players operation #ai_sum hr += #ai_wq hr

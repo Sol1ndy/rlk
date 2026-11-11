@@ -27,7 +27,13 @@ groggy, starts the forced rings only in the near band, takes q's grab knockback)
       for hits that never came, the whiff streak then refused real presses (its T1c 6.5 %/min). An input whose cue never showed
       is now withdrawn (`Agent.withdraw`); the free-fight σ0 parrier's refused presses went 17 → 0 (T13f).
 - [x] **3. tuning** (this commit): the numbers below; the final measurement passes every target on seeds 11 / 22 / 33.
-- [x] **4. regenerate, gates** (this commit): below.
+- [x] **4. regenerate, gates** (f4b88a44d): below ("Final" — superseded by step 6).
+- [x] **5. the lead's re-tune (11-11, after f4b88a44d)**: the P2 shift to the flashed attacks (88 % of P2's near weight) cannot
+      ship (the user: 「패링 불가 공격: 보스의 일부 큰 공격만」). New binding rules: in every band of both phases (and the far
+      rule) the unparriable entries take ≤ 35 % of the pick weight (mx / q count half), parried chains the majority; T10
+      relaxed to 0.8-1.6 (hr_design §6.4 "Relaxed by the lead, 11-11"). Kept: the tool and agent fixes, `GAUGE['hit']` 1, the
+      tiers, the P1 cooldowns, `hp` 225 (T9 / T9b re-checked). Merged `origin/wip/combat-hfb` (HF-B, 0651d1123) first: 05945c3b2.
+- [x] **6. final** (this commit): the section "Re-tune under the 35 % rule" below; the full gate set on that tree.
 
 ## Restated targets (hr_design §6.4 note) and why
 | # | was | now | why |
@@ -109,7 +115,7 @@ What decided it:
 - Not used: recovery (H1 already at + 4), `PP_FLINCH` (it lowers the mixed agent's ultimates under T11's 0.6), G2's cut
   count (off-limits, HF-A).
 
-## Final (the merged tree + the HB numbers; `review/bal/hb_final.log`) — before / after per seed
+## Final of f4b88a44d (superseded by the re-tune below; kept for the record) — (the merged tree + the HB numbers; `review/bal/hb_final.log`) — before / after per seed
 "Before" = the merged tree (HF-A) with the numbers as they came (H1's column B), measured with the fixed tool (hrsim's real F,
 the withdrawn inputs). Gauntlet rows (T5-T7m) do not depend on the HB numbers (TC, the scripts, the gauge size unchanged).
 
@@ -173,6 +179,96 @@ groggies in 6 minutes pass, 8 does not). The pooled values (0.55-0.57, 1.11-1.17
   pattern ends more than by hits now).
 - The kill: 158-175 s of fighting (+ ~50 s of cutscenes after CS0) for an item-less player; ~165 s for an average parrier.
 - The heavier chain hits (T1 raw 5) and the lighter flashed hits (T3 raw 8, kcut raw 9).
+
+## Re-tune under the 35 % rule (the release candidate; `review/bal/hb_final.log`)
+Variants (phase runs, merged tree HF-A + HF-B, hp 225), per seed 11 / 22 / 33:
+
+| v | weights (near band; mid / far / far rule as the final in all) | T1 | T1b | groggies P1 · P2 / 3 min | T10 | U walker P1 · P2 |
+|---|---|---|---|---|---|---|
+| W1 | chains kept: P1 a3 30 a3s 30 d4 25 rings 5 · a9 16 a10 14 blue 12 kcut 15; P2 a3 20 a3s 40 d4 15 rings 5 mx 20 · a9 12 blue 12 kcut 14 | 1.06 / 1.02 / 1.04 | 0.53-0.54 | 5/4/6 · 5/5/5 | 1.67 / 1.50 / **1.83** | 1.33 · 1.33-1.67 |
+| W2 | light parried chain: P1 a3 20 a3s 45 d4 15 rings 5; P2 a3 12 a3s 50 d4 10 rings 5 | 1.05 / 1.09 / 1.03 | 0.51-0.56 | 4/4/5 · 4/4/5 | 1.33 / 1.33 / **1.67** | **2.00** (s33) |
+| W3 | W2 without the free rings (rings 0; d4 12 / 8) | 1.01 / **0.99 / 0.99** | 0.50-0.60 | 4/4/4 · 4/4/4 | 1.33 each | 1.33 |
+| **W4** | W3 + a3s cooldown P1 110 → 140, P2 70 → 100 | 1.01 / 1.03 / 1.01 | 0.50 / 0.52 / 0.58 | 4/4/4 · 4/4/4 | 1.33 each | 1.33-1.67 · 1.33 |
+
+The free rings (4-5 parried hits each, ~0.8 / min) were the cheapest groggy lever; the gauge still forces them before every ult,
+so rings stays in the fight (≈ 1.0-1.5 / min). The a3s cooldown keeps the walker's ultimates in T11 (short patterns charge
+the gauge faster). The 35 % rule moved the mid / far bands and the far rule too (they were 46-72 % unparriable in the design's
+start values): the far band and the far rule now close the gap mostly with a4's leap (P1) and nb (P2).
+
+### Final weights per band (`api.WEIGHTS`, `FAR_RULE`) and the unparriable share
+| phase · band | parried (weight) | unparriable (weight; mx / q half) | share |
+|---|---|---|---|
+| P1 near | a1 8, a2 8, a3 20, a3s 45, d4 12, rings 0 = 93 | a9 14, a10 12, blue 11, kcut 13 = 50 | 35.0 % |
+| P1 mid | a3 10, a3s 15, tri 30, a4 20 = 75 | a9 6, a10 12, hcut 8, blue 7, kcut 7 = 40 | 34.8 % |
+| P1 far | a4 50 | a10 12, hcut 14 = 26 | 34.2 % |
+| P1 far rule | a4 65 | hcut 20, a10 15 | 35.0 % |
+| P2 near | a3 12, a3s 50, d4 8, rings 0, mx ½ 10 = 80 | a9 11, blue 11, kcut 11, mx ½ 10 = 43 | 35.0 % |
+| P2 mid | a3 10, a3s 15, tri 20, a4 15, nb 20, q ½ 8, mx ½ 7.5 = 95.5 | a9 6, a10 9, hcut 7, blue 7, kcut 6, q ½ 8, mx ½ 7.5 = 50.5 | 34.6 % |
+| P2 far | a4 20, nb 35, q ½ 10, mx ½ 5 = 70 | a10 10, hcut 12, q ½ 10, mx ½ 5 = 37 | 34.6 % |
+| P2 far rule | nb 50, q ½ 15 | hcut 15, q ½ 15 | 31.6 % |
+
+Realised picks (the σ1.5 parrier, per min): P1 a3s 3.6, a3 2.3, a9 1.8, a10 1.6, kcut 1.6, rings 1.6 (forced), blue 1.4, d4 1.2,
+a1 1.1, a2 1.0, ult 1.0; P2 a3s 4.9, mx 2.3, blue 2.1, a9 1.7, kcut 1.6, a3 1.3, d4 1.1, rings 1.1 (forced), ult 1.0. Hits that
+found it: P1 269 parried-type vs 77 unparriable, P2 253 vs 89 (in 9 min each).
+
+### Final table (seeds 11 / 22 / 33; pooled)
+| # | band | s11 | s22 | s33 | pooled |
+|---|---|---|---|---|---|
+| T1 | 1.00-1.15 | 1.01 | 1.03 | 1.01 | 1.02 |
+| T1b | ≤ 0.60 | 0.50 | 0.52 | 0.58 | 0.54 |
+| T1c | ≤ 5 | 0 | 0 | 0 | 0 |
+| T2 | ≤ 1.25 | 1.06 | 0.99 | 1.03 | 1.02 |
+| T3 | ≤ 1.8 | 1.47 | 1.50 | 1.51 | 1.49 |
+| T4 | ≤ 40 % | 19.0 | 19.0 | 19.0 | 19.0 |
+| T5 / T5b | ≤ 45 / 55 % | 40.3 / 49.3 | = | = | = |
+| T6 σ0; σ1 in window (raw); cleared | ≥ 95; ≥ 95; ≥ 95 / 90 % | 100; 97.1 (82.5); 8 / 8 | 100; 100 (87.5); 8 / 8 | 100; 100 (91.2); 8 / 8 | 100; 99.1 (87.1); 24 / 24 |
+| T7 | ≤ 35; 0; 0 | 0; 0; 0 | = | = | = |
+| T7m metronome (most segments) | 0 | G1 0 / 437 (3), G2 0 / 437 (4) | | | |
+| T8 | ≤ 1 | 1 | 1 | 1 | 1 |
+| T9 Lv5 / 10 / 15 | 150-185 s | 161 / 168 / 168 | 156 / 171 / 171 | 167 / 165 / 165 | 161 / 168 / 168 |
+| T9b | 125-170 s | 162 | 162 | 162 | 162 |
+| T10 σ1.5; walker | 0.8-1.6; ≤ 0.4 | 1.33; 0 | 1.33; 0 | 1.33; 0 | 1.33; 0 |
+| T11 walker; mixed | 0.8-1.5; 0.6-1.0 | 1.50; 0.67 | 1.33; 0.67 | 1.50; 0.67 | 1.44; 0.67 |
+| T12 in window (raw) | ≥ 95 % | 100 (94.2) | 100 (96.4) | 100 (74.6) | 100 (88.0) |
+| T13 | 100 %; 0 | 53 / 53; 0 | | | |
+| W35 unparriable share, every band | ≤ 35 % | max 35.0 | | | |
+
+**Robustness** (the same tree, seeds 44 / 55 / 66, phase runs): T1 1.02 / 1.02 / 1.00, T1b 0.47 / 0.55 / **0.61**, T1c 0, T2 1.00-1.09,
+T3 1.43-1.45, T4 19.0, T10 1.50 / **1.67** / 1.50 (groggies 4 + 5, 5 + 5, 5 + 4), T11 1.33; 0.67. Pooled in band; one seed of three
+misses T1b by 0.009 and one T10 by one groggy: per seed, both sit at the noise floor of a 3-minute run (the pooled reading is
+the stable one).
+
+### Every number changed against d7da75e79 (old → new) and why
+| knob (§6.4 order) | change | why |
+|---|---|---|
+| weights | the table above (every band; the far rule P1 hcut 45 / a4 30 / a10 25 → 20 / 65 / 15, P2 nb 40 / q 30 / hcut 30 → 50 / 30 / 15) | the lead's 35 % rule; inside it the parried weight leans on a3s, the free rings are gone (T10) |
+| cooldowns (P1) | a1 / a2 100 → 200, a3 / d4 140 → 200, rings 160 → 220, a9 160 → 220, a10 120 → 170, blue 180 → 250, kcut 200 → 280; a3s P1 80 → 140, P2 70 → 100 | the counter's parried singles and the near band (T10 / T1b, from the first pass); a3s: T11 |
+| recovery | — | already at the knob's + 4 (H1) |
+| `GAUGE` | `hit` 2 → 1 | T11 |
+| tiers | T1 29 → 31 (raw 4 → 5), T3 62 → 54 (raw 10 → 8), T4 71 → 61 (raw 11 → 9) | T1 after fewer ultimates; T1b |
+| `hp` | 260 → 225 (− 13.5 %) | T9 / T9b (re-checked on this mix: 156-171 s, 162 s) |
+| `NP_SHARE` / `NP_SHARE_MAX` (new data in `api.py`) + an import-time assert | — | the lead's rule, checked at every build (`api.py` refuses to load if a band goes over) |
+| not used | G2's cut count (HF-A's), `PP_FLINCH` (drops the mixed agent's U under 0.6), the groggy pay-off (the boss tier's) | |
+
+### Gates (the release candidate)
+| gate | result |
+|---|---|
+| rig → kit → player rig + actor (+ audio) → `regen_all.sh --mobs` (README 0-4), on `<S>/rp_hb` (a copy of `rp_hi`) | round 1 changed only her AI files (`ai/pick/*`, `ai/far_p*`, `core/start/a3s`); rounds 2 and 3 changed nothing in the tree, pack hash 44f657ac… both; the pack differs from `rp_hi` only by HF-A's `cue_0` sprite and the items atlas |
+| `check_mboss_pack` | 0 problems |
+| loadcheck `hb2` (26.3) | 0 function load failures, `Starting minecraft server version 26.3`, `Done` |
+| rplint / atlas_px (`rp_hb`) | 0 problems / 12.940 M (≤ 13.2 M) |
+| hr suites | test_input_hr 17, test_gauge 33, test_bal_hr 79, pat_ghost 65, test_scarlet 47, test_metro 30, pat_p1 559, pat_p2 70, test_flow 40, test_special_hr all, ident_hr all, test_reward all, test_moon 55, test_hwamu 283, test_arena_hr 94, test_clips_h1c 297, ev_dry 82, test_cam all, test_cine 159, test_contact 94, test_seq all, test_kit 16 081, test_rig 162, test_actor 167, gen_check_hr 28 / 28 (the generators re-run on a copy: no diff) — every one passes |
+| combat suites | test_cb 296, test_rm all, test_np 125, test_bal 117, test_bal_boss 117 |
+
+### Only a person playing can judge
+- Whether both phases now read as parry fights: about 3 of 4 of her picks are parried patterns; the flashed attacks (yellow /
+  blue / purple) are ~1 in 4, rings only comes before the ultimate.
+- The groggy: an average parrier breaks her ~1.3 × / min (4 times in 3 minutes of either phase, 2-3 in a kill); whether it
+  feels earned and the shared 100-t × 1.30 window pays enough.
+- The ultimate: ~1.3-1.5 / min for a player who is hit a lot, ~0.7 / min for a clean one.
+- The kill: 156-171 s of fighting (+ ~50 s of mid-fight cutscenes) for an item-less player, ~162 s for an average parrier.
+- From far she now closes mostly with a4's leap (P1) and nb (P2), less with the yellow dash cuts; the chain hits are heavier
+  (T1 raw 5), the flashed hits lighter (T3 raw 8, kcut raw 9).
 
 ## How to run
 ```bash
