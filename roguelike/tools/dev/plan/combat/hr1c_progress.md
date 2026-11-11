@@ -51,6 +51,7 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
   - `tests/test_clips_h1c.py` (new): the 12 clips as shipped — contract, joins with the stance clips / `q_grab` → `q_air` /
     `grog_in` → `down`, no root motion, airborne spans (§8.5), the blade at every hit tick against its hazard's shape, the
     blade readable from the F5 lens at every cue / flash tick.
+  - `tests/gen_check_hr.py`: the G4 stray in a P2 folder of the rebuilt fight (`p/q/`, was `p/r1/`).
   - `tests/test_rig.py`: the clip count of the rebuilt contract (59). `tools/scarlet_retarget.mjs --dump all` skips a
     clip outside the contract.
   - `tests/test_kit.py`: counts for the rebuilt contract (50 + 6 presets, 104 + 5 sounds + `kcut_go` once declared),
@@ -74,7 +75,8 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
   count is 59 now; `scarlet_retarget.mjs --dump all` skips a clip the contract dropped (it raised on `sq1`).
 - Lane H1's suites on the merged tree: `pat_p1` 529 / 529, `pat_p2` 67 / 67, `pat_ghost` 65 / 65, `test_scarlet` 47 / 47,
   `test_gauge` 22 / 22. `ident_hr` passes.
-- `gen_check_hr.py --rp` (run to its end, about an hour: seven rig builds): see the final report for its result.
+- `gen_check_hr.py --rp` (run to its end, about an hour: seven rig builds): 28 / 28. Its ownership probe G4 put a stray
+  into `p/r1/`, a folder the rebuilt fight no longer has (R1 is gone, so no writer owns it): the probe uses `p/q/` now.
 - Real server: `loadcheck.sh` 0 function load failures. Pack: `rplint.py` 0, `atlas_px.py` 12 919 040 px (unchanged).
 
 ## Decisions / deviations
@@ -115,4 +117,5 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
 - No change to `assets/minecraft/atlases/items.json` or to `textures/mboss/hr_kit/**`.
 
 ## Next
-- Nothing open. After the merges at HI: regenerate (rig → kit → `regen_all.sh`), rerun `test_clips_h1c.py`, `test_kit.py`.
+- Nothing open for this lane. After the merges at HI: regenerate (rig → kit with `--resourcepack` → `regen_all.sh`),
+  rerun `test_clips_h1c.py`, `test_kit.py`; the requests above are other lanes'.

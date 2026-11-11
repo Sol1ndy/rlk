@@ -22,7 +22,7 @@ both are removed at the end. The generators of this boss (contract §1 / PLAN §
   G2  each run writes only the generator's owned paths (every other file of the copy keeps its bytes and its mtime)
   G3  the documented order (core -> arena -> rig -> [kit] -> scarlet -> check) and the reverse order, each from a copy whose
       F:boss/scarlet/** was wiped, give the tested tree
-  G4  ownership: a stray file inside each owned folder (scarlet's core/ seq/ p/r1/, the rig's rig/, the arena's
+  G4  ownership: a stray file inside each owned folder (scarlet's core/ seq/ p/q/, the rig's rig/, the arena's
       mboss/arena/hr_field/) is spared by every other generator and removed by its owner
   G5  the rig's resource-pack side twice into the pack copy: the second build changes no byte, the pack equals the given one
 """
@@ -182,7 +182,7 @@ def main():
             check(f'G3 {name}: every generator ran', all(oks))
         # G4: ownership probes
         strays = {'scarlet': [FN + 'boss/scarlet/core/zz_stray.mcfunction', FN + 'boss/scarlet/seq/zz_stray/k.mcfunction',
-                              FN + 'boss/scarlet/p/r1/zz_stray.mcfunction'],
+                              FN + 'boss/scarlet/p/q/zz_stray.mcfunction'],    # (the rebuilt fight: R1 is gone, q is a P2 folder)
                   'rig': [FN + 'boss/scarlet/rig/zz_stray.mcfunction'],
                   'arena': [FN + 'mboss/arena/hr_field/zz_stray.mcfunction']}
         for owner, paths in strays.items():
