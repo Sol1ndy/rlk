@@ -1,4 +1,4 @@
-# A8 자영 연참: one pattern tick (#pt hr 1..214), dispatched by 16-tick blocks to k/<t>.
+# A8 자영 연참: one pattern tick (#pt hr 1..240), dispatched by 16-tick blocks to k/<t>.
 execute if score #pt hr matches 0..15 run return run function rlk:boss/scarlet/p/a8/b/0
 execute if score #pt hr matches 16..31 run return run function rlk:boss/scarlet/p/a8/b/1
 execute if score #pt hr matches 32..47 run return run function rlk:boss/scarlet/p/a8/b/2
@@ -13,3 +13,5 @@ execute if score #pt hr matches 160..175 run return run function rlk:boss/scarle
 execute if score #pt hr matches 176..191 run return run function rlk:boss/scarlet/p/a8/b/11
 execute if score #pt hr matches 192..207 run return run function rlk:boss/scarlet/p/a8/b/12
 execute if score #pt hr matches 208..223 run return run function rlk:boss/scarlet/p/a8/b/13
+execute if score #pt hr matches 224..239 run return run function rlk:boss/scarlet/p/a8/b/14
+execute if score #pt hr matches 240..255 run return run function rlk:boss/scarlet/p/a8/b/15

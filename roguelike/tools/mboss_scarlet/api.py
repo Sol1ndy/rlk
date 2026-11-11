@@ -15,8 +15,9 @@ The H1 interface commit landed additively (the 11-06 module kept building):
                   (CLIP_OWNER 'H1') and the whole sequence / cinematic contract of lane H2 / H2c: SEQS, SEQ_LEN, SEQ_ARGS,
                   SEQ_CLIPS, SEQ_EXTRA, LINE_AT, MUSIC_AT, SKIP_T / SKIP_WINDOW, END_H, COUNTER_EV, the 8 cinematic rows of
                   CLIPS_PLAN (CLIP_OWNER 'H2'), the registry numbers intro 1450 / death 1494, WARN_TEXT.
-  with H1's build the pattern side (H1-internal: HITS, WEIGHTS, COOLDOWN, MID_MAX, FAR_RULE, PAT_END, the gauntlet scripts,
-                  CUT_IDS, BOLTS, JUDGE_T / REPEL_T, FAIL*_T, P1 / P2, PH, TEST_IDS, PIP_RULE, the removed names).
+  H1's build      the pattern side (HITS with the P / N column, WEIGHTS, COOLDOWN, MID_MAX / MID_MIN, FAR_RULE, PAT_END, the
+                  gauntlet scripts G1 / G2, CUT_IDS, BOLTS, JUDGE_T = REPEL_T, FAIL*_T, P1 / P2, TEST_IDS, PIP_RULE) and the
+                  removals of §5.1 (the down window, R1-R3, the moon discs, the dark look requests, the dash-timed pips).
 Other lanes' parts are picked up when they land, never required before:
   seq.py          its SERVICES are used once the file declares `CONTRACT = 2` (= api.SEQ_CONTRACT) on a line of its own;
                   until then every sequence runs as the core stand-in core/sq/<name> (wait the length, the signals at their
@@ -156,29 +157,66 @@ DMG['TC'] = 37
 # A8.8 glow), 3 yellow tell #FFE14A, 4 crimson (P2 accents, 홍련일섬), 5 white glint
 C_LILAC, C_MAGENTA, C_YELLOW, C_CRIMSON, C_WHITE = 1, 2, 3, 4, 5
 KB_CHAIN, KB_FINAL, KB_SINGLE, KB_CUT = 0, 3, 2, 0    # chain hits / the last hit of a chain (0.6 b) / single hits / cuts
-# HITS[key] = [(clip, event, shape, dims, tier, kb)] (blocks; tier a DMG key). Shapes (framework mboss/hz/*, pj/launch):
-#   sector(r, half_deg) round her; disc(r) round her; line(len, w) ahead of her; dash_line(w) along her dash (length = the
-#   dash); pdisc(r) = a disc at the player's spot, locked at the clip's lock event (A9) or, for the cut builder (cut()),
-#   following the player until strike - LOCK_LEAD; pj_disc(hr, speed, life) = the moon disc (DISC, disc()).
-# Every hit Electro 1U, #hzQuiet 1, no floor decal (PLAN §1.4). The a8 / a13 / r1 / r2 / r3 entries are derived from the
+# HITS[key] = [(clip, event, shape, dims, tier, kb, parry)] (blocks; tier a DMG key; parry 'P' parryable / 'N' unparriable,
+# hr_design §2.1-2.2). Shapes (framework mboss/hz/*):
+#   sector(r, half_deg) round her; disc(r) round her (rings: at her spot; a4 / a10: at the landing lock); line(len, w) ahead
+#   of her (nb / q beam: through the lock, LINE_YAW); dash_line(w) along her dash (length = the dash); pdisc(r) = a disc at
+#   the player's locked spot (the cut builder cut(): following the player until strike - LOCK_LEAD); full = the whole arena.
+# Every hit Electro 1U, #hzQuiet 1, no floor decal. Every hazard is made with an explicit hz_opts(noparry=0 | 1): a P hit
+# is announced by the parry cue CUE_LEAD t before it (CUE_KIT at blade_mid + CUE_SND), an N hit by the module's own flash
+# (FLASH: yellow / purple / blue; #mbNpOwn mb 1 keeps the framework glint off). The a8 / a13 entries are derived from the
 # scripts of section 3 by _script_hits (section 7): each cut lands on the move whose clip 'hit' meets its strike tick.
-# Combat overhaul C (11-10): the yellow-flagged attacks (her own yellow tell, video_notes 1.6: never parried in the original)
-# are unparriable (hz_opts / pj_opts noparry=1): A9 (dash line + the locked disc), A10 (the plunge) and the R2 moon disc
-# after the A7 tell. Her other hits follow the framework rule (all parryable: discs < 4.5 b, sectors / lines < 8 b, the
-# counting / ghost cuts). She draws her own yellow tells, so the framework glint is off for her (#mbNpOwn 1, core/setup).
-NOPARRY = ('a9', 'a10')
-NOPARRY_DISC = True
+KB_THROW = 5              # q: the grab throws the player back
+_RING = ('disc', (2.6,))
 HITS = {
-    'a1': [('a1', 'hit', 'sector', (4.0, 80), 'T2', KB_SINGLE)],
-    'a2': [('a2', 'hit', 'sector', (3.6, 70), 'T2', KB_SINGLE)],
-    'a3': [('a3', 'h1', 'sector', (4.2, 90), 'T1', KB_CHAIN), ('a3', 'h2', 'sector', (4.0, 60), 'T1', KB_CHAIN),
-           ('a3', 'h3', 'sector', (4.0, 50), 'T1', KB_CHAIN), ('a3', 'h4', 'line', (5.0, 1.8), 'T1', KB_CHAIN),
-           ('a3', 'h5', 'sector', (4.6, 70), 'T2', KB_FINAL)],
-    'a4': [('a4', 'hit', 'disc', (2.6,), 'T3', KB_CHAIN), ('a4', 'hit2', 'disc', (3.0,), 'T1', KB_SINGLE)],   # A4 + A5
+    'a1': [('a1', 'hit', 'sector', (4.0, 80), 'T2', KB_SINGLE, 'P')],
+    'a2': [('a2', 'hit', 'sector', (3.6, 70), 'T2', KB_SINGLE, 'P')],
+    'a3': [('a3', 'h1', 'sector', (4.2, 90), 'T1', KB_CHAIN, 'P'), ('a3', 'h2', 'sector', (4.0, 60), 'T1', KB_CHAIN, 'P'),
+           ('a3', 'h3', 'sector', (4.0, 50), 'T1', KB_CHAIN, 'P'), ('a3', 'h4', 'line', (5.0, 1.8), 'T1', KB_CHAIN, 'P'),
+           ('a3', 'h5', 'sector', (4.6, 70), 'T2', KB_FINAL, 'P')],
+    'a3s': [('a3', 'h1', 'sector', (4.2, 90), 'T1', KB_CHAIN, 'P'), ('a3', 'h2', 'sector', (4.0, 60), 'T2', KB_FINAL, 'P')],
+    'd4': [('d4', 'h1', 'disc', (3.0,), 'T1', KB_CHAIN, 'P'), ('d4', 'h2', 'sector', (4.2, 35), 'T1', KB_CHAIN, 'P'),
+           ('d4', 'h3', 'line', (5.0, 1.8), 'T1', KB_CHAIN, 'P'), ('d4', 'h4', 'sector', (3.6, 60), 'T2', KB_FINAL, 'P')],
+    'tri': [('tri', 'h0', 'line', (6.0, 1.6), 'T1', KB_CHAIN, 'P'), ('tri', 'h1', 'sector', (5.0, 80), 'T1', KB_CHAIN, 'P'),
+            ('tri', 'h2', 'sector', (5.0, 80), 'T1', KB_CHAIN, 'P'), ('tri', 'h3', 'sector', (5.0, 80), 'T2', KB_FINAL, 'P')],
+    'a4': [('a4', 'hit', 'disc', (2.6,), 'T3', KB_CHAIN, 'P'), ('a4', 'hit2', 'disc', (3.0,), 'T1', KB_SINGLE, 'P')],   # A4 + A5
+    # rings: P1 = rows 0-3 (r4 the last: T2 kb 3); P2 = rows 0-2, 4, 5 (r4 a chain hit, r5 the last): HIT_PH
+    'rings': [('rings', 'r1') + _RING + ('T1', KB_CHAIN, 'P'), ('rings', 'r2') + _RING + ('T1', KB_CHAIN, 'P'),
+              ('rings', 'r3') + _RING + ('T1', KB_CHAIN, 'P'), ('rings', 'r4') + _RING + ('T2', KB_FINAL, 'P'),
+              ('rings', 'r4') + _RING + ('T1', KB_CHAIN, 'P'), ('rings', 'r5') + _RING + ('T2', KB_FINAL, 'P')],
+    'ult': [('ult', 'cut1', 'full', (), 'T2', KB_CHAIN, 'N'), ('ult', 'cut2', 'full', (), 'T3', KB_FINAL, 'N')],
     'a6': [],                                                                                              # no hit
-    'a9': [('a9', 'cut', 'dash_line', (2.4,), 'T3', KB_FINAL), ('a9', 'cut', 'pdisc', (4.0,), 'T3', KB_FINAL)],  # 1 group
-    'a10': [('a10', 'hit', 'disc', (3.5,), 'T3', KB_FINAL)],
+    'a9': [('a9', 'cut', 'dash_line', (2.4,), 'T3', KB_FINAL, 'N'), ('a9', 'cut', 'pdisc', (4.0,), 'T3', KB_FINAL, 'N')],  # 1 group
+    'a10': [('a10', 'hit', 'disc', (3.5,), 'T3', KB_FINAL, 'N')],
+    'hcut': [('hcut', 'cut', 'dash_line', (3.0,), 'T3', KB_FINAL, 'N'), ('hcut', 'cut', 'pdisc', (4.5,), 'T3', KB_FINAL, 'N')],
+    'blue': [('blue', 'hit', 'dash_line', (1.8,), 'T2', KB_SINGLE, 'N')],
+    # kcut: the dash line + three lines crossing the lock at KCUT_YAW (one group = one hit)
+    'kcut': [('kcut', 'cut', 'dash_line', (3.0,), 'T4', KB_FINAL, 'N'), ('kcut', 'cut', 'line', (12.0, 1.6), 'T4', KB_FINAL, 'N'),
+             ('kcut', 'cut', 'line', (12.0, 1.6), 'T4', KB_FINAL, 'N'), ('kcut', 'cut', 'line', (12.0, 1.6), 'T4', KB_FINAL, 'N')],
+    'mx': [('mx', 'x', 'pdisc', (2.8,), 'T3', KB_CHAIN, 'N'), ('mx', 'dome', 'disc', (3.2,), 'T2', KB_FINAL, 'P')],
+    'nb': [('nb', 'b1', 'line', (16.0, 3.0), 'T2', KB_CHAIN, 'P'), ('nb', 'b2', 'line', (16.0, 3.0), 'T2', KB_CHAIN, 'P'),
+           ('nb', 'b3', 'line', (16.0, 3.0), 'T3', KB_FINAL, 'P')],
+    # q (hr_design §8.2: the grab is unparriable): q_grab's grab, then q_air only when the grab landed (clock + Q_AIR_T0)
+    'q': [('q_grab', 'grab', 'pdisc', (2.2,), 'T2', KB_THROW, 'N'), ('q_air', 'beam', 'line', (14.0, 2.6), 'T2', KB_CHAIN, 'P'),
+          ('q_air', 'hit', 'pdisc', (2.6,), 'T3', KB_CHAIN, 'P'), ('q_air', 'pillar', 'pdisc', (2.4,), 'T3', KB_FINAL, 'N')],
 }
+HIT_PH = {'rings': {3: 1, 4: 2, 5: 2}}            # HITS row -> the only fight phase it is made in (1 P1 / 2 P2)
+KCUT_YAW = (0, 55, -55)                           # kcut's three lines through the lock, degrees from the dash direction
+NB_YAW = (-30, 30, 0)                             # nb's bands through each lock, degrees from her aim
+# The flash of every N hit: HITS row -> ((colour, clip, event, offset), ...): the flash is called at ev(clip, event) + offset.
+# Yellow >= YELLOW_MIN t before the hit; purple exactly PURPLE_LEAD t before its cut; blue: the sphere 15 t, then the lunge.
+FLASH_AT = {
+    'ult': {0: (('yellow', 'ult', 'yellow', 0), ('purple', 'ult', 'star1', 0)), 1: (('purple', 'ult', 'star2', 0),)},
+    'a9': {0: (('yellow', 'a9', 'yellow', 0), ('purple', 'a9', 'star', -1)), 1: ()},      # one group: the row 0 flashes
+    'a10': {0: (('yellow', 'a10', 'yellow', 0),)},
+    'hcut': {0: (('yellow', 'hcut', 'yellow', 0),), 1: ()},
+    'blue': {0: (('blue', 'blue', 'yellow', 0),)},      # flash_blue from the clip's yellow ring on (ring 4 t, sphere 4-19)
+    'kcut': {0: (('yellow', 'kcut', 'yellow', 0),), 1: (), 2: (), 3: ()},
+    'mx': {0: (('purple', 'mx', 'star', 0),)},
+    'q': {0: (('purple', 'q_grab', 'star', 0),), 3: (('purple', 'q_air', 'star', 0),)},
+}
+Q_AIR_T0 = 21             # q: the grab strikes after the module tick of its event (20); the landed branch plays q_air from here
+Q_MISS_END = 34           # q: missed / perfect-dodged / left the disc: she reforms, the pattern ends
 CUT_R = 3.2               # damage radius of a counting / ghost cut (the visible ring ~2.2; knob 2.8-3.6, PLAN §4.8)
 CUT_SHOW_R = 2.2
 LOCK_LEAD = 7             # aims lock 7 t before the hit
@@ -187,27 +225,30 @@ TELL_MIN, TELL_BIG, COMBO_GAP = 12, 20, 10   # first visible motion -> hit >= 12
 MOVE_R = SAFE - 0.5       # 22.5: every end point (landing, dash end, blink, reappear) via mv/ok + leash inside it
 assert MOVE_R == 22.5
 FALLBACK_R = 21.0         # the guaranteed last reappear / landing point: on the player -> C line, <= 21 b from C
-# the A7 moon disc (R2, A13): pj/launch blade shape (#pjShape 1), half width hr, height y0-y1 over the floor (a jump does
-# not clear it), speed b/t, life t, wall stop, aimed at its lock (the player's floor spot LOCK_LEAD t before the release,
-# DISC_LOCK; F1 HR-15; no homing), one kit card
-# (fx/prop/disc, horizontal, spinning 30 deg/t, facing its flight; summoned, then rotated), tier T2, never counts for pips
-# I1 (request s4-2): speed 1.75 = exactly 7 of the framework's 0.25 b sub-steps (mboss_lib.pj_speed_tenths rounds up, so
-# the frozen 1.8 flew 8 = 2.0 b/t); PLAN's "≈ 7 t from 12 b" (12 / 1.75 = 6.9 t).
-DISC = {'hr': 1.4, 'y0': 0.2, 'y1': 2.4, 'speed': 1.75, 'life': 16, 'shape': 1, 'spin': 30, 'tier': 'T2', 'kb': 0,
-        'kb_last_r2': 2}
 TRACK = {'deg': 10, 'step': 0.3, 'min': 2.4}   # chains: re-aim <= 10 deg/t + a 0.3 b step before each hit (stop at 2.4 b)
-DASH_LEN = {'a9': 12.0, 'a6': 12.0, 'cs1_lunge': 20.0}   # max dash / glide lengths (b): A9 iai dash, A6 back-blink
-LEAP_H = {'a4': 6.0, 'a10': 5.0}                         # leap heights (b): A4 rises 6 b in 4 t, A10 springs 5 b
+DASH_LEN = {'a9': 12.0, 'a6': 12.0, 'cs1_lunge': 20.0,   # max dash / glide lengths (b): A9 iai dash, A6 back-blink
+            'hcut': 16.0, 'blue': 9.0, 'kcut': 10.0, 'tri': 6.0, 'q': 14.0}   # hr_design §2.2
+DASH_BEYOND = {'a9': 3.0, 'hcut': 3.0, 'blue': 2.0, 'kcut': 3.0}   # the dash ends this far beyond the locked spot
+LEAP_H = {'a4': 6.0, 'a10': 5.0, 'nb': 5.0, 'q': 5.0, 'q2': 6.0}   # leap heights (b): A4 6 b in 4 t, A10 5 b; nb / q hr_design §2.2
+NB_TRAVEL, TRI_GLIDE, MX_RETREAT = 6.0, (6.0, 0.3, 12), (6.0, 9.0, 12)   # nb travels <= 6 b; tri glides in 0.3 b/t beyond 6 b
+#                                                          (ticks 0-12); mx: player nearer than 6 b -> a 12-t leap back to ~9 b
+MX_REPEAT = {'hp_pct': 30, 'chance': 60}                  # mx may repeat once at once at <= 30 % HP (the video's second X)
+RINGS_END = {1: 54, 2: 64}                                # rings ends 10 t after its last ring (P1 r4 44, P2 r5 54)
+ULT_AFTER = 6                                             # rings -> ult at a full gauge: ult starts this long after the last ring
+AIR_MAX = 44                                              # hr_design §8.5: no pattern holds her out of reach longer (nb 44 t)
 A4_TRAVEL, A10_DRIFT = 10.0, 0.4                          # A4 travels <= 10 b toward the player; A10 drifts <= 0.4 b/t
 A9_BEYOND = 3.0                                           # A9 dashes through the locked point to 3 b beyond (<= 12 b)
 A3_GLIDE = (8.0, 0.3, 14)                                 # A3 from 4.5-8 b: glides in 0.3 b/t during ticks 0-14
-RECOVER = {1: (8, 16), 2: (10, 16)}                       # idle between patterns (min, max) per fight phase P1 / P2
+# hrfair 2.0, first pass (H1, 11-11; hr_design §6.4's recovery knob + 4): P1 8-16 -> 12-20, P2 10-16 -> 14-20 (the new kit has
+# ~20 patterns / min and 1.8 groggies / min for an average parrier with the old values: T10's band is 0.8-1.3).
+RECOVER = {1: (12, 20), 2: (14, 20)}                      # idle between patterns (min, max) per fight phase P1 / P2
 # F1 (HR-13 / HR-14 / HR-18, the P1 pressure package, lead decision 11-05; PLAN §4.1 wins over §4.3's clip tails): every
 # P1-kit pattern ends 8-12 t after its last hit instead of at its clip's end (the clip's follow-through plays on while she
 # turns to the player; the AI recovery's walk / strafe takes over: the punish window); RECOVER above = the §4.8 knob
 # (P1 16-24 -> 12-20, P2 12-18 -> 10-16); S5 (11-06, the measured balance pass): P1 12-20 -> 8-16 (the knob's -4 t; T1).
 # A6 (no hit) keeps A6_TRIGGER['next'].
-PAT_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
+PAT_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a3s': 40, 'd4': 64, 'tri': 70, 'a4': 46, 'a9': 40, 'a10': 32, 'hcut': 38, 'blue': 32,
+           'kcut': 34, 'mx': 40, 'nb': 52, 'ult': 58}     # hr_design §2.2 (rings: RINGS_END; q: Q_MISS_END / Q_AIR_T0 + 90)
 # F1 round 1 (HR-14, the decision's "during any tail kept ... she walks / strafes facing and tracking the player"): a kept tail
 # lets the clip's follow-through play TAIL_MOVE t after the last hit / release (A4: until it lands; R1 / R3: until the solid
 # row), then she moves as in the recovery (ai/tail: the recovery's move and clip, ai/tail_step each later tick) while she
@@ -217,7 +258,9 @@ WALK_SPEED, GLIDE_SPEED = 0.12, 0.18                      # recovery walk / stra
 
 # ---------------------------------------------------------------------------------------------
 # 2b. HR rebuild (hr_design §1.2-1.5, §2.1; lane H1): the 5-segment gauge, balance, the parry cue, the unparriable flashes
-GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 5}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
+# hrfair 2.0, first pass (H1, 11-11): hit 5 -> 2. With the design's start value a player who is hit by everything filled it
+# every ~16 s (U 3.2 / min, T11's band 0.8-1.5); 2 keeps "full after ~60 s of clean play, ~35 s when hit every 6 s".
+GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 2}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
 #                                                      +hit per hit of hers that lands (tier 1-2 parries land; PP / PD do not),
 #                                                      -seg per perfect-parried gauntlet cut; U is armed at max
 GAUGE_FP = '#gau'                                    # objective OBJ; the under bar #buSub = #gau / seg, #buSubMax 5, BU_SHIELD
@@ -243,106 +286,63 @@ PH = {'intro': 0, 'p1': 1, 'cs1': 2, 'lead60': 3, 'a8': 4, 'cs2': 5, 'down': 6, 
 FLOOR_P1 = 600            # per mille of mhpM: the hit reaching it stops there; CS1 at the next decision
 FLOOR_ULT = 50            # per mille: the 5 % floor (set at CS1 0); A13 at the next decision (40 t later from the down)
 PIPS = 5
-PIP_RULE = 'perfect'      # combat overhaul C (11-10; was 'timed_dash' on dashInvT): at the strike tick s a pip goes when the
-# player's perfect window covers s - a dodge started 0..2 t before (player/def/q_pf0, #dgPW) or an F press 0..2 t before
-# (a perfect parry, #parW3) - checked at s (q_pf0) and at s + 1 (q_pf1: the same window one tick back), with the
-# player's feet within PIP_R of the cut's lock point; one per cut, any direction. Lane H rebuilds 홍련 on this system.
-PIP_Q = {0: 'rlk:player/def/q_pf0', 1: 'rlk:player/def/q_pf1'}
-PIP_R = CUT_R + 3.0       # 6.2
-BU_SHIELD, BU_DOWN = 1, 8  # under-bar colours (#buSubCol): electro for the shield (max 5), gold for the down timer (max 200)
+PIP_RULE = 'perfect_parry'   # hr_design §1.2: a gauntlet cut whose hit on the player is judged tier 3 (#parT tmp 3, with
+# #mbDodgeOk mb 1 from mboss/hurt_dodge) takes one segment (GAUGE['seg']); a perfect dodge, tier 2 / 1, walking out: nothing.
+BU_SHIELD = 1             # the under-bar colour (#buSubCol): electro for the 5-segment gauge
 
-# Gauntlet scripts (PLAN §4.4-4.5 tables as tuples). Rows (t, step, clip, cut): t = the clip's start on the pattern clock
-# T+ (T0 = the gauntlet's start), or the step's tick when clip is None; cut = (made, lock, strike, tier, kb) of the cut
-# hazard made at that step (api.cut), else None. Rows with t < 0 are played by SQ1 / the lead-ins (S2b), not by the
-# pattern. A move's contact = t + ev(clip, 'hit') = the strike of the cut made one step earlier.
-_T2, _T3 = ('T2', KB_CUT), ('T3', KB_FINAL)
-_TC = ('TC', KB_CUT)      # F1 (HR-19): the counting cuts of A8 / A13 (DMG['TC'])
-A8_SCRIPT = (
-    (-17, 'dark', None, None),                    # first real slice of the `dark` look job (called at -18)
-    (-14, 'brim', 'g_brim', None),                # SQ1 46: the right hand to the brim
+# Gauntlet scripts (hr_design §2.4 as tuples). Rows (t, step, clip, cut): t = the clip's start on the pattern clock T+ (T0 =
+# the gauntlet's start), or the step's tick when clip is None; cut = (made, lock, strike, tier, kb) of the cut hazard made
+# at that step (api.cut), else None. A move's contact = t + ev(clip, 'hit') = the strike of the cut made one step earlier.
+_TC = ('TC', KB_CUT)      # F1 (HR-19): the counting cuts of the gauntlets (DMG['TC'])
+A8_SCRIPT = (                                     # G1 (60 %): 9 parry cuts in 220 t
     (0, 'A8.T', 'g_tell', None),
-    (14, 'D1', 'g_dash', (14, 20, 27) + _TC),     # cut 1
-    (24, 'A8.1', 'g_ring', (27, 33, 40) + _TC),   # cut 2
-    (31, 'A8.2', 'g_rise', (40, 48, 55) + _TC),   # cut 3
-    (46, 'A8.3', 'g_leap', None),                 # vanishes in the air 62
-    (70, 'D2', 'g_glide', (70, 75, 82) + _TC),    # cut 4
-    (79, 'A8.4', 'g_sweep', (82, 87, 94) + _TC),  # cut 5
-    (88, 'A8.5', 'g_x', None),                    # vanishes 103
-    (108, 'D1', 'g_dash', (108, 114, 121) + _TC),  # cut 6
-    (118, 'A8.1', 'g_ring', None),
-    (130, 'D3', 'g_drop', (130, 140, 147) + _TC),  # cut 7
-    (144, 'A8.6', 'g_wrap', (147, 152, 159) + _TC),  # cut 8
-    (156, 'A8.7', 'g_dome', (159, 167, 174) + _TC),  # cut 9
-    (169, 'A8.8', 'g_vert', None),                # pink glow 170-173, rises out of view, hidden 186
-    (188, 'A8.9', 'g_dive', None),                # reappears 188 in normal colours, dives; judge at 194
-    (194, 'judge', None, None),                   # darkness lifts (crimson, slices 194-197); success g_deflect -> CS2 206;
-)                                                 # fail §5.5: g_reform 194-204, P2 decision at 214
-A13_SCRIPT = (
-    (-17, 'dark', None, None),                    # lead-in: darkness, the hand to the brim, the warning banner (ULT5_LETHAL)
+    (16, 'D1', 'g_dash', (16, 23, 30) + _TC),     # c1
+    (27, 'A8.1', 'g_ring', (30, 39, 46) + _TC),   # c2
+    (37, 'A8.2', 'g_rise', (46, 57, 64) + _TC),   # c3
+    (55, 'A8.3', 'g_leap', None),                 # gone 71
+    (80, 'D2', 'g_glide', (80, 87, 94) + _TC),    # c4
+    (91, 'A8.4', 'g_sweep', (94, 103, 110) + _TC),  # c5
+    (104, 'A8.5', 'g_x', None),                   # gone 118
+    (124, 'D1', 'g_dash', (124, 131, 138) + _TC),  # c6
+    (135, 'A8.1', 'g_ring', None),
+    (148, 'D3', 'g_drop', (148, 157, 164) + _TC),  # c7
+    (161, 'A8.6', 'g_wrap', (164, 173, 180) + _TC),  # c8
+    (177, 'A8.7', 'g_dome', (180, 189, 196) + _TC),  # c9
+    (191, 'A8.8', 'g_vert', None),                # pink glow 192-195, rises out of view, hidden 209
+    (214, 'A8.9', 'g_dive', None),                # reappears 214 in normal colours 6 b up, dives; judge at 220
+    (220, 'judge', None, None),                   # gauge 0: seq/repel {at:60} in this tick; fail §2.4: g_reform 220-230,
+)                                                 # P2 decision at 240
+A13_SCRIPT = (                                    # G2 (5 %): 11 parry cuts in 242 t, no discs, no yellow
     (0, 'A8.T', 'g_tell', None),
-    (14, 'D1', 'g_dash', (14, 20, 27) + _TC),     # U1
-    (24, 'A8.1', 'g_ring', (27, 33, 40) + _TC),   # U2
-    (31, 'A8.2', 'g_rise', (40, 48, 55) + _TC),   # U3
-    (46, 'A8.3', 'g_leap', None),                 # vanishes in the air 62
-    (67, 'D1', 'g_dash', (67, 73, 80) + _TC),     # U4
-    (77, 'A8.1', 'g_ring', None),                 # vanishes 89
-    (96, 'D2', 'g_glide', (96, 101, 108) + _TC),  # U5
-    (105, 'A8.4', 'g_sweep', (108, 113, 120) + _TC),  # U6
-    (114, 'A8.5', 'g_x', None),                   # vanishes 128
-    (127, 'tell', 'a7_tell', None),               # reappears 3 b away inside the yellow tell 129-137, retreats to 12 b
-    (143, 'disc1', 'a7_throw', None),             # gold blade line 150-154; release 155 -> at the player ~162
-    (155, 'disc2', 'a7_throw', None),             # release 167 -> ~174
-    (168, 'disc3', 'a7_throw', None),             # release 180 -> ~187
-    (194, 'vanish', None, None),                  # stands far 187-194; vanish 5 (purple glow + white ring)
-    (198, 'D4', 'g_run', (198, 204, 211) + _TC),  # U8
-    (208, 'A8.6', 'g_wrap', (211, 216, 223) + _TC),  # U9
-    (220, 'A8.7', 'g_dome', (223, 231, 238) + _TC),  # U10
-    (233, 'A8.8', 'g_vert', None),                # pink glow 234-237; rises, hidden 250
-    (252, 'A8.9', 'g_dive', None),                # reappears 252 in normal colours, dives; judge at 258
-    (258, 'judge', None, None),                   # success: darkness lifts, g_deflect -> CS3 270; fail: the instant death
+    (16, 'D1', 'g_dash', (16, 23, 30) + _TC),     # c1
+    (27, 'A8.1', 'g_ring', (30, 37, 44) + _TC),   # c2
+    (35, 'A8.2', 'g_rise', (44, 51, 58) + _TC),   # c3
+    (49, 'A8.3', 'g_leap', None),                 # gone 65
+    (72, 'D1', 'g_dash', (72, 79, 86) + _TC),     # c4
+    (83, 'A8.1', 'g_ring', None),                 # gone 95 (EXTRA_VANISH)
+    (100, 'D2', 'g_glide', (100, 107, 114) + _TC),  # c5
+    (111, 'A8.4', 'g_sweep', (114, 121, 128) + _TC),  # c6
+    (122, 'A8.5', 'g_x', None),                   # gone 136
+    (142, 'D4', 'g_run', (142, 149, 156) + _TC),  # c7
+    (153, 'A8.6', 'g_wrap', (156, 165, 172) + _TC),  # c8
+    (169, 'A8.7', 'g_dome', (172, 179, 186) + _TC),  # c9
+    (183, 'A8.7', 'g_dome', (186, 193, 200) + _TC),  # c10
+    (197, 'A8.7', 'g_dome', (200, 209, 216) + _TC),  # c11
+    (211, 'A8.8', 'g_vert', None),                # hidden 229
+    (236, 'A8.9', 'g_dive', None),                # dives; judge at 242
+    (242, 'judge', None, None),                   # gauge 0: seq/repel {at:5}; fail: the instant death
 )
-# P2 entries cut from the gauntlets' moves (PLAN §4.4; no shield, no darkness): same row form, cuts never count. The
-# 'solid' row is when the ghost tag (rlk_hr_ghost, hence rlk_mb_inv) goes and she is hittable again (PLAN: R1 "hittable
-# at 62", R3 "reforms 37-46"), not the g_reform clip's own visual 'solid' event (its tick 4).
-R1 = (
-    (0, 'A8.T', 'g_tell', None),                  # lilac switch 0 (form ghost, rlk_mb_inv), burst 3, hidden 4
-    (14, 'D1', 'g_dash', (14, 20, 27) + _T2),     # reappears 14 b front-left, dashes 20-24 to 1.5 b at the player's right
-    (24, 'A8.1', 'g_ring', (27, 33, 40) + _T2),
-    (31, 'A8.2', 'g_rise', (40, 48, 55) + _T3),   # the last hit T3 kb 3 (she leaps over the player)
-    (46, 'A8.3', 'g_leap', None),
-    (55, 'reform', 'g_reform', None),             # lands 3 b beyond the player and reforms 55-62
-    (62, 'solid', None, None),                    # hittable again
-    (67, 'end', None, None),                      # F1 (HR-14): 12 t after the last hit (was 76; the reform tail <= 12 t)
-)
-R2 = (
-    (0, 'tell', 'a7_tell', None),                 # a step back 0, yellow tell 2-10, retreats 6 b (4-14), settles 14
-    (16, 'throw', 'a7_throw', None),              # release 28: one disc aimed at its lock (F1 HR-15: the player's spot at 21)
-    (30, 'throw2', 'a7_throw', None),             # only at <= R2_TWO_PCT HP: release 42 (aimed anew: its lock at 35)
-    (60, 'end', None, None),
-)
-R2_TWO_PCT = 30
-R3 = (
-    (0, 'A8.T', 'g_tell', None),
-    (10, 'D2', 'g_glide', (10, 17, 24) + _T2),    # reappears low 8 b at the player's front-right (+55), glides to 1.6 b +45
-    (21, 'A8.4', 'g_sweep', (24, 30, 37) + _T3),  # hit1 24, springs up and hangs turning 24-32; hit2 37 = the X, T3 kb 3
-    (31, 'A8.5', 'g_x', None),
-    (37, 'reform', 'g_reform', None),             # reforms 37-46
-    (46, 'solid', None, None),
-    (49, 'end', None, None),                      # F1 (HR-14): 12 t after the last hit (was 60; the reform tail <= 12 t)
-)
-SCRIPTS = {'a8': A8_SCRIPT, 'a13': A13_SCRIPT, 'r1': R1, 'r2': R2, 'r3': R3}
+SCRIPTS = {'a8': A8_SCRIPT, 'a13': A13_SCRIPT}
 GAUNTLETS = ('a8', 'a13')
-CUT_IDS = {'a8': ('1', '2', '3', '4', '5', '6', '7', '8', '9'),
-           'a13': ('U1', 'U2', 'U3', 'U4', 'U5', 'U6', 'U8', 'U9', 'U10')}
-DISC_RELEASE = {'a13': (155, 167, 180), 'r2': (28, 42)}   # = row t + ev('a7_throw', 'release'); arrival ~ +7
-# F1 (HR-15, lead decision 11-05): each disc's aim locks LOCK_LEAD t before its release: a floor marker at the player's feet
-# (rlk_hr_lock + the pattern tags, as p1's lock_fn), she turns to it, g/disc/throw aims at it: lock -> hit = 7 t + the flight.
-DISC_LOCK = {k: tuple(t - LOCK_LEAD for t in v) for k, v in DISC_RELEASE.items()}
-BOLTS = {'a8': (34, 102, 161, 193), 'a13': (70, 225, 245, 258)}   # deco_bolt 3-6 b from the player (no hit), T+
-JUDGE_T = {'a8': 194, 'a13': 258}
-REPEL_T = {'a8': 206, 'a13': 270}                 # seq/repel {at:60 | 5} after g_deflect
-DARK_T, DARK_CALL_T, BRIM_T = -17, -18, -14       # T+ of the dark job's first slice / its call / the hand to the brim
-#                                                   in SQ1 (A8: sq1 'brim' 46); the lead-ins raise it at DARK_T (A13)
+CUT_IDS = {'a8': tuple(str(i) for i in range(1, 10)), 'a13': tuple(str(i) for i in range(1, 12))}
+CUT_GAP_MIN = 14          # every strike gap: a missed F (12 t refusal) never blocks the next cut
+EXTRA_VANISH = {'a13': (95,)}                     # g_ring does not end vanished: the vanish before D2's reappearance
+BOLTS = {'a8': (34, 102, 166, 218), 'a13': (70, 160, 205, 240)}   # deco_bolt 3-6 b from the player (no hit), T+
+JUDGE_T = {'a8': 220, 'a13': 242}
+REPEL_T = JUDGE_T                                 # the repel starts in the judge tick (its first frames are the gold deflect)
+# the 11-06 moon disc: only the kit's prop size reads it now (build_mboss_hr_fx.py DISC_SCALE); the module launches none
+DISC = {'hr': 1.4, 'y0': 0.2, 'y1': 2.4, 'speed': 1.75, 'life': 16, 'shape': 1, 'spin': 30, 'tier': 'T2', 'kb': 0,
+        'kb_last_r2': 2}
 DARK_SLICES = (-17, -14, -11, -8)                 # the `dark` job's four real slices land 3 t apart (PLAN §6.6)
 # Reappear geometry (S4's g/**), relative to the player's facing (+ = right), blocks / degrees (PLAN §4.5)
 # F1 (HR-27, lead decision 11-05): D2 / D4 at +-55 deg (was +-80): inside the default F5 view near its edge, as the footage
@@ -354,11 +354,8 @@ REAPPEAR = {
     'D3': {'dist': 2.5, 'up': 3.0, 'bearing': 60},
     'D4': {'dist': 12.0, 'bearing': -55},
     'A8.9': {'up': 6.0},
-    'tell': {'dist': 3.0, 'retreat': 12.0},
 }
-DOWN_T = 200              # the down window after CS2 (normal damage, the under bar = ticks left, gold)
-DOWN_FLOOR_WAIT = 40      # the hit reaching the 5 % floor in the down window -> lead_down 40 t later
-KIPUP_T, KIPUP_RECOVER = 20, 12   # the down's natural end: kipup (invulnerable) -> P2 decisions after 12 t
+P2_RECOVER, GROGGY_RECOVER = 20, 12   # P2's first decision after the repel {at:60}; the recovery after the balance groggy
 # The counter cinematic's scripted HP steps (true damage, per mille of mhpM via mboss/true_hit, at repel events
 # COUNTER_EV): repel {at:60} three steps (-4.5 %), repel {at:5} two steps then the lethal true hit (true_pct 100) at
 # 'kick'. PLAN §3.4 / §4.6 / §4.8 give 15, 15 at 5 % (-3 %, the footage 5.2 -> 2.3 %); §9.0's "(10, 10, 'kill')" is
@@ -367,10 +364,10 @@ COUNTER_PM = {60: (15, 15, 15), 5: (15, 15, 'kill')}
 COUNTER_EV = ('strike', 'land', 'kick')           # repel 49 / 101 / 129 (hr_design §3.4)
 FAIL60_PM = 500           # A8 fail (ULT60_LETHAL false): pl_dot 500 per mille, #mbDotLethal 0 (cannot kill) + a push
 FAIL60_PUSH = (2.5, 3)    # mboss_lib.push_ring(2.5, 3) at the impact point, the same tick
-FAIL60_REFORM_T, FAIL60_P2_T = 194, 214           # g_reform 194-204 (she lands 2 b from the player), P2 decision at 214
-FAIL5_T = {'reappear': 252, 'black': 255, 'slash': 258}   # the instant-death staging (ovl black 255-258, pinkwhite +
-#                                                           scarlet_line + ult/fatal at 258)
-REVIVE = {'dist': 8.0, 'wait': 60}                # after a Ronova revive: she stands 8 b away; 60 t later lead_stand a13
+FAIL60_REFORM_T, FAIL60_P2_T = 220, 240           # g_reform 220-230 (she lands 2 b from the player), P2 decision at 240
+FAIL5_T = {'reappear': 236, 'black': 239, 'slash': 242}   # the instant-death staging (ovl black 239-242, pinkwhite +
+#                                                           scarlet_line + ult/fatal at 242)
+REVIVE = {'dist': 8.0, 'wait': 60}                # after a Ronova revive: she stands 8 b away; 60 t later lead_re {g:a13}
 # Switches (PLAN §0.1 questions 5-7; each one value here, the default the build proceeds with)
 ULT60_LETHAL = False      # A8 fail = the 500 per-mille hit (True: the instant death + the banner)
 ULT5_LETHAL = True        # A13 fail = the instant death (ult/fatal; Ronova's revive applies) + the banner
@@ -399,41 +396,45 @@ COUNTER_TRIGGER = {'hits': 4, 'window': 40, 'chance': 70, 'front_deg': 45, 'flin
 # =============================================================================================
 # 4. AI (PLAN §4.7; S3 tunes values at review, the keys are frozen)
 BANDS = (4.5, 11.0)                              # near <= 4.5 < mid <= 11 < far
-MID_MAX = {'a3': 8.0, 'a9': 7.0}                 # these use their mid weight only up to this distance
-# WEIGHTS[key][fight phase 1 = P1 / 2 = P2] = (near, mid, far); renormalised over the entries off cooldown and allowed
-# F1 (HR-13 / HR-18, the P1 pressure package, lead decision 11-05): no empty band - the P1 near band gets A10 (20, the
-# yellow plunge on the locked spot) and small A1 / A2 weights (their 100-t cooldowns), so her near decision always has a
-# move; a band still empty twice in a row -> the 12-t backstep, then the mid pick (ai/none, ai/backstep).
-# S5 (11-06, the measured balance pass, HR-13/14/18 point 5's lever order): P1 near A9 25 -> 40 and A10 20 -> 40 (the two
-# player-centred lock discs a walking player cannot side-step; T1).
+MID_MAX = {'a3': 8.0, 'a3s': 8.0, 'a9': 7.0, 'tri': 10.0, 'blue': 7.0, 'kcut': 8.0}   # their mid weight only up to this distance
+MID_MIN = {'hcut': 8.0}                          # its mid weight only from this distance
+# WEIGHTS[key][fight phase 1 = P1 / 2 = P2] = (near, mid, far); renormalised over the entries off cooldown and allowed.
+# hr_design §2.2 *start* values (hrfair 2.0 tunes them, §6.4); a1 / a2 are trigger-only in P2; ult is never weighted.
 WEIGHTS = {
-    'a1': {1: (10, 0, 0)},
-    'a2': {1: (10, 0, 0)},
-    'a3': {1: (50, 15, 0), 2: (35, 10, 0)},
-    'a4': {1: (0, 35, 40), 2: (0, 20, 20)},
-    'a9': {1: (40, 10, 0), 2: (20, 10, 0)},
-    'a10': {1: (40, 25, 35), 2: (0, 15, 20)},
-    'r1': {2: (0, 20, 35)},
-    'r2': {2: (0, 15, 25)},
-    'r3': {2: (20, 25, 0)},
+    'a1': {1: (8, 0, 0)},
+    'a2': {1: (8, 0, 0)},
+    'a3': {1: (30, 10, 0), 2: (25, 10, 0)},
+    'a3s': {1: (30, 15, 0), 2: (30, 15, 0)},
+    'd4': {1: (25, 0, 0), 2: (20, 0, 0)},
+    'tri': {1: (0, 30, 0), 2: (0, 20, 0)},
+    'a4': {1: (0, 20, 25), 2: (0, 15, 15)},
+    'rings': {1: (20, 0, 0), 2: (20, 0, 0)},
+    'a9': {1: (25, 10, 0), 2: (15, 10, 0)},
+    'a10': {1: (20, 20, 25), 2: (0, 15, 20)},
+    'hcut': {1: (0, 10, 40), 2: (0, 10, 30)},
+    'blue': {1: (15, 15, 0), 2: (15, 15, 0)},
+    'kcut': {1: (20, 15, 0), 2: (20, 15, 0)},
+    'mx': {2: (20, 25, 20)},
+    'nb': {2: (0, 20, 25)},
+    'q': {2: (0, 20, 30)},
 }
-# F1 (lead decision 11-05): A9 P1 300 -> 160 (one full-screen flash per >= 8 s), A10 P1 260 -> 180, P2 = P1 x 0.85 rounded
-# to 10 t as the other entries (A9 140, A10 150); A6 400 in both phases (HR-38). S5 (11-06): A10 P1 180 -> 120, P2 = x0.85
-# -> 100 (A9 stays 160 / 140: one full-screen flash per >= 8 s, the lead's floor).
-COOLDOWN = {'a1': {1: 100, 2: 85}, 'a2': {1: 100, 2: 85}, 'a3': {1: 120, 2: 100}, 'a4': {1: 160, 2: 140},
-            'a6': {1: 400, 2: 400}, 'a9': {1: 160, 2: 140}, 'a10': {1: 120, 2: 100}, 'r1': {2: 220}, 'r2': {2: 260},
-            'r3': {2: 200}}
-TRIGGER_ONLY = ('a6',)                           # never picked by weight: the skill trigger (A1 / A2: the counter trigger,
-#                                                  the rear rule and, F1, small P1 near weights)
-FAR_RULE = {'dist': 8.0, 'dwell': 30, 1: {'a4': 60, 'a10': 40}, 2: {'r1': 40, 'a4': 30, 'r2': 30},
-            'fallback': ('glide', 'a3')}         # also the decision 16 t after A6
+COOLDOWN = {'a1': {1: 100, 2: 85}, 'a2': {1: 100, 2: 85}, 'a3': {1: 140, 2: 120}, 'a3s': {1: 80, 2: 70},
+            'd4': {1: 140, 2: 120}, 'tri': {1: 140, 2: 120}, 'a4': {1: 160, 2: 140}, 'rings': {1: 160, 2: 140},
+            'a6': {1: 400, 2: 400}, 'a9': {1: 160, 2: 140}, 'a10': {1: 120, 2: 100}, 'hcut': {1: 160, 2: 140},
+            'blue': {1: 180, 2: 150}, 'kcut': {1: 200, 2: 170}, 'mx': {2: 150}, 'nb': {2: 180}, 'q': {2: 300}}
+TRIGGER_ONLY = ('a6', 'ult')                     # never picked by weight: the skill trigger; ult only after rings at a full
+#                                                  gauge (A1 / A2: the counter trigger, the rear rule, small P1 near weights)
+FAR_RULE = {'dist': 8.0, 'dwell': 30, 1: {'hcut': 45, 'a4': 30, 'a10': 25}, 2: {'nb': 40, 'q': 30, 'hcut': 30},
+            'fallback': ('glide', 'a3s')}        # also the decision 16 t after A6
+ULT_FORCE = {'key': 'rings', 'then': 'ult', 'bands': (0, 1)}   # #gau = max: the next near / mid decision is rings (its cooldown
+#                                                                ignored), then ult; from far she closes first (the far rule)
 REAR_RULE = {'deg': 60, 'dwell': (20, 30), 'key': 'a1', 'cd_ignore_every': 200}
 NO_REPEAT = True                                 # no immediate repeat of an entry
 
 # =============================================================================================
 # 5. Keys, sequences, ownership, test ids, lines (PLAN §3.0, §9.0-9.2)
-P1 = ('a1', 'a2', 'a3', 'a4', 'a6', 'a9', 'a10')    # S3: tools/mboss_scarlet/p1.py -> p/<key>/** (a4 includes A5)
-P2 = ('r1', 'r2', 'r3', 'a8', 'a13')                # S4: tools/mboss_scarlet/p_ghost.py -> p/<key>/**
+P1 = ('a1', 'a2', 'a3', 'a3s', 'a4', 'a6', 'a9', 'a10', 'd4', 'tri', 'rings', 'ult', 'hcut', 'blue', 'kcut')   # p1.py
+P2 = ('mx', 'nb', 'q', 'a8', 'a13')                 # p_ghost.py -> p/<key>/** (P2's three entries + the gauntlets G1 / G2)
 SEQS = ('intro', 'cs1', 'lead60', 'repel', 'lead5', 'lead_re', 'ending', 'event')   # H2: seq.py -> seq/<name>/**
 SEQ_CONTRACT = 2          # seq.py declares `CONTRACT = 2` once it implements this table (else: the core stand-ins)
 SEQ_CLIPS = {'intro': ('intro', 'intro_end'), 'cs1': ('cs1',), 'lead60': ('lead60',), 'repel': ('repel',),
@@ -476,27 +477,33 @@ ACTOR_MANIFEST = _TOOLS / 'player_motion/cine/manifest.json'                    
 ACTOR_CALLS = {'spawn': [], 'play': ['clip'], 'tick': [], 'face': ['yaw'], 'stop': []}   # function rlk:char/cine/<call>
 ACTOR_CLOCK = ('#cavT', 'cine')                         # the clip tick to show: the module writes #sq hr into it every tick
 CAM_REQ, CAM_ID = ('#mbCam', 'mb'), ('#mbCamId', 'mb')  # FN-cam (H2): the lock request (1 every tick) and the live camera 1 / 2
-PATTERN_NAMES = {'a1': '회전 반월참', 'a2': '역습 일섬', 'a3': '오연 반월', 'a4': '월하 낙참 · 공중 원륜',
-                 'a6': '후방 섬보', 'a9': '황광 원참', 'a10': '황광 낙참', 'r1': '자영 돌격', 'r2': '월륜 일섬',
-                 'r3': '자영 활강', 'a8': '자영 연참', 'a13': '필살 · 자영 연참'}    # test/help only: no pattern
-#                                                                                   name is ever shown in the fight
-# boss/test/pattern {id:N} (PLAN §9.2); test/help lists TEST_HELP_NAMES; test/lock {id} for LOCK_IDS
-TEST_IDS = {1: 'a1', 2: 'a2', 3: 'a3', 4: 'a4', 5: 'a6', 6: 'a9', 7: 'a10', 11: 'r1', 12: 'r2', 13: 'r3',
-            20: 'cs1 -> sq1 -> a8', 21: 'a8 now (5/5)', 22: 'a8 with 0 pips (deflect -> cs2 -> down)', 23: 'a8 fail',
-            24: 'cs2 only', 25: 'down window', 26: 'lead_stand a13 + a13', 27: 'a13 now',
-            28: 'a13 with 0 pips (cs3 -> kill -> cs4 -> coda)', 29: 'a13 fail (instant death; test/defeat)',
-            30: 'intro replay', 31: 'look dark on / off', 32: 'look crimson', 33: 'p2 now (skip cs1 / a8)',
-            34: 'HP = 5 % floor + 1', 35: 'intro skip at tick 100', 80: 'HP = next floor + 1',
-            90: 'next event random', 91: 'next event = item', 92: 'next event = buff', 99: 'hold'}
+PATTERN_NAMES = {'a1': '회전 반월참', 'a2': '역습 일섬', 'a3': '오연 반월', 'a3s': '쌍월참', 'a4': '월하 낙참 · 공중 원륜',
+                 'a6': '후방 섬보', 'a9': '황광 원참', 'a10': '황광 낙참', 'd4': '원월 사연', 'tri': '돌진 삼월참',
+                 'rings': '회전 월륜', 'ult': '공간 참', 'hcut': '황광 섬월', 'blue': '청광 돌파', 'kcut': '황광 난참',
+                 'mx': '자광 십자참', 'nb': '낙월 사선', 'q': '자영 포박 · 천공 낙월', 'a8': '자영 연참',
+                 'a13': '필살 · 자영 연참'}    # test/help only: no pattern name is ever shown in the fight
+# boss/test/pattern {id:N} (hr_design §5.1); test/help lists TEST_HELP_NAMES; test/lock {id} for LOCK_IDS. A pattern key
+# sits at its #pat id (12 = ult: the test fills the gauge and starts rings, ult follows).
+TEST_IDS = {1: 'a1', 2: 'a2', 3: 'a3', 4: 'a4', 5: 'a6', 6: 'a9', 7: 'a10', 8: 'a3s', 9: 'd4', 10: 'tri', 11: 'rings',
+            12: 'ult', 13: 'hcut', 14: 'blue', 15: 'kcut', 16: 'mx', 17: 'nb', 18: 'q', 19: 'groggy now',
+            20: 'cs1 -> lead60 -> a8', 21: 'a8 now (5/5)', 22: 'a8 with the gauge at 0 (repel -> p2)', 23: 'a8 fail',
+            24: 'repel {at:60} only', 26: 'lead5 + a13', 27: 'a13 now',
+            28: 'a13 with the gauge at 0 (repel -> kill -> ending -> coda)', 29: 'a13 fail (instant death; test/defeat)',
+            30: 'intro replay', 32: 'look crimson', 33: 'p2 now (skip cs1 / a8)', 34: 'HP = 5 % floor + 1',
+            35: 'intro skip at tick 100', 36: 'cs1 skip at tick 100', 37: 'gauge = 50', 38: 'balance = 1',
+            80: 'HP = next floor + 1', 90: 'next event random', 91: 'next event = item', 92: 'next event = buff', 99: 'hold'}
 TEST_HELP_NAMES = {1: '회전 반월참', 2: '역습 일섬', 3: '오연 반월', 4: '월하 낙참 + 공중 원륜', 5: '후방 섬보',
-                   6: '황광 원참', 7: '황광 낙참', 11: '자영 돌격', 12: '월륜 일섬', 13: '자영 활강',
+                   6: '황광 원참', 7: '황광 낙참', 8: '쌍월참', 9: '원월 사연', 10: '돌진 삼월참', 11: '회전 월륜',
+                   12: '회전 월륜 → 공간 참 (게이지 가득)', 13: '황광 섬월', 14: '청광 돌파', 15: '황광 난참',
+                   16: '자광 십자참', 17: '낙월 사선', 18: '자영 포박 · 천공 낙월', 19: '그로기',
                    20: '60% 컷신 → 자영 연참', 21: '자영 연참 (실드 5칸)', 22: '자영 연참 (실드 0칸 → 반격)',
-                   23: '자영 연참 실패', 24: '반격 장면', 25: '쓰러짐', 26: '5% 이어짐 + 필살 · 자영 연참',
+                   23: '자영 연참 실패', 24: '반격 장면', 26: '5% 이어짐 + 필살 · 자영 연참',
                    27: '필살 · 자영 연참', 28: '필살 (실드 0칸 → 엔딩)', 29: '필살 실패 (즉사)', 30: '등장 다시',
-                   31: '어둠 켜기 / 끄기', 32: '붉은 들판', 33: '2페이즈로', 34: '체력 = 5% + 1',
-                   35: '등장 건너뛰기 (100틱)', 80: '체력 = 다음 바닥 + 1', 90: '다음 이벤트 무작위',
+                   32: '붉은 들판', 33: '2페이즈로', 34: '체력 = 5% + 1', 35: '등장 건너뛰기 (100틱)',
+                   36: '60% 컷신 건너뛰기 (100틱)', 37: '게이지 가득', 38: '균형치 1칸',
+                   80: '체력 = 다음 바닥 + 1', 90: '다음 이벤트 무작위',
                    91: '다음 이벤트 = 화무십일홍', 92: '다음 이벤트 = 월하대작', 99: '멈춤'}
-LOCK_IDS = tuple(i for i in sorted(TEST_IDS) if 1 <= i <= 13)
+LOCK_IDS = tuple(i for i in sorted(TEST_IDS) if 1 <= i <= 18)
 # Lines (PLAN §3.0, verbatim from the user's wiki pages w1 / w2 and the footage subtitles; speaker 홍련): kit
 # fx/hud/line {id} types two syllables per 2-t step with block.note_block.hat 0.3, holds, clears; a new line replaces a
 # running one; while an overlay is up the line keeps the overlay glyph on the title.
@@ -552,15 +559,18 @@ MUSIC_AT = {1: ('intro_end', 'music'), 2: ('cs1', 'music'), 3: ('ending', 'music
 # the buff objective hrMoon (SR, per player).
 OBJ = 'hr'
 CORE_FP = ('#ph', '#pat', '#pt', '#done', '#clk', '#rigc', '#rigt', '#sq', '#sqdone', '#hud', '#fl', '#tst', '#lock',
-           '#last', '#last2', '#rear', '#far', '#dec', '#rec', '#hits', '#a6cd', '#pips', '#gres', '#gk', '#down',
+           '#last', '#last2', '#rear', '#far', '#dec', '#rec', '#hits', '#a6cd', '#gres', '#gk',
            '#skip', '#warn', '#inv', LOOK_REQ)
 # I1 (request s3-5): S3's own fake players, folded in from s3lib.FP_EXTRA in the same order (s3lib.FP = CORE_FP; cleanup resets
 # exactly these, the build refuses any other '#name hr' of S3's files): temporaries, the constants #c<n> (CORE_CONSTS), the
 # floor / sequence / shield / kipup / revive / skip state, the AI's #ai_* and its per-pattern weights / cooldowns.
-CORE_CONSTS = (2, 3, 5, 10, 64, 100, 577, 1000, 36000)
+CORE_CONSTS = (2, 3, 5, 6, 10, 64, 100, 577, 1000, 36000)
 CORE_FP += (('#t', '#t2', '#t3', '#t4', '#t5', '#cn1', '#cn1000') + tuple(f'#c{c}' for c in CORE_CONSTS)
-            + ('#fl60', '#fl5', '#flw', '#sqn', '#sqh', '#shb', '#kip', '#grs', '#rvw', '#a6q', '#ctr', '#flq', '#h1', '#h2',
+            + ('#fl60', '#fl5', '#sqn', '#sqh', '#shb', '#grs', '#rvw', '#a6q', '#ctr', '#flq', '#h1', '#h2',
                '#h3', '#h4', '#pipoff', '#lk', '#skp', '#rp')
+            # hr_design §1.2-1.5 (H1's build): #pp a perfect parry seen this tick, #ppf the PP flinch's ticks left, #ultq ult
+            # follows the running rings, #hpp the player hits read this tick, #c30 / #c50 constants' helpers
+            + ('#pp', '#ppf', '#ultq', '#hpp', '#grc')
             + ('#ai_d2', '#ai_mv', '#ai_pht', '#ai_sum', '#ai_r', '#ai_rc', '#ai_ff', '#ai_nx', '#ai_rcd', '#ai_fl', '#ai_lf',
                '#ai_ls', '#ai_nn', '#ai_bs',        # F1 (HR-13): an empty pick in a row, the backstep's mid pick pending
                '#ai_tmc',                           # F1 round 1 (HR-14): the module clock of a kept tail's last move tick
@@ -815,24 +825,18 @@ def ev(clip, event):
 
 
 def _script_hits(key):
-    """HITS rows of a scripted pattern: each cut lands as a pdisc(CUT_R) on the contact of the move whose clip 'hit'
-    meets the cut's strike; each a7_throw row releases one moon disc."""
+    """HITS rows of a gauntlet: each cut lands as a parryable pdisc(CUT_R) on the contact of the move whose clip 'hit'
+    meets the cut's strike."""
     rows, out = SCRIPTS[key], []
     for t, _step, clip, c in rows:
         if c:
             mv = [r for r in rows if r[2] and 'hit' in CLIPS[r[2]][2] and r[0] + ev(r[2], 'hit') == c[2]]
             assert len(mv) == 1, (key, c)
-            out.append((mv[0][2], 'hit', 'pdisc', (CUT_R,), c[3], c[4]))
-        if clip == 'a7_throw':
-            out.append(('a7_throw', 'release', 'pj_disc', (DISC['hr'], DISC['speed'], DISC['life']), DISC['tier'],
-                        DISC['kb']))
+            out.append((mv[0][2], 'hit', 'pdisc', (CUT_R,), c[3], c[4], 'P'))
     return out
 
 
-HITS.update({k: _script_hits(k) for k in ('a8', 'a13', 'r1', 'r3')})
-# R2: one disc (kb 2 as a single hit); at <= R2_TWO_PCT HP a second disc follows, then the first is kb 0, the last kb 2
-HITS['r2'] = [('a7_throw', 'release', 'pj_disc', (DISC['hr'], DISC['speed'], DISC['life']), DISC['tier'],
-               DISC['kb_last_r2'])]
+HITS.update({k: _script_hits(k) for k in GAUNTLETS})
 
 # =============================================================================================
 # 8. Kit contract (S1K implements in tools/build_mboss_hr_fx.py, PLAN §9.2). Values in tenths of a block / degrees /
@@ -1018,6 +1022,7 @@ KIT_SOUND_RECIPES = {
     'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),       # U 24
     'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),     # U 46
     'sky_pillar': (('item.trident.thunder', 0.5, 1.9),),                  # q pillar 74
+    'kcut_go': (('item.trident.riptide_3', 0.6, 1.4),),                   # kcut's dash-through 20
 }
 KIT_SOUNDS = tuple(KIT_SOUND_RECIPES)
 # fx/hud/<name>: line {id} (LINES 1-25, letter reveal, overlay-aware), ovl {g,in,hold,out} (a full-screen title glyph;
@@ -1327,8 +1332,8 @@ FILES_9_1 = (
     'F:boss/scarlet/test/help', 'F:boss/scarlet/init', 'F:boss/scarlet/shield/cut', 'F:boss/scarlet/ult/fatal',
     'F:boss/scarlet/ev/roll', 'F:boss/scarlet/reward', 'F:boss/scarlet/p/a1/start', 'F:boss/scarlet/rig_stub/tick',
     'HR:renders/s3_a1.png',
-    'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/r1/start',
-    'F:boss/scarlet/p/r2/start', 'F:boss/scarlet/p/r3/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
+    'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/mx/start',
+    'F:boss/scarlet/p/nb/start', 'F:boss/scarlet/p/q/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
     'F:items/mythic/sword_hwamu/def', 'F:items/proc/hw_hit', 'F:items/register', 'F:player/take_damage',
     'F:player/def/judge', 'F:player/reset_one', 'F:player/update_item', 'F:player/update_item_macro',
     'F:player/hr_moon/apply', 'F:codex/labels', 'F:snd/f422', 'F:snd/f429', 'F:load', 'F:uninstall', 'R:items.md',
@@ -1343,32 +1348,33 @@ def owners_of(path):
             if any(fnmatchcase(path, p) and not any(fnmatchcase(path, x) for x in ex) for p, ex in pats)]
 
 
-# Shield (S3 -> S4; PLAN §5): call names under F:boss/scarlet/ and their macro args
-SHIELD_CALLS = {'arm': 'shield/arm', 'cut': 'shield/cut', 'judge': 'shield/judge', 'fail60': 'ult/fail60',
-                'fatal': 'ult/fatal', 'off': 'shield/off'}
-SHIELD_ARGS = {'cut': ['s']}
+# Shield = the 5-segment gauge inside a gauntlet (hr_design §1.2; shield.py -> p_ghost.py): call names under
+# F:boss/scarlet/ and their macro args
+SHIELD_CALLS = {'arm': 'shield/arm', 'judge': 'shield/judge', 'fail60': 'ult/fail60', 'fatal': 'ult/fatal',
+                'off': 'shield/off'}
+SHIELD_ARGS = {}
 GRES = '#gres'          # objective OBJ, after shield/judge: 1 deflect, 2 fail
-PIPS_FP = '#pips'       # pips left (the under bar #buSub)
+PIPS_FP = GAUGE_FP      # the segments left = #gau / GAUGE['seg'] (the under bar #buSub)
 
 
 def shield(call, **a):
-    """A shield call line (shield/arm: 5/5 + the under bar; shield/cut {s}: register a counting cut's strike tick s and
-    store its lock point (@s / position = the cut marker at the lock); shield/judge -> #gres hr; ult/fail60; ult/fatal
-    (@s = the player); shield/off)."""
+    """A shield call line (shield/arm: the gauge 5/5 + the under bar + the refill effect; shield/judge -> #gres hr;
+    ult/fail60; ult/fatal (@s = the player); shield/off: the gauge 0). The pip of a cut is the core's: shield/tick after
+    every gauntlet tick takes one segment for a perfect parry (PIP_RULE)."""
     assert call in SHIELD_CALLS and sorted(a) == sorted(SHIELD_ARGS.get(call, [])), (call, a)
     return f'function {NS}{SHIELD_CALLS[call]}' + (f' {_macro(a)}' if a else '')
 
 
-# The cut builder (PLAN §5.3; S4 implements g/cut/**): a ghost cut = a quiet Electro disc hazard of radius CUT_R at the
-# player's feet, made at `made` (tell = strike - made), re-aimed onto the player every tick until `lock` = strike -
-# LOCK_LEAD, then fixed; a counting cut (gauntlets) registers with shield/cut {s} at the lock.
+# The cut builder (hr_design §2.4; p_ghost.py implements g/cut/**): a gauntlet cut = a quiet Electro disc hazard of radius
+# CUT_R at the player's feet, parryable (hz_opts noparry 0), made at `made` (tell = strike - made), re-aimed onto the player
+# every tick until `lock` = strike - LOCK_LEAD, then fixed; the parry cue plays at the lock tick (the pattern's line).
 CUT_CALLS = ('g/cut/make', 'g/cut/aim', 'g/cut/lock')
 CUT_ARGS = {'g/cut/make': ['s', 't', 'dmg', 'kb', 'n'], 'g/cut/aim': ['s'], 'g/cut/lock': ['s']}
 
 
-def cut(made, lock, strike, tier='T2', kb=KB_CUT, count=1):
+def cut(made, lock, strike, tier='TC', kb=KB_CUT, count=1):
     """[(pattern tick, line)] of one cut: make at `made` (s = strike tick, t = strike - made, dmg = DMG[tier], kb, n =
-    1 counting / 0 not), aim every tick made+1 .. lock-1, lock at `lock` (which also calls shield/cut {s} when n = 1).
+    1 counting / 0 not), aim every tick made+1 .. lock-1, lock at `lock` (the last aim).
     @s / position: the pattern's executor (the body); g/cut/* find the player and their own marker (rlk_hr_cut, by s)."""
     assert lock == strike - LOCK_LEAD and strike - made >= TELL_MIN and made <= lock, (made, lock, strike)
     assert tier in DMG and int(count) in (0, 1)
@@ -1376,14 +1382,6 @@ def cut(made, lock, strike, tier='T2', kb=KB_CUT, count=1):
     out += [(t, f'function {NS}g/cut/aim {_macro({"s": strike})}') for t in range(made + 1, lock)]
     out.append((lock, f'function {NS}g/cut/lock {_macro({"s": strike})}'))
     return out
-
-
-def disc(kb=0):
-    """The one A7 moon-disc launch line (S4's g/disc/throw): @s = the body, rotated toward its lock (F1 HR-15: g/disc/lock,
-    the player's floor spot at DISC_LOCK = release - LOCK_LEAD; a throw without a lock locks at once); one pj/launch (DISC)
-    + one kit card (fx/prop/disc); kb 0, or 2 for R2's last disc."""
-    assert int(kb) in (0, DISC['kb_last_r2'])
-    return f'function {NS}g/disc/throw {_macro({"kb": kb})}'
 
 
 # FN-f (S1): mboss_lib.bars(on) -> one line, BARS_FNS[on]: 'function rlk:mboss/bars_off' (NEW: sets #mbBarOff mb 1,
@@ -1536,7 +1534,7 @@ def ev_title():
 def _check_scripts():
     for key, rows in SCRIPTS.items():
         ts = [r[0] for r in rows]
-        assert ts == sorted(ts), f'{key}: rows out of order'
+        assert ts == sorted(ts) and ts[0] == 0, f'{key}: rows out of order'
         for t, step, clip, c in rows:
             assert clip is None or clip in CLIPS, (key, step, clip)
             if c:
@@ -1544,20 +1542,22 @@ def _check_scripts():
                 cut(made, lock, strike, tier, kb)                     # lock = strike - 7, made >= 12 t before
                 hits = [r for r in rows if r[2] and 'hit' in CLIPS[r[2]][2] and r[0] + ev(r[2], 'hit') == strike]
                 assert len(hits) == 1, f'{key}: cut {c} strikes on no / several move contacts'
-    for g in GAUNTLETS:
+    for g, n in (('a8', 9), ('a13', 11)):
         cuts = [r[3] for r in SCRIPTS[g] if r[3]]
-        assert len(cuts) == len(CUT_IDS[g]) == 9 and all(c[3:] == _TC for c in cuts), g    # F1 (HR-19): tier TC
+        assert len(cuts) == len(CUT_IDS[g]) == n and all(c[3:] == _TC for c in cuts), g    # F1 (HR-19): tier TC, kb 0
+        strikes = [c[2] for c in cuts]
+        assert all(b - a >= CUT_GAP_MIN for a, b in zip(strikes, strikes[1:])), (g, strikes)
         dive = [r for r in SCRIPTS[g] if r[2] == 'g_dive']
-        assert len(dive) == 1 and dive[0][0] + ev('g_dive', 'hit') == JUDGE_T[g], g
-        assert REPEL_T[g] == JUDGE_T[g] + CLIPS['g_deflect'][0], g
-    for key, rels in DISC_RELEASE.items():
-        rows = [r for r in SCRIPTS[key] if r[2] == 'a7_throw']
-        assert tuple(r[0] + ev('a7_throw', 'release') for r in rows) == rels, key
-        assert all(r[0] <= lk < rel for r, lk, rel in zip(rows, DISC_LOCK[key], rels)), key   # F1 (HR-15): inside its throw
-    # F1 (HR-14): every P1-kit pattern ends 8-12 t after its last hit, inside its clip
+        assert len(dive) == 1 and dive[0][0] + ev('g_dive', 'hit') == JUDGE_T[g] == REPEL_T[g] == SCRIPTS[g][-1][0], g
+        assert all(0 < t <= JUDGE_T[g] for t in BOLTS[g]) and len(BOLTS[g]) == 4
+    assert FAIL5_T['slash'] == JUDGE_T['a13'] and FAIL60_REFORM_T == JUDGE_T['a8'] < FAIL60_P2_T
+    # hr_design §2.1: every pattern ends 8-12 t after its last hit, inside its clip (a4: after its landing)
     for key, end in PAT_END.items():
-        last = max(ev(c, e) for c, e, *_r in HITS[key]) if key != 'a4' else ev('a4', 'land')
-        assert 8 <= end - max(ev(c, e) for c, e, *_r in HITS[key]) <= 12 and last < end < CLIPS[key][0], (key, end)
+        hs = [h for i, h in enumerate(HITS[key]) if HIT_PH.get(key, {}).get(i) is None]
+        last = max(ev(c, e) for c, e, *_r in hs)
+        assert 8 <= end - last <= 12 and last < end < CLIPS[hs[-1][0]][0], (key, end)
+    for fp, end in RINGS_END.items():
+        assert end == max(ev(c, e) for i, (c, e, *_r) in enumerate(HITS['rings']) if HIT_PH['rings'].get(i, fp) == fp) + 10
 
 
 def _check_contract():
@@ -1567,12 +1567,26 @@ def _check_contract():
         assert lp is None or 0 <= lp[0] < lp[1] <= ln, f'clip {k}: loop {lp}'
     for key, hs in HITS.items():
         assert key in P1 + P2, key
-        for clip, e, shape, dims, tier, kb in hs:
+        for i, (clip, e, shape, dims, tier, kb, par) in enumerate(hs):
             assert clip in CLIPS and e in CLIPS[clip][2], f'HITS {key}: {clip}.{e}'
-            assert tier in DMG and kb in (KB_CHAIN, KB_SINGLE, KB_FINAL), (key, tier, kb)
+            assert tier in DMG and kb in (KB_CHAIN, KB_SINGLE, KB_FINAL, KB_THROW) and par in ('P', 'N'), (key, tier, kb, par)
+            assert shape in ('sector', 'disc', 'line', 'dash_line', 'pdisc', 'full'), (key, shape)
+            # every N hit has its flash row (a group's other rows share it: ()), no P hit has one
+            assert (i in FLASH_AT.get(key, {})) == (par == 'N'), f'HITS {key}[{i}]: the flash table and the P / N column differ'
+        for i, fl in FLASH_AT.get(key, {}).items():
+            h_t = ev(hs[i][0], hs[i][1])
+            for col, clip, e, off in fl:
+                t = ev(clip, e) + off
+                assert col in FLASH and clip == hs[i][0], (key, i, col)
+                if col == 'purple':
+                    assert h_t - t == PURPLE_LEAD, f'{key}[{i}]: purple {t} -> {h_t}'
+                if col == 'yellow':
+                    assert h_t - t >= YELLOW_MIN, f'{key}[{i}]: yellow {t} -> {h_t}'
     _check_scripts()
-    for key in ('a8', 'a13', 'r1', 'r2', 'r3'):
-        assert key in HITS, key
+    assert set(HITS) == set(P1 + P2), set(HITS) ^ set(P1 + P2)
+    assert all(k in P1 + P2 for k in list(MID_MAX) + list(MID_MIN) + list(PAT_END) + list(DASH_BEYOND))
+    for fp in (1, 2):
+        assert all(k in WEIGHTS or k in TRIGGER_ONLY for k in FAR_RULE[fp]) and FAR_RULE['fallback'][1] in P1
     assert sorted(LINES) == list(range(1, 26)) and all(LINES.values())
     assert sorted(LINE_AT) == sorted(LINES), 'every line has a place'
     assert all(i in LINES and len(p) >= 2 and ' '.join(p) == LINES[i] for i, p in LINE_PAGES.items()), 'LINE_PAGES verbatim'
@@ -1588,6 +1602,7 @@ def _check_contract():
         assert e in CLIPS[clip][2], (ph, clip)
     keys = set(P1 + P2)
     assert {TEST_IDS[i] for i in LOCK_IDS} == keys - set(GAUNTLETS) and len(P1 + P2) == len(keys)
+    assert not {11, 25, 31} & {i for i, v in TEST_IDS.items() if v in ('r1', 'down window', 'look dark on / off')}
     assert TEST_IDS[21].startswith('a8') and TEST_IDS[27].startswith('a13')
     assert set(TEST_HELP_NAMES) == set(TEST_IDS) and set(EV_TEST_IDS) <= set(TEST_IDS)
     assert set(WEIGHTS) | set(TRIGGER_ONLY) <= keys and set(COOLDOWN) <= keys and set(WEIGHTS) & set(TRIGGER_ONLY) == set()
@@ -1634,7 +1649,7 @@ def _check_contract():
     assert sorted(OVERLAYS_HR.values()) == [0xEC17, 0xEC18] and list(OVERLAYS_PLAN)[-2:] == ['gold', 'web']
     assert all(FONT_RANGE[0] <= c <= FONT_RANGE[1] for c in list(OVERLAYS_PLAN.values()) + [VIG])
     assert all(0 < t <= JUDGE_T[g] for g in GAUNTLETS for t in BOLTS[g])
-    assert DARK_SLICES[0] == DARK_T == DARK_CALL_T + 1 and DARK_SLICES == tuple(DARK_T + 3 * i for i in range(4))
+    assert DARK_SLICES == tuple(DARK_SLICES[0] + 3 * i for i in range(4))    # the theme's dark look (never requested now)
     assert LOOKS['scabbard'][-1] == 'gone' and set(ARENA_LOOKS) == set(LOOK_ID)
     assert xyz((884.0, 201.0, -5.0)) == '884.0 201 -5.0' and xyz((880.5, 200.9, 31.25)) == '880.5 200.9 31.25'
     return True

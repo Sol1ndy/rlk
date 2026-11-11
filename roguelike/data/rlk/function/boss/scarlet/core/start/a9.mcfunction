@@ -4,6 +4,8 @@ function rlk:boss/scarlet/core/stop_move
 scoreboard players set #pat hr 6
 scoreboard players set #pt hr 0
 scoreboard players set #done hr 0
+scoreboard players set #ppf hr 0
+scoreboard players set #ultq hr 0
 scoreboard players set #hits hr 0
 scoreboard players operation #last2 hr = #last hr
 scoreboard players set #last hr 6

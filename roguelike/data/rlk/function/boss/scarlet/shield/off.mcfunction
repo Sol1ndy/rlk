@@ -1,4 +1,3 @@
-# The shield off: no pips, no under bar, no pip window (cleanup, death, a cancelled gauntlet).
-scoreboard players set #pips hr 0
+# The gauge empty (a cancelled gauntlet, death, cleanup).
+scoreboard players set #gau hr 0
 scoreboard players set #shb hr 0
-kill @e[type=minecraft:marker,tag=rlk_hr_pip]

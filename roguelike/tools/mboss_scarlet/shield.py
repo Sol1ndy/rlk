@@ -1,31 +1,27 @@
-"""The 5-pip shield, the judge and the two fail hits of 홍련 (PLAN §5; OWNER: S3; the S4 gauntlets call it through
-api.shield()): shield/arm, shield/cut {s}, shield/tick (the core's per-tick pip check), shield/judge, ult/fail60,
-ult/fatal, shield/off, and the under bar (hud/bar_shield: #buSub = pips, #buSubMax 5, colour api.BU_SHIELD).
+"""The 5-segment gauge inside a gauntlet, the judge and the two fail hits of 홍련 (hr_design §1.2, §2.4; lane H1; the
+gauntlets call it through api.shield()): shield/arm, shield/tick (the core's per-tick segment check), shield/take,
+shield/judge, ult/fail60, ult/fatal, shield/off, and the under bar (hud/bar_shield: #buSub = #gau / 10, #buSubMax 5,
+colour api.BU_SHIELD).
 
-Semantics (contract §3.6, PLAN §5.1; combat overhaul C PIP_RULE 'perfect', was 'timed_dash'):
-- shield/arm (any executor): #pips hr = api.PIPS (5), the under bar on (#shb 1), #gres 0, every pending pip window gone.
-  The core calls it at SQ1 tick 0 and at a lead-in's refill beat (#sq_sig refill); a gauntlet never needs to.
-- shield/cut {s} (@s / position = the cut marker at its lock): registers one counting cut whose strike is pattern tick s
-  (#pt hr of the running gauntlet) and stores its lock point: a marker rlk_hr_pip there (objective hr = s). At #pt = s a
-  pip goes when the player's perfect window covers this tick (api.PIP_Q[0] = player/def/q_pf0: a dodge or an F press 0..2 t
-  ago), at #pt = s + 1 when it covered the tick before (api.PIP_Q[1]), and the player's feet are within api.PIP_R (6.2 b)
-  of the lock point; whatever the dodge direction; one pip per cut; never
-  below 0; kit pip_break at the player + its sound. The window closes after s + 1. Discs, the dive and uncounted cuts
-  (api.cut count 0) never call it.
-- shield/tick: run by the core every tick of a gauntlet, right after p/<g>/tick (the cut's own lock / strike already ran).
-- shield/judge (@s any): the pip windows close, the under bar goes; #gres hr = 1 (deflect: #pips 0) or 2 (fail). The
-  deflect staging is played here (kit clash_gold + light_column at the player, the deflect sound, the body's g_deflect
-  clip); the fail branch is the gauntlet's (A8: ult/fail60 + g_reform; A13: the FAIL5_T staging + ult/fatal). F2: the
-  column stands upright whatever the body's pitch (HR-41); in first person (no avatar: the player is rlk_body, the camera
-  on its own axis) the starburst sits 1.8 b out on the player's view ray and the column 1.8 b in front of them (HR-45).
+The gauge is api.GAUGE_FP (#gau hr, 0-50 = tenths of a segment). Outside the gauntlets the core charges it (core/gauge/*:
++3 per pattern, +5 per landed hit) and U spends it; inside:
+- shield/arm (any executor): #gau = 50 in one step (lead60's tick 0, the lead-ins' refill beat #sq_sig refill), #gres 0.
+  Silent: the refill effect and sound are the sequence's.
+- shield/tick: run by the core every tick of a gauntlet, right after p/<g>/tick. api.PIP_RULE 'perfect_parry': a cut is a
+  normal parryable hazard; when its hit on the player was judged a perfect parry the framework leaves #mbDodgeOk mb 1
+  (mboss/hurt_dodge) with #parT tmp 3 - the hazard strikes after the module tick, so the module sees it one tick later
+  (two for the second tick of the cut's 2-t active window). Then one segment goes (shield/take: -10, never below 0, the
+  kit's pip_break at the player + its sound) and #mbDodgeOk is cleared. A perfect dodge (#mbDodgeOk 1, #parT 0), a tier
+  2 / 1 parry (a landed hit: no #mbDodgeOk) and walking out take nothing. One cut = one hazard = at most one hit.
+- shield/judge (@s any): #gres hr = 1 (the gauge is 0: the deflect; the core starts seq/repel in this tick and the repel's
+  first frames are the gold deflect) or 2 (fail: the gauntlet's own branch follows); the gauge is 0 after either outcome.
 - ult/fail60 (position = the impact point): mboss/pl_dot api.FAIL60_PM per mille of the player's max HP, Electro,
   #mbDotLethal 0 (never kills), the push ring mboss_lib.push_ring(*api.FAIL60_PUSH) there in the same tick, the impact
   effects (kit dive_impact {r:30} + light_column) and the fail_impact sound.
 - ult/fatal (@s = the player; F:boss/raiden/hazard/fatal's model): nothing while the player is reviving (rnDie >= 1);
-  else player/hurt_do with all current HP (Electro), curHealth 0, player/die: it bypasses mboss/hurt, so dash i-frames and
-  every shield are ignored; Ronova's one revive still applies (player/die); a death in a test ends in mboss/test/defeat
-  (player/hook_respawn).
-- shield/off (any executor): #pips 0, the under bar and every pip window gone (cleanup, death, a cancelled gauntlet).
+  else player/hurt_do with all current HP (Electro), curHealth 0, player/die: it bypasses mboss/hurt, so i-frames, parries
+  and every shield are ignored; Ronova's one revive still applies; a death in a test ends in mboss/test/defeat.
+- shield/off (any executor): #gau 0 (a cancelled gauntlet, death, cleanup).
 """
 from . import api
 from . import s3lib as S
@@ -33,68 +29,40 @@ from .s3lib import sset, fn, part
 
 L, K = api.L, api.K
 OBJ = api.OBJ
-PIP_T = api.TAGS['pip']
-PIP_M = f'@e[type=minecraft:marker,tag={PIP_T}]'
-# F2 (HR-45): first person = the view system off, the player is its own rlk_body (no avatar); its eye height
-FIRST_PERSON, AVATAR, EYE = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=rlk_body]', 1.62
+GAU = api.GAUGE_FP
+G = api.GAUGE
 
 
 def build(W):
     w = W.w
-    q0, q1 = api.PIP_Q[0], api.PIP_Q[1]
-    r = L.num(api.PIP_R, 2)
-    w('shield/arm', ['# The shield full (api.PIPS) and its under bar on; pending pip windows and the last judge result gone.',
-                     sset('#pips', api.PIPS), sset('#shb', 1), sset('#gres', 0), f'kill {PIP_M}'])
-    w('shield/off', ['# The shield off: no pips, no under bar, no pip window (cleanup, death, a cancelled gauntlet).',
-                     sset('#pips', 0), sset('#shb', 0), f'kill {PIP_M}'])
-    w('shield/cut', [
-        '# {s}: a counting cut (@s / position = its marker at the lock point; S4 g/cut/lock): the pip window of strike tick s on',
-        '# the gauntlet clock #pt hr, at this lock point (a marker rlk_hr_pip, objective hr = s).',
-        f'execute if entity @s[tag={api.TAGS["cut"]}] at @s run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(PIP_T, "rlk_hr_pipnew")}}}',
-        f'execute unless entity @s[tag={api.TAGS["cut"]}] run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(PIP_T, "rlk_hr_pipnew")}}}',
-        f'$scoreboard players set @e[type=minecraft:marker,tag=rlk_hr_pipnew] {OBJ} $(s)',
-        'tag @e[type=minecraft:marker,tag=rlk_hr_pipnew] remove rlk_hr_pipnew'])
-    w('shield/tick', ['# Every gauntlet tick after p/<g>/tick (the core): each open pip window (@s = its marker, at the lock point).',
-                      f'execute as {PIP_M} at @s run {fn("shield/pip")}'])
-    w('shield/pip', [
-        '# @s = a pip window (objective hr = its strike tick s), at its lock point. #pt = s: a perfect dodge / parry window open',
-        f'# now ({q0}); #pt = s + 1: open one tick ago ({q1}); the player\'s feet within {r} b. One pip per cut; closed after s + 1.',
-        f'scoreboard players operation #t {OBJ} = @s {OBJ}',
-        f'scoreboard players operation #t {OBJ} -= #pt {OBJ}',
-        f'execute if score #t {OBJ} matches 1.. run return 0',
-        f'execute if score #t {OBJ} matches ..-2 run return run kill @s',
-        f'execute if score #pipoff {OBJ} matches 1 if score #t {OBJ} matches -1 run return run kill @s',
+    w('shield/arm', [f'# The gauge full ({G["max"]} = 5 segments) in one step (lead60 tick 0, a lead-in\'s refill beat); the last judge',
+                     '# result gone.', sset(GAU, G['max']), sset('#shb', 1), sset('#gres', 0)])
+    w('shield/off', ['# The gauge empty (a cancelled gauntlet, death, cleanup).', sset(GAU, 0), sset('#shb', 0)])
+    w('shield/tick', [
+        '# Every gauntlet tick after p/<g>/tick (the core): a cut\'s hit judged a perfect parry (#mbDodgeOk mb 1 from',
+        '# mboss/hurt_dodge with #parT tmp 3) takes one segment; a perfect dodge (#parT 0) takes none. The event is cleared.',
+        'execute unless score #mbDodgeOk mb matches 1 run return 0',
+        'scoreboard players set #mbDodgeOk mb 0',
+        'execute unless score #parT tmp matches 3 run return 0',
         f'execute if score #pipoff {OBJ} matches 1 run return 0',
-        f'execute if score #t {OBJ} matches 0 if function {q0} if entity '
-        f'{S.PLAYER[:-1]},distance=..{r}] run return run {fn("shield/take")}',
-        f'execute if score #t {OBJ} matches -1 if function {q1} if entity '
-        f'{S.PLAYER[:-1]},distance=..{r}] run return run {fn("shield/take")}',
-        f'execute if score #t {OBJ} matches -1 run kill @s'])
-    w('shield/take', ['# A pip goes (@s = the window, closed now): one segment of the under bar, the shards and the crack at the player.',
-                      'kill @s',
-                      f'execute if score #pips {OBJ} matches ..0 run return 0',
-                      f'scoreboard players remove #pips {OBJ} 1']
+        fn('shield/take')])
+    w('shield/take', [f'# One segment goes (-{G["seg"]}, never below 0): the shards and the crack at the player.',
+                      f'execute if score {GAU} {OBJ} matches ..0 run return 0',
+                      f'scoreboard players remove {GAU} {OBJ} {G["seg"]}',
+                      f'execute if score {GAU} {OBJ} matches ..-1 run {sset(GAU, 0)}']
       + S.fx('pip_break', [part(S.DUST['lilac'], 0.4, 0.5, 0.4, 0.1, 14), part('minecraft:end_rod', 0.3, 0.4, 0.3, 0.06, 6)],
              pos=f'at {S.PLAYER} positioned ~ ~1.1 ~')
       + S.snd('pip_break', pos=f'at {S.PLAYER}'))
     w('shield/judge', [
-        '# The judge (the final dive\'s contact; S4 at api.JUDGE_T): the pip windows close and the under bar goes; #gres hr 1 =',
-        '# deflect (the shield empty: the gold starburst + light column at the player, the deflect sound, g_deflect), 2 = fail',
-        '# (the gauntlet\'s own branch follows).',
-        f'kill {PIP_M}', sset('#shb', 0),
-        f'execute if score #pips {OBJ} matches 1.. run return run {sset("#gres", 2)}',
-        sset('#gres', 1)]
-      + S.fx('clash_gold', [part('minecraft:end_rod', 0.4, 0.4, 0.4, 0.15, 24), part(S.DUST['yellow'], 0.3, 0.3, 0.3, 0, 12)],
-             pos=f'{AVATAR} at {S.PLAYER} rotated ~ 0 positioned ~ ~1.3 ~')
-      + S.fx('clash_gold', [], pos=f'{FIRST_PERSON} at {S.PLAYER} positioned ~ ~{EYE} ~ positioned ^ ^ ^1.8')
-      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos=f'{AVATAR} at {S.PLAYER} rotated ~ 0')
-      + S.fx('light_column', [], pos=f'{FIRST_PERSON} at {S.PLAYER} rotated ~ 0 positioned ^ ^ ^1.8')
-      + S.snd('deflect', pos=f'at {S.PLAYER}')
-      + [f'execute as {S.BODY} at @s run {api.play("g_deflect")}'])
+        '# The judge (the final dive\'s contact; the gauntlet at api.JUDGE_T): #gres hr 1 = the gauge is 0 (the deflect: the',
+        '# core starts seq/repel in this tick), 2 = fail (the gauntlet\'s own branch follows). The gauge is 0 afterwards.',
+        sset('#gres', 1),
+        f'execute if score {GAU} {OBJ} matches 1.. run {sset("#gres", 2)}',
+        sset(GAU, 0), 'scoreboard players set #mbDodgeOk mb 0'])
     w('ult/fail60', [
         f'# The 60 % fail hit (ULT60_LETHAL false; position = the impact point, the dive on the player): {api.FAIL60_PM} per mille',
-        '# of the player\'s max HP through mboss/pl_dot (no dodge, no position check: the failed judge is the hit; #mbDotLethal 0:',
-        '# it never kills), the push ring in the same tick (pl_dot has no knockback), the impact effects and sound.']
+        '# of the player\'s max HP through mboss/pl_dot (no dodge, no parry, no position check: the failed judge is the hit;',
+        '# #mbDotLethal 0: it never kills), the push ring in the same tick (pl_dot has no knockback), the impact effects and sound.']
       + L.pl_dot(api.FAIL60_PM, api.ELEC, 0)
       + [L.push_ring(*api.FAIL60_PUSH)]
       + S.fx('dive_impact', [part(S.DUST['lilac'], 1.2, 0.1, 1.2, 0, 30)], pos='positioned ~ ~0.1 ~', r=30)
@@ -102,14 +70,15 @@ def build(W):
       + S.snd('fail_impact', pos='positioned ~ ~ ~'))
     w('ult/fatal', [
         '# The 5 % instant death (ULT5_LETHAL true; @s = the player; F:boss/raiden/hazard/fatal\'s model): skipped while the player',
-        '# revives; else all current HP as the hit (the number, Electro), curHealth 0, player/die. It bypasses mboss/hurt (dash',
-        '# i-frames and every shield are ignored); Ronova\'s one revive still applies; in a test the death ends in test/defeat.',
+        '# revives; else all current HP as the hit (the number, Electro), curHealth 0, player/die. It bypasses mboss/hurt (i-frames,',
+        '# parries and every shield are ignored); Ronova\'s one revive still applies; in a test the death ends in test/defeat.',
         'execute if score @s rnDie matches 1.. run return 0',
         'scoreboard players operation #hurtDmg tmp = @s curHealth',
         f'scoreboard players set #elem tmp {api.ELEC}',
         'function rlk:player/hurt_do',
         'scoreboard players set @s curHealth 0',
         'function rlk:player/die'])
-    w('hud/bar_shield', ['# The under bar = the shield (bars hook): pips left of 5, electro.',
-                         f'scoreboard players operation #buSub bu = #pips {OBJ}',
+    w('hud/bar_shield', [f'# The under bar = the 5-segment gauge (bars hook): #gau / {G["seg"]} of {api.PIPS}, electro.',
+                         f'scoreboard players operation #buSub bu = {GAU} {OBJ}',
+                         f'scoreboard players operation #buSub bu /= #c10 {OBJ}',
                          f'scoreboard players set #buSubMax bu {api.PIPS}', f'scoreboard players set #buSubCol bu {api.BU_SHIELD}'])
