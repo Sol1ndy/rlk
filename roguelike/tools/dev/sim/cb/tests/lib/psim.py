@@ -161,6 +161,11 @@ def snbt_dump(v, top=False):
     if isinstance(v, int):
         return str(v)
     if isinstance(v, float):
+        if top:
+            # a macro argument (MacroFunction.stringify, 26.3 bytecode): floats and doubles go through a DecimalFormat - no 'd'
+            # suffix, no exponent (round W: player/dash_sub's ~$(dx) took '0.125d' here and the move was never simulated)
+            t = ('%.15f' % v).rstrip('0').rstrip('.')
+            return '0' if t in ('', '-0') else t
         return f'{v}d'
     if isinstance(v, dict):
         return '{' + ','.join((k if re.fullmatch(r'[A-Za-z0-9._+\-]+', k) else _q(k)) + ':' + snbt_dump(x)

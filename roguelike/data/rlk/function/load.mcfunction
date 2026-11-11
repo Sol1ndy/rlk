@@ -75,6 +75,9 @@ scoreboard players add #dgBox cb 0
 execute unless score #parMl cb matches -2147483648.. run scoreboard players set #parMl cb -1000000
 execute unless score #dgRf cb matches -2147483648.. run scoreboard players set #dgRf cb -1000000
 execute unless score #dgTry cb matches -2147483648.. run scoreboard players set #dgTry cb -1000000
+# round W: #dgMv 이번 닷지 세트의 동작(1 일반 닷지의 스텝 · 2 더블 닷지의 두 번째 동작), #dgCr 일반 닷지로 몸을 낮춘 마네킹 아바타가 있음
+scoreboard players add #dgMv cb 0
+scoreboard players add #dgCr cb 0
 # 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
 scoreboard players set #hcK tmp 0
 scoreboard players set #hcC tmp 0
@@ -789,7 +792,7 @@ scoreboard players set #skPtMax tmp 12
 # 기본 공격에 맞은 몹: 경직 시간(틱) / 밀려나는 세기(칸/틱 × 1000. 바닐라 넉백 = 400, 0 이면 안 밀림)
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180
-# 닷지(우클릭 · 옛 대쉬 이동): 재사용 대기(틱)의 기본값 — 누르면 #dashCoolBase(아무것도 피하지 못한 닷지), 그 닷지가 공격을 피하면(퍼펙트 ·
+# 닷지(우클릭; round W: 긴 대쉬는 없고 원작의 닷지 한 벌 — 일반 닷지의 짧은 스텝 · 더블 닷지 · 퍼펙트 닷지, player/dash): 재사용 대기(틱)의 기본값 — 누르면 #dashCoolBase(아무것도 피하지 못한 닷지), 그 닷지가 공격을 피하면(퍼펙트 ·
 # 넓은 닷지) #dashCoolHitBase 가 되게 차이만큼 돌려준다(닷지 한 번에 한 번, player/def/dg_refund). 실제 값 #dashCoolT · #dashCoolHitT 는
 # 각인(질주 2개: -#dashEngSpd %, 반올림)에 따라 engravings/scan_more 가 계산
 scoreboard players set #dashCoolBase tmp 18
@@ -800,6 +803,9 @@ scoreboard players set #dashCoolHitT tmp 12
 scoreboard players set #dgPW tmp 3
 scoreboard players set #dgLW tmp 7
 scoreboard players set #dgLooseC tmp 1
+# 더블 닷지: 일반 닷지를 누른 지 1 ~ #dgChW 틱 안의 두 번째 누름이 두 번째 동작(공중 옆돌기)으로 이어진다(원작: 3~26프레임 뒤의 두 번째
+# 누름이 모두 더블 닷지 = 9틱까지 확인). 이동 거리 · 속도는 player/dodge/speed
+scoreboard players set #dgChW tmp 10
 # 퍼펙트 닷지: 원소 에너지(× 100, 고정량 · 원소 충전 효율 미적용)
 scoreboard players set #dgEn tmp 1000
 # 패링 창(F 를 받은 틱 = 0): #parW3 틱 미만 = 3단계(퍼펙트), #parW2 미만 = 2단계, #parW1 미만 = 1단계, 그 뒤 = 실패

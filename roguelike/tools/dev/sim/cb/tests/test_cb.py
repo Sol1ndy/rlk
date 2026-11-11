@@ -3,7 +3,8 @@
 datapack root (read only).
 
     python3 test_cb.py <datapack root> [section ...]
-      sections: static input lock judge tiers dodge cool context energy cd bal boss near raiden readers fx beat bossloop beatloop cost
+      sections: static input lock judge tiers dodge cool double context energy cd bal boss near raiden readers fx beat bossloop
+                beatloop cost
                 (default: all)
 
   static   the dash charges / HUD gauge / dash_iframe / hurt_nd are gone; dashInvT is written only by the non-dodge
@@ -30,6 +31,10 @@ datapack root (read only).
   dodge    perfect 0-2 t for every class; loose 3-6 t for normal and elite, not for bosses; 7+ nothing
   cool     review A-12: the dodge cooldown is 18 t after a dodge that avoided nothing and 12 t after one that avoided an
            attack (perfect or loose; the refund once per dodge); 질주 2 = 14 / 10; the fail sound only on a fresh press
+  double   round W (the dash is gone: the reference game's dodge set): the plain dodge's step (1.0 b in 3 t, the speed
+           table and the real move), a second press 1..#dgChW t later = the double dodge's second move (a new stamp with
+           its own perfect / loose window and refund, 1.8 b in 6 t, the cooldown + #dashCoolT), one per set, a held F5
+           repeat never chains it, a press after the window or after the second move is refused
   context  cm brain / projectile (owner by cmId) / elite class / Raiden / the boss framework (hurt_ctx: boss body) /
            vanilla (ctx_va): attacker tag rlk_hc_atk, class, kind; the tag never outlives the judge
   energy   +10 pt (1000) once per dodge (a second hit in the same window gives none), clamped at the burst cost, 스커크
@@ -52,14 +57,14 @@ datapack root (read only).
            killed where it stood (A-03: glow off and moved to the far chunk first), it faces as the body did (A-06);
            the crosshair is sent in the tick an overlay ends (A-09)
   beat     round V, lane VP (the perfect parry / dodge beat, #btOn tmp 1): the hold schedule and the untouchable ticks of both
-           beats, the clock (#now cb counts world ticks, #btLag grows by N = 5 / 7), (a)(b) the same scripted fights with the
+           beats, the clock (#now cb counts world ticks, #btLag grows by N = 5 / 4; round W: 4 for the dodge, 7 before), (a)(b) the same scripted fights with the
            beat on and off give identical events on the beat's clock and take exactly N real ticks more per beat (chains 10 /
            3 / 2 t apart, mistimed presses, dodge cooldowns), (c) nothing hurts during a beat, (d) back-to-back beats, (e)
            death / revival wait / selection space / map / cutscene / camera lock / reload / lost tag leave nothing held,
            a freeze started during the hold survives the release, the gates and clock users are in place, the idle cost
   beatloop beatloop_hr.py (홍련's two gauntlets and her free fight in the suites' H1 world, same proof) and
            beatloop_cb.py for the three mid-bosses: a real fight with the beat on = the same fight with it off, world tick by
-           world tick (every `# mb` score, the body, the hazard clocks, health, the dodge cooldown), held = 5 / 7 per beat
+           world tick (every `# mb` score, the body, the hazard clocks, health, the dodge cooldown), held = 5 / 4 per beat
   bossloop review A-11: a real mid-boss fight (the vendored azsim world of tools/dev/sim/hr/tests/lib, read only) with
            rlk:tick's pre-pass lines and its mboss/near_all line in the world loop: the pre-pass runs every tick, the
            near pass only in the window, a dodge whose body has left finds its perfect dodge through near_all
@@ -529,7 +534,11 @@ def t_input():
         prepass(s)
         cooldown(s)
     s.call('rlk:player/dash', pctx(s))
-    ck('input: a second dodge inside the cooldown is refused (no charges any more)', P(s, 'dgAt') == t1)
+    t2, c2 = P(s, 'dgAt'), P(s, 'dashCool')
+    s.call('rlk:player/dash', pctx(s))
+    ck('input: a second press 5 t later is the double dodge (new stamp, cooldown 13 + 18); a third press inside the cooldown is '
+       'refused (no charges, one double per set)', t2 == t1 + 5 and c2 == 13 + G(s, '#dashCoolT') and P(s, 'dgAt') == t2
+       and G(s, '#dgMv', 'cb') == 2, (t1, t2, c2, P(s, 'dgAt')))
     # review A-02: the F5 use-item click (rcU, set by the advancement of the tick before) held for 30 ticks
     fresh(s)
     s.log.clear()
@@ -547,7 +556,8 @@ def t_input():
         cooldown(s)
     ck('input: a held use-item click (rcU every tick, 30 t) is a right-click on ticks 0, 4, 8 ... only (review A-02)',
        hold == list(range(0, 30, 4)), hold)
-    ck('input: ... rcT counts the held ticks (1..30) and the dodge repeats only when the cooldown is over',
+    ck('input: ... rcT counts the held ticks (1..30) and the dodge repeats only when the cooldown is over (a held repeat '
+       'never chains the double dodge)',
        rct == list(range(1, 31)) and dodges == [0, 20], (rct[:6], dodges))
     ck('input: ... and no fail sound plays while it is held (dash_fail is silent on the 4-t repeats)',
        len(s.calls('rlk:player/dash_fail')) == 6 and not s.calls('rlk:snd/f228'), (len(s.calls('rlk:player/dash_fail')), len(s.calls('rlk:snd/f228'))))
@@ -568,7 +578,7 @@ def t_input():
     # a fresh click inside the cooldown plays the fail sound once; its 4-t repeat (a held click on the eye shield) is silent
     fresh(s)
     prepass(s, rc=True)
-    for _ in range(7):
+    for _ in range(11):                                   # past the double dodge's window (#dgChW 10)
         prepass(s)
         cooldown(s)
     s.log.clear()
@@ -918,13 +928,15 @@ def t_cool():
        (G(s, '#dashCoolT'), G(s, '#dashCoolHitT')))
 
     def again(hit_at=None, cls=0, hits=1):
-        """a dodge on tick 0, a strike `hit_at` ticks later (or none), a right-click on every later tick: -> the tick of
+        """a dodge on tick 0, a strike `hit_at` ticks later (or none), a right-click on every later tick with the set's second
+        move taken out (round W: a press 1..#dgChW t later would chain the double dodge; section `double`): -> the tick of
         the next dodge, what the strike did"""
         fresh(s)
         P(s, 'energy', 0)
         prepass(s, rc=True)
         cooldown(s)
         res = None
+        s.setsc('#dgMv', 'cb', 0)                         # this set's second move is not wanted: every later press tests the cooldown
         for k in range(1, 40):
             _, dg = prepass(s, rc=True)
             if dg:
@@ -985,6 +997,110 @@ def t_cool():
     ck(f'cool: dodging whenever the cooldown allows against {n} strikes of a normal mob: {land} land (>= 45 %), {perf} perfect '
        f'(<= 25 %), {dodges} dodges in 3000 t (<= 3000 / 12)', land >= 0.45 * n and perf <= 0.25 * n and dodges <= 250, (land, perf, dodges, n))
     no_errors(s, 'cool')
+
+
+# ================================================================================================== the dodge set (round W)
+MOVE = next(l for l in code(rd('player/tick')) if 'dash_move_tick' in l)
+
+
+def t_double():
+    s, pl = world()
+    e = brain(s)
+    chw = G(s, '#dgChW')
+
+    def speeds(mv, n):
+        s.setsc('#dgMv', 'cb', mv)
+        out = []
+        for k in range(n, 0, -1):
+            P(s, 'dashMoveT', k)
+            s.call('rlk:player/dodge/speed', pctx(s))
+            out.append(G(s, '#dgSp'))
+        P(s, 'dashMoveT', 0)
+        return out
+    ck('double: no dash any more - the plain dodge\'s step 0.5 / 0.3 / 0.2 b (1.0 b in 3 t), the second move 0.25 / 0.4 / 0.4 / '
+       '0.35 / 0.25 / 0.15 b (1.8 b in 6 t); #dgChW 10', speeds(1, 3) == [500, 300, 200] and speeds(2, 6) == [250, 400, 400, 350, 250, 150]
+       and chw == 10, (speeds(1, 3), speeds(2, 6), chw))
+
+    def tick(rc=False, hit=False):
+        """one game tick: the pre-pass (a right-click on the eye shield), player/tick's move line, a strike, the cooldown"""
+        _, dg = prepass(s, rc=rc)
+        s.cmd(split(MOVE), pctx(s))
+        lost = cm_hit(s, e, 60) if hit else None
+        cooldown(s)
+        return dg, lost
+
+    def at():
+        return (round(pl.pos[0], 3), round(pl.pos[2], 3))
+    # the plain dodge: looking along +z (yaw 0), no move input: a 1.0 b step forward in 3 ticks
+    fresh(s)
+    pl.pos = [0.5, 64.0, 0.5]
+    pl.rot = [0.0, 0.0]
+    P(s, 'dashPX', 50)
+    P(s, 'dashPZ', 50)
+    p0 = at()
+    trail = []
+    dg, _ = tick(rc=True)
+    trail.append(at())
+    for _ in range(4):
+        tick()
+        trail.append(at())
+    moved = round(trail[-1][1] - p0[1], 3)
+    ck(f'double: a plain dodge with no move input steps {moved} b forward (1.0) in 3 ticks and stops (no 3-b dash)',
+       dg and abs(moved - 1.0) < 0.02 and trail[2] == trail[4] and G(s, '#dgMv', 'cb') == 1 and P(s, 'dashCool') == G(s, '#dashCoolT') - 5,
+       (trail, P(s, 'dashCool')))
+    # the double dodge: a second press k ticks later
+    for k in (1, 4, chw):
+        fresh(s)
+        pl.pos = [0.5, 64.0, 0.5]
+        P(s, 'dashPX', 50)
+        P(s, 'dashPZ', 50)
+        tick(rc=True)
+        t1 = P(s, 'dgAt')
+        for _ in range(k - 1):
+            tick()
+        z0 = pl.pos[2]
+        dg, _ = tick(rc=True)
+        mv, t2, c2, mt = G(s, '#dgMv', 'cb'), P(s, 'dgAt'), P(s, 'dashCool'), P(s, 'dashMoveT')
+        for _ in range(7):
+            tick()
+        z1 = round(pl.pos[2] - z0, 3)
+        ck(f'double: a second press {k} t after the first is the double dodge: a new stamp, the move 6 t / {z1} b (1.8), the '
+           f'cooldown + #dashCoolT ({c2 + 1} = 18 - {k} + 18)', dg and mv == 2 and t2 == t1 + k and mt == 5 and abs(z1 - 1.8) < 0.02
+           and c2 + 1 == 2 * G(s, '#dashCoolT') - k, (dg, mv, t2 - t1, mt, z1, c2))
+        n0 = len(s.calls('rlk:player/dash_fail'))
+        tick(rc=True)
+        ck(f'double: ... a third press inside the cooldown is refused (one double per set)', P(s, 'dgAt') == t2
+           and len(s.calls('rlk:player/dash_fail')) == n0 + 1)
+    fresh(s)
+    tick(rc=True)
+    t1 = P(s, 'dgAt')
+    for _ in range(chw):
+        tick()
+    dg, _ = tick(rc=True)
+    ck(f'double: a press {chw + 1} t after the first (past #dgChW) is refused, no second move', not dg and P(s, 'dgAt') == t1
+       and G(s, '#dgMv', 'cb') == 1)
+    # the second move's own windows: a strike 1 t after the second press is a perfect dodge with its own refund
+    fresh(s)
+    P(s, 'energy', 0)
+    tick(rc=True)
+    for _ in range(2):
+        tick()
+    tick(rc=True)
+    c0 = P(s, 'dashCool')
+    _, lost = tick(hit=True)
+    ck('double: a strike 1 t after the second press: a perfect dodge (no damage, +10 pt), the cooldown refunded once by 6 '
+       f'({c0} -> {P(s, "dashCool") + 0})', lost == 0 and G(s, '#pdg') == 1 and P(s, 'energy') == G(s, '#dgEn')
+       and P(s, 'dashCool') == c0 - 1 - (G(s, '#dashCoolT') - G(s, '#dashCoolHitT')), (lost, G(s, '#pdg'), c0, P(s, 'dashCool')))
+    # a strike 5 t after the first press of a set that is then doubled: the first step's loose window still avoids it
+    fresh(s)
+    tick(rc=True)
+    tick(rc=True)
+    for _ in range(3):
+        tick()
+    _, lost = tick(hit=True)
+    ck('double: a normal mob\'s strike 5 t after the first press, 4 t after the second: avoided (the loose / perfect windows of '
+       'both moves count)', lost == 0, lost)
+    no_errors(s, 'double')
 
 
 # ================================================================================================== context
@@ -1548,10 +1664,28 @@ def t_fx():
             eot(s)
             sot(s)
     src = {n: rd(f'player/def/fx/{n}') for n in ('p1_at', 'p2_at', 'p3_at', 'p3_star', 'p2', 'p1')}
-    ck('fx: tiers 2 / 1 draw no flash particle, no star glyph and no title; their sound is the thin chain tick, not the perfect '
-       'parry\'s anvil / trident clang or the amethyst ring', all('flash' not in src[n] and 'g/star' not in src[n] and 'ovl' not in src[n]
-       and 'anvil' not in src[n] and 'resonate' not in src[n] for n in ('p1_at', 'p2_at', 'p1', 'p2'))
-       and 'block.chain.hit' in src['p1_at'] and 'block.chain.hit' in src['p2_at'] and 'anvil' in src['p3_at'] and 'resonate' in src['p3_star'])
+    def stack(n):
+        """the playsound layers of a function: [(event, volume, pitch)]"""
+        return [(w[1], float(w[-2]), float(w[-1])) for w in (l.split() for l in code(src[n]) if l.startswith('playsound'))]
+
+    def anvil(n):
+        """the volume of a stack's anvil layer (the clash's body: the file is at volume 0.5, so 2 = its full gain)"""
+        return max([v for e, v, _p in stack(n) if e.endswith('anvil.land')] or [0])
+    src['p3_boom'] = rd('player/def/fx/p3_boom')
+    src['p3_shatter'] = rd('player/def/fx/p3_shatter')
+    n1, n2, n3 = len(stack('p1_at')), len(stack('p2_at')), sum(len(stack(n)) for n in ('p3_at', 'p3_boom', 'p3_star', 'p3_shatter'))
+    a1, a2, a3 = anvil('p1_at'), anvil('p2_at'), anvil('p3_at')
+    ck(f'fx: tiers 2 / 1 draw no flash particle, no star glyph and no title (the big presentation is the perfect parry\'s only)',
+       all('flash' not in src[n] and 'g/star' not in src[n] and 'ovl' not in src[n] for n in ('p1_at', 'p2_at', 'p1', 'p2')))
+    ck(f'fx: round W sounds: every tier is a layered metallic stack (an anvil clash + a trident hit), heavier per tier: layers '
+       f'{n1} / {n2} / {n3} (contact, boom, ring, release), the anvil {a1} / {a2} / {a3}; only the perfect parry has the sub boom '
+       f'(bass drum) and the three-chime ring; pitch 0.5-2, volume <= 2',
+       all(any(e.endswith(k) for e, _v, _p in stack(n) for k in ('trident.hit', 'trident.hit_ground')) for n in ('p1_at', 'p2_at', 'p3_at'))
+       and 3 <= n1 < n2 < n3 and n3 >= 15 and 0 < a1 < a2 < a3
+       and any(e.endswith('basedrum') for e, _v, _p in stack('p3_boom')) and sum(e.endswith('note_block.chime') for e, _v, _p in stack('p3_star')) == 3
+       and not any(e.endswith(('basedrum', 'note_block.chime')) for n in ('p1_at', 'p2_at') for e, _v, _p in stack(n))
+       and all(0.5 <= p <= 2 and 0 < v <= 2 for n in ('p1_at', 'p2_at', 'p3_at', 'p3_boom', 'p3_star', 'p3_shatter') for _e, v, p in stack(n)),
+       (n1, n2, n3, a1, a2, a3))
     ck('fx: every effect entity is gone', not s.select('@e[tag=rlk_cb_fx]', pctx(s)))
     s.titles.clear()
     s.gt += 30
@@ -1560,13 +1694,15 @@ def t_fx():
     s.ents.append(Ent('interaction', (0.5, 64.0, 0.5), (0.0, 0.0), ['rlk_dgo', 'rlk_pet']))
     P(s, 'vBig', 0)
     cm_hit(s, e, 20)
-    ck('fx: a perfect dodge: beat kind 2, the dark vignette overlay (vBig 17), the ghost mannequin (team rlk_cbred), the burst card',
+    ck('fx: a perfect dodge: beat kind 2, the dark vignette overlay (vBig 11), the ghost mannequin (team rlk_cbred), the burst card, '
+       'the flip starts in the trigger tick (round W)',
        any('title' in t for t in s.titles) and bool(s.select('@e[tag=rlk_cb_ghost]', pctx(s))) and G(s, '#btK', 'cb') == 2
-       and P(s, 'vBig') == 17 and fxn(s, 'rlk_cb_burst') == 1, (s.titles[-1:], G(s, '#btK', 'cb'), P(s, 'vBig')))
+       and P(s, 'vBig') == 11 and fxn(s, 'rlk_cb_burst') == 1 and len(s.calls('rlk:char/motion/beat/dodge')) == 1,
+       (s.titles[-1:], G(s, '#btK', 'cb'), P(s, 'vBig'), len(s.calls('rlk:char/motion/beat/dodge'))))
     for _ in range(30):
         eot(s)
         sot(s)
-    ck('fx: ... the avatar\'s flip starts on tick 5, the tint goes on the landing tick 21, the beat is over on tick 27 and '
+    ck('fx: ... the tint goes on the landing tick 7, the beat is over on tick 14 and '
        'every effect entity is gone', len(s.calls('rlk:char/motion/beat/dodge')) == 1 and len(s.calls('rlk:char/motion/beat/tint_off')) >= 1
        and G(s, '#btK', 'cb') == 0 and not s.select('@e[tag=rlk_cb_fx]', pctx(s)),
        (len(s.calls('rlk:char/motion/beat/dodge')), G(s, '#btK', 'cb')))
@@ -1712,9 +1848,10 @@ def prepass2(s, f=False, rc=False):
 
 
 def t_beat():
-    # ---- the schedule: which real ticks hold the world, which are untouchable, the clock's lag (N = 5 / 7)
+    # ---- the schedule: which real ticks hold the world, which are untouchable, the clock's lag (N = 5 / 4; round W: the
+    # perfect dodge is a x1/2 slow motion of 4 world ticks, untouchable 1-11 = the same 7 world ticks as before, over on 14)
     for kind, name, holds, inv, endA in ((1, 'perfect parry', [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], 17),
-                                         (2, 'perfect dodge', [1, 6, 7, 9, 10, 12, 13], list(range(1, 15)), 27)):
+                                         (2, 'perfect dodge', [1, 3, 5, 7], list(range(1, 12)), 14)):
         s, pl = world(beat=1)
         e = brain(s)
         fresh(s)
@@ -1778,8 +1915,8 @@ def t_beat():
         ck(f'beat: {name}: the beat on and off give the same events on the beat\'s clock ({len(ev1)} events, {par} perfect parries, '
            f'{pdg} perfect dodges)', ev0 == ev1 and len(ev1) >= 4 and (n_par is None or par == n_par) and (n_dg is None or pdg == n_dg),
            [(a, b) for a, b in zip(ev0, ev1) if a != b][:3] or (len(ev0), len(ev1), par, pdg))
-        ck(f'beat: ... and takes exactly 5 real ticks more per perfect parry and 7 per perfect dodge ({real1} = {real0} + 5 x {par} '
-           f'+ 7 x {pdg})', real1 == real0 + 5 * par + 7 * pdg, (real0, real1, par, pdg))
+        ck(f'beat: ... and takes exactly 5 real ticks more per perfect parry and 4 per perfect dodge ({real1} = {real0} + 5 x {par} '
+           f'+ 4 x {pdg})', real1 == real0 + 5 * par + 4 * pdg, (real0, real1, par, pdg))
     # ---- (c): untouchable for the beat
     s, pl = world(beat=1)
     e = brain(s)
@@ -1873,7 +2010,7 @@ def t_beat():
              ('/reload (rlk:load)', lambda s, pl: s.call('rlk:load', C0)),
              ('the player tag is gone', lambda s, pl: pl.tags.discard('player'))]
     for name, what in exits:
-        for kind, at in ((1, 3), (2, 6)):
+        for kind, at in ((1, 3), (2, 5)):
             held, after = frozen_then(what, kind, at)
             ck(f'beat: (e) {name} during a {"parry freeze" if kind == 1 else "dodge slow motion"}: the next tick nothing is held (the '
                f'mob has its AI back, a mob frozen before keeps its own NoAI, no tag, the clock keeps its lag)',
@@ -1986,7 +2123,7 @@ def t_cost():
     ck(f'cost: the idle pre-pass runs {n} commands (<= 6)', n <= 6, n)
 
 
-SECTIONS = [('static', t_static), ('input', t_input), ('lock', t_lock), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge), ('cool', t_cool),
+SECTIONS = [('static', t_static), ('input', t_input), ('lock', t_lock), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge), ('cool', t_cool), ('double', t_double),
             ('context', t_context), ('energy', t_energy), ('cd', t_cd), ('bal', t_bal), ('boss', t_boss), ('near', t_near), ('raiden', t_raiden),
             ('readers', t_readers), ('fx', t_fx), ('beat', t_beat), ('bossloop', t_bossloop), ('beatloop', t_beatloop), ('cost', t_cost)]
 for name, fn in SECTIONS:

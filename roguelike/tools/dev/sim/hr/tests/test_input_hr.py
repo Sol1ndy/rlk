@@ -8,7 +8,8 @@ from the loaded pack (load.mcfunction):
      #parGap x (1 + #parWs). Refused: #parMl = now + #parRe. A parry (the judge): parHit = parLk - #parChain = now, the
      streak cleared at tier >= #parWsClr.
   dodge  accepted when dashCool is 0: dashCool = #dashCoolT; a dodge that avoided a hit gets #dashCoolT - #dashCoolHitT
-     back once; - 1 per tick.
+     back once; - 1 per tick. Round W: a press inside the cooldown 1..#dgChW t after the set's first dodge is the double
+     dodge's second move (dashCool + #dashCoolT), once per set.
     python3 test_input_hr.py <roguelike>      (from a copy of tools/dev/sim outside the datapack)
 """
 import sys
@@ -27,10 +28,11 @@ class Ref:
         g = lambda k: s.sc(k, 'tmp')    # noqa: E731
         self.gap, self.re, self.chain = g('#parGap'), g('#parRe'), g('#parChain')
         self.ws_t, self.ws_max, self.ws_clr = g('#parWsT'), g('#parWsMax'), g('#parWsClr')
-        self.cd, self.cd_hit = g('#dashCoolT'), g('#dashCoolHitT')
+        self.cd, self.cd_hit, self.chw = g('#dashCoolT'), g('#dashCoolHitT'), g('#dgChW')
         self.par_at = self.par_lk = self.par_hit = self.ml = -10 ** 6
         self.ws = 0
         self.d_ready = -10 ** 6
+        self.d_set = None
 
     def press(self, t):
         if t < self.par_lk or t < self.ml:
@@ -51,8 +53,13 @@ class Ref:
 
     def dodge(self, t):
         if t < self.d_ready:
+            if self.d_set is not None and 1 <= t - self.d_set <= self.chw:
+                self.d_ready += self.cd          # the double dodge
+                self.d_set = None
+                return True
             return False
         self.d_ready = t + self.cd
+        self.d_set = t
         return True
 
     def avoided(self):
@@ -127,7 +134,8 @@ for r in range(1, 101, 5):
     s.dodge(at=t0 + r)
 H.run_h1(s, 102)
 want = [ref.dodge(t0 + r) for r in range(1, 101, 5)]
-ck(f'dodges every 5 t, nothing to avoid: one per #dashCoolT ({ref.cd} t)', [ok for _t, ok in s.d_log] == want, (s.d_log, want))
+ck(f'dodges every 5 t, nothing to avoid: a set (the step + the double dodge 5 t later) per 2 x #dashCoolT ({ref.cd} t)',
+   [ok for _t, ok in s.d_log] == want and want[:3] == [True, True, False], (s.d_log, want))
 s = fresh()
 H.facing_setup(s, 6.0)
 H.start_pattern(s, S.TID['a10'])

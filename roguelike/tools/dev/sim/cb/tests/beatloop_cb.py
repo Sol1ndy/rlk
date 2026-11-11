@@ -14,7 +14,7 @@ caches #plG / #pxG aside), the body's position, every hazard's clock, the player
   policy f     F one tick before every parryable strike (perfect parries): the two runs must be IDENTICAL world tick by world
                tick, the beat-on run exactly 5 real ticks longer per perfect parry
   policy mix   F and dodges alternate: the beat-on run may differ only where a dodge beat made the player untouchable; it
-               reports the perfect dodges, checks N = 7 per dodge and that nothing was lost inside a beat
+               reports the perfect dodges, checks N = 4 per dodge (round W; 7 before) and that nothing was lost inside a beat
 Prints one line per check; exit 1 on any failure.
 """
 import sys
@@ -163,9 +163,9 @@ def main():
     m0, t0 = fight(0, 'mix')
     m1, t1 = fight(1, 'mix')
     ck(f'beatloop: F and dodges mixed: {t1["par3"]} perfect parries, {t1["pd"]} perfect dodges with the beat on; held '
-       f'{t1["held"]} = lag {t1["lag"]} real ticks, between 5 P + 7 D minus the beats cut by the next one and 5 P + 7 D',
-       t1['pd'] >= 2 and t1['held'] == t1['lag'] and t1['held'] <= 5 * t1['par3'] + 7 * t1['pd']
-       and t1['held'] >= 5 * t1['par3'] + 7 * t1['pd'] - 12 * 3, t1)
+       f'{t1["held"]} = lag {t1["lag"]} real ticks, between 5 P + 4 D minus the beats cut by the next one and 5 P + 4 D',
+       t1['pd'] >= 2 and t1['held'] == t1['lag'] and t1['held'] <= 5 * t1['par3'] + 4 * t1['pd']
+       and t1['held'] >= 5 * t1['par3'] + 4 * t1['pd'] - 12 * 3, t1)
     ck('beatloop: ... no health is lost on an untouchable tick', t1['lost_in_beat'] == 0 and s1['lost_in_beat'] == 0, (t1['lost_in_beat'], s1['lost_in_beat']))
     common = {k: v for k, v in m0.items() if k in m1}
     d = first_diff(common, {k: m1[k] for k in common})

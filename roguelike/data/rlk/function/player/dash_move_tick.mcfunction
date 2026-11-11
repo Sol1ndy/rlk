@@ -1,7 +1,13 @@
-# @s = 플레이어, at @s rotated ~ 0. 틱당 0.25칸 서브스텝 4개. 검사는 몸 앞면(중심+0.3칸)
+# @s = 플레이어, at @s rotated ~ 0. 닷지 이동 한 틱: 이번 틱의 속도 #dgSp(player/dodge/speed, 칸 × 1000)를 서브스텝 4개로 나눠 옮긴다
+# (서브스텝 하나 0.125칸 이하). 검사는 몸 앞면(중심+0.3칸)
+function rlk:player/dodge/speed
 scoreboard players operation #subx tmp = @s dashDX
+scoreboard players operation #subx tmp *= #dgSp tmp
+scoreboard players operation #subx tmp /= #1000 tmp
 scoreboard players operation #subx tmp /= #st4 tmp
 scoreboard players operation #subz tmp = @s dashDZ
+scoreboard players operation #subz tmp *= #dgSp tmp
+scoreboard players operation #subz tmp /= #1000 tmp
 scoreboard players operation #subz tmp /= #st4 tmp
 execute store result storage rlk:dm dx double 0.001 run scoreboard players get #subx tmp
 execute store result storage rlk:dm dz double 0.001 run scoreboard players get #subz tmp

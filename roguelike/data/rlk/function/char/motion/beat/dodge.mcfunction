@@ -1,10 +1,10 @@
-# @s = player, 5 ticks after the dodged hit (player/def/beat/d/clock): upright with both arms raised, arching back through the
-# slow motion, then the back handspring and the landing facing the attacker (clip pdodge; ref_pd.md 4).
-# Not when the player has acted since the dodge (an attack, a skill, another dodge or F: player/def/beat/act; a rig character: a
-# clip other than the dash is playing): the flip is presentation and never cuts the player's own action.
-execute if score #btAct cb matches 1 run return 0
-execute if score @s pmMoveLock matches 1 run return 0
-execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"dash"} run return 0
+# @s = player, on the trigger tick of a perfect dodge (player/def/beat/start_d; round W: at once, no wind-up): the back
+# handspring - launch, 360 degrees backward in 6 ticks, landed facing the attacker on tick 7, the ready stance on tick 10 (clip
+# pdodge) - and the red-pink body glow. Rig characters play their clip, mannequin characters the stand-in rig.
+# Not while a move-locked action plays, nor over a rig clip other than the dodge's own (dash / dash2): the flip is presentation
+# and never cuts the player's own action. The glow starts either way.
+execute if score @s pmMoveLock matches 1 run return run function rlk:char/motion/beat/tint_on
+execute if score @s pmActive matches 1 unless data storage rlk:player_motion active{clip:"dash"} unless data storage rlk:player_motion active{clip:"dash2"} run return run function rlk:char/motion/beat/tint_on
 execute if score #charN tmp matches 5 unless score @s arM matches 1.. run function rlk:char/motion/start {char:"arle",clip:"pdodge"}
 execute if score #charN tmp matches 5 if score @s arM matches 1.. run function rlk:char/motion/start {char:"arle",clip:"pdodge_i"}
 execute if score #charN tmp matches 3 unless score @s skM matches 1.. run function rlk:char/motion/start {char:"skirk",clip:"pdodge"}

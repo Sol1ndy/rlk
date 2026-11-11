@@ -1449,26 +1449,6 @@
           }
         ]
       },
-      "dash": {
-        "playback_rate": 100,
-        "hit_ticks": [],
-        "layers": [
-          {
-            "tick": 1,
-            "event": "item.armor.equip_leather",
-            "volume": 0.16,
-            "pitch": 1.35,
-            "layer": "coat flutter"
-          },
-          {
-            "tick": 2,
-            "event": "block.amethyst_block.chime",
-            "volume": 0.22,
-            "pitch": 1.8,
-            "layer": "gold rose shimmer"
-          }
-        ]
-      },
       "sheathe": {
         "playback_rate": 100,
         "hit_ticks": [],

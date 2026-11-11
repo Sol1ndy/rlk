@@ -298,9 +298,9 @@ def beatpat():
                f'{len(s1["kitl"])} kit calls, {len(s1["rigl"])} rig calls)',
                all(s0[k] == s1[k] for k in ('judged', 'hz', 'kitl', 'rigl')),
                [k for k in ('judged', 'hz', 'kitl', 'rigl') if s0[k] != s1[k]])
-            ck(f'{lab}: held {s1["held"]} real ticks = 5 x {par} + 7 x {pd} = #btLag (+{s1["lag"]}); on a held tick no sweep card, '
+            ck(f'{lab}: held {s1["held"]} real ticks = 5 x {par} + 4 x {pd} = #btLag (+{s1["lag"]}); on a held tick no sweep card, '
                f'no kit card, no rig call, no kit call, not her body, not #pt changes; nothing held at the end',
-               s1['held'] == 5 * par + 7 * pd == s1['lag'] and s0['held'] == 0 and not s1['froze'] and not s1['left']
+               s1['held'] == 5 * par + 4 * pd == s1['lag'] and s0['held'] == 0 and not s1['froze'] and not s1['left']
                and s1['real'] == len(r1) + s1['held'], (s1['held'], par, pd, s1['lag'], s1['froze'][:3], s1['left']))
             if s1['heads']:
                 bad = {i: t for i, t in s1['heads'].items() if t not in s1['hits'] and t - 1 not in s1['hits']}
@@ -602,7 +602,7 @@ def swap():
     tot = 0
     for ch, name in sorted((MAN_CH | RIG_CH).items()):
         own = 'rig' if ch in RIG_CH else 'avatar'
-        for kind, last in (('parry', 17), ('dodge', 27)):
+        for kind, last in (('parry', 17), ('dodge', 14)):     # round W: the dodge beat is 14 ticks (27 before)
             bad, after, glows = [], [], []
             # no lock: the beat alone
             for age in [None] + list(range(0, last + 1)):

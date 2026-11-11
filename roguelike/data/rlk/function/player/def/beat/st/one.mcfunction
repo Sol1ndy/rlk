@@ -4,7 +4,7 @@ execute if score #d cb matches ..0 run return 0
 execute if score #d cb = @s btD run return 0
 execute unless data entity @s {shadow_radius:0f} run return 0
 scoreboard players operation @s btD0 = #d cb
-scoreboard players operation #d cb *= #3 tmp
+scoreboard players operation #d cb *= #2 tmp
 execute if score #d cb matches 120.. run scoreboard players set #d cb 120
 scoreboard players operation @s btD = #d cb
 tag @s add rlk_bt_st
