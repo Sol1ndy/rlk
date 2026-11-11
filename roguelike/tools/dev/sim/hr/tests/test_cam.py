@@ -834,13 +834,14 @@ VC_FILES = ('roguelike/data/rlk/function/combat/sap_absorb.mcfunction', 'rogueli
 
 def other_lanes():
     """Round V integration: on the merged tree the other lanes' files differ from the base too. They are the round V groups of
-    ident_hr.py (lane VB: the gauge's dividers; lane VP: the beat and its clock users; the integration's own), read from there."""
+    ident_hr.py (lane VB: the gauge's dividers; lane VP: the beat and its clock users; the integration's own), read from there;
+    round W integration: and the round W groups (lane WP's dodge set, the integration's own)."""
     try:
         import ident_hr as IH
     except Exception as e:      # noqa: BLE001
         print(f'   ident: ident_hr.py not readable ({e}): the other lanes\' files are not excused')
         return []
-    return [p for g, p in IH.PATS if g.startswith('round V') and g != IH.LANE_VC]
+    return [p for g, p in IH.PATS if g.startswith(('round V', 'round W')) and g != IH.LANE_VC]
 
 
 BEAT_WORDS = ('#btK cb', '#btAdj cb', '#btHold cb')      # lane VP's lines / conditions in rlk:tick (the beat's clock and gates)
@@ -861,7 +862,7 @@ def ident():
     oth = other_lanes()
     extra = [n for n in other if n not in VC_FILES and not any(p.fullmatch(n[len('roguelike/'):]) for p in oth)]
     ck(f'D1 against {base[:9]}: outside F:boss/scarlet, F:mboss/cam and F:char/cine only lane VC\'s listed files change '
-       f'(and the files of the other round V lanes: ident_hr.py\'s round V groups)', not extra, str(extra))
+       f'(and the files of the other round V / W lanes: ident_hr.py\'s round V / W groups)', not extra, str(extra))
     for n in other:
         if not n.endswith('.mcfunction') or n not in VC_FILES:
             continue

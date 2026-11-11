@@ -223,10 +223,11 @@ ALLOW[LANE_VP] = (
 # Round W, lane WP (11-12, wip/w-player; tools/dev/plan/combat/wp_progress.md): the dash is gone - the reference game's dodge
 # set (player/dash*, player/dodge/**, combat/rc_hold's held-repeat flag), the dodge clips dash / dash_l / dash_b / dash2 of every
 # character (char/motion/{dash*,clips/*/dash*,*_fx/dash*,events/*/dash*}; 나비아's old dash fx / audio gone), the parry sounds
-# and the faster perfect dodge (player/def/**, char/motion/beat|lite: group VP), the audio manifest
+# and the faster perfect dodge (player/def/**, char/motion/beat|lite: group VP), the audio manifest; the whiff ladder's lines of
+# player/f_key (w_brief §6; listed here by the integration: test_cam D1 reads the round V / W groups)
 LANE_WP = 'round W lane WP (11-12): the dodge set replaces the dash, parry sounds, the faster perfect dodge'
 ALLOW[LANE_WP] = (
-    [F + r'player/(?:dash[a-z_]*|dodge/.+)\.mcfunction', F + r'combat/rc_hold\.mcfunction',
+    [F + r'player/(?:dash[a-z_]*|dodge/.+|f_key)\.mcfunction', F + r'combat/rc_hold\.mcfunction',
      F + r'char/motion/dash(?:2|_l|_b|_face)?\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/dash(?:2|_l|_b)?/.+',
      F + r'char/motion/(?:(?:arle|skirk|navia)_fx|events/(?:arle|skirk|navia))/dash(?:2|_l|_b)?\.mcfunction',
      F + r'char/motion/navia_fx/dash/.+', F + r'char/motion/audio/navia/dash\.mcfunction',
@@ -234,6 +235,13 @@ ALLOW[LANE_WP] = (
 # Round V, the integration (11-12, wip/v-int; tools/dev/plan/combat/vi_progress.md): the developer fallback mob of room/mob_summon
 # (`#mobTmp room 1`) is a zombie (lane VC's blank husk texture hides a husk)
 ALLOW['round V integration (11-12): the developer fallback mob is a zombie'] = [F + r'room/mob_summon\.mcfunction']
+# Round W, the integration (11-12, wip/w-int; tools/dev/plan/combat/wi_progress.md): 홍련's damage numbers smaller and beside her
+# (review w T3-09: combat/apply's two number lines skip her body, combat/text_normal_side + _n / text_crit_side), a dodge in flight
+# ends when a locked sequence holds the player (player/tick -> player/dodge/cut), the cartwheel's stand-in rig ticks without a
+# beat (rlk:tick)
+LANE_WI = 'round W integration (11-12): her damage numbers beside her, the dodge cut by a lock, the stand-in rig without a beat'
+ALLOW[LANE_WI] = [F + r'combat/(?:apply|text_normal_side(?:_n)?|text_crit_side)\.mcfunction', F + r'player/(?:tick|dodge/cut)\.mcfunction',
+                  F + r'tick\.mcfunction']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
               LANE_WP,                              # lane WP: the dash clips / 나비아's dash fx + audio, beat/d/a14, a21

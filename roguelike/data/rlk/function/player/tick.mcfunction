@@ -1,5 +1,8 @@
 execute if score @s rdCam matches 1 run scoreboard players set @s dashMoveT 0
 execute if score @s rdCam matches 1 run scoreboard players set @s stepT 0
+# round W (통합): 연출 잠금이 플레이어를 잡은 동안(mboss/cam/hold, 태그 rlk_mb_camh) 날아가던 닷지는 끝난다 — 숨은 아바타가 더 움직이지
+# 않고, 웅크림 · 옆돌기의 대역 리그도 거둔다(player/dodge/cut)
+execute if entity @s[tag=rlk_mb_camh] run function rlk:player/dodge/cut
 # 플레이어별 매 틱 처리 (@s = 플레이어)
 
 # 아직 초기화되지 않았으면 초기화

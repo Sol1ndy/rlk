@@ -47,8 +47,10 @@ execute if score #charN tmp matches 6 if score #dmg tmp matches 1.. unless score
 execute store result storage rlk:combat ox float 0.1 run random value -8..8
 execute store result storage rlk:combat oz float 0.1 run random value -8..8
 execute store result storage rlk:combat oy float 0.1 run random value 16..26
-execute unless score #lunar tmp matches 1 if score #crit tmp matches 1 run function rlk:combat/text_crit_macro with storage rlk:combat
-execute unless score #lunar tmp matches 1 if score #crit tmp matches 0 run function rlk:combat/text_normal_macro with storage rlk:combat
+execute unless score #lunar tmp matches 1 unless entity @s[tag=rlk_mb_scarlet] if score #crit tmp matches 1 run function rlk:combat/text_crit_macro with storage rlk:combat
+execute unless score #lunar tmp matches 1 unless entity @s[tag=rlk_mb_scarlet] if score #crit tmp matches 0 run function rlk:combat/text_normal_macro with storage rlk:combat
+# round W (통합, 리뷰 T3-09): 홍련의 몸체에 뜨는 숫자는 작게, 그녀 옆에서(combat/text_normal_side) — 예비 동작 · 칼의 궤적을 가리지 않게
+execute unless score #lunar tmp matches 1 if entity @s[tag=rlk_mb_scarlet] run function rlk:combat/text_normal_side
 # 달 피해: 달빛 그라데이션 숫자
 execute if score #lunar tmp matches 1 run function rlk:combat/text_lunar
 

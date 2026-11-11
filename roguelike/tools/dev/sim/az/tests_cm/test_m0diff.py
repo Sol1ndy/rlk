@@ -60,6 +60,9 @@ LANE_C_CMD = 1.2
 # round V, lane VP (11-11): the perfect parry / dodge beat's hold test, the first line of mboss/main (one command per boss tick;
 # tools/dev/plan/combat/vp_progress.md "Cost"). The effect kits' two clock lines (나비, 역장) come on top and are not budgeted.
 LANE_VP_CMD = 1.0
+# round W, the integration (11-12, tools/dev/plan/combat/wi_progress.md): 홍련's damage numbers beside her (review w T3-09) cost
+# every combat/apply hit the self-tag test of its new line (1 command per hit; A strikes every 6 t: +0.17 per tick).
+LANE_WI_CMD = 0.2
 # round V, lane VB (11-11; found at the integration, 11-12: the draw stood exactly at its budget): the under bar's segment
 # option #buSubSeg bu (홍련's 5-segment gauge) costs every boss bar draw its reset in bossui/draw (1) and, with an under bar,
 # the gated divider line of bossui/sub (1). Named apart, so the older allowance stays visible (README 0-9).
@@ -292,7 +295,8 @@ def main():
             check(f'A force {f}: dmg / dodge / hz / pj / rig / line logs identical', not dl, dl)
             per = (r1['cmds'] - r0['cmds']) / r0['ticks']
             check(f'A force {f}: commands per tick {r0["cmds"] / r0["ticks"]:.1f} -> {r1["cmds"] / r1["ticks"]:.1f} '
-                  f'(+{per:.2f}/t, budget {CMD_BUDGET} + lane C {LANE_C_CMD} + lane VP {LANE_VP_CMD})', per <= CMD_BUDGET + LANE_C_CMD + LANE_VP_CMD, per)
+                  f'(+{per:.2f}/t, budget {CMD_BUDGET} + lane C {LANE_C_CMD} + lane VP {LANE_VP_CMD} + round W {LANE_WI_CMD})',
+                  per <= CMD_BUDGET + LANE_C_CMD + LANE_VP_CMD + LANE_WI_CMD, per)
         print('== B. kill / cancel / pause / reload: traces and end states')
         for mode in [m for m in args.modes.split(',') if m]:
             for f in forces:

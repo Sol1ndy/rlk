@@ -101,6 +101,8 @@ function rlk:fx/nv/world
 execute if entity @e[tag=rlk_cb_fx,limit=1] run function rlk:player/def/fx/world
 # round V: 박자가 도는 동안의 뒤쪽 일(마네킹 캐릭터의 대역 리그, 느린 화면의 디스플레이 보간 늘이기; player/def/beat/post)
 execute if score #btK cb matches 1.. run function rlk:player/def/beat/post
+# round W (통합): 박자 없이 도는 대역 리그(마네킹 캐릭터의 더블 닷지 옆돌기, char/motion/dash2 → lite/f)도 같은 자리에서 한 틱
+execute unless score #btK cb matches 1.. as @a[tag=player,limit=1] if score @s plActive matches 1 run function rlk:char/motion/lite/tick
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems
