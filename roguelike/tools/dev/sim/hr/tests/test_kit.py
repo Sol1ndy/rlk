@@ -1251,7 +1251,8 @@ if HR_PRESETS:
                 if painter(a, b)[3] >= thr:
                     r = max(r, abs(a), abs(b))
         return r
-    f_cue, f_glint = vis_frac(G.P.paint_cue), vis_frac(G.P.paint_glint)
+    paint_cue = getattr(G.P, 'paint_cue', lambda a, b: (0.0, 0.0, 0.0, 0.0))
+    f_cue, f_glint = vis_frac(paint_cue), vis_frac(G.P.paint_glint)
     check(f_cue >= 0.85 and f_glint <= 0.5, f'hr1c: the cue sprite\'s rays reach {f_cue:.2f} of its card (glint_0 only {f_glint:.2f})')
     s = fresh()
     T0 = s.gt
@@ -1262,11 +1263,11 @@ if HR_PRESETS:
     check(kind(s, main) == 'cue_0' and tint(s, main) == G.WHITE, f'hr1c: the cue\'s main card is the white-gold cue_0 ({kind(s, main)})')
     check(s0 is not None and s0 * f_cue >= 1.0 and end_scale(s, main)[0] * f_cue >= 1.3,
           f'hr1c: the cue is >= 1.0 b visible from its first tick ({s0} x {f_cue:.2f}) and {end_scale(s, main)[0] * f_cue:.2f} b at full size')
-    core, rim = G.P.paint_cue(0.0, 0.0), G.P.paint_cue(0.18, 0.0)
+    core, rim = paint_cue(0.0, 0.0), paint_cue(0.18, 0.0)
     check(min(core[:3]) >= 0.97 and rim[0] >= rim[1] > rim[2] and rim[3] >= 0.8,
           f'hr1c: the cue is white in the core, warm gold round it ({core}, {rim})')
-    ring = max(G.P.paint_cue(0.82 * math.cos(math.radians(a)), 0.82 * math.sin(math.radians(a)))[3] for a in (20, 25, 65, 70, 110, 160))
-    check(ring < 0.05, f'hr1c: the cue sprite has no ring (between its rays at r 0.82: alpha {ring:.2f})')
+    ring = max(paint_cue(0.82 * math.cos(math.radians(a)), 0.82 * math.sin(math.radians(a)))[3] for a in (20, 25, 65, 70, 110, 160))
+    check(ring < 0.05 and f_cue > 0, f'hr1c: the cue sprite has no ring (between its rays at r 0.82: alpha {ring:.2f})')
     check({kind(s, e) for e in cue} == {'cue_0', 'glint_0'} and any(kind(s, e) == 'glint_0' and tint(s, e) == G.TINT[2] for e in cue),
           f'hr1c: the cue = cue_0 cards + a pink glint inside ({sorted(kind(s, e) for e in cue)})')
     s.tick(12)

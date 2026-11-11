@@ -320,23 +320,29 @@ A8_SCRIPT = (                                     # G1 (60 %): 9 parry cuts in 2
     (214, 'A8.9', 'g_dive', None),                # reappears 214 in normal colours 6 b up, dives; judge at 220
     (220, 'judge', None, None),                   # gauge 0: seq/repel {at:60} in this tick; fail §2.4: g_reform 220-230,
 )                                                 # P2 decision at 240
+# HA-03, G2: 30 44 58 86 114 128 156 172 186 200 216 gave 10 perfect parries to a 14-t beat and 5 to 3-t / 6-t mashers. With
+# 11 cuts, every gap >= 14 and the moves' own spacing kept (a reappearance only after the vanish before it: the leap's gone
+# + 2, the ring's vanish + 2, the X's gone + 2), no strike set found keeps every period 8-30 at <= 3 (local searches,
+# an exhaustive DFS; hfa_progress.md); this one is the best found: at most 4 (16 t: 24 of 427 starts, 19 t: 2), never
+# the 5 a clear needs at any period 2-40. Moved: the D1 reappearance 16 -> 13 and every later beat (the clips and their
+# order unchanged; the dome three now 21 / 16 apart).
 A13_SCRIPT = (                                    # G2 (5 %): 11 parry cuts in 242 t, no discs, no yellow
     (0, 'A8.T', 'g_tell', None),
-    (16, 'D1', 'g_dash', (16, 23, 30) + _TC),     # c1
-    (27, 'A8.1', 'g_ring', (30, 37, 44) + _TC),   # c2
-    (35, 'A8.2', 'g_rise', (44, 51, 58) + _TC),   # c3
+    (13, 'D1', 'g_dash', (13, 20, 27) + _TC),     # c1
+    (24, 'A8.1', 'g_ring', (27, 34, 41) + _TC),   # c2
+    (32, 'A8.2', 'g_rise', (41, 51, 58) + _TC),   # c3
     (49, 'A8.3', 'g_leap', None),                 # gone 65
-    (72, 'D1', 'g_dash', (72, 79, 86) + _TC),     # c4
-    (83, 'A8.1', 'g_ring', None),                 # gone 95 (EXTRA_VANISH)
-    (100, 'D2', 'g_glide', (100, 107, 114) + _TC),  # c5
-    (111, 'A8.4', 'g_sweep', (114, 121, 128) + _TC),  # c6
+    (77, 'D1', 'g_dash', (77, 84, 91) + _TC),     # c4
+    (88, 'A8.1', 'g_ring', None),                 # gone 97 (EXTRA_VANISH)
+    (99, 'D2', 'g_glide', (99, 106, 113) + _TC),  # c5
+    (110, 'A8.4', 'g_sweep', (113, 121, 128) + _TC),  # c6
     (122, 'A8.5', 'g_x', None),                   # gone 136
-    (142, 'D4', 'g_run', (142, 149, 156) + _TC),  # c7
-    (153, 'A8.6', 'g_wrap', (156, 165, 172) + _TC),  # c8
-    (169, 'A8.7', 'g_dome', (172, 179, 186) + _TC),  # c9
-    (183, 'A8.7', 'g_dome', (186, 193, 200) + _TC),  # c10
-    (197, 'A8.7', 'g_dome', (200, 209, 216) + _TC),  # c11
-    (211, 'A8.8', 'g_vert', None),                # hidden 229
+    (138, 'D4', 'g_run', (138, 145, 152) + _TC),  # c7
+    (149, 'A8.6', 'g_wrap', (152, 162, 169) + _TC),  # c8
+    (166, 'A8.7', 'g_dome', (169, 183, 190) + _TC),  # c9
+    (187, 'A8.7', 'g_dome', (190, 199, 206) + _TC),  # c10
+    (203, 'A8.7', 'g_dome', (206, 213, 220) + _TC),  # c11
+    (215, 'A8.8', 'g_vert', None),                # hidden 233
     (236, 'A8.9', 'g_dive', None),                # dives; judge at 242
     (242, 'judge', None, None),                   # gauge 0: seq/repel {at:5}; fail: the instant death
 )
@@ -344,8 +350,9 @@ SCRIPTS = {'a8': A8_SCRIPT, 'a13': A13_SCRIPT}
 GAUNTLETS = ('a8', 'a13')
 CUT_IDS = {'a8': tuple(str(i) for i in range(1, 10)), 'a13': tuple(str(i) for i in range(1, 12))}
 CUT_GAP_MIN = 14          # every strike gap: a missed F (12 t refusal) never blocks the next cut
-EXTRA_VANISH = {'a13': (95,)}                     # g_ring does not end vanished: the vanish before D2's reappearance
-BOLTS = {'a8': (34, 102, 166, 218), 'a13': (70, 160, 205, 240)}   # deco_bolt 3-6 b from the player (no hit), T+
+EXTRA_VANISH = {'a13': (97,)}                     # g_ring does not end vanished: the vanish before D2's reappearance
+# HA-03: G1's 102 -> 99 and G2's 205 -> 198 (the re-timed cuts would put them on a lock / one tick before a strike)
+BOLTS = {'a8': (34, 99, 166, 218), 'a13': (70, 160, 198, 240)}    # deco_bolt 3-6 b from the player (no hit), T+
 JUDGE_T = {'a8': 220, 'a13': 242}
 REPEL_T = JUDGE_T                                 # the repel starts in the judge tick (its first frames are the gold deflect)
 # the 11-06 moon disc: only the kit's prop size reads it now (build_mboss_hr_fx.py DISC_SCALE); the module launches none

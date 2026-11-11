@@ -6,4 +6,3 @@ execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
 function rlk:mboss/mv/face
-execute at @e[tag=rlk_body,limit=1] rotated as @a[tag=player,limit=1] rotated ~75 0 positioned ^ ^ ^4.4 positioned ~ 201 ~ run function rlk:boss/scarlet/g/bolt

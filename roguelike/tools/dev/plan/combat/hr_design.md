@@ -703,7 +703,11 @@ G2's cut count (9-11), `PP_FLINCH` 0-10. The item (`sword_hwamu`) and the buff a
   groggy has reached.
 - **HA-05**: `bal_ok` refuses `a4` 28-38 too (the ring hop); `test_bal_hr` reads her body height in every pattern.
 - **HA-03**: the gauntlet strikes are re-timed (§2.4 rows moved by a few ticks, see `api.A8_SCRIPT` / `A13_SCRIPT` and
-  `hfa_progress.md`) so that no blind metronome clears them; `tests/test_metro.py` drives the real F functions.
+  `hfa_progress.md`) so that no blind metronome clears them; `tests/test_metro.py` drives the real F functions. G1 strikes
+  30 48 64 91 109 139 163 180 196 (≤ 3 perfect parries for every period 8-30 and start, as ruled); G2 strikes 27 41 58 91 113 128
+  152 169 190 206 220 (deviation: an exhaustive search proved that with 11 cuts, gaps ≥ 14 and the moves' own spacing no set
+  stays at ≤ 3 for every period; this one reaches 4 only at 16 t / 19 t for a few starts, and 5 at no period 2-40). Bolts G1
+  34 99 166 218, G2 70 160 198 240; G2's extra vanish 97.
 - **HA-06 / HA-07**: the cue's sound and sprite (above, §2.1).
 - **HA-08**: `q`'s grab kb 0.
 - **HA-09**: a full gauge forces `rings` in the near band only; from the mid band `ai/ult_close` glides her in (0.3 b/t to 4 b,

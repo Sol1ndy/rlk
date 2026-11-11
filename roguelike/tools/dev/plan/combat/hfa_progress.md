@@ -40,7 +40,18 @@ played in the real gauntlet with F through `player/f_key`: segments taken = the 
 - **G1** (9 cuts): 30 46 64 94 110 138 164 180 196 → **30 48 64 91 109 139 163 180 196** (c2 +2: A8.2 39; c4 −3: D2 77,
   A8.4 88; c5 −1: A8.5 103; c6 +1: D1 125, A8.1 136; c7 −1: D3 147, A8.6 160). The DFS found 33 311 strike sets with ≤ 3
   for every period 8-30 and start (s1 28-34, gaps 14-30, last ≤ 199); this one is the nearest to the old (8 ticks moved).
-- **G2**: in progress.
+- **G2** (11 cuts): 30 44 58 86 114 128 156 172 186 200 216 → **27 41 58 91 113 128 152 169 190 206 220** (every beat moved:
+  D1 13, A8.1 24, A8.2 32, A8.3 49, D1 77, A8.1 88, vanish 97, D2 99, A8.4 110, A8.5 122, D4 138, A8.6 149, A8.7 166 / 187 / 203,
+  A8.8 215; the dive 236 and the judge 242 as before). **Deviation from the ruling (≤ 3 for every period)**: with 11 cuts,
+  every gap ≥ 14 and the moves' own spacing (a reappearance only after the vanish before it: the leap's gone + 2, the ring's
+  vanish + 2, the X's gone + 2 — the minimum gaps 14 14 24 20 14 23 14 14 14 14) the exhaustive DFS (`dfs2.c`, every start
+  ≥ T − 200, s1 21-32, last ≤ 221) finds **no** strike set that keeps every period 8-30 at ≤ 3 (4.9 M nodes, 0 solutions);
+  without the spacing rule the local searches never found one either (best 4). The nearest sound thing: the set with the
+  fewest 4s (local search, cost = periods at 4, then starts at 4, then the distance to the old): 4 only at 16 t (24 of the
+  starts T−200…220) and 19 t (2), 3 elsewhere in 8-30; mashers 6 / 7 t and slow beats 31-33 / 39 t also reach 4 at a few
+  starts; **5 (a clear) at no period 2-40 and no start**. Old G2: 14 t 10, 12 / 28 t 6, mashers 3 / 6 t 5 (cleared).
+  `test_metro` pins: G1 ≤ 3; G2 ≤ 4, over 3 at ≤ 2 periods and ≤ 30 starts; < 5 at 2-7 and 31-40.
+- Metronome table (best perfect parries per period, any start; real F functions): see "Gates" (test_metro).
 
 ## Pack files (`<S>/rp_hfa` vs `<S>/rp_hi`)
 - added: `assets/rlk/textures/mboss/hr_kit/cue_0.png`, `assets/rlk/models/item/mboss/hr_kit/cue_0.json`, `assets/rlk/items/mboss/hr_kit/cue_0.json`

@@ -1,4 +1,5 @@
 # A13 ticks 112..127.
+execute if score #pt hr matches 113 run return run function rlk:boss/scarlet/p/a13/k/113
 execute if score #pt hr matches 114 run return run function rlk:boss/scarlet/p/a13/k/114
 execute if score #pt hr matches 115 run return run function rlk:boss/scarlet/p/a13/k/115
 execute if score #pt hr matches 116 run return run function rlk:boss/scarlet/p/a13/k/116

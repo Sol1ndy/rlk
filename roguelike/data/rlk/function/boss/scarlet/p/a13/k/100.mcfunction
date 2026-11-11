@@ -1,9 +1,2 @@
 # A13 pattern tick 100.
-function rlk:boss/scarlet/rig/play/g_glide
-function rlk:boss/scarlet/g/spot/d2
-function rlk:mboss/mv/stop
-execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run tp @s ~ ~ ~
-kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
-function rlk:mboss/mv/face
-execute at @s run function rlk:boss/scarlet/fx/snd/g_appear
-function rlk:boss/scarlet/g/cut/make {s:114,t:14,dmg:37,kb:0,n:1}
+function rlk:boss/scarlet/g/cut/aim {s:113}
