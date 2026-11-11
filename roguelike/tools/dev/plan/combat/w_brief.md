@@ -135,3 +135,14 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G
 ```
 Commits made before this point keep the trailer they have.
+
+## 6. Addendum (11-12 04:05 KST): the parry whiff ladder goes
+The user asked whether the original game lengthens the parry cooldown when F is mashed; it does not (the escalating
+lock was the round-A review's addition, `rulings_A.md` A-01 (2)). The user: 「없애」 ("remove it").
+**WP**: remove the whiff streak entirely — every F press locks for the base `#parGap` (12 t) and nothing else; no
+streak counter, no `#parWsT` / `#parWsClr` behaviour, no growing lock. Keep the base lock and the rule that an ignored
+press during the lock does not re-arm early (A-01 (1)), so mashing faster than the gap still never gets a press in.
+Update test_cb, README 3 and `c_progress` / `fa_progress` notes. Then re-check what the ladder was guarding: the
+gauntlet metronome search (`test_metro`: G1 / G2 must stay uncleared by any fixed-period masher) and the balance
+agents (hrfair T7: sloppy ≤ 35 %, masher / dodger 0 % clears; T6 / T13) — report the numbers; if a masher can now
+clear a gauntlet, say so with the period that does it and do not fix it by bringing the ladder back (the lead decides).
