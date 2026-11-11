@@ -78,6 +78,20 @@ def her_point(tracks, seq, rec, kind):
     return world_of(fr, (hb[0] + d[0] * co + d[2] * si, hb[1] + d[1], hb[2] - d[0] * si + d[2] * co))
 
 
+def actor_feet(man, seq, rec):
+    """The actor's root on the floor (the manifest's `shift` of the tick in the stage frame its root stands in)."""
+    if not man or rec['stage'] is None:
+        return None
+    tk = man['clips'][ACLIP[seq]]['tick']
+    fr = rec['stage']
+    if seq == 'ending' and rec['sq'] >= FACE2_AT and rec['stage2']:
+        fr = rec['stage2']
+    if seq == 'event' and rec['stage2']:
+        fr = rec['stage2']
+    i = max(0, min(rec['sq'], len(tk['shift']) - 1))
+    return world_of(fr, tk['shift'][i])
+
+
 def actor_head(man, seq, rec):
     if not man or rec['stage'] is None:
         return None
@@ -133,7 +147,10 @@ def analyse(dp, name, stage='c', recs=None):
             ah = actor_head(man, sn, r)
             pj = (lambda p: SH.project(eye, rot[0], rot[1], p) if p else None)  # noqa: E731
             gone = sn == 'event' and t >= api.EV_T['hide']          # the coda: she has left (state/hidden at E40)
+            hf = tuple(r['body'][0]) if r.get('body') else None      # her feet = her body on the floor
+            af = actor_feet(man, sn, r)
             out.append(dict(seq=sn, sq=t, gone=gone, shot=sh.name if sh else None, sub=tuple(sh.sub) if sh else (), her=pj(hp), pelvis=pj(pp),
+                            full=bool(sh and getattr(sh, 'full', False)), her_feet=pj(hf), actor_feet=pj(af),
                             d=math.dist(eye, hp) if hp else None, actor=pj(ah), ad=math.dist(eye, ah) if ah else None,
                             line=[i for i, (t0, n) in lines.items() if t0 <= t < t0 + n]))
     return out
@@ -188,6 +205,46 @@ def face_under_text(rows, L, fov=70.0, aspect=16 / 9):
         rr = HEAD_R / (h[2] * math.tan(math.radians(fov / 2)))
         if abs(h[0]) - rr / aspect < bx and h[1] - rr < by1 and h[1] + rr > by0:
             bad.append(r)
+    return bad
+
+
+FOVS = (70.0, 90.0, 110.0)          # mboss_lib.CAM_FOVS: the fields of view a two-figure shot is checked at (90 = the user's)
+EDGE = 0.96                         # a point is "inside the picture" within this part of it
+
+
+def at_fov(p, fov):
+    """A projected point (sx, sy, depth) of the 70-degree picture as it lies in the picture of another vertical field of view."""
+    if p is None or p[0] is None:
+        return None
+    k = math.tan(math.radians(SH.FOV_V / 2)) / math.tan(math.radians(fov / 2))
+    return (p[0] * k, p[1] * k, p[2])
+
+
+def two_figure_bad(rows, L, fovs=FOVS, aspect=16 / 9):
+    """Round W (w_brief WC 3): the ticks of a shot of BOTH figures (cam.Shot.sub holds 'her' and 'actor') on which, at one of
+    the fields of view, a head is not whole inside the picture (the head point +- HEAD_R), a head lies under the dialogue
+    box while a line shows, or - a `full` shot - a figure's feet are outside. [(row, fov, what)]."""
+    bad = []
+    for r in rows:
+        if r['gone'] or not ('her' in r['sub'] and 'actor' in r['sub']):
+            continue
+        for fov in fovs:
+            tv = math.tan(math.radians(fov / 2))
+            box = L.cam_text_box(L.CAM_LINE, 192, fov) if r['line'] else None
+            for who, hk, fk in (('her', 'her', 'her_feet'), ('actor', 'actor', 'actor_feet')):
+                h = at_fov(r[hk], fov)
+                if h is None or h[2] <= 0.05:
+                    bad.append((r, fov, f'{who}: head behind the lens'))
+                    continue
+                rr = HEAD_R / (h[2] * tv)
+                if abs(h[0]) + rr / aspect > EDGE or abs(h[1]) + rr > EDGE:
+                    bad.append((r, fov, f'{who}: head at ({h[0]:.2f}, {h[1]:.2f}) r {rr:.2f}'))
+                if box and h[0] * aspect + rr > box[0] and h[0] * aspect - rr < box[1] and h[1] - rr < box[3] and h[1] + rr > box[2]:
+                    bad.append((r, fov, f'{who}: head under the line box'))
+                if r['full']:
+                    f = at_fov(r[fk], fov)
+                    if f is None or f[2] <= 0.05 or abs(f[0]) > EDGE or abs(f[1]) > EDGE:
+                        bad.append((r, fov, f'{who}: feet at {None if f is None else (round(f[0], 2), round(f[1], 2))}'))
     return bad
 
 

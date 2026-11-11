@@ -23,9 +23,10 @@ const mix = (a, b, u) => a.map((x, i) => x + (b[i] - x) * u);
 // §4.3, the actor's side: `blade` = the blade's centre line (root..tip) through the point, `tip` = the blade's point there,
 // `hilt` = the hilt (pommel..guard) there, hand_l / foot_r = that grip point / sole there, `under` = the named point under it
 // (within r sideways, below[0]..below[1] lower: her forearm lies on the shoulder).
+// (round W, lane WC: w_brief §4.5 / §4.6) the locks a swordfighter's distance apart; the exchange on the ground (KA1-KA4)
 export const K = {
-  K1: [0, 1.45, .75], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.20, 1.10], KS: [.20, 1.50, 1.60], KK: [0, .35, 2.7],
-  KG: [0, 2.05, 2.35], KE2: [0, 1.5, 2.1], KE5: [0, 1.5, 3.25], KA1: [0, 6.9, 2.55], KA2: [0, 7.3, 2.6], KA3: [0, 6.8, 2.5], KA4: [0, 6.9, 2.6],
+  K1: [0, 1.45, .95], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.20, 1.10], KS: [.20, 1.50, 1.60], KK: [0, .35, 2.7],
+  KG: [0, 2.05, 2.95], KE2: [0, 1.5, 2.2], KE5: [0, 1.5, 3.45], KA1: [0, 1.45, 3.5], KA2: [0, 1.85, 3.05], KA3: [0, 1.25, 3.55], KA4: [0, 1.5, 3.45],
 };
 export const CONTACT = {
   K1: {clip: 'cs1', ticks: [10, 30], p: K.K1, what: 'blade', tol: .08},
@@ -78,9 +79,14 @@ const STAND = {R: [.125, 0], L: [-.125, 0]};
 const READY = {R: [.2, .26], L: [-.2, -.24]};
 // a sword held in space: the grip point, the blade's direction, the side its edge faces (the broad face's normal follows)
 const blade = (hilt, dir, edge = [0, 0, 1]) => { const d = norm(dir); return {hR: hilt, wR: 1, bd: d, bn: norm(cross(d, edge)), ws: 1}; };
-// the blade-lock convention of §3.0, the actor's half of the X: hilt 0.3 below K, 0.3 to its right, 0.25 before it
+// the blade-lock convention of §3.0, the actor's half of the X: round W (w_brief §4.5, "it's a sword fight but it feels like they are
+// talking with their bodies"): the hilt 0.36 below K, 0.26 to its right and 0.55 before it - the blades meet at the middle of the
+// actor's blade, the hands held before the chest, the body upright (it was 0.25 before K: the actor leant in, chest to chest)
+const LOCK_OFF = [.26, -.36, -.55];
 const ELBOWS_OUT = {pL: [-1, -.4, .35], pR: [1, -.45, .1]};       // two hands on the hilt: the elbows point out and forward, clear of the chest
-const lock = Kp => { const hilt = add(Kp, [.3, -.3, -.25]); return {...blade(hilt, sub(Kp, hilt), [0, 0, 1]), ...ELBOWS_OUT}; };
+const lock = Kp => { const hilt = add(Kp, LOCK_OFF); return {...blade(hilt, sub(Kp, hilt), [0, 0, 1]), ...ELBOWS_OUT}; };
+// a blade whose centre line passes K: the hilt `along` b from K back along dir
+const thru = (Kp, dir, along = .65, edge = [0, 0, 1]) => { const d = norm(dir); return blade(sub(Kp, mulv(d, along)), d, edge); };
 const pommelOf = c => add(c.hR, mulv(norm(c.bd), SWORD.left));
 
 // The pelvis offset (hip) that keeps both shins upright over planted feet at the given drop: with no ankle the sole only lies
@@ -481,7 +487,7 @@ function ending(tr) {
   step(tr, 'L', 12, 16, [r1.fL[0], r1.fL[2]], .07);
   tr.mv(4, 20, {hip: r1.hip, rot: r1.rot, tor: r1.tor, head: r1.head, hR: r1.hR, bd: r1.bd, bn: r1.bn, pR: r1.pR, aL: r1.aL, kR: r1.kR, kL: r1.kL, look: [0, 1.6, 4.6], wl: .5}, 'io');
   // 46-50 the sword goes back over the right shoulder; 50-54 the lunge, the cut's point on her brim at 52, down into the lock
-  const E2 = [0, 0, 1.3], dG = norm([-.75, .75, 1.1]), hG = sub(K.KG, mulv(dG, SWORD.tip));
+  const E2 = [0, 0, 1.3], dG = norm([-.45, .42, 1.25]), hG = sub(K.KG, mulv(dG, SWORD.tip));
   const cock = blade(add(E1, [.5, 1.46, -.06]), [.55, .7, -.45], [0, 1, 0]);
   tr.mv(44, 50, {hR: cock.hR, bd: cock.bd, bn: cock.bn, tor: [-4, 16, 0], hip: add(r1.hip, [0, -.03, -.04])}, 'io');
   const lkE = lock(K.KE2);
@@ -552,64 +558,66 @@ function ending(tr) {
   tr.at(190, {hip: l5.hip, rot: l5.rot, tor: l5.tor, head: l5.head, two: 1, wl: 0, aL: ARM.balL, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR}, 'i');
   tr.at(197, {hip: add(l5.hip, [0, -.06, -.03])}, 'io');
   tr.at(204, {hip: add(l5.hip, [0, -.12, -.02])}, 'io');
-  // 204-216 springs up to (0, 6.0, 1.5); the legs trail, the sword ready at the right
-  const air = (root, rest = {}) => ({root, lfR: 1, lfL: 1, hip: [0, 0, 0], ...rest});
+  // 204-310 (round W, w_brief §4.6: the aerial duel is gone) the exchange on the ground at E6, 2.25 b from her: back into the guard
+  // 204-212; a1 228 the block, the blade up to its left onto her diagonal at KA1; a2 262 the raised horizontal guard under her
+  // overhead at KA2 (the arms give, the knees bend); a3 286 its own descending cut from high on its right meets hers at KA3; the X
+  // lock at KA4 298-304; pushed off 304-310 (sliding back to f 1.9); a backward spring 312-329 home to the stage origin
+  const r6 = readyAt(E6);
   tr.hold(204, ...Object.keys(REST));
-  tr.at(206, {two: 0, lfR: 1, lfL: 1, lR: [4, 0, -4, 10], lL: [-10, 0, 4, 24], hip: [0, .0, 0]}, 'l');
-  const U0 = [0, 6.0, 1.5];
-  const fly = blade(add(U0, [.46, 1.2, .2]), [.4, .6, -.7], [1, 0, 0]);
-  tr.at(216, {...air(U0), rot: [0, 0, 0], tor: [-6, 14, 0], head: [-6, -10, 0], lR: [38, 0, -8, 70], lL: [-8, 0, 6, 40], aL: [-20, 0, 40, 40], look: [0, 7.6, 3.6], wl: .7}, 'o');
-  carry(tr, 204, 216, sub(lk5.hR, E6), [.46, 1.2, .2], 'io');
-  tr.at(210, {bd: norm([.3, .9, .3])}, 'l'); tr.at(216, {bd: fly.bd, bn: fly.bn}, 'l');
-  // 216-228 the passing cut meets hers at KA1: level, right to left
-  const U1 = [.1, 5.86, 1.62];
-  const c1a = blade(add(U1, [.5, 1.12, .0]), [.86, .1, -.5], [0, 0, 1]), c1b = blade(add(U1, [.36, 1.04, .36]), sub(K.KA1, add(U1, [.36, 1.04, .36])), [0, 0, 1]);
-  const c1c = blade(add(U1, [-.2, 1.0, .46]), [-.92, -.1, .38], [0, 0, 1]);
-  tr.at(222, {root: [.06, 6.0, 1.5], hR: c1a.hR, bd: c1a.bd, bn: [0, 1, 0], tor: [-4, 34, 0], head: [-4, -30, 0], lR: [30, 0, -8, 50], lL: [-14, 0, 6, 50]}, 'io');
-  tr.at(228, {root: U1}, 'io');
-  sweep(tr, 224, 228, c1a, c1b, {ease: 'i', n: [0, 1, 0]});
-  sweep(tr, 228, 232, c1b, c1c, {ease: 'o', n: [0, 1, 0]});
-  tr.at(228, {tor: [-8, 4, 0], head: [-2, 0, 0], aL: [-34, 0, 44, 30]}, 'i');
-  tr.at(232, {tor: [-10, -30, 0], head: [0, 26, 0], lR: [10, 0, -8, 40], lL: [26, 0, 6, 60]}, 'o');
-  // 232-252 drifts back and up from the pass, the sword carried round over the right shoulder; 252-260 into the level guard
-  const U2 = [-.5, 5.51, 2.17];
-  tr.hold(232, 'root');
-  tr.at(242, {root: [.12, 6.1, 1.36]}, 'o'); tr.at(252, {root: [-.2, 5.9, 1.8]}, 'io');
-  tr.at(236, {hR: [.3, 7.0, 1.86], bd: norm([-.3, .7, .65]), tor: [-6, -10, 0], head: [0, 6, 0], aL: [10, 0, 30, 60]}, 'io');
-  tr.at(243, {hR: [.6, 7.5, 1.3], bd: norm([.3, .9, -.3]), bn: [1, 0, 0], tor: [4, 16, 0], head: [-8, -12, 0], lR: [14, 0, -8, 40], lL: [30, 0, 6, 64]}, 'io');
-  tr.at(252, {hR: [.26, 7.46, 2.1], bd: norm([.8, .58, .1]), tor: [2, -6, 0], lR: [20, 0, -8, 60], lL: [4, 0, 6, 50]}, 'io');
-  const hA2 = add(K.KA2, [-.45, 0, -.05]), gA2 = blade(hA2, [1, 0, .08], [0, 1, 0]);
-  const b262 = fit({...REST, ...air(U2), rot: [0, 0, 0], tor: [5, -22, 0], head: [-16, 16, 0], ...gA2, ...ELBOWS_OUT, two: 1, lR: [40, 0, -8, 76], lL: [14, 0, 6, 64]}, {reach: .57, vars: ['hr', 'hf', 'ty', 'tr', 'tp']});
-  tr.at(256, {two: 0}, 'l');
-  tr.hold(256, 'pL', 'pR');
-  tr.at(260, {root: U2, hR: gA2.hR, bd: gA2.bd, bn: gA2.bn, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR, hip: b262.hip, tor: b262.tor, head: b262.head, two: 1, lR: b262.lR, lL: b262.lL, wl: 0}, 'io');
-  // 262 her cut falls on the guard: the arms give, the body drops; 266-286 swings out and round into the big cut at KA3
-  tr.hold(262, 'root', 'hR', 'hip', 'tor', 'bd', 'bn', 'head', 'lR', 'lL');
-  tr.at(265, {root: add(U2, [0, -.3, -.12]), hip: add(b262.hip, [0, -.06, 0]), hR: add(gA2.hR, [0, -.34, -.14]), tor: add(b262.tor, [8, 0, 0])}, 'o');
-  const U3 = [0, 5.6, 1.6];
-  const hi3 = blade(add(U3, [.5, 1.7, -.1]), [.3, .8, -.5], [1, 0, 0]);
-  const h3 = add(U3, [.3, 1.34, .44]), d3 = norm(sub(K.KA3, h3)), c3 = blade(h3, d3, [1, 0, 0]);
-  const lo3 = blade(add(U3, [-.1, .9, .5]), [-.5, -.6, .62], [1, 0, 0]);
-  tr.hold(265, 'two'); tr.at(268, {two: 0}, 'l');
-  tr.at(278, {root: [.1, 6.0, 1.3], hip: [0, 0, 0], hR: hi3.hR, bd: hi3.bd, bn: hi3.bn, tor: [8, 24, 0], head: [-10, -20, 0], lR: [10, 0, -8, 30], lL: [-20, 0, 6, 50], aL: [-10, 0, 50, 40]}, 'io');
-  tr.at(286, {root: U3}, 'i');
+  pose(tr, 212, {...r6, two: 0, wl: .5, look: [0, 1.5, 4.75], pL: r6.pL, pR: r6.pR}, 'io');
+  const ready6 = {hR: r6.hR, bd: r6.bd, bn: r6.bn};
+  // a1: the block (one hand, the left hand braced at the pommel for the impact 226-232)
+  const b1 = thru(K.KA1, [-.42, .6, .55], .62, [-1, 0, 0]);
+  sweep(tr, 220, 226, ready6, b1, {ease: 'io'});
+  tr.hold(226, 'hR', 'bd', 'bn');
+  tr.at(228, {hR: b1.hR, bd: b1.bd, bn: b1.bn}, 'l');
+  tr.at(222, {tor: [-4, -14, 0], head: [2, 10, 0], aL: [10, 0, 30, 50]}, 'io');
+  tr.at(228, {hip: add(r6.hip, [0, -.03, 0])}, 'l');
+  tr.at(231, {hip: add(r6.hip, [0, -.08, -.04]), tor: [-2, -18, 0]}, 'o');
+  sweep(tr, 228, 238, b1, ready6, {ease: 'io'});
+  tr.at(240, {hip: r6.hip, tor: r6.tor, head: r6.head, aL: ARM.balL}, 'io');
+  // a2: the raised horizontal guard (one hand, the hilt over its right shoulder, the blade across before its head to its left, the
+  // left hand open under the flat), K at the blade's middle
+  const g2 = blade(add(K.KA2, [.4, -.04, -.12]), [-1, .05, .25], [0, 1, 0]);
+  sweep(tr, 246, 259, ready6, g2, {ease: 'io', via: norm([.3, .9, .3])});
+  tr.at(259, {tor: [-6, 6, 0], head: [12, 0, 0], aL: [70, 0, 30, 70]}, 'io');
+  tr.hold(262, 'hR', 'bd', 'bn', 'hip', 'tor');
+  tr.at(265, {hR: add(g2.hR, [0, -.2, -.05]), hip: add(r6.hip, [0, -.1, -.03]), tor: [0, 6, 0]}, 'o');
+  sweep(tr, 266, 274, {hR: add(g2.hR, [0, -.2, -.05]), bd: g2.bd, bn: g2.bn}, ready6, {ease: 'io'});
+  tr.at(274, {hip: r6.hip, tor: r6.tor, head: r6.head, aL: ARM.balL}, 'io');
+  // a3: its own cut from high on its right down across to its left, meeting hers at KA3 (every tick 282-289)
+  const hi3 = blade(add(E6, [.5, 1.68, -.1]), [.3, .8, -.5], [1, 0, 0]);
+  const c3 = thru(K.KA3, [-.35, -.35, .85], .65, [1, 0, 0]);
+  const lo3 = blade(add(E6, [-.12, .92, .45]), [-.5, -.6, .62], [1, 0, 0]);
+  sweep(tr, 274, 282, ready6, hi3, {ease: 'io'});
+  tr.at(280, {tor: [6, 22, 0], head: [-8, -18, 0], aL: [-10, 0, 50, 40]}, 'io');
   sweep(tr, 282, 286, hi3, c3, {ease: 'i'});
   sweep(tr, 286, 289, c3, lo3, {ease: 'o'});
-  tr.at(286, {tor: [-12, -4, 0], head: [-2, 0, 0], lR: [44, 0, -8, 70], lL: [-6, 0, 6, 40]}, 'i');
-  tr.at(289, {root: add(U3, [0, -.12, -.1]), tor: [-20, -20, 0]}, 'o');
-  // 290-298 into the lock at KA4 (two hands), pressing to 304
-  const U4 = [.0, 5.45, 1.85], lk4 = lock(K.KA4);
-  const b4 = fit({...REST, ...air(U4), rot: [0, 0, 0], tor: [-10, 8, 0], head: [4, 4, 0], ...lk4, two: 1, hip: [.2, 0, .0], lR: [36, 0, -8, 70], lL: [-16, 0, 6, 44]});
-  tr.mv(291, 298, {root: U4, hR: lk4.hR, bd: lk4.bd, bn: lk4.bn, pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR, hip: b4.hip, tor: b4.tor, head: b4.head, two: 1, lR: b4.lR, lL: b4.lL}, 'io');
-  tr.at(304, {hip: add(b4.hip, [0, 0, .05]), tor: add(b4.tor, [-6, 0, 0])}, 'io');
-  // 304-330 pushed off: falls back to the mark, lands in a crouch, rises by 338
+  tr.at(286, {tor: [-12, -4, 0], head: [-2, 0, 0]}, 'i');
+  tr.at(289, {hip: add(r6.hip, [0, -.06, .02]), tor: [-18, -18, 0]}, 'o');
+  // the lock at KA4 (two hands) 291-298, pressing to 304
+  const lk4 = lock(K.KA4);
+  const b4 = fit({...r6, ...lk4, two: 1, rot: [0, -6, 0], tor: [-12, 8, 0], hip: [.05, -.1, .02], head: [6, 4, 0], wl: 0});
+  sweep(tr, 289, 297, lo3, lk4, {ease: 'io'});
+  tr.hold(291, 'two', 'pL', 'pR');
+  tr.at(297, {hR: lk4.hR, bd: lk4.bd, bn: lk4.bn}, 'l');
+  tr.mv(291, 298, {pL: ELBOWS_OUT.pL, pR: ELBOWS_OUT.pR, hip: b4.hip, tor: b4.tor, head: b4.head, rot: b4.rot, two: 1, wl: 0}, 'io');
+  tr.at(304, {hip: add(b4.hip, [0, -.04, .03]), tor: add(b4.tor, [-6, 0, 0])}, 'io');
+  // pushed off 304-310: slides back to f 1.9, the heels dragging, the left hand off; 312-329 a backward spring home (low)
+  const E7 = [0, 0, 1.9];
   tr.hold(304, ...Object.keys(REST));
   tr.at(306, {two: 0}, 'l');
-  tr.at(312, {root: [0, 5.2, 1.2], hip: [0, 0, 0], tor: [16, 0, 0], head: [-8, 0, 0], lR: [64, 0, -8, 70], lL: [24, 0, 6, 60], aL: [-30, 0, 60, 20], bd: norm([.5, .6, .62])}, 'o');
-  tr.at(330, {root: O}, 'i');
-  carry(tr, 304, 312, sub(lk4.hR, U4), [.5, 1.3, .3], 'o');
-  carry(tr, 312, 330, [.5, 1.3, .3], [.46, .9, .3], 'io');
-  tr.at(326, {tor: [-10, 0, 0], head: [6, 0, 0], lR: [30, 0, -6, 50], lL: [22, 0, 6, 44], aL: [10, 0, 40, 40]}, 'io');
+  tr.at(310, {root: E7, hip: add(r6.hip, [0, -.1, -.04]), tor: [-16, 6, 0], head: [10, 8, 0], aL: [20, 0, 35, 50], fR: add(r6.fR, [0, 0, -.6]), fL: add(r6.fL, [0, 0, -.6])}, 'o');
+  carry(tr, 304, 310, sub(lk4.hR, E6), [.42, .86, .3], 'o');
+  // 311-329 backs off home to the stage origin in three steps (the soles may drag: a declared slide)
+  tr.at(315, {root: [0, 0, 1.45], hip: add(r6.hip, [0, -.04, -.02]), tor: [-10, 4, 0]}, 'io');
+  tr.at(319, {root: [0, 0, .95]}, 'l'); tr.at(323, {root: [0, 0, .45]}, 'l'); tr.at(328, {root: O}, 'o');
+  step(tr, 'R', 311, 315, [.2, 1.45], .08);
+  step(tr, 'L', 315, 319, [-.2, .82], .08);
+  step(tr, 'R', 319, 323, [.2, .5], .08);
+  step(tr, 'L', 323, 327, [-.2, -.14], .08);
+  carry(tr, 310, 328, [.42, .86, .3], [.46, .9, .3], 'io');
+  tr.at(326, {tor: [-10, 0, 0], head: [6, 0, 0], aL: [10, 0, 40, 40]}, 'io');
   const ld = stance(O, [.2, .16], [-.2, -.14], {drop: .26});
   tr.at(329, {fR: ld.fR, fL: ld.fL, kR: [.25, 0, 1], kL: [-.3, 0, 1], rot: [0, 0, 0]});
   tr.hold(329, 'lfR', 'lfL');
@@ -648,14 +656,14 @@ export const CLIPS = [
     her: [[0, [0, 0, 20.73]], [1052, [0, 0, 20.7]], [1148, [0, 0, 13.5]], [1234, [0, 0, 13.5]], [1246, [0, 4.5, 10]], [1258, [0, 0, 6.5]]]}),
   mk('cs1', 720, cs1, {grip: 'right hand; two hands 6-34', two: [[10, 30]], slides: [[30, 44], [664, 676], [694, 704]], sync: [566], steps: [68, 76, 82, 657, 663, 671, 711, 716],
     beats: 'ready 0-6; guard up 6-10; the cut on the blade at K1 at 10; lock 10-30, pushing 24-30; the shove 30-34; slides back 34-44; recovers, steps forward 60-82; sword lowered by 84; half guard 350-370, held; hit 650-653; stagger 652-664 (f -0.5); on the right knee, the sword planted 664-694; up 694-716; idle 720',
-    her: [[0, [0, 0, 9]], [6, [0, 0, 9]], [10, [0, 0, 1.5]], [34, [0, 0, 1.5]], [50, [0, 0, 9]]]}),
+    her: [[0, [0, 0, 9]], [6, [0, 0, 9]], [10, [0, 0, 2.25]], [34, [0, 0, 2.25]], [50, [0, 0, 9]]]}),
   mk('repel', 140, repel, {keep: [129], grip: 'two hands 0-30; left hand free 30-140 (on her wrist 36-48; the throw: the right fist with the sword hooked over her sword forearm 78-96, the left hand round her wrist 86-91)', two: [[0, 26]], slides: [[61, 68], [129, 139]], steps: [34, 38, 52, 68, 72, 132, 138],
     beats: 'high guard at KR 0-4; holds 4-22; heaves 22-26; beats her blade aside 26-30; steps in 30-36; left hand on her wrist at KW 36-48; hilt strike at KH 49; rising cut 56; level cut 62, past her right side 62-68 (r -0.5); back to her 68; hooks her arm over the right shoulder 70-76; the throw 78-96: the right fist over her sword forearm 78-96, the left hand round her wrist 86-91 (reaching 79-85, letting go 92-97), the hips back under her, the back bent, the head ducked left: she goes over the right shoulder, low (her pelvis 0.35 b over it at 88); lets go 96, straightens 96-102; the point at her 104-118; leg back 120-128; kick at KK 129; back-flip 132-138; idle 140',
     her: [[0, [0, 1, 1.0]], [6, [0, 0, 1.3]], [52, [0, 0, 1.1]], [68, [0, 0, 1.2]], [78, [0, 0, 1.2]], [88, [0.28, 1.4, 2.0]], [101, [0, 0, 3.0]], [129, [0, 0, 3.0]], [135, [0, 0, 8]], [140, [0, 0, 9]]]}),
   mk('ending', 1372, ending, {start: KICK, after: ['repel', 129], grounded: [[330, 1372]],
-    grip: 'right hand; two hands 56-80, 190-204, 260-266, 298-304; left hand free 556-616', two: [[56, 80], [190, 204], [262, 262], [298, 304]],
-    slides: [[50, 56], [80, 104], [117, 124]], steps: [8, 12, 16, 54, 123, 172, 180, 187, 189, 330, 343, 348, 386, 392],
-    beats: 'the kick\'s pose 0; steps back to f 0.8 4-16, ready; lunge 50-54, the point on her brim at KG 52; lock at KE2 56-80; shoved back 80-90, skids to -1.5 by 104; crouch 104-116; dash-cut to +1.0 118-124; follow-through; runs to 2.5 164-188; clash at KE5 190, lock to 204; springs up 204-216; KA1 228; a turn 232-252; level guard at KA2 262; KA3 286; lock at KA4 298-304; falls 304-330, lands, rises; sword lowered 380-400; left hand half raised 566-584, lowered 590-606; nod 860; stands to 1372',
-    her: [[0, [0, 0, 4.2]], [22, [0, 0, 4.6]], [50, [0, 0, 4.6]], [54, [0, 0, 2.9]], [80, [0, 0, 2.9]], [86, [0, 0, 6]], [116, [0, 0, 6]], [136, [0, 0, 11]], [150, [0, 0, 11]], [188, [0, 0, 4.0]], [204, [0, 0, 4.0]], [216, [0, 6, 3.6]], [304, [0, 6, 3.6]], [334, [0, 0, 9]]]}),
+    grip: 'right hand; two hands 56-80, 190-204, 298-304; left hand free 556-616', two: [[56, 80], [190, 204], [298, 304]],
+    slides: [[50, 56], [80, 104], [117, 124], [304, 330]], steps: [8, 12, 16, 54, 123, 172, 180, 187, 189, 330, 343, 348, 386, 392],
+    beats: 'the kick\'s pose 0; steps back to f 0.8 4-16, ready; lunge 50-54, the point on her brim at KG 52; lock at KE2 56-80; shoved back 80-90, skids to -1.5 by 104; crouch 104-116; dash-cut to +1.0 118-124; follow-through; runs to 2.5 164-188; clash at KE5 190, lock to 204; the exchange on the ground (round W): the block at KA1 228; the raised guard at KA2 262; its cut on hers at KA3 286; lock at KA4 298-304; pushed off 304-310, backs off home 311-328, rises; sword lowered 380-400; left hand half raised 566-584, lowered 590-606; nod 860; stands to 1372',
+    her: [[0, [0, 0, 4.8]], [22, [0, 0, 5.2]], [50, [0, 0, 5.2]], [54, [0, 0, 3.5]], [80, [0, 0, 3.5]], [86, [0, 0, 6.6]], [116, [0, 0, 6.6]], [136, [0, 0, 11]], [150, [0, 0, 11]], [188, [0, 0, 4.75]], [254, [0, 0, 4.75]], [262, [0, 0, 4.35]], [266, [0, 0, 4.35]], [274, [0, 0, 4.75]], [304, [0, 0, 4.75]], [310, [0, 0, 5.3]], [314, [0, 0, 5.3]], [334, [0, 0, 9]]]}),
   mk('coda', 120, coda, {grip: 'right hand, sword low', beats: 'idle; the right forearm lifts a little 44-56, back by 70', her: [[0, [0, 0, 4.5]]]}),
 ];

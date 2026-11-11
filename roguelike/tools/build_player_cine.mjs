@@ -121,7 +121,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
 
   // ---- clips -----------------------------------------------------------------------------------------------------------------
   const manifest = {
-    schema: 1, id: 'cine', _doc: 'The cutscene actor (tools/build_player_cine.mjs; hr_design.md §4.2, §4.3, §5.3). Generated: do not edit. Points are in the stage frame ST(r, u, f): r to the actor\'s right, u up, f forward, the origin at the avatar\'s feet. Per tick: shift = the root\'s displacement, hilt = the grip point in the right hand, tip = the blade\'s point, hand_r / hand_l = the grip points of the hands (also pommel, foot_r, foot_l, head, shoulder_r).',
+    schema: 1, id: 'cine', _doc: 'The cutscene actor (tools/build_player_cine.mjs; hr_design.md §4.2, §4.3, §5.3). Generated: do not edit. Points are in the stage frame ST(r, u, f): r to the actor\'s right, u up, f forward, the origin at the avatar\'s feet. Per tick: shift = the root\'s displacement, hilt = the grip point in the right hand, tip = the blade\'s point, hand_r / hand_l = the grip points of the hands (also pommel, foot_r, foot_l, head, shoulder_r; round W: chest, waist = the torso\'s axis for the gap check of test_contact.py).',
     source: 'tools/player_motion/cine/clips.mjs', parts: PARTS, uuid: UUID(0).slice(0, -2) + '{:02x}',
     tags: {root: TAG.root, part: TAG.part, per_part: 'rlk_cine_<part>', hidden: TAG.hidden, all: ['rlk_room', 'rlk_mb_aux']},
     objective: OBJ, fake_players: {tick: '#cavT', clip: '#cavC', shown: '#cavP', rearm: '#cavR', face: '#cavF', face_yaw: '#cavFy', char: '#cavCh'},
@@ -315,7 +315,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     const col = k => pts.map(P => P[k].map(r3));
     manifest.clips[name] = {id, len: L, grip: clip.grip, beats: clip.beats, steps: clip.steps || [], handback: clip.handback, slides: clip.slides || [], two_hands: clip.two || [], her: clip.her || [],
       sync, keys: keyCount, key_files: keyTicks.length, json_frames: keys.length, contact, mutual,
-      tick: {shift: rootAt, hilt: col('hilt'), tip: col('tip'), hand_r: col('hand_r'), hand_l: col('hand_l'), pommel: col('pommel'), foot_r: col('foot_r'), foot_l: col('foot_l'), head: col('head'), shoulder_r: col('shoulder_r')}};
+      tick: {shift: rootAt, hilt: col('hilt'), tip: col('tip'), hand_r: col('hand_r'), hand_l: col('hand_l'), pommel: col('pommel'), foot_r: col('foot_r'), foot_l: col('foot_l'), head: col('head'), shoulder_r: col('shoulder_r'), chest: col('chest'), waist: col('waist')}};
   });
   // the clips that follow each other without a respawn meet in one pose
   for (const [a, ta, b] of [['repel', 129, 'ending'], ['ending', 1372, 'coda']]) {
@@ -416,7 +416,7 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     if (!fs.existsSync(path.join(debugDp, 'pack.mcmeta'))) fs.copyFileSync(path.join(dpRoot, 'pack.mcmeta'), path.join(debugDp, 'pack.mcmeta'));
   }
   manifest.checks.warnings = warns;
-  put(path.join(cineDir, 'manifest.json'), JSON.stringify(manifest, (k, v) => v, 0).replace(/("(?:shift|hilt|tip|hand_r|hand_l|pommel|foot_r|foot_l|head|shoulder_r)":)/g, '\n  $1').replace(/("(?:cs0|cs1|repel|ending|coda)":\{"id")/g, '\n $1'));
+  put(path.join(cineDir, 'manifest.json'), JSON.stringify(manifest, (k, v) => v, 0).replace(/("(?:shift|hilt|tip|hand_r|hand_l|pommel|foot_r|foot_l|head|shoulder_r|chest|waist)":)/g, '\n  $1').replace(/("(?:cs0|cs1|repel|ending|coda)":\{"id")/g, '\n $1'));
   for (const w of warns) console.log('cine warning: ' + w);
   if (errors.length) throw new Error('cine actor:\n  ' + errors.join('\n  '));
   console.log(`Built the cutscene actor: ${CLIPS.length} clips, ${Object.values(manifest.clips).reduce((s, c) => s + c.keys, 0)} keys in ${Object.values(manifest.clips).reduce((s, c) => s + c.key_files, 0)} files.`);

@@ -475,20 +475,26 @@ back-flip, the aerial duel) leave it.
 ### 4.3 Contacts (stage frame; her clip and the actor clip both meet these; tolerance 0.08 b for blades, 0.12 b for hands and feet)
 | id | sequence · ticks | point | what meets |
 |---|---|---|---|
-| K1 | `cs1` 10-30 | `ST(0, 1.45, 0.75)` | blade lock (the X convention of §3.0); she stands at f 1.5 |
+| K1 | `cs1` 10-30 | `ST(0, 1.45, 0.95)` | blade lock (the X convention of §3.0); she stands at f 2.25 (round W: a swordfighter's distance) |
 | KR | `repel` 0-26 | `ST(0, 1.55, 0.65)` | her blade pressing down on the actor's high guard: her hilt at KR + (−0.25, +0.35, +0.30), the actor's at KR + (+0.35, −0.20, −0.20) |
 | KW | `repel` 36-48 | `ST(0.15, 1.95, 0.85)` | the actor's left hand on her sword wrist (her anchor `hand_l` is there) |
 | KH | `repel` 49 | `ST(0, 2.20, 1.10)` | the actor's hilt on her hat crown (her anchor `hat_crown` is there) |
 | KS | `repel` 70-78 | `ST(0.20, 1.50, 1.60)` | her sword forearm over the actor's right shoulder |
 | KT | `repel` 88 / 101 | `ST(0.28, 1.4, 2.0)` / `ST(0, 0.25, 3.0)` | her pelvis over the actor's right shoulder (HF-B: 0.3-0.6 b over it, the actor's hands on her sword forearm) / on the ground (head toward +f) |
 | KK | `repel` 129 | `ST(0, 0.35, 2.7)` | the actor's right foot on her flank |
-| KG | `ending` 52 | `ST(0, 2.05, 2.35)` | the actor's blade tip on the near edge of her brim |
-| KE2 | `ending` 56-80 | `ST(0, 1.5, 2.1)` | blade lock (X) |
-| KE5 | `ending` 190-204 | `ST(0, 1.5, 3.25)` | blade lock (X) |
-| KA1 | `ending` 228 | `ST(0, 6.9, 2.55)` | passing cuts, edge on edge |
-| KA2 | `ending` 262 | `ST(0, 7.3, 2.6)` | her overhead cut on the actor's horizontal guard |
-| KA3 | `ending` 286 | `ST(0, 6.8, 2.5)` | cut on cut (the big flash) |
-| KA4 | `ending` 298-304 | `ST(0, 6.9, 2.6)` | blade lock (X), then both push off |
+| KG | `ending` 52 | `ST(0, 2.05, 2.95)` | the actor's blade tip on the near edge of her brim |
+| KE2 | `ending` 56-80 | `ST(0, 1.5, 2.2)` | blade lock (X) |
+| KE5 | `ending` 190-204 | `ST(0, 1.5, 3.45)` | blade lock (X) |
+| KA1 | `ending` 228 | `ST(0, 1.45, 3.5)` | round W, on the ground: her diagonal cut on the actor's block |
+| KA2 | `ending` 262 | `ST(0, 1.85, 3.05)` | her overhead cut on the actor's raised horizontal guard (she has stepped in to f 4.35) |
+| KA3 | `ending` 286 | `ST(0, 1.25, 3.55)` | cut on cut (the big flash) |
+| KA4 | `ending` 298-304 | `ST(0, 1.5, 3.45)` | blade lock (X), then both push off |
+
+Round W (lane WC, `w_brief.md` §4.5 / §4.6): every lock / clash keeps a swordfighter's distance — her root 1.3 b beyond the
+contact, the actor's hilt 0.55 b before it (`tools/player_motion/cine/clips.mjs` LOCK_OFF): the torso axes >= 1.5 b apart
+(test_contact `gap`; the 11-12 locks were 0.9-1.2 b, chest to chest). The aerial duel (E6 204-314) is gone: the exchange
+KA1-KA4 is on the ground, 2.25 b apart, in close shots between face and abdomen with sparks at every contact; she springs back
+to her mark low (apex 1 b, 314-334), seen at the landing.
 `test_contact.py` (HI, after H2 and H3 land): at each row's ticks the distance from the point to her blade's centre line
 (from her rig manifest's `hand_l` / `blade_tip` anchors) and to the actor's (from H3's manifest) is within tolerance.
 

@@ -432,12 +432,17 @@ const tipOf = (fr, n) => {
 }
 // her points of one solved frame (rig frame): the sword's grip and tip (null while it is not in her hand), the grips of both hands,
 // the left elbow, the soles (the shin's end), the pelvis pivot, the head centre, the crown top, the brim (centre, normal)
+const MOUTH = [0, .09, -.25];           // her mouth on the face (head frame, from the neck base)
 function cinePoints(o, qq) {
   const A = o._anchors, held = o.sword.s[0] > 1e-4 && (qq.sword || 'hand') === 'hand' && (qq.shW || 0) < .5;
   const sole = n => add(o[n].t, rot(o[n].q, [0, -SK.shin, 0]));
   return {hilt: held ? o.sword.t : null, tip: held ? A.blade_tip : null, hand_l: A.hand_l, hand_r: A.hand_r, elbow_l: o.forearm_l.t,
     foot_l: sole('shin_l'), foot_r: sole('shin_r'), pelvis: o.pelvis.t, head: A.head, hat_crown: A.hat_crown,
     brim: o.hat.s[0] > 1e-4 ? {c: o.hat.t, n: rot(o.hat.q, [0, 1, 0])} : null,
+    // (round W, lane WC: the drinks) her mouth on the face, the cup's / the bottle's rim centre and axis while in her hand
+    mouth: add(o.head.t, rot(o.head.q, MOUTH)),
+    cup: o.cup.s[0] > 1e-4 ? {rim: add(o.cup.t, rot(o.cup.q, [0, CUP.h, 0])), up: rot(o.cup.q, [0, 1, 0])} : null,
+    bottle: o.bottle.s[0] > 1e-4 ? {rim: add(o.bottle.t, rot(o.bottle.q, [0, BOTTLE.h, 0])), up: rot(o.bottle.q, [0, 1, 0])} : null,
     boxes: ['pelvis', 'torso', 'thigh_l', 'thigh_r'].map(n => ({n, t: o[n].t, q: o[n].q}))};
 }
 const supportTable = {}, retargetTable = {}, boundErrors = [], KEEP_F = {};
@@ -857,7 +862,7 @@ const contactErrors = [], contactReport = {}, mutualErrors = [];
 if (cineMod && cineMod.rootAt) {
   const r3 = v => v.map(x => +x.toFixed(3));
   const out = {schema: 1, source: 'tools/build_scarlet_rig.mjs (clips tools/scarlet_cine.mjs)',
-    _doc: 'Her side of the cutscene contacts (hr_design.md §4.3, §5.3): per cinematic clip, per clip tick, her points in the stage frame ST(r, u, f) (origin = the avatar\'s feet, f toward her, r to the actor\'s right, u up; blocks). root = [r, u, f, yaw] = the root track the clip is choreographed to (scarlet_cine.mjs ROOTS: her body as the sequence moves it; yaw 0 faces +f, 180 faces the actor); hilt / tip = the grip centre and the tip of her sword (null while it is not in her hand); hand_l / hand_r = the grips; elbow_l; foot_l / foot_r = the soles; pelvis = its pivot; head; hat_crown; brim = [centre, normal] of the hat brim (radius brim_r). seq = the sequence and the #sq tick of clip tick 0. Generated: never edit.',
+    _doc: 'Her side of the cutscene contacts (hr_design.md §4.3, §5.3): per cinematic clip, per clip tick, her points in the stage frame ST(r, u, f) (origin = the avatar\'s feet, f toward her, r to the actor\'s right, u up; blocks). root = [r, u, f, yaw] = the root track the clip is choreographed to (scarlet_cine.mjs ROOTS: her body as the sequence moves it; yaw 0 faces +f, 180 faces the actor); hilt / tip = the grip centre and the tip of her sword (null while it is not in her hand); hand_l / hand_r = the grips; elbow_l; foot_l / foot_r = the soles; pelvis = its pivot; head; hat_crown; brim = [centre, normal] of the hat brim (radius brim_r); mouth (on the face); cup / bottle = [rim centre, axis] while in her hand (null otherwise). seq = the sequence and the #sq tick of clip tick 0. Generated: never edit.',
     brim_r: HAT.R, tol: cineMod.TOL || null, contacts: [], clips: {}};
   for (const n of cineNames) {
     const T = cineTracks[n]; if (!T) continue;
@@ -868,7 +873,9 @@ if (cineMod && cineMod.rootAt) {
     out.clips[n] = {len: CONTRACT[n].len, seq: info, staged: true, root: rows.map(({R}) => [...r3(R.p), +R.yaw.toFixed(2)]),
       hilt: col('hilt'), tip: col('tip'), hand_l: col('hand_l'), hand_r: col('hand_r'), elbow_l: col('elbow_l'), foot_l: col('foot_l'), foot_r: col('foot_r'),
       pelvis: col('pelvis'), head: col('head'), hat_crown: col('hat_crown'),
-      brim: rows.map(({R, P}) => (P.brim ? [r3(toStage(R, P.brim.c)), r3(toStageDir(R, P.brim.n))] : null))};
+      brim: rows.map(({R, P}) => (P.brim ? [r3(toStage(R, P.brim.c)), r3(toStageDir(R, P.brim.n))] : null)),
+      mouth: col('mouth'), cup: rows.map(({R, P}) => (P.cup ? [r3(toStage(R, P.cup.rim)), r3(toStageDir(R, P.cup.up))] : null)),
+      bottle: rows.map(({R, P}) => (P.bottle ? [r3(toStage(R, P.bottle.rim)), r3(toStageDir(R, P.bottle.up))] : null))};
     // the contact rows of this clip (her side): the distance per tick, the worst kept
     for (const K of (cineMod.CONTACTS || []).filter(k => k.clip === n)) {
       let worst = 0, at = K.t0;

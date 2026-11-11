@@ -20,6 +20,7 @@ avatar pos, held, gm, sig, kit [(sub, args)], cmds; and, filled in when the worl
                             invisible one of them as a ghost unless its texture is blank.
 """
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -95,7 +96,12 @@ class SeqSim(CS.CamSim):
             tx = {t: next((x.data.get('text', '') for x in self.ents if x.alive and t in x.tags and live is not None
                            and x.data.get('riding') == live.id), None) for t in (CS.LINE_TAG, CS.HINT_TAG)}
             r['text'], r['hint'] = tx[CS.LINE_TAG], tx[CS.HINT_TAG]
+            # (round W, WC 7) every text display that shows something: (the camera it rides 1 | 2, 0 = none; its tag; the text)
+            cam_of = {e.id: i for i in (1, 2) for e in self.ents if e.alive and f'rlk_mb_cam{i}' in e.tags}
+            r['texts'] = sorted((cam_of.get(x.data.get('riding'), 0), tg, x.data.get('text', '')) for x in self.ents
+                                if x.alive and x.etype == 'text_display' and x.data.get('text') for tg in (CS.LINE_TAG, CS.HINT_TAG) if tg in x.tags)
             r['rig'] = self.rig_pos
+            r['props'] = self.props()
             r['living'] = sorted({(e.etype, tuple(sorted(t for t in e.tags if t in LIVING_KEYS))) for e in self.ents
                                   if e.alive and e.etype not in NOT_LIVING})
             b = H.body_of(self)
@@ -114,6 +120,29 @@ class SeqSim(CS.CamSim):
             TRACE.pop()
         return r
 
+    # ---- (round W) the sequence's prop cards (rlk_hr_sqp: the petals): their model and scale, for the shot sheets and the
+    # petal checks (the kit's dress functions are stubs here: fx/prop/petal_big {look} = model petal_big_<k> at 0.8)
+    PROP_LOOK = {'whole': 0, 'cut': 1, 'split': 2}
+
+    def cmd(self, t, ctx):
+        n0 = len(self.ents)
+        r = super().cmd(t, ctx)
+        if t[0] == 'summon' and 'item_display' in t[1] and len(t) > 5 and '"rlk_hr_sqp"' in t[5] and len(self.ents) > n0:
+            e = self.ents[-1]
+            m = re.search(r'"minecraft:item_model":"([^"]+)"', t[5])
+            k = re.search(r'scale:\[(-?[0-9.]+)f', t[5])
+            e.data['model'] = m.group(1) if m else None
+            e.data['scale'] = float(k.group(1)) if k else 1.0
+        if t[0] == 'data' and len(t) >= 5 and t[1] == 'merge' and t[2] == 'entity' and 'scale:[' in t[4]:
+            for e in self._targets(t[3], ctx):
+                if 'rlk_hr_sqp' in e.tags:
+                    e.data['scale'] = float(re.search(r'scale:\[(-?[0-9.]+)f', t[4]).group(1))
+        return r
+
+    def props(self):
+        return [dict(pos=tuple(e.pos), model=e.data.get('model'), scale=e.data.get('scale', 1.0), tags=sorted(x for x in e.tags if x.startswith('rlk_hr_sqp_')))
+                for e in self.ents if e.alive and e.etype.endswith('item_display') and 'rlk_hr_sqp' in e.tags]
+
     def actor_root(self):
         return next((e for e in self.ents if e.alive and 'rlk_cine_root' in e.tags), None)
 
@@ -126,6 +155,9 @@ class SeqSim(CS.CamSim):
             self.step()
         if fid in (ROOT + 'rig/tick', ROOT + 'rig/follow_now'):
             self.rig_follow(fid, ctx)
+        if fid == ROOT + 'fx/prop/petal_big' and ctx.ex is not None and 'rlk_hr_sqp' in ctx.ex.tags:
+            ctx.ex.data['model'] = f'rlk:mboss/hr_kit/petal_big_{self.PROP_LOOK[(macro or {}).get("look", "whole")]}'
+            ctx.ex.data['scale'] = 0.8
         if fid.startswith('rlk:char/cine/'):
             call = fid.rsplit('/', 1)[1]
             ex = ctx.ex

@@ -708,19 +708,30 @@ CAM_EYE = 0.0                                                          # a displ
 CAM_BACK = 4.0                                                         # the F5 pull-back of a non-living camera entity (b)
 CAM_GRID = 360.0 / 256.0                                               # the rotation step that reaches the client (1.40625)
 CAM_SEG_MAX = 59                                                       # teleport_duration is clamped to 0..59
-CAM_FNS = ('spawn', 'spawn_at', 'fix', 'hold', 'release', 'kill')
+CAM_FNS = ('spawn', 'spawn_at', 'fix', 'hold', 'release', 'kill', 'text')
 CAM_RESEND = ('#mbCamRe', 'mb')                                        # ticks left in which the camera is re-sent for real
 CAM_RESEND_HOLD = 3                                                    # ... at the start of every hold
 CAM_MOD = 'rlk:mb_cam'                                                 # the id of the hold's attribute modifiers
 CAM_ADV = 'rlk:mboss/cam_post'                                         # the tick advancement whose reward is mboss/cam/post
 CAM_IN_PRED = 'rlk:mboss_cam_in'                                       # any movement key down (a free client could fly)
 CAM_SIDEBAR = 'stacks'                                                 # the pack's sidebar objective (load.mcfunction)
-# The texts. On the screen (a 16 : 9 picture; the numbers are for a vertical field of view of 70, the game's default; a
-# wider one moves both toward the middle and shrinks them: at 90 the line is 31 px tall at 1080p, the hint 17 px):
+# The texts. On the screen (a 16 : 9 picture; a text is 0.3 b before the eye in the world, so the vertical field of view
+# scales its size and its distance from the picture's middle together: x tan(45) / tan(fov / 2) of the numbers below).
+# Round W: the numbers are for a field of view of 90 (the user's), 70 and 110 are the bounds they are checked at:
+#   the line: its middle 60 % below the centre (70: 86 %, 110: 42 %), glyphs 36 px at 1080p (70: 51, 110: 25);
+#   the hint (the skip prompt): top right, its middle 62 % up and 98 % of the half HEIGHT to the right (70: 89 % / 140 %,
+#   the picture's half width being 178 %), glyphs 20 px (70: 29, 110: 14) - out of the line's way at every field of view.
+# Only the LIVE camera carries the texts (round W: the idle camera stands somewhere in the world - prepared for the next
+# cut, or left at the last shot's place - and a billboard text riding it showed "small and far away" in the picture):
+# cam_line / cam_hint write the component to storage rlk:mboss camtx, mboss/cam/text puts it on the live camera's texts
+# and blanks the others'; cam.py calls it again at every cut.
 CAM_TEXT_D = 0.3                 # blocks before the eye (nothing of a shot comes nearer to the lens)
-CAM_FOV_REF = 70.0
-CAM_LINE = {'k': 0.0858, 'y': -0.62, 'bg': 0xB8000000, 'width': 400}    # scale, the block's middle (-1 bottom .. 1 top)
-CAM_HINT = {'k': 0.0464, 'y': -0.80, 'bg': 0xB8000000, 'width': 400}
+CAM_FOV_REF = 90.0
+CAM_FOVS = (70.0, 90.0, 110.0)   # the fields of view every text and every two-figure shot is checked at
+CAM_LINE = {'k': 0.1, 'x': 0.0, 'y': -0.60, 'bg': 0xB8000000, 'width': 400}    # scale, the block's middle (x, y in half picture heights)
+CAM_HINT = {'k': 0.0556, 'x': 0.98, 'y': 0.62, 'bg': 0xB8000000, 'width': 400}
+CAM_TXT_STORE = 'rlk:mboss camtx'                                      # {line: {text, background}, hint: {text, background}}
+CAM_TEXT_OF = {1: 'rlk_mb_camx1', 2: 'rlk_mb_camx2'}                   # the texts riding camera 1 / 2
 
 
 def cam_sel(i):
@@ -771,10 +782,16 @@ def _argb(v):
 def cam_text_geom(spec):
     """(translation y, translation z, scale) of a camera text (CAM_LINE / CAM_HINT): the block's middle at spec['y'] of the
     half picture height (at CAM_FOV_REF), CAM_TEXT_D before the eye; the text block's bottom edge is the display's origin
-    and one line is 9 font px of 0.025 * scale blocks (TextDisplayRenderer)."""
+    and one line is 9 font px of 0.025 * scale blocks (TextDisplayRenderer). The x translation: cam_text_tx."""
     import math
     half = CAM_TEXT_D * math.tan(math.radians(CAM_FOV_REF / 2))
     return (spec['y'] * half - 0.025 * spec['k'] * 4.5, CAM_BACK - CAM_TEXT_D, spec['k'])
+
+
+def cam_text_tx(spec):
+    """The translation x (to the picture's right) of a camera text: its middle at spec['x'] half picture heights."""
+    import math
+    return spec['x'] * CAM_TEXT_D * math.tan(math.radians(CAM_FOV_REF / 2))
 
 
 def cam_text_px(spec, fov=CAM_FOV_REF, screen_h=1080):
@@ -783,22 +800,33 @@ def cam_text_px(spec, fov=CAM_FOV_REF, screen_h=1080):
     return 0.025 * spec['k'] / (CAM_TEXT_D * math.tan(math.radians(fov / 2))) * screen_h / 2
 
 
-def _cam_text(tag, spec, component):
-    sel = f'@e[type=minecraft:text_display,tag={tag}]'
-    if component is None:
-        return f'execute as {sel} run data merge entity @s {{text:"",background:0}}'
-    return f'execute as {sel} run data merge entity @s {{text:{component},background:{_argb(spec["bg"])}}}'
+def cam_text_box(spec, width, fov=CAM_FOV_REF):
+    """(x0, x1, y0, y1) of a camera text's backdrop in the picture at a vertical field of view, in half picture HEIGHTS
+    from the middle (x to the right, y up; a 16 : 9 picture reaches x = +-16 / 9): a block of one line `width` font px wide
+    (TextDisplayRenderer: the backdrop is 1 font px wider on every side; a line is 9 px, 10 with its gap)."""
+    import math
+    half = CAM_TEXT_D * math.tan(math.radians(fov / 2))
+    px = 0.025 * spec['k']
+    ty, _tz, _k = cam_text_geom(spec)
+    tx = cam_text_tx(spec)
+    return ((tx - (width / 2 + 1) * px) / half, (tx + (width / 2 + 1) * px) / half, (ty - px) / half, (ty + 10 * px) / half)
+
+
+def _cam_text(key, spec, component):
+    val = '{text:"",background:0}' if component is None else f'{{text:{component},background:{_argb(spec["bg"])}}}'
+    return [f'data modify storage {CAM_TXT_STORE}.{key} set value {val}', cam('text')]
 
 
 def cam_line(component=None):
-    """The line that shows a text component (SNBT, e.g. '{text:"...",color:"#F2D0E8"}') as the dialogue line of every
-    camera (lower third, dark backdrop), or clears it (None). No effect while no camera exists."""
-    return _cam_text(CAM_LINE_TAG, CAM_LINE, component)
+    """The two lines that show a text component (SNBT, e.g. '{text:"...",color:"#F2D0E8"}') as the dialogue line (lower
+    third, dark backdrop) on the LIVE camera, or clear it (None): the value goes to storage, mboss/cam/text applies it
+    (and again at every cut). No effect while no camera exists."""
+    return _cam_text('line', CAM_LINE, component)
 
 
 def cam_hint(component=None):
-    """The same for the small hint under the line (the skip prompt)."""
-    return _cam_text(CAM_HINT_TAG, CAM_HINT, component)
+    """The same for the small hint in the picture's top right (the skip prompt)."""
+    return _cam_text('hint', CAM_HINT, component)
 
 
 def repool(pct):

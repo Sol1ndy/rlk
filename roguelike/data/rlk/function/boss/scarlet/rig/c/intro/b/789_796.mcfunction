@@ -1,8 +1,0 @@
-execute if score @s hrRigT matches 789 run return run function rlk:boss/scarlet/rig/c/intro/k/789
-execute if score @s hrRigT matches 790 run return run function rlk:boss/scarlet/rig/c/intro/k/790
-execute if score @s hrRigT matches 791 run return run function rlk:boss/scarlet/rig/c/intro/k/791
-execute if score @s hrRigT matches 792 run return run function rlk:boss/scarlet/rig/c/intro/k/792
-execute if score @s hrRigT matches 793 run return run function rlk:boss/scarlet/rig/c/intro/k/793
-execute if score @s hrRigT matches 794 run return run function rlk:boss/scarlet/rig/c/intro/k/794
-execute if score @s hrRigT matches 795 run return run function rlk:boss/scarlet/rig/c/intro/k/795
-execute if score @s hrRigT matches 796 run return run function rlk:boss/scarlet/rig/c/intro/k/796

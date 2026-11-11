@@ -66,6 +66,17 @@ VIEW_EMPTY = ('rlk:view/ride_apply', 'rlk:view/menu_do', 'rlk:view/burst_camera_
 SEAT_UP = 1.9          # the seat above the avatar's feet, the riding player above the seat (positions only for show)
 
 
+def flat_text(c):
+    """The plain text of a text component as the sims keep it (text, then extra, in order)."""
+    if isinstance(c, str):
+        return c
+    if isinstance(c, list):
+        return ''.join(flat_text(x) for x in c)
+    if isinstance(c, dict):
+        return flat_text(c.get('text', '')) + flat_text(c.get('extra', []))
+    return str(c)
+
+
 class CamSim(H.ScSim):
     def __init__(self, root):
         super().__init__(root)
@@ -247,6 +258,19 @@ class CamSim(H.ScSim):
                     p.data.update(riding=cam.id, text='', bg=0)
                     self.ents.append(p)
             return r
+        if c == 'data' and len(t) == 10 and t[1:3] == ['modify', 'entity'] and t[4:7] == ['{}', 'merge', 'from'] and t[7] == 'storage':
+            # (round W) mboss/cam/text: a text display takes {text, background} from storage
+            self.ncmd += 1
+            es = self._targets(t[3], ctx)
+            try:
+                val = self.path_get(self.storage.get(t[8], {}), t[9])
+            except (KeyError, IndexError, TypeError):
+                return 0
+            for e in es:
+                if e.etype == 'text_display' and isinstance(val, dict):
+                    e.data['text'] = flat_text(val.get('text', ''))
+                    e.data['bg'] = int(val.get('background', e.data.get('bg', 0)))
+            return 1 if es else 0
         if c == 'data' and len(t) >= 5 and t[1] == 'merge' and t[2] == 'entity':
             self.ncmd += 1
             es = self._targets(t[3], ctx)
