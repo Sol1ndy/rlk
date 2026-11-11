@@ -1,8 +1,11 @@
 # Hook cleanup (no executor; idempotent; won / cancel / defeat / map change): every state, hazard and marker of the
 # module, the kit cards and HUD, the rig, every rlk_hr_* entity, every fake player of objective hr (init / spawn make
 # them again) and storage core.* / seq.*. Never the event scores (api.EV_FP, saved around `reset *`) nor ev.*: the
-# reward hook reads them after this.
+# reward hook reads them after this. The framework flags of the module go too: #mbNpOwn (her own flashes) and
+# #mbBalOff (FN-bal).
 function rlk:boss/scarlet/core/stop_all
+scoreboard players set #mbNpOwn mb 0
+scoreboard players set #mbBalOff mb 0
 function rlk:boss/scarlet/seq/intro/cancel
 function rlk:boss/scarlet/seq/cs1/cancel
 function rlk:boss/scarlet/seq/lead60/cancel

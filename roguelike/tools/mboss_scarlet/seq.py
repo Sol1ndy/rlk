@@ -6,8 +6,8 @@ CONTRACT = 2 below is the marker tools/build_mboss_scarlet.py looks for (api.SEQ
 
 Contract (api.Service): SERVICES = one api.Service per api.SEQS name; build(W) writes only under seq/ (W =
 api.Writer('S2b', api.OWN['S2b'])): the entry points seq/<name>/{start,tick,cancel} (+ seq/<name>/skip of api.SEQ_EXTRA) and
-their internal files: k/<t> (the lines of tick t), b/<a>_<b> (dispatch), m/<key> (body moves, the stage, turns), and for a
-locked sequence lock / unlock / fin / cam (+ c/<t>, cb/<a>_<b>: the camera lines). The core sets #sq hr 0 and calls start
+their internal files: k/<t> | k/<a>_<b> (the lines of a tick or of a run of equal ticks), kb/<a>_<b> (dispatch), m/<key> (body
+moves, the stage, turns), and for a locked sequence lock / unlock / fin / cam (+ c/, cb/: the camera lines); seq/lib/ shared. The core sets #sq hr 0 and calls start
 (@s = the body, at it), then adds 1 to #sq and calls tick every tick; rig/tick runs after the module logic, so her clip
 shows tick e when #sq = e. A sequence sets #sqdone hr 1 at its length (api.SEQ_LEN). cancel has no executor, is idempotent
 and removes only what the sequence made.
@@ -21,10 +21,12 @@ of its music event, the title, her body moves, and (new) the stage, the camera a
 The lock (hr_design §3.0, the framework's FN-cam): a locked sequence calls its seq/<name>/lock every tick of its lock span:
 the request `#mbCam mb 1` (api.cam_req), the actor's clock and tick (api.actor*, '' until lane H3's manifest exists), the
 camera lines of the tick. The framework holds the player in spectator mode on the live camera stand and releases them the
-tick the request stops. If the player was released while the sequence still held them (a pause: death, Ronova's revive, a
-menu; /reload; a relog; a killed stand), `lock` sees the missing hold tag and calls `unlock`: #sq_cx hr 1 = no lock for the
-rest of this run (the stands and the actor go, the avatar shows, the sequence plays on unlocked with its timing and its
-signals, as the 11-06 cutscenes did). The core may instead end the sequence at once (§3.6): `cancel` + its own end state.
+tick the request stops. If the player was released while the sequence held them (#sq_h hr 1 = this run has seen the hold; a
+pause: death, Ronova's revive, a menu; /reload; a relog; a killed stand), or the hold never came by tick 3, `lock` calls
+`unlock`: #sq_cx hr 1 = no lock for the rest of this run (the stands and the actor go, the avatar shows, the sequence plays
+on unlocked with its timing and its signals, as the 11-06 cutscenes did). The core ends a paused / reloaded sequence itself
+(§3.6): `cancel` (the request taken back, the stands, the stage, the actor, the kit's line / overlay and the HUD hold gone
+in that tick) + its own end state. The lethal repel hands its actor to the ending (#sq_keep hr; lane H3's clips meet).
 
 The stage (rlk_hr_stage, a marker made at tick 0): origin = the avatar's feet on the floor, forward = the bearing avatar
 -> her, unless ST(0, 0, FMAX) fails mboss/mv/ok, then avatar -> the arena centre (nearer than 0.6 b to her: the avatar's
@@ -163,6 +165,7 @@ def floor_pt(f, r=0.0, frame='ST'):
 HUD_OFF = ('intro', 'cs1', 'repel', 'ending', 'event')
 HUD_HOLD = 'scoreboard players set @a[tag=player] hudHold 2'
 HUD_BLANK = 'title @a[tag=player] actionbar ""'
+HUD_FREE = 'scoreboard players set @a[tag=player] hudHold 0'          # a cancel: the HUD is back at once
 NO_LEASH = ('cs1', 'repel')        # fight-state sequences with contact marks next to the avatar: the arena leash rests
 
 
@@ -297,6 +300,10 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
         lockn = [f'execute if score #sq {OBJ} matches ..{t1 - 1} unless score {CX_FP} {OBJ} matches 1 run function {base}/lock']
         if fin:
             s.at(t1, f'function {base}/fin')
+    # a cancel releases everything at once (the core cancels on a pause / reload and goes to the end state itself): the lock
+    # request of this tick taken back (the framework then releases the player in this tick), the kit's line / overlay off,
+    # the HUD hold ended
+    release = [x for x in (f'scoreboard players set {L.CAM_REQ[0]} {L.CAM_REQ[1]} 0', K.hud('clear'), HUD_FREE) if x]
     stop_lines = actor_lines('stop')
     if keep and stop_lines:
         stop_lines = [f'execute unless score {KEEP_FP} {OBJ} matches 1 run {x}' for x in stop_lines] + [sset(KEEP_FP, 0)]
@@ -312,7 +319,7 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
     W.w(f'seq/{name}/cancel', [f'# {head}', '# Cancel (no executor; idempotent): what this sequence made.',
                                f'kill @e[type=minecraft:marker,tag={STAGE_T}]', f'kill @e[type=minecraft:marker,tag={STAGE2_T}]',
                                f'kill @e[type=minecraft:marker,tag={HELP_T}]',
-                               *([L.cam('kill'), *stop_lines, sset(CX_FP, 0), sset(HELD_FP, 0)] if lock else []), *leash_off,
+                               *([L.cam('kill'), *stop_lines, sset(CX_FP, 0), sset(HELD_FP, 0), *release] if lock else []), *leash_off,
                                *[c for c in cancel if c]])
 
 
@@ -563,7 +570,7 @@ def build_intro(W):
     # ---- I1-I2: the rift closing behind the actor, the ambient, the wind (2 s), the actor's steps (its clip's footfalls)
     rift = K.p('arrive_rift')
     s.st(0, ST(0, 0, -api.CS0_WALK_BACK - 1.5), rift)
-    s.at(0, K.p('ambient_p1'), (f'execute at {STAGE} run {snd("cs0_wind")}' if snd('cs0_wind') else None))
+    s.at(0, K.p('ambient_p1'), (f'execute at {PL} run {snd("cs0_wind")}' if snd('cs0_wind') else None))   # at the listener (HR-46)
     stop_wind = 'stopsound @a[tag=player] * minecraft:item.elytra.flying' if snd('cs0_wind') else None
     s.at(60, stop_wind)
     for t, f in actor_steps('cs0', 0, api.SEQ_LEN['intro'], [(t, -api.CS0_WALK_BACK + 0.075 * (t - 20)) for t in range(20, 100, 12)]):
@@ -863,7 +870,6 @@ def build_repel(W):
     # f 0.5, stands before her (shot sheet); here the seized wrist and the hilt on her hat are between the two heads
     tr.cut(26, B, ST(2.2, 1.5, 0.1), ST(0, 1.4, 0.8), 'R2 grab / R3 hat strike', ('her', 'actor'))
     tr.cut(52, A, ST(-2.2, 1.2, 2.4), ST(0, 1.2, 0.8), 'R4 two cuts', ('her', 'actor'))
-    # (the design's eye on the axis has the actor cover her whole: 1.4 b to the side shows her at its back)
     # R5: three-quarter from the actor's right (the design's head-on ST(0, 1.6, 3.6) has the actor's head before hers: she
     # stands behind it; from here her head and the hooked arm over the right shoulder are beside the actor's)
     tr.cut(68, B, ST(2.1, 1.6, 2.7), ST(0, 1.3, 1.5), 'R5 back to back', ('her', 'actor'))

@@ -7,5 +7,8 @@ function rlk:mboss/cam/kill
 function rlk:char/cine/stop
 scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
+scoreboard players set #mbCam mb 0
+function rlk:boss/scarlet/fx/hud/clear
+scoreboard players set @a[tag=player] hudHold 0
 scoreboard players set #mbNoLeash mb 0
 kill @e[type=minecraft:item_display,tag=rlk_hr_sqp]

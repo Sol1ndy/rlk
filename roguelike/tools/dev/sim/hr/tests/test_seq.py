@@ -181,7 +181,7 @@ def static():
             body = ln[1:] if ln.startswith('$') else ln
             if re.search(r'scoreboard players (add|remove) \S+ \S+ -', body):
                 bad['negative literal'].append((rel, ln))
-            if '#mbCam mb' in body and not rel.endswith('/lock'):
+            if ('#mbCam mb 1' in body and not rel.endswith('/lock')) or ('#mbCam mb' in body and not rel.endswith(('/lock', '/cancel'))):
                 bad['request outside lock'].append((rel, ln))
             if re.search(r'function rlk:boss/scarlet/(core|ai|shield|ult|hud|ev|test|p|g)/', body) and 'ev/apply' not in body and 'ev/title' not in body:
                 bad['core call'].append((rel, ln))
@@ -200,7 +200,7 @@ def static():
             if ln.startswith('$') != ('$(' in ln):
                 bad['macro'].append((rel, ln))
     for k, v in bad.items():
-        ck(f'S3 seq/**: no {k}' if k not in ('sound', 'macro') else f'S3 seq/**: {"vanilla sound ids only" if k == "sound" else "a macro line has $(...) and only a macro line"}',
+        ck((f'S3 seq/**: no {k}' if k != 'request outside lock' else 'S3 seq/**: the lock request is set only in lock files (a cancel takes it back)') if k not in ('sound', 'macro') else f'S3 seq/**: {"vanilla sound ids only" if k == "sound" else "a macro line has $(...) and only a macro line"}',
            not v, str(v[:4]))
     ck('S3 the sound list of the vanilla jar was there to check against', snd_ids is not None)
     titles = [(p.relative_to(SQ).as_posix(), ln) for p in files for ln in fn_lines(p) if re.search(r'(^| run )title ', ln)]

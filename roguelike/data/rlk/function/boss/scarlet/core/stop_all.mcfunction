@@ -1,5 +1,5 @@
 # Every state of the fight stops (death, cleanup, tests; any executor): the pattern / gauntlet, the running
-# sequence, the shield, the pattern hazards and markers, the glide.
+# sequence, the pattern hazards and markers, the glide (the gauge is kept: death_start / cleanup empty it).
 function rlk:boss/scarlet/core/cancel_d
 execute if score #sqn hr matches 1 run function rlk:boss/scarlet/seq/intro/cancel
 execute if score #sqn hr matches 2 run function rlk:boss/scarlet/seq/cs1/cancel
@@ -16,11 +16,10 @@ scoreboard players set #sqn hr 0
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_sig hr 0
 scoreboard players set #rvw hr 0
-scoreboard players set #kip hr 0
-scoreboard players set #flw hr 0
 scoreboard players set #grs hr 0
 scoreboard players set #rp hr 0
-function rlk:boss/scarlet/shield/off
+scoreboard players set #ppf hr 0
+scoreboard players set #ultq hr 0
 kill @e[tag=rlk_hr_p]
 kill @e[tag=rlk_hr_cut]
 kill @e[type=minecraft:marker,tag=rlk_hr_lock]

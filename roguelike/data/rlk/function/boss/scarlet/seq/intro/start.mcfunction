@@ -22,4 +22,4 @@ title @a[tag=player] actionbar ""
 execute unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/intro/lock
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^0 ^0 ^-7.5 run function rlk:boss/scarlet/fx/p/arrive_rift
 function rlk:boss/scarlet/fx/p/ambient_p1
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:boss/scarlet/fx/snd/cs0_wind
+execute at @a[tag=player,limit=1] run function rlk:boss/scarlet/fx/snd/cs0_wind

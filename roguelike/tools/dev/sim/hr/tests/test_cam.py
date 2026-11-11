@@ -500,7 +500,9 @@ def cost():
     ck('C1 mboss/main pays one command for the request', sum(l.startswith('scoreboard') and 'mbCam' in l for l in m) == 1)
     ck('C1 rlk:tick pays two commands in a tick without a lock', len(CS.tick_cam_lines(DP)) == 2 and set(free) == {2}, str(set(free)))
     ck('C2 a held tick costs at most 12 commands', max(heldc) <= 12, str(max(heldc)))
-    ck('C2 the first held tick and the release tick at most 30 each', first <= 30 and rel <= 30, f'{first} {rel}')
+    actor_stop = (F / 'char/cine/stop.mcfunction').exists()        # lane H3's actor: the release ends it (its own commands)
+    ck(f'C2 the first held tick at most 30, the release tick at most {50 if actor_stop else 30}'
+       f'{" (with char/cine/stop, the actor\'s own end)" if actor_stop else ""}', first <= 30 and rel <= (50 if actor_stop else 30), f'{first} {rel}')
 
 
 # ============================================================================================================ ident

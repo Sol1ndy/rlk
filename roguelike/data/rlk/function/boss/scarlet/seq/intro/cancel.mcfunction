@@ -7,6 +7,9 @@ function rlk:mboss/cam/kill
 function rlk:char/cine/stop
 scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
+scoreboard players set #mbCam mb 0
+function rlk:boss/scarlet/fx/hud/clear
+scoreboard players set @a[tag=player] hudHold 0
 stopsound @a[tag=player] * minecraft:item.elytra.flying
 kill @e[type=minecraft:item_display,tag=rlk_hr_sqp]
 execute if data storage rlk:mboss {look_hr_field:"moon"} as @e[type=minecraft:item_display,tag=rlk_hr_deco_moon_halo] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}

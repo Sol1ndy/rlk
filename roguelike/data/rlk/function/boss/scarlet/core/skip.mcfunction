@@ -1,6 +1,6 @@
-# The intro skip input (@s = body, every intro tick; PLAN §3.1): from 20 to 1270 the prompt ⊙ 건너뛰기 · Shift 길게
-# (hudHold); holding sneak (rlk:in_sneak) brightens it in 4 steps of 5 t, a release resets the count;
-# 20 t held -> the skip (seq/intro/skip, then #sq = 1289: the next tick plays intro_end from 0).
+# The intro skip input (@s = body, every tick of the sequence; hr_design §3.0): from 20 to 1270 the prompt
+# ⊙ 건너뛰기 · Shift 길게 (hudHold); holding sneak (rlk:in_sneak) brightens it in 4 steps of 5 t, a release
+# resets the count; 20 t held -> the skip (seq/intro/skip, then #sq = 1289: the next tick is 1290).
 execute if score #skip hr matches ..-1 run return 0
 execute if score #skp hr matches 1.. if score #sq hr = #skp hr run return run function rlk:boss/scarlet/core/skip_go
 execute if score #sq hr matches 1271.. run return run function rlk:boss/scarlet/core/skip_clear

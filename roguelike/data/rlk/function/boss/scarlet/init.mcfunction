@@ -3,6 +3,7 @@ scoreboard objectives add hr dummy
 scoreboard players set #c2 hr 2
 scoreboard players set #c3 hr 3
 scoreboard players set #c5 hr 5
+scoreboard players set #c6 hr 6
 scoreboard players set #c10 hr 10
 scoreboard players set #c64 hr 64
 scoreboard players set #c100 hr 100

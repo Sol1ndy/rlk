@@ -37,7 +37,8 @@ def _tid():
     return t
 
 
-TID = _tid()                                   # a1 1 a2 2 a3 3 a4 4 a6 5 a9 6 a10 7 r1 11 r2 12 r3 13 a8 21 a13 27
+TID = _tid()            # a1 1 a2 2 a3 3 a4 4 a6 5 a9 6 a10 7 a3s 8 d4 9 tri 10 rings 11 ult 12 hcut 13 blue 14 kcut 15 mx 16
+#                         nb 17 q 18 a8 21 a13 27
 KEY_OF = {v: k for k, v in TID.items()}
 SEQ_ID = {n: i + 1 for i, n in enumerate(api.SEQS)}   # #sqn hr: the running sequence (0 none)
 GK = {'a8': 1, 'a13': 2}                       # #gk hr: the current / pending gauntlet
@@ -50,7 +51,7 @@ AT_OF = {'a8': 60, 'a13': 5}                   # repel {at} of each gauntlet's c
 # I1 (request s3-5): the S3 extras live in the contract now (api.CORE_FP, same order; api.CORE_CONSTS).
 CONSTS = api.CORE_CONSTS
 FP_EXTRA = ()
-FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1)       # p1.py's own pattern scores (#<key>_<x>)
+FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1 + api.P2)   # the patterns' own scores (#<key>_<x>)
 FP = tuple(api.CORE_FP) + tuple(FP_EXTRA)
 assert len(FP) == len(set(FP)), 'duplicate fake player'
 assert not set(FP) & set(api.EV_FP)
@@ -171,7 +172,7 @@ def line(lid):
 
 
 # ------------------------------------------------------------------------------------------------- hazards
-SHAPE_FN = {'sector': L.hz_sector, 'disc': L.hz_disc, 'line': L.hz_line}
+SHAPE_FN = {'sector': L.hz_sector, 'disc': L.hz_disc, 'line': L.hz_line, 'full': L.hz_full}
 
 
 def hz_tag(key):
@@ -180,26 +181,63 @@ def hz_tag(key):
             f'function {NS}core/hz_tag/{key}')
 
 
-def hz_opts(kb, grp=False, act=None, noparry=None):
+def hz_opts(kb, grp=False, act=None, noparry=0, kbdir=None):
     """The one-shot options of every hazard of 홍련: quiet (#hzQuiet 1, no framework outline or flash: no floor decal of
-    any kind, PLAN §1.4), no framework sound (the kit / stand-in sounds are the pattern's), Electro (el 3), knockback;
-    noparry=1 for the yellow-flagged attacks (api.NOPARRY, combat overhaul C)."""
-    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.ELEC, act=act, noparry=noparry)
+    any kind), no framework sound (the kit / stand-in sounds are the pattern's), Electro (el 3), knockback; noparry is
+    always explicit (hr_design §2.1: 0 for a P hit - the default rule would flag the long lines and big discs -, 1 for an
+    N hit; the module draws its own flash, #mbNpOwn mb 1)."""
+    assert int(noparry) in (0, 1)
+    return L.hz_opts(quiet=1, sfx=0, grp=grp, kb=kb, el=api.ELEC, act=act, noparry=int(noparry), kbdir=kbdir)
 
 
-def hazard(key, hit, grp=False, tell=1, pos=None, dims=None):
+def hazard(key, hit, grp=False, tell=1, pos=None, dims=None, kbdir=None):
     """Lines that create the quiet hazard of api.HITS entry `hit`, striking `tell` ticks later. pos: execute
     subcommands for the origin (default: the body on the floor, aim = body yaw); dims: shape args override."""
-    clip, event, shape, hdims, tier, kb = hit
+    clip, event, shape, hdims, tier, kb, par = hit
     dims = dims or hdims
     if shape == 'pdisc':
         shape = 'disc'
-    out = hz_opts(kb, grp=grp, noparry=1 if key in api.NOPARRY else None)
+    assert shape in SHAPE_FN, (key, shape)
+    out = hz_opts(kb, grp=grp, noparry=1 if par == 'N' else 0, kbdir=kbdir)
     call = SHAPE_FN[shape](*dims, tell, api.DMG[tier])
     where = pos or f'{AT_BODY} positioned ~ {CY} ~'
     out.append(f'execute {where} run {call}')
     out.append(hz_tag(key))
     return out
+
+
+# ------------------------------------------------------------------------------------------------- the parry cue, the flashes
+CUE_FB = [part(DUST['magenta'], 0.06, 0.06, 0.06, 0, 8), part('minecraft:end_rod', 0.02, 0.02, 0.02, 0.01, 2)]
+FLASH_FB = {'yellow': [part(DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
+            'purple': [part(DUST['lilac'], 0.2, 0.2, 0.2, 0, 10), part('minecraft:end_rod', 0.1, 0.1, 0.1, 0.02, 3)],
+            'blue': [part('minecraft:dust{color:[0.35,0.62,1.0],scale:1.6}', 0.6, 0.8, 0.6, 0, 36),
+                     part(DUST['yellow'], 0.5, 0.05, 0.5, 0, 10)]}
+
+
+def anchored(anchor, lines, follow=False):
+    """Kit / stand-in lines at a rig anchor (rig/anchor/<a> moves the one rlk_hr_anchor marker; @s = the body); follow: the
+    cards made follow her body (fx/follow_on .. follow_off)."""
+    lines = [x for x in lines if x]
+    if not lines:
+        return []
+    out = [api.rig(f'anchor/{anchor}')] + placed(lines, f'at {ANCHOR_M} rotated as @s')
+    on, off = K.fixed('follow_on'), K.fixed('follow_off')
+    return [on] + out + [off] if follow and on else out
+
+
+def cue(pos=None):
+    """The parry cue (hr_design §2.1 code P): the pink sparkle glint api.CUE_KIT at her blade (anchor blade_mid; pos: execute
+    subcommands of another point, e.g. a gauntlet's reappear point) + the sound api.CUE_SND; @s = the body."""
+    name, a = api.CUE_KIT
+    g = fx_lines(name, CUE_FB, **a)
+    return (placed(g, pos) if pos else anchored('blade_mid', g, follow=True)) + snd(api.CUE_SND)
+
+
+def flash(colour, **over):
+    """The module's own unparriable flash on her chest (api.FLASH / FLASH_SND; the cards follow her): yellow / purple / blue.
+    over: other preset args (kcut's longer yellow)."""
+    name, a = api.FLASH[colour]
+    return anchored('chest', fx_lines(name, FLASH_FB[colour], **{**a, **over}), follow=True) + snd(api.FLASH_SND[colour])
 
 
 # ------------------------------------------------------------------------------------------------- pattern builder
@@ -216,6 +254,11 @@ class PB:
         self.end_t = None
         self.grp_n = 0
         self.motions = []                   # (t0, t1, kind) of the body moves (tests)
+        self.cues, self.flashes = [], []    # the parry cue ticks; (colour, tick) of the flashes (tests)
+        self.flash_args = {}                # colour -> preset arg overrides (kcut's longer yellow)
+        self.pp = None                      # the hit tick whose perfect parry ends the pattern early (PP_FLINCH)
+        self.owner = 'p1.py'
+        self.tick_head = []                 # lines at the top of p/<key>/tick (a held clock: mx's retreat)
 
     def at(self, t, *lines):
         for ln in lines:
@@ -244,15 +287,55 @@ class PB:
         self.grp_n += 1
         return self.grp_n
 
-    def hit(self, idx, tell_from, grp=0, **kw):
-        """The api.HITS[key][idx] hazard: made at its event tick - 1 (tell 1). tell_from = the first visible motion of
-        this hit (tests: event - tell_from >= TELL_MIN / TELL_BIG)."""
+    def hit(self, idx, tell_from, grp=0, made=None, t=None, cue_pos=None, cond=None, **kw):
+        """The api.HITS[key][idx] hazard: made at its event tick - 1 (tell 1; made = another creation tick). tell_from = the
+        first visible motion of this hit (tests: event - tell_from >= TELL_MIN / TELL_BIG). A P hit gets the parry cue at
+        its tick - api.CUE_LEAD, an N hit the flashes of api.FLASH_AT (flash rows). t: the pattern tick of the hit when it
+        is not the clip tick (q's second clip); cond: an execute condition for every line of it (a fight-phase row)."""
         h = api.HITS[self.key][idx]
-        t = api.ev(h[0], h[1])
-        assert t >= 1 and tell_from <= t
-        self.at(t - 1, hazard(self.key, h, grp=bool(grp), **kw))
-        self.hits.append(dict(t=t, idx=idx, tell=tell_from, grp=grp, kb=h[5], shape=h[2], tier=h[4], dims=h[3]))
+        ev_t = api.ev(h[0], h[1])
+        t = ev_t if t is None else t
+        made = t - 1 if made is None else made
+        ph = api.HIT_PH.get(self.key, {}).get(idx)
+        if ph is not None and cond is None:
+            cond = f'if score #ph {OBJ} matches {api.PH["p1"] if ph == 1 else api.PH["p2"]}'
+        g8 = (lambda ls: [gate(cond, x) for x in ls]) if cond else (lambda ls: ls)
+        assert made >= 0 and tell_from <= t and made < t
+        self.at(made, g8(hazard(self.key, h, grp=bool(grp), tell=t - made, **kw)))
+        rec = dict(t=t, idx=idx, tell=tell_from, grp=grp, kb=h[5], shape=h[2], tier=h[4], dims=h[3], parry=h[6], ph=ph,
+                   made=made, cue=None, flash=[])
+        if h[6] == 'P':
+            self.at(t - api.CUE_LEAD, g8(cue(cue_pos)))
+            rec['cue'] = t - api.CUE_LEAD
+            self.cues.append(t - api.CUE_LEAD)
+        else:
+            for col, clip, e, off in api.FLASH_AT[self.key][idx]:
+                ft = api.ev(clip, e) + off + (t - ev_t)
+                self.at(ft, g8(flash(col, **self.flash_args.get(col, {}))))
+                rec['flash'].append((col, ft))
+                self.flashes.append((col, ft))
+        self.hits.append(rec)
         return t
+
+    def note_hit(self, idx, t, tell_from, grp=0, made=None):
+        """Record a hit the pattern builds itself (a dash line with a run-time length): the flashes of an N row, the table."""
+        h = api.HITS[self.key][idx]
+        rec = dict(t=t, idx=idx, tell=tell_from, grp=grp, kb=h[5], shape=h[2], tier=h[4], dims=h[3], parry=h[6], ph=None,
+                   made=t - 1 if made is None else made, cue=None, flash=[])
+        assert h[6] == 'N', 'a hand-built hit must be an N row (a P row needs the cue: use hit())'
+        for col, clip, e, off in api.FLASH_AT[self.key][idx]:
+            ft = api.ev(clip, e) + off + (t - api.ev(h[0], h[1]))
+            self.at(ft, flash(col, **self.flash_args.get(col, {})))
+            rec['flash'].append((col, ft))
+            self.flashes.append((col, ft))
+        self.hits.append(rec)
+
+    def pp_window(self, h, cond=None):
+        """hr_design §1.5: a perfect parry on the pattern's last / single hit at h (seen by the module one or two ticks later:
+        the hazard strikes after the module tick) -> core/pp (the flinch clip; the pattern ends api.PP_FLINCH t later)."""
+        line = f'execute if score #pp {OBJ} matches 1 run {fn("core/pp")}'
+        self.rng(h + 1, h + 2, gate(cond, line) if cond else line)
+        self.pp = h
 
     def end(self, t):
         self.end_t = t
@@ -262,9 +345,10 @@ class PB:
         key, W = self.key, self.W
         assert self.end_t is not None, key
         name = api.PATTERN_NAMES[key]
-        W.w(f'p/{key}/start', [f'# {key.upper()} {name} (S3, p1.py): pattern tick 0 (@s = the body, at it). Clock #pt hr.',
+        W.w(f'p/{key}/start', [f'# {key.upper()} {name} ({self.owner}): pattern tick 0 (@s = the body, at it). Clock #pt hr.',
                                sset('#done', 0)] + list(start_head) + self.ticks.get(0, []))
         tick = [f'# {key.upper()} {name}: one pattern tick (#pt hr = 1..{self.end_t}); events in k/<t>.']
+        tick += list(self.tick_head)
         for t0, t1, cmd in self.ranges:
             rr = f'{t0}' if t0 == t1 else f'{t0}..{t1}'
             tick.append(gate(f'if score #pt {OBJ} matches {rr}', cmd))
