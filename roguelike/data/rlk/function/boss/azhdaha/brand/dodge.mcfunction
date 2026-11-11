@@ -1,4 +1,4 @@
-# @s = body: a perfect dodge (#mbDodgeOk 1: one-shot strike >= 12 t, not nododge, or a pj) cleanses, once per 40 t.
+# @s = body: a perfect dodge or a perfect parry (#mbDodgeOk 1: of a real attack, not a lingering hazard) cleanses, once per 40 t.
 execute unless score #mbDodgeOk mb matches 1 run return 0
 execute unless entity @a[tag=player,scores={azBrT=1..},limit=1] run return 0
 scoreboard players operation #azX mb = #azClk mb
