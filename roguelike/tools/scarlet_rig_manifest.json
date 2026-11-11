@@ -2211,7 +2211,7 @@
    },
    "owner": "H2",
    "key_files": 379,
-   "keys": 2133,
+   "keys": 2129,
    "keys_per_tick": 3,
    "source": "v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬",
    "note": "",
@@ -2533,7 +2533,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 27708164
+  "version": 184711937
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -18953,10 +18953,9 @@
    ],
    "lift": {},
    "hat_push": {
-    "241": 4.9,
-    "242": 33.8,
-    "243": 18.8,
-    "244": 3.8,
+    "241": 2.9,
+    "242": 25.1,
+    "243": 11,
     "246": 3.6,
     "247": 3.6,
     "254": 12.6,
@@ -25427,7 +25426,7 @@
      "gripClear": 24.88,
      "handClearL": 19.06,
      "handClearR": 2.44,
-     "hatClear": 33.81,
+     "hatClear": 25.09,
      "scab": 1.5,
      "scabArm": 40,
      "scabFwd": 13.9
@@ -25570,9 +25569,9 @@
   "parts": 29,
   "models": 63,
   "key_files": 3457,
-  "keys": 29171,
+  "keys": 29167,
   "rig_functions": 4216,
-  "rig_bytes": 8912898,
+  "rig_bytes": 8911852,
   "cull_overhang_ticks": 0
  },
  "sprites": {

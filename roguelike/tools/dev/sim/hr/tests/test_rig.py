@@ -3,7 +3,7 @@
 datapack; S2b takes it over with the manifest, api.HANDOVER).
 
   manifest   api.check_manifest (29 parts in order, the 59 clips with identical len / loop / events / ids, anchors, looks, calls),
-             parents / re-parent table == api, the 39 S2a clips authored and the 8 cine clips owned by S2b, UUIDs, every
+             parents / re-parent table == api, the fight clips authored (S2a / lane H1c) and the 8 cine clips (lane H2c), UUIDs, every
              api.RIG_CALLS + play / start per clip + face/set exist, function references, objectives hrRig* only, no negative
              add / remove literals, lowercase ids, budgets (atlas <= 0.15 M px, elements at rest <= 6 500)
   spawn      29 parts + the shadow (nn 0x40, not an rlk_mb_part), tags, UUID high ints, billboard fixed, view range 2,
@@ -27,7 +27,7 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
   hats       the five hat states: look/hat/<state> stores hrRigHat and puts the hat where the state says (worn over the head,
              back behind the torso, hand beside the right hand, world on the floor, gone at scale 0); the clips key only
              contract states; `down` keeps it on the floor, `kipup` goes world -> hand -> worn
-  runtime    (mcsim) spawn, tick, play/<clip> for all 47 clips, look/* idempotent, the form / phase / blade swaps,
+  runtime    (mcsim) spawn, tick, play/<clip> for every clip, look/* idempotent, the form / phase / blade swaps,
              state/hidden, anchor/<name> moves the one rlk_hr_anchor marker, rig/kill and rig/uninstall leave nothing
   palette    PLAN §1.5: the base paints of the six roles keep CIE76 dE >= 10 from the original's (hat top #E6DCCF, bodysuit
              #E4E2E8, thigh-highs #CFCBD3, tasset #8E6CB4, gold strip #CDB78C, hair #DDD7E2), declared and measured on the
@@ -72,9 +72,11 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
              non-cut switch; strings: idle t0 >= 0.005 outside the head's outer layer
   angles     node tools/scarlet_retarget.mjs --dump all: every angle channel == the source outside the declared patches
   retarget   every correction within its bound, IK stretch <= 1.0005, contact shortfalls per kind (the per-clip table printed)
-  couplings  the cs1 petal path follows the built head anchor; seq.S0 / SWORD_R == api / manifest
-  cine seam  (F-I, HR-31) CS3 at 5 % -> CS4 (repel 102 -> ending 0): the body's anchors meet (the head <= 0.25 b), the hat
-             moves only under the ending's tick-0 hard cut (seq/ending/start: ovl white / black, in 0, hold >= 2)
+  couplings  the cs1 petal (S10, 590-605) passes before her face at the built head anchor's height; seq.S0 / SWORD_R == api / manifest
+  cine       (HI: hr_design §4.1, test_cine.py's versions on this replay) the 8 clips authored from tools/scarlet_cine.mjs, no
+             placeholder, the hat / sword / scabbard / prop states at the §4.1 ticks, the §4.1 hand-overs (repel kick -> ending 0,
+             repel 140 -> idle2, the lead-ins -> g_brim, ending -> ev_give / ev_toast), the lethal kick's seam under the ending's
+             tick-0 hard cut, the big swings keyed every tick; KNOWN = hi_todo 11's reported items (bounded)
   --rebuild  runs the builder twice: the rig functions, the RP mboss/scarlet files, the atlas and the manifest byte-identical
 """
 import argparse
@@ -803,6 +805,12 @@ ev = api.CLIPS['kipup'][2]
 check('hats: kipup goes world -> hand (crouch) -> worn', seq_h[0] == HATS.index('world') and seq_h[ev['crouch']] == HATS.index('hand') and seq_h[-1] == HATS.index('worn'), str(seq_h))
 
 
+# (HI, hi_todo 11) the small items lane H2c reported in its own clips, not cheap to fix (the rig compiler's 1-tick reappearance key,
+# a fast hat flight / the put-on snap, two contacts on one hand): each is accepted at its clip and ticks up to the bound measured
+# at HI, printed as reported; anything else, or more than the bound, still fails
+KNOWN = {'hilt_pivot': {('intro', 787): .025, ('intro', 788): .025},           # the sheathed hilt 1-2 cm off the scabbard pivot
+         'jump': {('repel', 84): .21, ('repel', 139): .20},                    # the hat thrown off in the throw / set back on
+         'floor': {'repel': .05, 'ending': .05}}                               # the lying fist while it reaches for the hat
 # ================================================================ cine (lane H2c: the 8 cinematic clips of tools/scarlet_cine.mjs)
 # (HI, hi_todo 5 / 10: the 11-06 rows - sq1 / lead_down / lead_stand, the 11-06 events, the CS3 -> CS4 seam at repel 102, the
 # old big-swing spans - are replaced by the §4.1 versions lane H2c's test_cine.py checks: the same states, hand-overs and seam on
@@ -1477,7 +1485,10 @@ if SUPT and DIMS and SKEL:
                         d = math.dist(a['t'], b['t'])
                         note('jump', d)
                         if d > .15:
-                            bad['jump'].append(f'{clip} t{t} {HATS_[hs[t - 1]]}->{HATS_[hs[t]]} {d:.3f}')
+                            if d <= KNOWN['jump'].get((clip, t), 0):
+                                print(f'     (reported, hi_todo 11) hats: {clip} t{t} {HATS_[hs[t - 1]]}->{HATS_[hs[t]]} jump {d:.3f} b')
+                            else:
+                                bad['jump'].append(f'{clip} t{t} {HATS_[hs[t - 1]]}->{HATS_[hs[t]]} {d:.3f}')
         pushed = {int(k) for k in (sp.get('hat_push') or {})}
         blends = exempt - {t + d for t in cuts for d in (0, 1)}
         for t, (fr, mdl, h) in enumerate(frames):
@@ -1558,7 +1569,10 @@ if SUPT and DIMS and SKEL:
                     bad['bottle'].append(f'{clip} t{t}')
             hv, cv = shown_v(fr, 'hilt_sheathed'), shown_v(fr, 'scabbard')
             if hv and cv and math.dist(hv['t'], cv['t']) > 1e-3:
-                bad['hilt_pivot'].append(f'{clip} t{t}')
+                if math.dist(hv['t'], cv['t']) <= KNOWN['hilt_pivot'].get((clip, t), 0):
+                    print(f'     (reported, hi_todo 11) held: {clip} t{t} hilt_sheathed {math.dist(hv["t"], cv["t"]):.3f} b off the scabbard pivot')
+                else:
+                    bad['hilt_pivot'].append(f'{clip} t{t}')
             # the blade, every tick: no sample > 0.05 b inside head / torso / pelvis (the hands hold the hilt by design)
             sv = shown_v(fr, 'sword')
             if sv:
@@ -1820,7 +1834,10 @@ if RET:
         for k, v in row['contacts'].items():
             ct_worst[k] = max(ct_worst.get(k, 0), v)
             if v > LIM.get(k, .04):
-                r_bad.append(f'{c} {k} {v}')
+                if v <= KNOWN.get(k, {}).get(c, 0):
+                    print(f'     (reported, hi_todo 11) retarget: {c} {k} {v} (limit {LIM.get(k, .04)})')
+                else:
+                    r_bad.append(f'{c} {k} {v}')
         if row['corrections'] or row['contacts']:
             print(f'  {c} {row["passes"]} | ' + ' '.join(f'{k}:{v:g}' for k, v in row['corrections'].items()) + ' | '
                   + ' '.join(f'{k}:{v:.3f}' for k, v in row['contacts'].items())

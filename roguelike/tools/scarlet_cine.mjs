@@ -456,7 +456,9 @@ const cs1Lock = (t, G = K1_G[t]) => xLock('cs1', t, 'K1', G, K1_POS[t], {tor: [t
   const EASY = {...ST, pos: [0, -.04, 0], tor: [-4, 4, 0], head: [-6, -2, 0], ...F_ST, ...SHEATHED, aL: [6, 10, .96], aR: [6, 10, .96], hat: 'worn', gN: 0};
   k.k(199, {}).k(200, {...EASY}).k(215, {aL: [30, 6, .7]}).k(216, {bottle: 'hand', hL: 'grip', botT: 0, aL: [24, 8, .8]}).k(224, {aL: [14, 10, .9]}).k(232, {});
   // S6: the hat swung off and round (240-252, every tick; the hat at arm's length in the right hand), back on 256-262
-  k.k(236, {hR: 'brim', bwR: 1, bzR: 30, aR: [120, 30, .9], pR: [.8, -.2, .3], head: [-10, 6, 0]}, 'io')
+  // (HI, hi_todo 11) the head pitched -5 at 236, not -10: the worn brim, pulled by the hand, cleared the head's top corner by
+  // -1.7 mm (test_rig `hats: worn`); now >= 1 mm on every tick
+  k.k(236, {hR: 'brim', bwR: 1, bzR: 30, aR: [120, 30, .9], pR: [.8, -.2, .3], head: [-5, 6, 0]}, 'io')
     .k(240, {hat: 'hand', hR: 'grip', bwR: 0, hhB: 40, hhE: 30, hhN: [40, 70], aR: [130, 36, .9], head: [-6, 8, 0], tor: [-4, 8, 0]}, 'l');
   // the hand's bearing round her right side (from her front): 40 -> 150 (behind her right shoulder: toward the lens) -> 40, the
   // hat radially beyond the hand, its crown tipped outward as it swings
