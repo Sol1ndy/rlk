@@ -19,6 +19,8 @@ execute if score #amove tmp matches 5..250 run scoreboard players operation #vx 
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vz tmp = #dvz tmp
 function rlk:player/dash_norm
 execute if score #dgMv cb matches 1 if score #amove tmp matches 5..250 run scoreboard players set #dgMv cb 3
+# 더블 닷지의 옆돌기를 방향키 없이: 앞의 적(없으면 시선) 기준 옆 뒤로(player/dodge/side; 통합 11-12 — 시선을 따라 적 속으로 들어가던 것)
+execute if score #dgMv cb matches 2 unless score #amove tmp matches 5..250 run function rlk:player/dodge/side
 # 방향 단위 벡터 × 1000(dashDX · dashDZ); 틱마다의 속도와 길이는 player/dodge/speed · len
 scoreboard players operation @s dashDX = #ux tmp
 scoreboard players operation @s dashDX *= #st10 tmp

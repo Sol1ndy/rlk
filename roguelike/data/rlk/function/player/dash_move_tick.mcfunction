@@ -1,6 +1,8 @@
 # @s = 플레이어, at @s rotated ~ 0. 닷지 이동 한 틱: 이번 틱의 속도 #dgSp(player/dodge/speed, 칸 × 1000)를 서브스텝 4개로 나눠 옮긴다
 # (서브스텝 하나 0.125칸 이하). 검사는 몸 앞면(중심+0.3칸)
 function rlk:player/dodge/speed
+# 옆돌기는 적의 몸 속에서 끝나지 않는다(그 앞에서 멈춤, player/dodge/clear)
+execute if score #dgMv cb matches 2 run function rlk:player/dodge/clear
 scoreboard players operation #subx tmp = @s dashDX
 scoreboard players operation #subx tmp *= #dgSp tmp
 scoreboard players operation #subx tmp /= #1000 tmp

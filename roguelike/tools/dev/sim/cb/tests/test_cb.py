@@ -1074,6 +1074,8 @@ def t_double():
         s.cmd(split(MOVE), pctx(s))
         lost = cm_hit(s, e, 60) if hit else None
         cooldown(s)
+        P(s, 'dashPX', math.floor(pl.pos[0] * 100))       # rlk:tick's last lines: the body's place for the next tick's move test
+        P(s, 'dashPZ', math.floor(pl.pos[2] * 100))
         return dg, lost
 
     def at():
@@ -1133,19 +1135,54 @@ def t_double():
         t1 = P(s, 'dgAt')
         for _ in range(k - 1):
             tick()
-        z0 = pl.pos[2]
+        x0, z0 = pl.pos[0], pl.pos[2]
         dg, _ = tick(rc=True)
         mv, t2, c2, mt = G(s, '#dgMv', 'cb'), P(s, 'dgAt'), P(s, 'dashCool'), P(s, 'dashMoveT')
         for _ in range(7):
             tick()
-        z1 = round(pl.pos[2] - z0, 3)
-        ck(f'double: a second press {k} t after the first is the double dodge: a new stamp, the cartwheel 6 t / {z1} b (2.2), the '
-           f'cooldown + #dashCoolT ({c2 + 1} = 18 - {k} + 18)', dg and mv == 2 and t2 == t1 + k and mt == 5 and abs(z1 - 2.2) < 0.02
-           and c2 + 1 == 2 * G(s, '#dashCoolT') - k, (dg, mv, t2 - t1, mt, z1, c2))
+        dx, dz = pl.pos[0] - x0, pl.pos[2] - z0
+        z1 = round(math.hypot(dx, dz), 3)
+        ck(f'double: a second press {k} t after the first is the double dodge: a new stamp, the cartwheel 6 t / {z1} b (2.2; with no '
+           f'direction and no enemy ahead sideways-and-back of the view: dz {dz:.2f} < 0), the cooldown + #dashCoolT ({c2 + 1} = 18 - '
+           f'{k} + 18)', dg and mv == 2 and t2 == t1 + k and mt == 5 and 2.0 <= z1 <= 2.25 and dz < -1.2 and abs(dx) > 1.2
+           and c2 + 1 == 2 * G(s, '#dashCoolT') - k, (dg, mv, t2 - t1, mt, z1, dx, dz, c2))
         n0 = len(s.calls('rlk:player/dash_fail'))
         tick(rc=True)
         ck(f'double: ... a third press inside the cooldown is refused (one double per set)', P(s, 'dgAt') == t2
            and len(s.calls('rlk:player/dash_fail')) == n0 + 1)
+    # the integration (11-12): with no direction held the cartwheel goes sideways-and-back from the nearest enemy ahead (never toward
+    # it), the sides alternate; with a direction held into an enemy it stops short of the body
+    sides, far = [], []
+    for k in range(2):
+        fresh(s)
+        e.pos = [0.5, 64.0, 3.0]                                # the enemy 2.5 b ahead (the view is +z)
+        pl.pos, pl.rot = [0.5, 64.0, 0.5], [0.0, 0.0]
+        P(s, 'dashPX', 50)
+        P(s, 'dashPZ', 50)
+        tick(rc=True)
+        tick(rc=True)
+        d0 = math.dist(pl.pos[::2], e.pos[::2])
+        for _ in range(8):
+            tick()
+        sides.append(round(pl.pos[0] - 0.5, 2))
+        far.append(round(math.dist(pl.pos[::2], e.pos[::2]) - d0, 2))
+    ck(f'double: no direction, an enemy ahead: the cartwheel goes sideways-and-back from it ({far} b further from it; x {sides}: the '
+       f'sides alternate)', all(f >= 1.2 for f in far) and sides[0] * sides[1] < 0 and min(abs(x) for x in sides) >= 1.0, (far, sides))
+    fresh(s)
+    e.pos = [2.0, 64.0, 0.5]                                    # the enemy 1.5 b along the held direction (+x)
+    pl.pos, pl.rot = [0.5, 64.0, 0.5], [0.0, 0.0]
+    P(s, 'dashPX', 50)
+    P(s, 'dashPZ', 50)
+    tick(rc=True)
+    pl.pos = [0.5, 64.0, 0.5]
+    P(s, 'dashPX', 30)                                          # moving +x: a direction held
+    dg, _ = tick(rc=True)
+    for _ in range(8):
+        tick()
+    gap_ = round(math.dist(pl.pos[::2], e.pos[::2]), 2)
+    ck(f'double: a direction held into an enemy: the cartwheel stops short of its body (ends {gap_} b from its centre, > 0.6)',
+       dg and G(s, '#dgMv', 'cb') == 2 and gap_ > 0.6, (dg, gap_, pl.pos))
+    e.pos = [2.5, 64.0, 0.5]
     fresh(s)
     tick(rc=True)
     t1 = P(s, 'dgAt')

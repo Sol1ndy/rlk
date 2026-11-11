@@ -79,6 +79,8 @@ execute unless score #dgTry cb matches -2147483648.. run scoreboard players set 
 scoreboard players add #dgMv cb 0
 scoreboard players add #dgN cb 0
 scoreboard players add #dgPrev cb 0
+# #dgSide 더블 닷지의 옆돌기(방향키 없음)를 번갈아 오른쪽 / 왼쪽 뒤로(player/dodge/side)
+scoreboard players add #dgSide cb 0
 scoreboard players add #dgCr cb 0
 # 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
 scoreboard players set #hcK tmp 0

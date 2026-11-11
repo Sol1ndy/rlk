@@ -293,7 +293,7 @@ def dodgecam():
        f'cartwheels seen, the player travelled {tot["moved"]:.0f} b in all; the camera inside her on {tot["inside"]} of '
        f'{tot["ticks"]} ticks; her body in the camera line {tot["line"]} ticks (the standing player with the same views: {tot["line_ref"]}); '
        f'her steps out of the line {tot["clears"]} (standing: {tot["clears_ref"]}); the player\'s own move closer than '
-       f'{SEP_MIN} b to her on {tot["own_on"]} ticks (a direction-less double dodge goes along the view: into her), knocked back by '
+       f'{SEP_MIN} b to her on {tot["own_on"]} ticks (a direction-less double dodge goes sideways-and-back from her: player/dodge/side), knocked back by '
        f'her hit across her way on {tot["kb_on"]} ({tot["kb_runs"][:4]})',
        tot['back'] >= 20 and tot['cart'] >= 10 and tot['inside'] == 0, tot)
 
