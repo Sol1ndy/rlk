@@ -259,11 +259,13 @@ def dodgecam():
     rows = []
     for key, ph in keys:
         dist = 6.0 if key in api.GAUNTLETS else 3.0
-        ref = dc_run(key, ph, 'still', 'track', dist)
-        tot['line_ref'] += ref['line']
-        tot['clears_ref'] += ref['clears']
+        refs = {view: dc_run(key, ph, 'still', view, dist) for view in ('track', 'fixed', 'side')}
+        for ref in refs.values():
+            tot['line_ref'] += 2 * ref['line']
+            tot['clears_ref'] += 2 * ref['clears']
         for pol in ('step', 'double'):
             for view in ('track', 'fixed', 'side'):
+                ref = refs[view]                                # the standing player with the same view
                 r = dc_run(key, ph, pol, view, dist)
                 tot['runs'] += 1
                 for k in ('back', 'cart', 'ticks', 'line', 'clears'):
@@ -289,8 +291,8 @@ def dodgecam():
         return
     ck(f'dodgecam: {tot["runs"]} runs with the real dodge set: {tot["back"]} back-steps after an avoided hit and {tot["cart"]} '
        f'cartwheels seen, the player travelled {tot["moved"]:.0f} b in all; the camera inside her on {tot["inside"]} of '
-       f'{tot["ticks"]} ticks; her body in the camera line {tot["line"]} ticks (standing reference: {tot["line_ref"]} per view); '
-       f'her steps out of the line {tot["clears"]} (standing: {tot["clears_ref"]} per view); the player\'s own move closer than '
+       f'{tot["ticks"]} ticks; her body in the camera line {tot["line"]} ticks (the standing player with the same views: {tot["line_ref"]}); '
+       f'her steps out of the line {tot["clears"]} (standing: {tot["clears_ref"]}); the player\'s own move closer than '
        f'{SEP_MIN} b to her on {tot["own_on"]} ticks (a direction-less double dodge goes along the view: into her), knocked back by '
        f'her hit across her way on {tot["kb_on"]} ({tot["kb_runs"][:4]})',
        tot['back'] >= 20 and tot['cart'] >= 10 and tot['inside'] == 0, tot)
