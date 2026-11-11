@@ -426,7 +426,8 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   FN-a~f, `test_rig` 리그 · 영상 클립, `ev_dry` 시퀀스, `test_scarlet` 코어 · 단계 · 멈춤 · 틱 비용, `pat_p1` · `pat_ghost` 패턴, `test_reward`
   이벤트, `test_kit` 효과 킷, `test_arena_hr` 경기장, `test_hwamu` · `test_moon` 아이템 · 버프, `ident_hr` 35b82e5 와 바이트 비교, `gen_check_hr`
   생성 순서 · 소유 경로; 모의기 `sim/hr/tests/lib` · `sim/hr/s1k/lib` · `sim/hr/sr`; 11-11 다시 만든 싸움에서 더한 것: `pat_p2` · `test_gauge` ·
-  `test_bal_hr` · `test_clips_h1c` · `test_seq` · `test_cam` · `test_cine` · `test_contact` · `test_actor` · 한 판 전체 `test_flow`, 레인 H2 의 세계
+  `test_bal_hr` · `test_clips_h1c` · `test_seq` · `test_cam` · `test_cine` · `test_contact` · `test_actor` · 한 판 전체 `test_flow`,
+  검토 H-A 의 `test_metro`(박자 F 로 연참을 못 깸, 진짜 F 함수; 탐색 도구 `sim/hr/review/metro`), 레인 H2 의 세계
   `sim/hr/h2/{camsim,seqsim}.py`, 균형 `sim/hr/review/bal/hrfair2.py` — 목록과 몫은 홍련 절 「파일 · 생성 순서」), 챕터 틀 `sim/az/tests_cm/`(라우팅 · 프록시 · 틀 도우미,
   중간보스 행동 불변 `test_m0diff`, 생성 순서 `gen_check`, 바이트 고정 `ident`(낡음: 0-9)), 정적 검사기(`check_refs` · `check_macro` ·
   `check_nbtpath` · `lint_mc`), 전투 개편 lane R `sim/cb/tests/`(`test_rm`: 요이미야 · 활 삭제와 저장 월드 이전 · F5 하나 · 전투 중 선택 안내, 11-10; lane C `test_cb`:
