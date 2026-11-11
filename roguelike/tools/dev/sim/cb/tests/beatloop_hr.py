@@ -6,8 +6,8 @@
 The H1 world of the 홍련 suites (tools/dev/sim/hr/tests/lib/hrsim.py: the real core, the real F path, the real judge) runs
 each scenario twice: with the beat's world hold off (#btOn tmp 0) and on (1). With it on, every real tick starts with
 rlk:tick's own beat-clock line; on a tick the beat holds, the real game time moves on while her world does not run
-(mboss/main returns on its first line - called here to prove it - and nothing else of the world is called, as rlk:tick's
-gates do). The scripted player presses on world ticks, so both runs get the same inputs on the beat's clock.
+(rlk:tick's own mboss/main line is run here as written: its hold condition keeps the world out; nothing else of the world
+is called, as rlk:tick's other gates do). The scripted player presses on world ticks, so both runs get the same inputs on the beat's clock.
 
   G1 / G2   the two gauntlets (test ids of api.GAUNTLETS), F one tick before every scripted cut: every cut a perfect parry, the
             shield gauge emptied, the same judged strikes on the same world ticks, every `# hr` / `# mb` score, her body and
@@ -36,6 +36,7 @@ TEST = {'a8': 21, 'a13': 27}
 TICK = [l for l in (FN / 'tick.mcfunction').read_text(encoding='utf-8').split('\n') if l.strip() and not l.startswith('#')]
 CLOCK = next(l for l in TICK if 'player/def/beat/clock' in l)
 POST = next(l for l in TICK if 'player/def/beat/post' in l)
+MAINL = next(l for l in TICK if 'function rlk:mboss/main' in l)
 STUB = ('rlk:player/def/guard', 'rlk:items/hook/on_parry_press', 'rlk:items/hook/on_parry', 'rlk:items/hook/on_pdodge',
         'rlk:char/motion/finish', 'rlk:player/def/fx/p1', 'rlk:player/def/fx/p2', 'rlk:player/def/fx/p3_at',
         'rlk:player/def/fx/p3_star', 'rlk:player/def/fx/p3_shatter', 'rlk:player/def/fx/p3_bolt', 'rlk:player/def/fx/ovl',
@@ -109,7 +110,7 @@ def fight(on, kind):
             st['held'] += 1
             s.held += 1
             n0 = s.ncmd
-            s.call('rlk:mboss/main', C0)                    # the hook: returns on its first command
+            s.cmd(split(MAINL), C0)                         # rlk:tick's own mboss/main line: its hold condition
             st['hook'] = max(st.get('hook', 0), s.ncmd - n0)
         else:
             H.world_h1(s)
@@ -159,8 +160,8 @@ def main():
         ck(f'beathr: ... beat on = beat off, world tick by world tick ({len(r1)} world ticks: every `# hr` and `# mb` score, her '
            f'body and yaw, both health pools)', d is None and len(r1) == len(r0) and len(r1) >= 100, d)
         ck(f'beathr: ... held {s1["held"]} real ticks = 5 x {par} perfect parries = #btLag (+{s1["lag"]}); {s1["real"]} real ticks = '
-           f'{len(r1)} world ticks + the held ones; a held tick costs mboss/main {s1.get("hook", 0)} commands (the call and its first line)',
-           s1['held'] == 5 * par == s1['lag'] and s1['real'] == len(r1) + s1['held'] and s0['held'] == 0 and s1.get('hook', 2) <= 2,
+           f'{len(r1)} world ticks + the held ones; on a held tick rlk:tick\'s mboss/main line runs {s1.get("hook", 0)} command(s)',
+           s1['held'] == 5 * par == s1['lag'] and s1['real'] == len(r1) + s1['held'] and s0['held'] == 0 and s1.get('hook', 1) <= 1,
            (s1['held'], par, s1['lag'], s1['real'], len(r1), s1.get('hook')))
     print(f'beatloop_hr: {"FAILED " + str(len(FAILS)) if FAILS else "all passed"}')
     return 1 if FAILS else 0

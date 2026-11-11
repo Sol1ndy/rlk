@@ -51,17 +51,17 @@ per-tick decrement in `player/tick` and `mob/tick`.
 
 | clock | where | how it follows the beat |
 |---|---|---|
-| registry bosses: module AI and pattern clocks, the rig (clip clock, follow), `mv` glides / leaps, `hz` hazards, `pj` projectiles, `pull`, bars, typed lines, chapter mode (`world_cm_pre/post`), boss DoT, the gauntlet / shield / ULT clocks of 홍련, balance `bal_tick` | `mboss/main` -> `mboss/world` (everything a boss fight ticks hangs under it) | hook 1 in `build_mboss_core.py`: `mboss/main`'s first line returns on a held tick, before `#mbLowG` / `#mbCam` are cleared (the requests survive) |
+| registry bosses: module AI and pattern clocks, the rig (clip clock, follow), `mv` glides / leaps, `hz` hazards, `pj` projectiles, `pull`, bars, typed lines, chapter mode (`world_cm_pre/post`), boss DoT, the gauntlet / shield / ULT clocks of 홍련, balance `bal_tick` | `mboss/main` -> `mboss/world` (everything a boss fight ticks hangs under it) | `rlk:tick`'s `mboss/main` line has `unless score #btHold cb matches 1` (no extra command; a held tick does not clear `#mbLowG` / `#mbCam`, so the requests survive). First built as the first line of `mboss/main`; moved because that cost every boss tick one command (`test_m0diff` A) |
 | the near re-test of the dodge window | `rlk:tick` -> `mboss/near_all` | gated in `rlk:tick` |
-| custom mobs: brains (`cmS` wind-ups, `cmCd` cooldowns), all cm rigs (ch1 / ch2 / ch3), aim markers | `cm/world` | first line returns on a held tick |
-| custom-mob projectiles and ground effects | `cm/pj/world` | first line returns on a held tick |
+| custom mobs: brains (`cmS` wind-ups, `cmCd` cooldowns), all cm rigs (ch1 / ch2 / ch3), aim markers | `cm/world` | the condition on its `rlk:tick` line |
+| custom-mob projectiles and ground effects | `cm/pj/world` | the condition on its `rlk:tick` line |
 | 나루카미: AI, objects, hazards, movement fx, domes, orbs, vfx worlds, her own balance clock | `rlk:tick` -> `boss/raiden/world` | gated in `rlk:tick` (her clock runs outside the registry: one dispatcher line) |
 | every mob: stun `stunT`, balance regen / groggy `balT` (`bal/tick`), element state and DoTs `elAct` (`element/tick`: `frzT` too) | `mob/tick` | the three lines gated; the health bar, the click shield and vanilla-hit detection keep running (the player can hit a frozen enemy) |
 | vanilla AI and physics of mobs (walking, vanilla melee, the cm brains' pathfinding) | the server | `beat/hold_on` / `hold_off` on every hold edge: `NoAI:1b` on every `rlk_mob` that did not have it (tag `rlk_bt_noai`), restored unless a freeze / groggy took over meanwhile (their "was NoAI before" notes `rlk_noai` / `rlk_bal_noai` are corrected) |
 | the F lock, the whiff ladder, the 3-tick re-press block, parry / dodge windows, the dodge-start box | stamps on `#now cb` | the combat clock (above) |
 | the dodge cooldown `dashCool` | `player/tick` | the decrement is gated |
 | the effect kits of 6 bosses (cards' ages: az, ap, tk, kn, bf, fg; self-scheduled, so they run on held ticks) | `<boss>/fx/e/{world,make}`, `fx/tele/wave_to`, apep `fx/p/**` | in the generators: `e/world` skips a held tick on its second line (it only re-schedules itself: the per-run counters stand still too) and every `time query gametime` is followed by `-= #btLag cb` (ages and timed cards stay in step with the hits afterwards). `beatloop_cb.py` compares the kits' scores too |
-| the warning glint's spacing `#npGap` | `mboss/np_gate` | hook 2: `#npNow mb -= #btAdj cb` |
+| the warning glint's spacing `#npGap` | `mboss/np_gate` | core hook: `#npNow mb -= #btAdj cb` |
 | 야타용왕's "time since the proxy was hit", 역장's break / banner stamps | `boss/azhdaha/{ai/sample4,on_hit}`, `mboss/fieldgen/{on_hit,field/banner,hud/banner_cut}` | `-= #btAdj cb` in the module generators |
 | display interpolation of world displays in the x1/3 phase | client | `beat/st/*` (below) |
 
@@ -122,11 +122,31 @@ lying body would swing its far end; they still freeze and get the lightning). Co
   `#btInv` 0, the mob has its AI back, a mob frozen before keeps its own NoAI, no tag, no marker, the clock keeps its lag); a
   freeze the player starts during the hold survives the release and loses the wrong "was NoAI" note.
 
+## Cost against the budgets
+- Idle (no beat running): `rlk:tick` + 3 commands (the clock test, `#now cb -= #btAdj cb`, the post test); the world gates are
+  conditions on existing lines (+ 0); each effect-kit world + 2 while it has cards (the hold test, the lag), each kit `make` + 1.
+  `az/tests_cm test_m0diff` A (mid-boss tick cost against the 10-20 release, a budget the tree already exceeds: README 0-9):
+  proto + 8.03 -> + 8.03, 파수꾼 unchanged, 나비 + 8.27 -> about + 10.3, 역장 + 8.76 -> about + 10.8 (their kits' two lines). `test_scarlet`: P1 471 / P2 481 commands
+  per tick, the same as on the base tree (budget 830); `test_flow`: the whole fight 361, G1 385, G2 399; the player side
+  (`perf_harness/pmeas.py`, late18): idle 688 -> 688, combat 692 -> 692, the F press 6 ticks 3 875 -> 3 877 (`beat/act`).
+- One perfect parry (17 ticks; measured in `test_cb`'s world, everything real): 1 500 commands with a rig character, 2 050
+  with a mannequin character (the stand-in rig's 11 poses per tick), + about 175 for the generic tilt of a 29-part rig = about
+  100 - 130 per tick while it runs. One perfect dodge (27 ticks): 1 900 / 2 700, + the stretch passes of a 29-part rig about
+  1 150 (three passes, the teleport_duration pass and its undo) = about 110 - 145 per tick while it runs; its heaviest single
+  tick is tick 5 (the clip start + the first passes: about +700).
+- The worst sustained case is a gauntlet answered perfectly: G2 = 11 beats in 282 world + 55 held ticks: (399 x 282 + 11 x
+  2 200) / 337 = about 405 commands per tick with parries, about 440 with dodges (11 x 3 850 over 359 ticks) - half the 830
+  budget. A held tick itself is cheap: the world costs nothing, only the player side runs.
+- Atlas: 12.940 M -> 13.089 M px (the 31 half-resolution hot sprites + two glow cards; limit 13.2 M). Fonts are not in the atlas.
+
 ## Client facts verified in the bytecode (javap, `<S>/cb/vp/bc`)
 - `Display.readAdditionalSaveData` / `setTransformationInterpolationDelay(.., true)` / `tick()` / `RENDER_STATE_IDS` (above).
 - `BakedQuad$MaterialInfo.of(Material$Baked, Transparency, ..)`, `lightEmission`, `TextureAtlasSprite.transparency()`: item quads
   pick their render type from the sprite's own transparency and carry a light emission (the glow shell / cards blend and glow).
 - Fonts: `client_facts.md` 7 (the lead's): cell > 256 px -> missing glyph.
+- `DisplayRenderer.calculateOrientation`: a FIXED display is drawn with `rotationYXZ(-yaw, +pitch, 0)` of its ENTITY rotation:
+  the entity's pitch tilts the whole model about the entity position (the generic rocked-back tilt: pitch -16 = the top goes
+  away from the facing).
 
 ## Pack files (all written by generators in git)
 - `assets/rlk/font/cb.json`, `assets/rlk/textures/font/cb/{streak_0..3,tint,vig,star,spark,bolt_1..3,burst,glint_l,glint_r}.png`

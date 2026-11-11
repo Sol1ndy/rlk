@@ -1,5 +1,3 @@
-# round V: 박자가 세계를 멈춘 틱(player/def/beat/clock)에는 커스텀 몹의 두뇌 · 리그가 돌지 않는다
-execute if score #btHold cb matches 1 run return 0
 # 커스텀 몹이 있을 때 매 틱
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
 # 조준점(몸 가슴) · 방향 계산용 표식 · 미끼(바닐라 근접 공격을 대신 맞는 투명 마네킹)

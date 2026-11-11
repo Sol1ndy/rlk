@@ -6,8 +6,8 @@
 The world of bossloop_cb.py (the vendored azsim of tools/dev/sim/hr/tests/lib + rlk:tick's own pre-pass lines, which now
 hold the beat's clock) runs the same fight twice, with the beat's world hold off (#btOn tmp 0) and on (1). The scripted
 player decides once per COMBAT tick (the tick number the pre-pass carries), exactly as the fight looked on that world tick,
-so both runs get the same inputs on the beat's clock. On a held tick the loop does what rlk:tick does: mboss/main returns on
-its first line (the real hook), scheduled functions still run (the effect kits, on their lag-corrected clock), the dodge
+so both runs get the same inputs on the beat's clock. On a held tick the loop does what rlk:tick does: its mboss/main line
+(run here as written) does not call the world, scheduled functions still run (the effect kits, on their lag-corrected clock), the dodge
 cooldown line is gated. Compared per world tick: every `#... mb` score of the framework and the module (the two raw game-time
 caches #plG / #pxG aside), the body's position, every hazard's clock, the player's health.
 
@@ -27,6 +27,7 @@ import bossloop_cb as B  # noqa: E402
 from bossloop_cb import azsim, Ctx, split, C0, ck, FAILS, DP, BOSS, PRE, COOL, TICK  # noqa: E402
 
 POST = next(l for l in TICK if 'player/def/beat/post' in l)
+MAINL = next(l for l in TICK if 'function rlk:mboss/main' in l)
 # presentation the simulator has no use for (avatar clips, particles, glyph cards, the title); the beat's engine stays real
 STUB = ('rlk:player/def/guard', 'rlk:items/hook/on_parry_press', 'rlk:items/hook/on_parry', 'rlk:items/hook/on_pdodge',
         'rlk:items/hook/on_dash', 'rlk:char/motion/dash', 'rlk:char/motion/finish', 'rlk:player/dash_dir',
@@ -102,7 +103,7 @@ def fight(on, policy, n_real=1700):
         if hold:
             st['held'] += 1
             s.t += 1                                        # real time passes; rlk:tick's world lines are gated ...
-            s.call('rlk:mboss/main', C0)                    # ... mboss/main by its own first line (the hook under test)
+            s.cmd(split(MAINL), C0)                         # ... rlk:tick's own mboss/main line: its hold condition
             s.run_sched()
         else:
             azsim.world(s)
@@ -144,7 +145,7 @@ def first_diff(a, b):
 
 
 def main():
-    ck('beatloop: mboss/main\'s first command is the hold hook', B.code('mboss/main')[0] == 'execute if score #btHold cb matches 1 run return 0')
+    ck('beatloop: rlk:tick\'s mboss/main line carries the hold condition', 'unless score #btHold cb matches 1' in MAINL and '#btHold' not in '\n'.join(B.code('mboss/main')))
     r0, s0 = fight(0, 'f')
     r1, s1 = fight(1, 'f')
     n = min(len(r0), len(r1))

@@ -71,9 +71,9 @@ def w(name, text):
 # dodge's slow motion are built in the game (`tick rate` cannot be used from functions in single player): while the beat
 # holds the world (#btHold cb 1 on a real tick; player/def/beat/clock, first thing in rlk:tick) nothing of a boss fight runs -
 # module AI and pattern clocks, the rig, mv / hz / pj / pull, bars, typed lines - and it resumes where it stopped, later.
-# Everything the core contributes is here plus three one-line hooks marked "VP beat":
-#   mboss/main      first line: a held tick returns before the per-tick requests (#mbLowG / #mbCam) are cleared, so low
-#                   gravity and a cutscene lock survive the hold exactly as they were
+# The hold itself is one condition on rlk:tick's mboss/main line (`unless score #btHold cb matches 1`: no command more per
+# tick, and the per-tick requests #mbLowG / #mbCam are not cleared on a held tick, so low gravity and a cutscene lock survive
+# it). What the core contributes is here plus two one-line hooks marked "VP beat":
 #   mboss/np_gate   the warning glint's spacing is counted on the beat's clock (game time minus the held ticks)
 #   mboss/pl_dot2   the boss DoT does not tick damage while the player is untouchable (#btInv cb 1)
 # and two optional module hooks, dispatched over the registry entries with the flag "beat" (like "bal"):
@@ -82,11 +82,9 @@ def w(name, text):
 #                            = the generic one: the rig parts (rlk_mb_part) tilt back about the feet and step back a little,
 #                            for the bosses of mboss/d/beat_rock (upright, man-sized bodies)
 #   <fn root>/beat_release   as the body, at it, on the release tick (before the fight's tick): undo it
-BEAT_HOLD = ('# VP beat: a held tick of the perfect parry / dodge beat (player/def/beat/clock) - nothing below runs, the requests stay\n'
-             'execute if score #btHold cb matches 1 run return 0')
 BEAT_NOW_NP = '# VP beat: on the beat\'s clock\nscoreboard players operation #npNow mb -= #btAdj cb'
 BEAT_INV = '\n# VP beat: untouchable for the beat\nexecute if score #btInv cb matches 1 run return 0'
-TOK.update({'@BEAT_HOLD@': BEAT_HOLD, '@BEAT_NOW_NP@': BEAT_NOW_NP, '@BEAT_INV@': BEAT_INV})
+TOK.update({'@BEAT_NOW_NP@': BEAT_NOW_NP, '@BEAT_INV@': BEAT_INV})
 BEAT_BOSSES = [b for b in BOSSES if b.get('beat')]
 # The generic rocked-back tilt pivots the whole rig about the anchor: right for an upright, man-sized body only (a long or
 # lying body would swing its far end metres). Default by id; a registry entry may say "rock": 0 / 1.
@@ -1128,7 +1126,6 @@ execute if score #mbPushOn mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_bod
 execute if score #mbMusPh mb matches 1.. run function rlk:mboss/music/tick
 ''')
 w('main', '''
-@BEAT_HOLD@
 # From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
 # here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
 # lost): the fight's leftovers and the bars go, and the scans stop until the next mboss/start.

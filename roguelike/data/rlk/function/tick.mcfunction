@@ -16,7 +16,9 @@ execute if score #pcount tmp matches 2.. run return 0
 # 우클릭(닷지)을 받고, 이번 틱의 gametime(#now cb)과 퍼펙트 닷지 창(#dgOpen cb)을 정한다(player/def/input)
 execute store result score #now cb run time query gametime
 # round V (lane VP): 퍼펙트 패링 · 퍼펙트 닷지의 박자(player/def/beat/*). 박자가 도는 동안(#btK cb)만 그 시계가 이번 틱을 정한다: 세계를 멈춘
-# 틱(#btHold cb 1)에는 아래의 적 쪽 줄들(몹의 타이머 · 커스텀 몹 · 나루카미 · 중간보스 · 근접 재판정)과 닷지 재사용 대기가 돌지 않는다.
+# 틱(#btHold cb 1)에는 아래의 적 쪽 줄들(몹의 타이머 · 커스텀 몹과 그 투사체 · 나루카미 · 중간보스 mboss/main · 근접 재판정: 각 줄의
+# `unless score #btHold cb matches 1`, 평소에는 명령이 하나도 늘지 않는다)과 닷지 재사용 대기가 돌지 않는다. mboss/main 이 돌지 않은 틱에는
+# 그 틱마다의 요청(#mbLowG · #mbCam)도 지워지지 않아 저중력 · 연출 잠금이 그대로 이어진다.
 # #now cb = 전투 시계 = gametime − 지금까지 멈춘 틱(#btAdj cb): 창 · 잠금 · 재사용 대기는 멈추지 않은 세계의 틱 수로 센다
 execute if score #btK cb matches 1.. run function rlk:player/def/beat/clock
 scoreboard players operation #now cb -= #btAdj cb
@@ -61,9 +63,9 @@ execute if entity @e[tag=rlk_mshield,limit=1] run function rlk:combat/mshield_ti
 # 커스텀 몹(cm): 두뇌 · 투사체 · 모습/부착물 정리
 # 퍼펙트 닷지 창이 열린 동안(#dgOpen cb 1)은 몸 자리를 닷지를 시작한 자리(rlk_dgo)로 두고 판정한다: 그 자리에 닿은 공격 = 퍼펙트 닷지
 execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_on
-execute if entity @e[tag=rlk_cmb,limit=1] run function rlk:cm/world
+execute if entity @e[tag=rlk_cmb,limit=1] unless score #btHold cb matches 1 run function rlk:cm/world
 execute unless entity @e[tag=rlk_cmb,limit=1] if entity @e[tag=rlk_cmglob,limit=1] run kill @e[tag=rlk_cmglob]
-execute if entity @e[tag=rlk_cmp,limit=1] run function rlk:cm/pj/world
+execute if entity @e[tag=rlk_cmp,limit=1] unless score #btHold cb matches 1 run function rlk:cm/pj/world
 execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_off
 execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
 # Narukami boss AI, telegraphs, combat objects and orphan cleanup.
@@ -72,7 +74,7 @@ execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux
 # 보스바는 서버 전체에 남으므로, 불러와진 나루카미가 없으면(런 종료·로비 복귀·청크 밖) 바로 숨긴다
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
 # 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
-execute if score #mbLive mb matches 1 run function rlk:mboss/main
+execute if score #mbLive mb matches 1 unless score #btHold cb matches 1 run function rlk:mboss/main
 # 연출 카메라 잠금(FN-cam, tools/build_mboss_core.py mboss/cam/*): 보스 모듈이 이번 전투 틱에 요청했으면(#mbCam 1; mboss/main 이 틱마다 지우고
 # 모듈의 틱이 다시 켬) 플레이어를 관전 모드로 카메라 거치대(#mbCamId 1 = rlk_mb_cam1, 2 = rlk_mb_cam2)에 붙여 두고(관전 중 Shift 는 관전을
 # 풀므로 틱마다 다시 spectate), 요청이 멈추면(연출 끝 · 취소 · 멈춤 · 사망 · /reload · 정리) 잡혀 있던 플레이어(태그 rlk_mb_camh)를 바로 푼다:

@@ -1,5 +1,3 @@
-# VP beat: a held tick of the perfect parry / dodge beat (player/def/beat/clock) - nothing below runs, the requests stay
-execute if score #btHold cb matches 1 run return 0
 # From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
 # here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
 # lost): the fight's leftovers and the bars go, and the scans stop until the next mboss/start.
