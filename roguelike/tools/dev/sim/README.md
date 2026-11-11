@@ -202,6 +202,24 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 | `np_table.py` | `<기록 폴더> <tag> [보스 …] [--cmp=<다른 tag>] [--json=f]` | 그 기록(`<tag>_<보스>_{pat,dodge,stand,fight}.json`)으로 보스별 표(패턴마다 모양 · 상태 P / U / U-ND / U-field · 섬광에서 타격까지 틱 · 매 틱 닷지로 피한 수), `--cmp` 는 두 tag 의 `fight` 기록 비교(패링 불가 표시 말고는 같아야 함) |
 | `test_np.py` | `<dp> [fw b08 b09 mobs table] [--logs=<폴더> --tag=<tag>] [--jobs=N]` | 고침의 검사(6522feef5 에서는 실패): `fw` 기본 규칙 · 옵션 · `np_auto` · 문 · 섬광 자리 · 묶음의 답, `b08` 타키 그로기 바닥, `b09` 아펩 치워 둔 몸, `mobs` 궁수 화살 · 시킨(자식 프로세스), `table` 일곱 보스의 `hzlog` 기록(직접 돌리거나 `--logs` 로 재사용: 패링 불가 패턴 = 판정 목록, 섬광 ≥ 20틱 전 · 바닥 위 1칸 이상 · 닷지 불가 / 장판에는 없음, 한 묶음 · 한 타격에 답 하나, 매 틱 닷지로 모두 피함, 연달아 닷지해야 하는 불가 타격의 간격, 그 지대 안에 세운 플레이어도 모두 판정 · 회피) |
 
+### 3-7. 전투 개편 검토 A 의 고침 (`cb/tests/`; 11-11, 가지 `wip/combat-fix-a`; `tools/dev/plan/combat/fa_progress.md`)
+`python3 test_cb.py <dp> [static input lock judge tiers dodge cool context energy cd bal boss near raiden readers fx bossloop cost]`
+(데이터팩 밖 사본에서; lane C 의 스위트에 더한 것). 틀이 달라진 점: 입력은 `rlk:tick` 의 앞 단계 줄(`#now` · `player/def/input` · `#dgOpen` · 상자 줄)을
+파일에서 읽어 그대로 실행하고(`prepass`), 모의기에 `rotate` · `kill` 의 결과 수 · `data merge` 의 Glowing · `x_rotation` · interaction 의 진짜 클릭
+자료(psim 은 엔티티 자료 검사를 모두 참으로 답해 눈앞 실드가 매 틱 "클릭"되었다)를 더했다. 실패가 삼켜지지 않게 `no_errors` 가 패링 · 닷지 함수의
+모의기 오류 목록을 본다.
+
+| 절 | 무엇 (검토 A 의 어느 것) |
+|---|---|
+| `input` | 진짜 F · 우클릭 경로, 누르고 있는 아이템 사용 우클릭(A-02), F + 우클릭 한 틱(A-08), 도장 없는 플레이어의 첫 닷지와 시작 자리 상자의 정리(A-07) |
+| `lock` | 헛누름 연속 12 / 24 / 36 / 48, 무시된 F 뒤 3틱, 1~2틱 연타는 한 번, 3~40틱 모든 주기와 불규칙 간격의 퍼펙트 창 비율 · 실제 타격 229번(리뷰어의 루프), 정당한 플레이(10~40틱 연쇄의 h − 1, 3틱 · 2틱 연속기의 모든 박자), 실수 하나의 값, 연타로 연속기 통과(A-01) |
+| `cool` | 닷지 재사용 대기 18 / 피하면 12(한 번만 돌려줌), 질주 2 = 14 / 10, 재사용 대기마다 누르는 닷지의 루프(A-12) |
+| `fx` | 만든 틱에 나이를 먹어도 효과가 제 길이(A-05), 잔상은 먼 청크로 옮겨진 뒤에만 kill(A-03) · 몸의 yaw(A-06), 덮개가 끝나는 틱의 조준점(A-09) |
+| `bal` | 퍼펙트 패링의 균형치는 적의 자리에서(B-05) |
+| `bossloop` | `bossloop_cb.py <dp> [보스 n]`(자식 프로세스; `hr/tests/lib` 의 azsim 을 읽기만 함): 실제 중간보스 전투의 월드 루프에 `rlk:tick` 의 앞 단계 줄과 `mboss/near_all` 줄을 넣어, 앞 단계가 매 틱 · 근접 재판정이 창이 열린 틱에만 돌고, 몸이 떠난 닷지가 근접 재판정으로 퍼펙트 닷지가 되며, 몸 표시가 매 틱 제자리로 돌아오는지(A-11) |
+
+실제 26.3 서버 탐침은 스위트 밖: `tools/dev/plan/combat/fa_probe/`(`probe.sh` · 탐침 팩 `rvp` · `parse.py`, 고치기 전 / 뒤 결과).
+
 ## 4. 균형 탐침 (`ar/review/bal/`, `ap/balance/azfair_core.py`)
 - `knfair5.py <dp> <mode> <policy> <dodge> <char> <seed> [n] [lv] [plv] [out.json]`: 아이템 없는 Lv15 플레이어 대 L18 보스,
   `mode` = `p1a` / `p1b` / `p2`(10만 체력 보스로 그 단계만 n틱) / `whole`(진짜 체력으로 끝까지), `policy` · `dodge` 는

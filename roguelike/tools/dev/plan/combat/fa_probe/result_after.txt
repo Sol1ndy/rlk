@@ -51,8 +51,8 @@ A-03 run 2 (the pack's own fx/pd ghost; per tick): t ghost-tagged, mannequins ta
   t11 ghost 0 mann 0 near 0 glow None pos None box 0
   t12 ghost 0 mann 0 near 0 glow None pos None box 0
   t13 ghost 0 mann 0 near 0 glow None pos None box 0
-A-07: {'dodged': 1, 'pdg': 1, 'dgKill': 535, 'box_later': 0, 'now': 532, 'now_later': 592, 'dgAt1': 532, 'dgAt0': 532, 'box0': 1, 'has_stamps': 0}
+A-07: {'dodged': 1, 'pdg': 1, 'dgKill': 511, 'box_later': 0, 'now': 508, 'now_later': 568, 'dgAt1': 508, 'dgAt0': 508, 'box0': 1, 'has_stamps': 0}
 A-02: {'dodges': 2, 'rcT_max': 40, 'fail_sound_ticks': 0}
 A-01: [(1, 1), (2, 1), (3, 7), (4, 7), (5, 7), (6, 7), (8, 7), (12, 7)]
 left at the end: any mannequin / any rlk_dgo box: ['failed', 'failed'] (failed = none left)
-tick: ['Average time per tick: 1.6ms (Target: 50.0ms)']
+tick: ['Average time per tick: 1.3ms (Target: 50.0ms)']
