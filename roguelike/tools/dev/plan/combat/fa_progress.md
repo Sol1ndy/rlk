@@ -143,7 +143,14 @@ A-12(닷지 재사용 대기 18 / 피하면 12)의 전 · 뒤는 아래 표의 A
   `perf_harness/test_lag` PASS, `pmeas` 기준 6522feef5 → 병합: late18 전투 평균 691 → 691 · 최대 6011 → 6017 · F 6틱 3 860 → 3 869 · 정리 5 438 → 5 444,
   small3 F 6틱 3 802 → 3 811(틱당 +1~2: 버린 닷지 기록 · 헛누름 계산), 스캔 수 같음(전투 400틱에 4 = 10초 대비);
   loadcheck `fa`(26.3: Starting … 26.3 · Done · 1870 advancements) 0 failure; 탐침 `merged` = 탐침 `new` 와 같은 결과(A-07 의 시각만 다름).
-  나머지(`test_scarlet` · `test_bal` · `test_bal_boss` · `test_special_hr` · `pat_p1` · `az run_all`)는 `outm/SUMMARY.txt`.
+  `test_scarlet` 통과 · `test_special_hr` 통과 · `pat_p1`(홍련) 통과 · `test_bal` 117/117 · `test_bal_boss` 129/129;
+  `az/tests_cm/run_all`: fix B 의 기록과 같은 상태 — `test_chapter` · `test_fw_az` · `test_fw_ap` · `gen_check` 통과, 알려진 실패
+  `test_m0diff` 38(A 틱당: proto +7.03 · 파수꾼 +6.16 · 나비 +7.27 · 역장 +7.76; fix B 는 +7.03 / +6.16 / +7.26 / +7.76), `test_px` 4e,
+  `ident` 10, 옮기지 않은 mb / mb2 / mb3 스위트 없음, vcheck 기준선 없음(환경). `test_m0diff` B 에 이 가지의 새 상수 다섯이 보여
+  NEW_FAKE 에 더함(다시 돌려 그 이름이 빠짐, 실패 수 38 그대로). 검사기를 fix B 병합(56147aaa4)과 비교: `check_macro` 3 475 = 3 475(BAD 줄
+  같음), `check_refs` 같음(함수 수 +5: 새 6 − rd_glint), `lint_mc` 53 000 = 53 000(줄까지 같음), `check_nbtpath` invalid 0.
+  리소스팩: 바뀌는 파일 없음 — `build_combat_fx.py --resourcepack` 의 출력 6개가 6522feef5 의 생성기 출력 · lane C 의 `rp_c` 와 바이트까지 같음
+  (`rplint` · 아틀라스는 해당 없음).
 
 ## 남은 것 / 넘긴 것
 - A-10 (f): `boss/azhdaha/brand/dodge.mcfunction` 첫 줄 주석은 `tools/mboss_azhdaha/**` 의 생성 출력 → FB 범위(고치지 않음).

@@ -74,8 +74,11 @@ NEW_FAKE = {'#atkSeq', '#auxResEl', '#auxResElV', '#buHpCol', '#buNoNum', '#c280
             '#npOk',         # fix lane FB (11-11, review B): the glint gate's answer (mboss/np_gate)
             # ... and its tunables set by rlk:load (README 3 「패링 · 닷지」)
             '#dashCoolBase', '#dgPW', '#dgLW', '#dgLooseC', '#dgEn', '#parW3', '#parW2', '#parW1', '#parGap', '#parRe',
-            '#parChain', '#parKeep2', '#parKeep1', '#parCut', '#npGap'}
-# fake-player scores of the base whose value changed on purpose: the dash's cooldown constant is now the dodge's (5 -> 12 t)
+            '#parChain', '#parKeep2', '#parKeep1', '#parCut', '#npGap',
+            # fix lane FA (11-11, review A-01 / A-12): the whiff streak's tunables and the cooldown after an avoided attack
+            '#parWsMax', '#parWsT', '#parWsClr', '#dashCoolHitBase', '#dashCoolHitT'}
+# fake-player scores of the base whose value changed on purpose: the dash's cooldown constant is now the dodge's (5 -> 12 t;
+# 18 t since fix lane FA: a dodge that avoided nothing)
 CHANGED_FAKE = {'#dashCoolT'}
 # ... and the ones lane C removed with the dash charges / gauge
 GONE_FAKE = {'#dashMaxBase', '#dashRegenBase', '#dashMax', '#dashRegenT', '#hudSeg', '#dashEngMax'}
