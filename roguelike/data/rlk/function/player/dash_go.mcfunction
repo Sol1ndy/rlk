@@ -2,6 +2,8 @@ execute if score @s pmActive matches 1 run function rlk:char/motion/finish
 # 실제 닷지 (@s = 플레이어, at @s = 몸): 시각 도장 + 효과 + 방향/이동. 무적 틱은 없다: 맞는 순간 player/def/judge 가
 # 지금 - dgAt 로 판정(퍼펙트 #dgPW 틱 미만 · 일반 몹 #dgLW 틱 미만). 시작한 자리에 판정용 표식(rlk_dgo, 퍼펙트 창 동안)
 function rlk:player/def/dodge_stamp
+# round V: 박자의 아바타 동작(마네킹 캐릭터의 대역 리그)은 다음 행동이 끊는다
+function rlk:player/def/beat/act
 # 진행 중인 평타는 취소(아직 안 들어간 타격 포함)하고, 다음 평타는 1타부터
 scoreboard players set @s comboStep 0
 scoreboard players set @s pmAtkPending 0

@@ -44,6 +44,9 @@ Run: python3 tools/build_mboss_ap_fx.py --resourcepack <unpacked RP> [--datapack
 API: scratchpad ap/ap_fx_api.md. Other generators `import build_mboss_ap_fx as K` (no files are written on import).
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -1521,7 +1524,7 @@ TETHER_N = 10
         'dust #D4E784, the wave flips phase every 2 t). At the 양육 orb, rotated facing the basic (pitch counts).',
         ('len',), tuple((f'z{k}', 'len', 0.1 * k / TETHER_N) for k in range(1, TETHER_N + 1)))
 def _p_tether():
-    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players set #wk4 mb 4',
+    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb', 'scoreboard players set #wk4 mb 4',
            'scoreboard players operation #wkPh mb = #wkNow mb', 'scoreboard players operation #wkPh mb %= #wk4 mb']
     for ph in (0, 1):
         sel = '..1' if ph == 0 else '2..'
@@ -1602,7 +1605,7 @@ def _p_heart_beam():
 
 @preset('gold_motes', 'Drifting gold motes over the phase-2 field (every 20 t). At the floor centre.')
 def _p_gold_motes():
-    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players set #wk3 mb 3',
+    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb', 'scoreboard players set #wk3 mb 3',
            'scoreboard players operation #wkPh mb = #wkNow mb', 'scoreboard players operation #wkPh mb %= #wk3 mb']
     rnd = RND(30)
     for v in range(3):
@@ -1754,7 +1757,7 @@ def _p_crouch_splash():
 @preset('whirl_leaves', 'Whirling leaves around the body (Q2 t18-36, every 3 t; the three positions rotate each call). '
         'At the body.')
 def _p_whirl_leaves():
-    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players set #wk3 mb 3',
+    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb', 'scoreboard players set #wk3 mb 3',
            'scoreboard players operation #wkPh mb = #wkNow mb', 'scoreboard players operation #wkPh mb %= #wk3 mb']
     for v in range(3):
         for k in range(3):
@@ -1806,7 +1809,7 @@ def _p_dome_rise():
 @preset('beam_rain', 'Falling light columns over the disc (Q2 t134-156, every 4 t; the three positions rotate each '
         'call). At the floor centre.')
 def _p_beam_rain():
-    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players set #wk3 mb 3',
+    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb', 'scoreboard players set #wk3 mb 3',
            'scoreboard players operation #wkPh mb = #wkNow mb', 'scoreboard players operation #wkPh mb %= #wk3 mb']
     rnd = RND(33)
     for v in range(3):
@@ -1983,7 +1986,7 @@ HELIX_STEPS = 8
 @preset('helix_trail', 'The double-helix ribbon behind a seed orb (Q5 t42-55, every tick; particles only): two sine '
         'strands, dust #E7F99F -> #8BCAAA, the phase turning 45 degrees a tick. At the orb, rotated as its flight.')
 def _p_helix_trail():
-    out = ['execute store result score #wkNow mb run time query gametime', f'scoreboard players set #wk8 mb {HELIX_STEPS}',
+    out = ['execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb', f'scoreboard players set #wk8 mb {HELIX_STEPS}',
            'scoreboard players operation #wkPh mb = #wkNow mb', 'scoreboard players operation #wkPh mb %= #wk8 mb']
     for k in range(HELIX_STEPS):
         t = 2 * math.pi * k / HELIX_STEPS
@@ -2170,7 +2173,7 @@ def engine(W):
         f'function {E}spawn with storage {STO} a',
         f'execute if score #wkTel mb matches {POOL_TELE} run tag {SEL}_new] add {TAG}_t',
         f'execute if score #wkTel mb matches {POOL_FLOOD} run tag {SEL}_new] add {TAG}_fl',
-        'execute store result score #wkNow mb run time query gametime',
+        'execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb',
         'scoreboard players add #wkNow mb 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -2215,9 +2218,11 @@ def engine(W):
         '# telegraph and flood cards (fx/clear; the phase-2 dressing pool stays). The dressing pool is never aged: its',
         '# ley strips pulse (their width breathes over 20 t).',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] if entity {SEL},tag=!{TAG}_d,limit=1] run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] if entity {SEL},tag=!{TAG}_d,limit=1] run function {FN}clear',
-        'execute store result score #wkNow mb run time query gametime',
+        'execute store result score #wkNow mb run time query gametime', 'scoreboard players operation #wkNow mb -= #btLag cb',
         f'execute as {SEL},tag=!{TAG}_d] run function {E}age',
         f'execute if score #wkDN mb matches 1.. run function {FN}dress/e/pulse',
         f'execute store result score #wkN mb if entity {SEL},tag=!{TAG}_t,tag=!{TAG}_d,tag=!{TAG}_fl]',
@@ -2861,7 +2866,7 @@ def props(W):
                              f'brightness:{{sky:15,block:{br}}},view_range:2f,shadow_radius:0f{tr}}}'])
     spin = ['# Internal (as a homing-wheel prop, from p/homing_trail every 2 t): roll it a quarter turn about the view axis',
             '# over 2 t (four phases of gametime), so the camera-facing wheel spins.',
-            'execute store result score #wkSp mb run time query gametime', 'scoreboard players set #wk8 mb 8',
+            'execute store result score #wkSp mb run time query gametime', 'scoreboard players operation #wkSp mb -= #btLag cb', 'scoreboard players set #wk8 mb 8',
             'scoreboard players operation #wkSp mb %= #wk8 mb']
     for k, q in enumerate(SPIN_Q):
         spin.append(f'execute if score #wkSp mb matches {2 * k}..{2 * k + 1} run data merge entity @s {{start_interpolation:0,'

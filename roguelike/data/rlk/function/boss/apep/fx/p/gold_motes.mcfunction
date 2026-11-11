@@ -3,6 +3,7 @@
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #wkN mb matches 40.. run return 0
 execute store result score #wkNow mb run time query gametime
+scoreboard players operation #wkNow mb -= #btLag cb
 scoreboard players set #wk3 mb 3
 scoreboard players operation #wkPh mb = #wkNow mb
 scoreboard players operation #wkPh mb %= #wk3 mb

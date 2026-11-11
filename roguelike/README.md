@@ -139,7 +139,8 @@
     없애면 옛 파일을 손으로 지운다.
   - 단 매니페스트를 바꾸는 생성기(리그 `.mjs`, 효과 킷, `build_mboss_cproto.py`)는 그것을 읽는 코어 · 모듈보다 먼저 돌린다(아니면
     `regen_all.sh` 를 한 번 더).
-  - 플레이어 리그 `build_player_rig.mjs`(+ locomotion; `char/motion/**`; 홍련 컷신 배우 `char/cine/**` 는 통째로 다시 씀) · 1챕터 몹 리그 `build_mobs.mjs` · `build_swordsman.mjs`
+  - 플레이어 리그 `build_player_rig.mjs`(+ locomotion; `char/motion/**`; 홍련 컷신 배우 `char/cine/**` 는 통째로 다시 씀; round V 의 박자 동작
+    `char/motion/beat/**` · 대역 리그 `char/motion/lite/**` · 클립 `pparry` / `pdodge` 는 `build_player_beat.mjs` 가 같은 실행에서) · 1챕터 몹 리그 `build_mobs.mjs` · `build_swordsman.mjs`
     (`cm/<몹>/` 포즈) · 2 · 3챕터 몹 리그 `.mjs` 는 덮어쓰기만 하고 낡은 파일을 지우지 않는다: 클립 · 모델 · 파트의 이름을 바꾸거나
     없애면 옛 파일을 손으로 지운다(리소스팩 쪽은 리소스팩 README 3절). 리소스팩 `items.json` 의 순서는 돌린 순서를 따른다(0-9).
 - **데이터팩**(레지스트리를 읽는 Python 생성기, 리소스팩 필요 없음): `bash roguelike/tools/dev/regen_all.sh roguelike [--mobs]` —
@@ -171,7 +172,7 @@
   #   build_rift.py, build_bossbar.py, build_minimap.py, build_navia_fx_cards.py, build_balance.py(균형치 글꼴 rlk:bal; 데이터팩 몫은 regen_all 이 돌림),
   #   build_combat_fx.py(패링 · 닷지 · 경고 섬광 글꼴 rlk:cb: RP font/cb.json + textures/font/cb/*.png, 데이터팩 player/def/fx/g/**)
   python3 tools/build_raiden_all.py --resourcepack $RP        # 나루카미 전부(데이터팩 + RP, 끝에 check_raiden_pack.py)
-  node tools/build_player_rig.mjs --datapack . --resourcepack $RP && python3 tools/build_player_audio.py   # 아바타 + 홍련 컷신 배우(build_player_cine.mjs)
+  node tools/build_player_rig.mjs --datapack . --resourcepack $RP && python3 tools/build_player_audio.py   # 아바타 + 홍련 컷신 배우(build_player_cine.mjs) + 박자의 동작 · 무기 빛(build_player_beat.mjs)
   node tools/build_mobs.mjs --datapack . --resourcepack $RP && node tools/build_swordsman.mjs --datapack . --resourcepack $RP
   node tools/build_ch2_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch2_elite_rigs.mjs --resourcepack $RP   # → build_ch2_mobs.py
   node tools/build_ch3_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch3_elite_rigs.mjs --resourcepack $RP   # → build_ch3_mobs.py
@@ -255,6 +256,9 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   - 텍스트 컴포넌트가 글리프 폰트를 상속하지 않게: 컴포넌트마다 `font` 를 적고, 글리프 뿌리 텍스트는 비우고 꾸미지 않으며, 킷 글꼴은
     끝에 `minecraft:default` 참조(10-14 보스바 숫자 · 10-21 배너 글자가 네모로 보였다).
   - 리소스 id 는 소문자 `[a-z0-9_.-/]` — 하나만 어겨도 클라이언트가 아틀라스 전체를 버린다(10-22e 텍스처가 모두 깨짐; `rplint`).
+  - 글꼴 비트맵의 셀(이미지 ÷ 글자 수)은 256 × 256 px 이하 — 넘으면 그 글리프만 말없이 네모 상자가 된다(11-11b 패링 줄; `rplint`).
+  - 디스플레이 엔티티의 NBT 를 쓰면(`data merge / modify`) 클라이언트가 그 디스플레이의 보간을 처음부터 다시 돌린다(자세가 한 번 튐): 자세를
+    주는 틱에 함께 쓰거나, 같은 쓰기에 그림자 세기 같은 그리기 속성을 바꿔 넣는다(3절 「박자」, round V).
   - 바닥 아래로 아무것도 안 내려가고, 블록 속으로 텔레포트 금지(목적지는 `mv/ok` · 안전 바닥 검사; 리그 생성기가 매 틱 검사).
   - 손에 든 소품은 옆에서 봐도 올바른 방향(10-29c 창 · 북채).
   - 큰 휘두르기는 키를 촘촘히(보간은 가까운 쪽으로 돌아 휘두르기가 찌르기처럼 보인다: 10-22 만겁).
@@ -409,7 +413,7 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   (`ch2/tests_a|b` · `ch3/tests_a|b`)은 옮기지 않았으니 같은 짜임으로 새로 쓴다.
 
 ### 0-8. 시험 도구
-- `tools/dev/`(zip 에 안 들어감): `loadcheck.sh`(실제 서버 로드), `rplint.py`(리소스팩 린트), `regen_all.sh`(데이터팩 재생성),
+- `tools/dev/`(zip 에 안 들어감): `loadcheck.sh`(실제 서버 로드), `rplint.py`(리소스팩 린트: 경로 · JSON · 아틀라스 · 글꼴 셀 256 px), `regen_all.sh`(데이터팩 재생성),
   `atlas_px.py`(아틀라스 크기), `sim/`(모의기 · 스위트 · 균형 탐침 · 그림 도구 · 계획 · 계약 문서; 파일마다의 설명과 옛 경로 처리는
   `tools/dev/sim/README.md`). **스위트는 저장소의 `tools/dev/sim` 에서 바로 돌리지 않는다**: sim README 1절대로 데이터팩 밖(옛
   스크래치패드 경로나 `<작업>`)에 사본을 두고 거기서 돌린다(시험하는 `roguelike/` 안에서 돌리면 변형 트리가 자기 `tmp/` 까지 복사하며
@@ -796,6 +800,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 | `#parGap` / `#parRe` / `#parChain` | 받은 F 뒤 다시 받지 않는 틱 / 그동안 또 누르면 늘어나는 틱 / 패링이 된 뒤의 틱 | 12 / 4 / 2 |
 | `#parKeep2` / `#parKeep1` / `#parCut` | 2단계 · 1단계가 남기는 피해(%) / 퍼펙트 패링의 원소전투 스킬 재사용 대기 감소(틱) | 20 / 50 / 20 |
 | `#npGap` | 패링 불가 공격의 경고 섬광을 다시 띄우지 않는 틱 | 10 |
+| `#btOn` | 퍼펙트 패링 · 퍼펙트 닷지의 박자: 1 = 세계를 멈추고 / 늦춘다, 0 = 효과만(3절 「박자」) | 1 |
 | `#hudHoldT` | 다른 액션바 안내가 뜰 때 HUD 를 멈추는 시간(틱) | 40 (2초) |
 | `#comboD12` / `#comboD21` | 콤보 딜레이 1타→2타 / 2타→1타 (공속 100% 기준 틱×100) | 600 / 1000 |
 | `#lvHp0` / `#lvHpUp` | 1레벨 기초 체력 / 레벨당 증가 | 100 / 12 |
@@ -920,23 +925,52 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   (두 명 태그 · 청크가 안 불림 · 서버가 멈춤) 지울 때까지 매 틱, `#dgBox cb`)를 몸으로도 판정한다(`player/def/ghost_on` · `ghost_off`: 태그 `rlk_body` 를 잠깐
   옮김): 커스텀 몹(`cm/world` · `cm/pj/world` 동안 통째로), 보스의 위험 지대 · 투사체(`rlk:tick` 이 `mboss/main` 바로 뒤에, 창 안 · 싸움 중 · 멈춤 아님일 때만
   `mboss/near_all` → 활성 지대 `hz/near` · 움직인 뒤의 투사체 `pj/near`; 틀의 틱 비용은 그대로), 나루카미(`hazard/try_near`). 그 자리에 닿은 공격은 창 안이므로 언제나 퍼펙트 닷지다(피해 없음). 닷지 불가 공격은 다시 판정하지 않는다.
-- **효과**(바닐라 소리, 글리프는 리소스팩 글꼴 `rlk:cb` U+EE00~EE04, `tools/build_combat_fx.py`). 효과 엔티티의 나이(`player/def/fx/world`,
-  `rlk:tick` 의 뒤쪽)는 만든 틱에도 한 번 먹으므로 남은 틱 `cb` 는 한 틱 더한 값으로 시작한다(별빛 6 · 번개 11 · 화면 튐 3 · 잔상 9 · 경고 섬광 6):
-  - 3단계: 접점(아바타 가슴에서 적 쪽 0.55칸)에 금백색 별빛(글리프 `star`, text_display: 만든 틱은 그대로, 다음 틱부터 2틱 커졌다 2틱 사라짐) · 금빛
-    섬광 · 불꽃, 화면을 가로지르는 가는 금주황 줄(제목 덮개 `streak`, 6틱), 발밑을 기어가는 노란 번개 10틱, 화면이 짧게 튐(막은 틱에 시점
-    1.5도, 다음 틱에 되돌림; 거의 똑바로 올려다볼 때는 좌우로만 — 위아래는 끝에서 잘려 1도 어긋나므로). 서버를 멈추거나 느리게 하지 않는다.
-    소리: 모루 · 삼지창 · 자수정 울림.
-  - 2단계: 작은 별빛 · 금빛 번쩍임, 화면 가운데 짧은 줄(`streak_s`, 4틱). 소리: 방패 막기 · 치명타. 1단계: 접점의 작은 금빛 불꽃만, 낮은 방패 막기 소리.
-  - 퍼펙트 닷지: 화면에 붉은 주황빛(`wash`, 10틱), 시작한 자리에 아바타의 붉은 잔상(지금 캐릭터 모습의 투명 · 빛나는 마네킹 = 붉은 테두리, 팀
-    `rlk_cbred`, 몸이 보던 쪽을 봄, 8틱) · 붉은 섬광 · 먼지. 소리: 환술사의 거울 이동 · 브리즈 미끄러짐 · 자수정 차임.
-    잔상은 살아 있는 엔티티라 `kill` 하면 클라이언트가 20틱의 사망 동작(쓰러지는 붉은 테두리)과 연기를 보여 준다(실제 26.3 서버로 확인, 리뷰
-    A-03). 그래서 8틱째에 테두리를 끄고(`Glowing:0b`) 지도 방이 있는 먼 고정 청크(1000000.5 400 1000000.5)로 옮긴 뒤 다음 틱에 거기서 지운다
-    (`player/def/fx/ghost_out`; 추적 범위를 벗어난 엔티티는 클라이언트에서 그 틱에 바로 사라진다). 앞선 잔상이 남아 있을 때도 같은 길.
-  - 제목 덮개는 다른 큰 제목(`vBig`: 보스 킷의 덮개)이나 아랫줄 글(`ttlT`: 대사 · 안내)이 떠 있으면 생략한다(그 글의 시간이 바뀌지 않게).
-    덮개가 끝나는 틱(`vBig` 가 0 이 되는 틱)에 F5 조준점을 바로 다시 보낸다(`view/tick` 이 `#xh view` 를 9 로; 전에는 10틱 주기를 기다려 최대
-    9틱 늦었다, A-09).
-  - 가드 자세(F 를 받은 순간): 리그 캐릭터(아를레키노 · 스커크 · 나비아)는 `guard` 클립(`tools/player_motion/<캐릭터>/guard.json`: physical_1 의 준비 ·
-    든 자세를 4틱 유지, `char/motion/guard`), 마네킹 캐릭터는 왼손 휘두르기. 진행 중인 평타는 대쉬 때처럼 끊긴다.
+- **효과**(round V 에서 다시 만듦 — 원작 영상 `tools/dev/plan/combat/review/v/ref_pd.md` 의 틱 표대로; 바닐라 소리, 글리프는 리소스팩 글꼴
+  `rlk:cb` U+EE00~EE0D, `tools/build_combat_fx.py`). 효과 엔티티의 나이(`player/def/fx/world`, `rlk:tick` 의 뒤쪽)는 만든 틱에도 한 번 먹으므로
+  남은 틱 `cb` 는 한 틱 더한 값으로 시작한다(별빛 6 · 작은 불꽃 4 · 터짐 4 · 번개 3 · 잔상 9 · 경고 섬광 6). **큰 연출은 퍼펙트 패링 · 퍼펙트 닷지에만** 있다
+  (11-11b 판은 2단계 패링도 같은 별빛 · 화면 번쩍임이라 「막았는데 왜 실드가 안 깨졌나」를 알 수 없었다):
+  - **1 · 2단계 패링 = 원작의 일반 가드**: 접점에 작은 연노랑 불꽃 하나(글리프 `spark`, 0.3칸 / 0.45칸, 3틱)와 불티 몇 개, 가늘고 짧은 "틱"
+    (`block.chain.hit`). 멈춤 · 가로 줄 · 화면 빛 · 별빛 · 섬광 입자 없음.
+  - **3단계(퍼펙트) 패링**(`fx/p3` → `beat/start_p`; 실제 틱, 0 = 맞은 틱): 0 접점의 불티와 쨍(모루 · 삼지창) · **무기가 노랗게 빛나기 시작** · 쳐내는 동작
+    → 1 멈춤 → 2 쳐낸 자세(런지: 앞무릎 굽힘 · 뒷다리 뻗음 · 칼 든 팔을 머리 위로)로 얼어붙고 공격자는 뒤로 젖혀짐 · 접점(머리 높이, 적 쪽 0.65칸)에
+    별빛(글리프 `star` 1.3칸, 속 `#FDF7D4` · 살 `#F5C058`) · 화면을 가로지르는 가는 줄 + 따뜻한 빛(제목 덮개 `parry`: `tint` + `streak_0..3`) · 밝은
+    울림(자수정 · 종) · 시야가 5 % 당겨짐 → 3~5 그대로 → 6 **한 틱에 제 속도로 풀림**: 별빛이 불꽃 줄기로 깨져 날아가고 시야가 돌아옴 → 7~15 공격자
+    위를 기는 가는 흰노랑 번개(글리프 `bolt_1..3` 열두 모양) → 12 무기의 빛이 꺼짐. 시점은 건드리지 않는다(11-11b 의 1.5도 튐은 없앰).
+  - **퍼펙트 닷지**(`fx/pd` → `beat/start_d`): 0 닷지를 시작한 자리에 흰 테두리 잔상 · 붉은 분홍 터짐(`burst`) · 낮은 붐, 화면 가장자리가 어두워짐(제목 덮개
+    `vig`, 2 + 12 + 3틱; 색과 무관하게 어두워지는 테두리라 붉은 2페이즈 꽃밭에서도 읽힌다) · 아바타에 붉은 분홍 기운(스킨 색조 + 최대 밝기 + 분홍
+    테두리) → 1 멈춤 한 틱 → 2~5 제 속도(닷지 이동이 끝남) → 5 몸을 세우고 두 팔을 듦 → 6~14 **느린 화면 ×1/3**(뒤로 휘며 버팀) → 14~21 **백
+    핸드스프링**(뒤로 360도, 정점에서 거꾸로 서 다리를 앞뒤로 벌림, 적을 보고 T 자로 착지; 닷지의 이동은 게임의 대쉬 그대로이고 이 동작은 제자리에서)
+    → 21 붉은 기운이 걷힘 → 22~26 낮은 준비 자세. 몸 둘레에 분홍 불티 · 꽃잎(1~20). 잔상은 살아 있는 엔티티라 `kill` 하면 클라이언트가 20틱의 사망
+    동작과 연기를 보여 준다(리뷰 A-03): 8틱째에 테두리를 끄고 먼 고정 청크로 옮긴 뒤 다음 틱에 거기서 지운다(`player/def/fx/ghost_out`).
+  - **무기의 빛**(사용자 「패링은 검에서 노란 빛」): 무기 모델 자체가 빛난다 — 리그 무기 7종은 `<모델>_glow`(그 모델의 요소 + 같은 요소로 만든
+    노란흰색 발광 껍질, 최대 밝기), 마네킹 캐릭터의 바닐라 검은 `rlk:player_motion/wg/<검>`(바닐라 모델 + 칼날을 따라가는 발광 카드), 법구 캐릭터
+    (로노바 · 네페르)는 대역 리그의 손에 빛(`wg/orb`) + 떠 있는 법구에 노란 테두리(`char/motion/beat/wglow_on` · `wglow_off`).
+  - **아바타 동작**: 클립 `pparry`(16틱) · `pdodge`(21틱; `tools/player_motion/beat/clips.json` 한 벌 → `tools/build_player_beat.mjs`). 리그 캐릭터
+    (아를레키노 · 스커크 · 나비아)는 자기 리그의 클립(둘째 무기 상태는 `_i`), 마네킹 캐릭터(루미네 · 클로린드 · 로노바 · 네페르)는 그동안 마네킹을
+    숨기고 **대역 리그**(`char/motion/lite/**`: 홍련 컷신 배우의 부품 모델 + 마네킹이 든 무기)가 같은 동작을 한다. 움직임을 잠그지 않는다: 플레이어의
+    다음 행동(받은 F · 닷지 · 평타 · 스킬 / 폭발)이 끊는다(리그 캐릭터는 새 클립이, 대역 리그는 `player/def/beat/act` 가).
+  - 제목 덮개는 다른 큰 제목(`vBig`)이나 아랫줄 글(`ttlT`)이 떠 있으면 생략한다. 덮개가 끝나는 틱에 F5 조준점을 바로 다시 보낸다(A-09).
+  - 가드 자세(F 를 받은 순간): 리그 캐릭터는 `guard` 클립, 마네킹 캐릭터는 왼손 휘두르기. 진행 중인 평타는 대쉬 때처럼 끊긴다.
+  - 글꼴 셀은 모두 256 px 이하다: 클라이언트의 글리프 아틀라스가 256 × 256 이라 더 큰 셀은 **말없이 네모 상자**가 된다(11-11b 의 `streak` 512 × 288 =
+    사용자가 본 「타이틀에 네모 박스」; `review/v/client_facts.md` 7). 넓은 것은 조각 글리프를 −1 공백으로 이어 붙인다. `rplint` 가 모든 글꼴에서 잡는다.
+- **박자(beat) — 퍼펙트 패링의 멈춤과 퍼펙트 닷지의 느린 화면**(round V, `player/def/beat/**`; `tick rate` 는 싱글 플레이의 함수에서 쓸 수 없어
+  게임 안에서 만든다. 기록 · 시계 목록 · 증명은 `tools/dev/plan/combat/vp_progress.md`):
+  - 박자가 **세계를 멈춘 틱**(`#btHold cb 1`)에는 적 쪽이 한 틱도 가지 않는다: 레지스트리 보스 전부(`mboss/main` 의 첫 줄 — 모듈 AI · 패턴 시계 ·
+    리그 · `mv` · 위험 지대 · 투사체 · 끌어당기기 · 보스바 · 대사), 커스텀 몹과 그 투사체(`cm/world` · `cm/pj/world` 의 첫 줄), 나루카미(`rlk:tick` 의
+    한 줄), 모든 몹의 경직 · 균형치 · 원소 타이머(`mob/tick` 의 세 줄), 스스로 걷는 몹(멈추는 틱에 `NoAI`, 풀리는 틱에 되돌림), 보스 효과 킷
+    6종의 시계(`gametime − #btLag`), 그리고 **플레이어에게 불리하게 세는 것**(닷지 재사용 대기, F 잠금 · 헛누름 사다리 · 패링 / 닷지 창 = 전투 시계).
+    시간표: 퍼펙트 패링 = 맞은 뒤 1~5틱 멈춤(늘어난 길이 N = 5), 퍼펙트 닷지 = 1틱 멈춤 → 4틱 제 속도 → 9틱 동안 세 틱에 한 번(N = 7).
+  - **전투 시계** `#now cb` = gametime − 지금까지 멈춘 틱 = 「다음에 도는 세계 틱의 번호」. 패링 · 닷지의 모든 도장과 물음(`q_pf0` · `q_pf1`)이 이 시계라
+    **창 · 잠금 · 재사용 대기 · 건틀릿은 멈추지 않은 세계의 틱 수로 예전 그대로**다. 멈춘 동안 누른 F · 닷지는 세계가 풀리는 틱에 누른 것으로
+    친다(입력을 잃지 않는다). 박자 뒤의 모든 일은 정확히 N틱 뒤에 일어난다.
+  - 박자 동안(패링 1~5틱, 닷지 1~14틱) **플레이어는 맞지 않는다**(`judge2` 3-1 · `player/hurt_elem` · `mboss/pl_dot2`; 퍼펙트로 받아낸 것은 그대로
+    그 답이고 새 박자를 연다). 판정을 거치지 않는 즉사기(홍련 `ult/fatal` 등)는 그대로다.
+  - 느린 화면에서 리그가 끊겨 보이지 않게 세계 쪽 디스플레이의 보간 길이(`interpolation_duration` · `teleport_duration`)를 3배로 늘였다가 되돌린다
+    (`beat/st/*`; 디스플레이 NBT 를 쓰면 클라이언트가 보간을 다시 시작하므로 같은 쓰기에 그림자 세기를 조금 바꿔 「지금 보이는 자세에서 이어서」가 되게 한다).
+  - 공격자가 뒤로 젖혀지는 반응은 어느 리그에나 듣는 기본형(발밑 한 점에 모인 부품을 16도 기울이고 0.2칸 물림: 아를레키노 · 타키 · 홍련 · 나루카미 ·
+    커스텀 몹)이고, 보스 모듈은 레지스트리 `"beat": 1` + `<모듈>/beat_parried` · `beat_release` 로 자기 자세를 줄 수 있다(`mboss/d/beat_*`).
+  - 끝: 제 시간(패링 17틱 · 닷지 27틱), 다음 박자, 그리고 사망 · 부활 대기 · 선택 공간 · 지도 · 연출(`#mbCine` · 카메라 잠금) · 플레이어 없음 · `/reload` —
+    어느 길이든 `beat/end` 가 멈춘 것 · 기울인 것 · 늘인 것을 모두 되돌린다. `#btOn tmp 0` 이면 세계를 멈추지 않고 효과만(11-11b 의 시계 그대로).
 - **패링 불가 공격**(사용자 결정 11-10: 보스의 일부 큰 공격만 — 범위 공격 · 잡기; 11-11 검토 B 뒤 고침): 보스 틀의 위험 지대는 `#hzNoParry`
   (한 번 쓰는 옵션, `L.hz_opts(noparry=)`)가 없으면 기본 규칙 `mboss/hz/np_def` 로 정한다 — **성질상 패링으로 답할 수 없는 것만** 패링 불가:
   닷지 불가(`#hzNoDodge`: 점프 · 안전한 원 · 자리로 피하는 기믹) · 최대 체력 ‰(`#hzPm`) · 다시 맞기(`#hzRearm`: 남는 장판 · 광선) · 경기장 전체(종류 5) ·
@@ -982,11 +1016,13 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   패링 포함)뿐 아니라 **퍼펙트 패링 · 퍼펙트 닷지**로 받아낸 한 번도 묶음을 끈다 — 한 틱씩 이어지는 쐐기로 만든 휘두르기(아펩 꼬리)나 시차를 둔
   탄막의 다음 것이, 입력이 이미 쓰인 다음 틱에 맞지 않는다(예전에는 가장 잘 받아낸 퍼펙트가 가장 나쁜 결과였다). 원소폭발 · 부활 · 추락의 무적으로
   넘긴 것은 묶음을 끄지 않는다. 맞았을 때만 생기는 것(역장의 판석 `#fq6SH`, 생명의 계약 `#mbHitBol`, 나루카미의 악의 +60)은 그대로 맞았을 때만이다.
-- **조절 지점**(`load`): `#dgPW` `#dgLW` `#dgLooseC` `#dgEn` `#dashCoolBase` `#dashCoolHitBase` · `#parW3` `#parW2` `#parW1` `#parGap` `#parWsMax`
+- **조절 지점**(`load`): `#btOn`(박자) · `#dgPW` `#dgLW` `#dgLooseC` `#dgEn` `#dashCoolBase` `#dashCoolHitBase` · `#parW3` `#parW2` `#parW1` `#parGap` `#parWsMax`
   `#parWsT` `#parWsClr` `#parRe` `#parChain` `#parKeep2` `#parKeep1` `#parCut` · `#npGap`.
 - 시험: `tools/dev/sim/cb/tests/test_cb.py`(0-8; 묶음 `lock` = 헛누름 · 연타와 정당한 플레이, `cool` = 닷지 재사용 대기, `bossloop` =
   `bossloop_cb.py`: 실제 중간보스 전투의 월드 루프에서 `rlk:tick` 의 입력 앞 단계와 `mboss/near_all` 줄을 그대로 돌림) · `test_np.py`(검토 B: 패링 불가 규칙 ·
-  경고 섬광 · 묶음의 답, 0-8).
+  경고 섬광 · 묶음의 답, 0-8). round V: `test_cb` 의 `fx` 를 새 연출로, 묶음 `beat`(박자의 시간표 · 전투 시계 · 켠 것과 끈 것의 일치 ·
+  맞지 않음 · 연속 박자 · 모든 끝) · `beatloop_cb.py`(실제 중간보스 전투가 박자를 켜도 세계 틱 단위로 똑같음) · 그 둘만 돌리는 `test_beat.py`; 그림 도구
+  `tools/dev/sim/cb/fx_sheet.py`(글리프 덮개를 화면 프레임 위에) · `beat_sheet.py`(아바타 클립을 매 틱 옆 · 뒤에서; `build_player_rig.mjs --beat-debug-dp`).
 
 ### 균형치 · 그로기 (`bal/`, 생성기 `tools/build_balance.py`; 전투 개편 B)
 모든 적에게 **균형치**(노란 마름모)가 있다. 다 깎이면 **그로기**: 몇 초 동안 행동 불능 + 받는 피해 증가, 끝나면 다시 가득 찬다.
@@ -1390,6 +1426,9 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
   사이드바 줄 정리). 로노바 · 클로린드가 쓰는 투사체 틀(`char/bow/arrow_*` · `assist` · `calc`)과 원거리 타격 표시 `#bowHit` 는 이름 그대로 남겼다.
   리소스팩의 그녀 몫(스킨 `skin/yoimiya`, 모델 `rlk:bow_pull_0~2` · `rlk:h/bow` · `rlk:h/bow_pull_0~2`)은 다음 RP 릴리스에서 지운다.
 - 캐릭터마다 무기 타입(`weaponType`) 하나가 고정입니다: 한손검 `sword`(루미네 · 스커크 · 클로린드) / 장병기 `polearm`(아를레키노) / 양손검 `claymore`(나비아) / 법구 `catalyst`(로노바) / `kick`(네페르: 무기 이름은 법구지만 발차기). `char/load_cur` 가 이를 `#wType`(`catalyst` 3 · 나머지 1; 2 는 없앤 활)으로 바꾸고 `combat/on_attack` 이 평타를 나눕니다: 1 은 근접 틀 `combat/find`(스커크 · 아를레키노 · 나비아는 리그 동작 `char/motion/combat/request`, 나머지는 `combat/find_immediate` — 네페르의 발차기 · 환영극도 그 안에서 갈라짐; 클로린드는 `#clShoot 1` 인 동안 `char/clorinde/auto_toggle`), 3 은 `char/ronova/na`.
+- 아바타가 그려지는 방식: 아를레키노 · 스커크 · 나비아는 디스플레이 리그(`char/motion/**`, 클립 · 이동 자세), 루미네 · 클로린드 · 로노바 · 네페르는
+  마네킹(`rlk_av`, `/swing`). 퍼펙트 패링 · 퍼펙트 닷지의 동작(`pparry` · `pdodge`)은 일곱 명 모두 같다: 리그 캐릭터는 자기 클립, 마네킹 캐릭터는 그동안만
+  서는 대역 리그(`char/motion/lite/**`; 3절 「효과」 · 「박자」).
 - 인벤토리 0번 칸 = 캐릭터 정보(플레이어 머리, 캐릭터 스킨). 핫바 1번 = 원소전투 스킬, 2번 = 원소폭발.
 - **원소전투 스킬**: 재사용 대기로 동작. 대기 중에는 아이템이 회색 염료로 바뀌고 개수 = 남은 초.
 - **원소폭발**: 원소 에너지가 필요량만큼 차야 사용(사용하면 0). 아이템 이름 = `(이름) - [|||||||||||||||] 40/60pt`, 가득 차면 반짝임.

@@ -2,6 +2,7 @@
 # Internal (as a homing-wheel prop, from p/homing_trail every 2 t): roll it a quarter turn about the view axis
 # over 2 t (four phases of gametime), so the camera-facing wheel spins.
 execute store result score #wkSp mb run time query gametime
+scoreboard players operation #wkSp mb -= #btLag cb
 scoreboard players set #wk8 mb 8
 scoreboard players operation #wkSp mb %= #wk8 mb
 execute if score #wkSp mb matches 0..1 run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{left_rotation:[0f,0f,0f,1f]}}

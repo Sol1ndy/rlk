@@ -5,6 +5,7 @@
 # 시각 도장이 없는 플레이어(전투 개편 전 저장)의 첫 닷지: 도장을 쓰기 전에 비운다(판정이 나중에 비우면 이 닷지가 지워진다)
 execute unless score @s parHit matches -2147483648.. run function rlk:player/def/reset
 execute store result score #now cb run time query gametime
+scoreboard players operation #now cb -= #btAdj cb
 scoreboard players operation @s dgAt = #now cb
 scoreboard players operation #dgEnd cb = #now cb
 scoreboard players operation #dgEnd cb += #dgPW tmp

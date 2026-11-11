@@ -7,6 +7,7 @@ scoreboard players operation #fgBanF mb = #fgFN mb
 scoreboard players set #fgLowG mb 1
 function rlk:mboss/fieldgen/fx/hud/banner_field
 execute store result score #fgBanG mb run time query gametime
+scoreboard players operation #fgBanG mb -= #btAdj cb
 function rlk:mboss/fieldgen/fx/hud/lowg_on
 function rlk:mboss/line/say {t:"중력이 감소하고 점프 능력이 향상됩니다",c:"#D9C8FF",gap:1,hold:50,snd:1}
 function rlk:mboss/fieldgen/seq_f/banner

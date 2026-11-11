@@ -11,6 +11,7 @@ scoreboard players add #t cb 1
 scoreboard players operation #t cb *= #parGap tmp
 scoreboard players operation @s parLk = #now cb
 scoreboard players operation @s parLk += #t cb
+function rlk:player/def/beat/act
 execute if score @s pmActive matches 1 run function rlk:char/motion/finish
 scoreboard players set @s comboStep 0
 scoreboard players set @s pmAtkPending 0

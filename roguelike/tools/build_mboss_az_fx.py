@@ -40,6 +40,9 @@ API: scratchpad az/az_fx_api.md (= tools-side copy). Other generators `import bu
 written on import).
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -2080,7 +2083,7 @@ def engine(W):
         f'function {E}spawn with storage {STO} a',
         f'execute if score #akTel mb matches 1 run tag {SEL}_new] add {TAG}_t',
         f'execute if score #akTel mb matches 2 run tag {SEL}_new] add {TAG}_fp',
-        'execute store result score #akNow mb run time query gametime',
+        'execute store result score #akNow mb run time query gametime', 'scoreboard players operation #akNow mb -= #btLag cb',
         'scoreboard players add #akNow mb 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -2095,7 +2098,7 @@ def engine(W):
         'scoreboard players add #akN mb 1',
         f'$function {E}spawn {{kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:"$(s0)",s1:"$(s1)",z:"$(z)",off:"$(off)",'
         'move:"$(move)",col:$(col),col2:$(col2),ax:"$(ax)",rr:"$(rr)",sr:"$(sr)",d:$(d),f:$(f),' + DEF_A + '}',
-        'execute store result score #akNow mb run time query gametime',
+        'execute store result score #akNow mb run time query gametime', 'scoreboard players operation #akNow mb -= #btLag cb',
         'scoreboard players add #akNow mb 1',
         f'$execute as {SEL}_new,limit=1] run function {E}bornf {{dly:$(dly),life:$(life),fade:$(f),h1:$(h1),tsh:"$(tsh)",'
         'tfd:"$(tfd)",thit:"$(thit)"}',
@@ -2159,9 +2162,11 @@ def engine(W):
         '# the end of the server tick; no hook in rlk:tick). A dead or reviving player clears them (fields too: the',
         '# module redraws its field table on resume). Safe-circle beams (tele/safe_beam) emit every 2 t.',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run return run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run return run function {FN}clear',
-        'execute store result score #akNow mb run time query gametime',
+        'execute store result score #akNow mb run time query gametime', 'scoreboard players operation #akNow mb -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute store result score #akN mb if entity {SEL},tag=!{TAG}_t,tag=!{TAG}_fp]',
         f'execute store result score #akTN mb if entity {SEL}_t]',
@@ -2770,7 +2775,7 @@ def telegraphs(W):
         f'execute store result storage {STO} w.d int 1 run scoreboard players get #akTd mb',
         '$data modify storage ' + STO + ' w.id set value $(id)',
         '# the new end of life: now + dur + hold + 1',
-        'execute store result score #akWl mb run time query gametime',
+        'execute store result score #akWl mb run time query gametime', 'scoreboard players operation #akWl mb -= #btLag cb',
         'scoreboard players add #akWl mb 2', 'scoreboard players operation #akWl mb += #akTd mb',
         '$scoreboard players operation #akWl mb += #akWh$(id) mb',
         f'function {T}wave_to with storage {STO} w',

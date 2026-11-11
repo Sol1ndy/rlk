@@ -1,4 +1,7 @@
 # @s = player (modelled on F:player/hurt_elem).
+
+# VP beat: untouchable for the beat
+execute if score #btInv cb matches 1 run return 0
 scoreboard players operation #mbDI mb = @s dashInvT
 scoreboard players set @s dashInvT 0
 scoreboard players operation #dmgIn tmp = @s maxHealth

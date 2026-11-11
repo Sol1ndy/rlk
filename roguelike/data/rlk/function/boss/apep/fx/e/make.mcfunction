@@ -33,6 +33,7 @@ function rlk:boss/apep/fx/e/spawn with storage rlk:apkit a
 execute if score #wkTel mb matches 1 run tag @e[type=minecraft:item_display,tag=rlk_wk_new] add rlk_wk_t
 execute if score #wkTel mb matches 3 run tag @e[type=minecraft:item_display,tag=rlk_wk_new] add rlk_wk_fl
 execute store result score #wkNow mb run time query gametime
+scoreboard players operation #wkNow mb -= #btLag cb
 scoreboard players add #wkNow mb 1
 execute as @e[type=minecraft:item_display,tag=rlk_wk_new,limit=1] run function rlk:boss/apep/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_wk_new] remove rlk_wk_new

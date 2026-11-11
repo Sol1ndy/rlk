@@ -15,6 +15,11 @@ execute if score #pcount tmp matches 2.. run return 0
 # 전투 개편 C: 입력 앞 단계. 이번 틱의 모든 피격(아바타의 바닐라 피격 · 커스텀 몹 · 나루카미 · 중간보스)보다 먼저 F(패링)와
 # 우클릭(닷지)을 받고, 이번 틱의 gametime(#now cb)과 퍼펙트 닷지 창(#dgOpen cb)을 정한다(player/def/input)
 execute store result score #now cb run time query gametime
+# round V (lane VP): 퍼펙트 패링 · 퍼펙트 닷지의 박자(player/def/beat/*). 박자가 도는 동안(#btK cb)만 그 시계가 이번 틱을 정한다: 세계를 멈춘
+# 틱(#btHold cb 1)에는 아래의 적 쪽 줄들(몹의 타이머 · 커스텀 몹 · 나루카미 · 중간보스 · 근접 재판정)과 닷지 재사용 대기가 돌지 않는다.
+# #now cb = 전투 시계 = gametime − 지금까지 멈춘 틱(#btAdj cb): 창 · 잠금 · 재사용 대기는 멈추지 않은 세계의 틱 수로 센다
+execute if score #btK cb matches 1.. run function rlk:player/def/beat/clock
+scoreboard players operation #now cb -= #btAdj cb
 execute as @a[tag=player] at @s run function rlk:player/def/input
 execute store success score #dgOpen cb if score #now cb <= #dgEnd cb
 # 창이 끝난 다음 틱에 시작 자리 상자를 지운다(그 틱을 놓쳤어도 지울 때까지: player/def/box_end)
@@ -62,7 +67,7 @@ execute if entity @e[tag=rlk_cmp,limit=1] run function rlk:cm/pj/world
 execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_off
 execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
 # Narukami boss AI, telegraphs, combat objects and orphan cleanup.
-execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
+execute unless score #btHold cb matches 1 if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
 execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux,limit=1] run function rlk:boss/raiden/cleanup
 # 보스바는 서버 전체에 남으므로, 불러와진 나루카미가 없으면(런 종료·로비 복귀·청크 밖) 바로 숨긴다
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
@@ -75,7 +80,7 @@ execute if score #mbLive mb matches 1 run function rlk:mboss/main
 execute if score #mbCam mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/cam/hold
 execute unless score #mbCam mb matches 1 as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 # 전투 개편 C: 퍼펙트 닷지 창 동안 보스의 위험 지대 · 투사체를 닷지를 시작한 자리에서 한 번 더 판정(mboss/near_all; 몸이 이미 빠져나간 퍼펙트 닷지)
-execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 run function rlk:mboss/near_all
+execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 unless score #btHold cb matches 1 run function rlk:mboss/near_all
 execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
@@ -92,6 +97,8 @@ execute as @e[tag=rlk_jav] at @s run function rlk:char/lumine/jav_tick
 function rlk:fx/nv/world
 # 전투 개편 C: 패링 · 닷지 · 경고 섬광 효과의 나이(player/def/fx/world)
 execute if entity @e[tag=rlk_cb_fx,limit=1] run function rlk:player/def/fx/world
+# round V: 박자가 도는 동안의 뒤쪽 일(마네킹 캐릭터의 대역 리그, 느린 화면의 디스플레이 보간 늘이기; player/def/beat/post)
+execute if score #btK cb matches 1.. run function rlk:player/def/beat/post
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems

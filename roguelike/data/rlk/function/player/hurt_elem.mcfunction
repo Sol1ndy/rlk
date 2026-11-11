@@ -1,5 +1,7 @@
 # 반응 피해(감전·연소 틱 등)를 플레이어가 직접 받음 (@s = 플레이어, 입력: #dmg, #elem). 방어력 미적용
 execute if score @s dashInvT matches 1.. run return 0
+# round V: 박자 동안은 맞지 않는다
+execute if score #btInv cb matches 1 run return 0
 scoreboard players operation #dmgIn tmp = #dmg tmp
 # 각인 수호: 보호막
 function rlk:engravings/guard/absorb

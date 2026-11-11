@@ -245,6 +245,20 @@ scoreboard objectives remove cb
 team remove rlk_cbred
 kill @e[tag=rlk_cb_fx]
 kill @e[tag=rlk_dgo]
+# round V (lane VP): 박자 — 세워 둔 몹 · 기울인 부품 · 늘인 보간을 되돌리고(beat/end) 그 점수판 · 표식 · 대역 리그를 지운다
+function rlk:player/def/beat/end
+kill @e[tag=rlk_pl]
+kill @e[tag=rlk_pl_basis]
+kill @e[type=minecraft:marker,tag=rlk_bt_pt]
+scoreboard objectives remove btD
+scoreboard objectives remove btD0
+scoreboard objectives remove btTp
+scoreboard objectives remove plActive
+scoreboard objectives remove plTick
+scoreboard objectives remove plClip
+scoreboard objectives remove plLen
+scoreboard objectives remove pbGlow
+scoreboard objectives remove pbTint
 scoreboard objectives remove db
 scoreboard objectives remove dbgDropI
 scoreboard objectives remove dbgPage

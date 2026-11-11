@@ -29,6 +29,7 @@ data modify storage rlk:tk fx.a.z set from storage rlk:tk fx.a.s0
 execute if score #dly tkFx matches 1.. run data modify storage rlk:tk fx.a.z set value "0f,0f,0f"
 function rlk:boss/tachy/fx/e/spawn with storage rlk:tk fx.a
 execute store result score #now tkFx run time query gametime
+scoreboard players operation #now tkFx -= #btLag cb
 scoreboard players add #now tkFx 1
 execute as @e[type=minecraft:item_display,tag=rlk_tk_fx_new,limit=1] run function rlk:boss/tachy/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_tk_fx_new] remove rlk_tk_fx_new

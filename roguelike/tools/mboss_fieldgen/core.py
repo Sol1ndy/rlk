@@ -327,10 +327,10 @@ class Core:
             f'execute if score #fgBrk mb matches {A.METER_N}.. run return 0',
             'execute if score #tfm tmp matches 1 run return 0',
             'execute if score #sub itv matches 1 run return 0',
-            'execute store result score #fgNow mb run time query gametime',
+            'execute store result score #fgNow mb run time query gametime', 'scoreboard players operation #fgNow mb -= #btAdj cb',
             'scoreboard players operation #fgNow mb -= #fgBrkT mb',
             f'execute if score #fgNow mb matches ..{ICD - 1} run return 0',
-            'execute store result score #fgBrkT mb run time query gametime',
+            'execute store result score #fgBrkT mb run time query gametime', 'scoreboard players operation #fgBrkT mb -= #btAdj cb',
             'scoreboard players add #fgBrk mb 1',
             sc_set('#fgBrkFx', 1),
             f'execute if score #fgBrk mb matches {A.METER_N}.. run scoreboard players set #fgBrkQ mb 1'])
@@ -728,7 +728,7 @@ class Core:
             'scoreboard players operation #fgBanF mb = #fgFN mb',
             sc_set('#fgLowG', 1),
             K.hud('banner_field'),
-            'execute store result score #fgBanG mb run time query gametime',
+            'execute store result score #fgBanG mb run time query gametime', 'scoreboard players operation #fgBanG mb -= #btAdj cb',
             K.hud('lowg_on'),
             g.say(BANNER, '#D9C8FF', 1, 50, 1),
             F('seq_f/banner')])  # [seq_f: field author]
@@ -1000,7 +1000,7 @@ class Core:
         self.w('hud/banner_cut', [
             f'# Drop the kit\'s field banner while it still shows (within {BANNER_T} t of field/banner; any executor): the break,',
             '# death, a test cut, a cleanup. Another actionbar message is never cut.',
-            'execute store result score #fgX mb run time query gametime',
+            'execute store result score #fgX mb run time query gametime', 'scoreboard players operation #fgX mb -= #btAdj cb',
             'scoreboard players operation #fgX mb -= #fgBanG mb',
             f'execute if score #fgX mb matches 0..{BANNER_T} run {K.hud("banner_end")}'])
         self.w('hud/bar_meter', ['scoreboard players operation #buSub bu = #fgBrk mb', sc_set_bu('#buSubMax', A.METER_N), sc_set_bu('#buSubCol', 1)])

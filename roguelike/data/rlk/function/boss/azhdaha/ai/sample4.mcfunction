@@ -18,6 +18,7 @@ scoreboard players operation #azDwell mb += #azFs5 mb
 # a flank proxy hit in the last 40 t from |s| >= 3 (#azPxHit = mbPart of the last hit, #azPxGT its gametime)
 scoreboard players set #azPxF mb 0
 execute store result score #azX mb run time query gametime
+scoreboard players operation #azX mb -= #btAdj cb
 scoreboard players operation #azX mb -= #azPxGT mb
 execute if score #azPxHit mb matches 2 if score #azX mb matches ..40 if score #azAs mb matches 3000.. run scoreboard players set #azPxF mb 1
 execute if score #azPxHit mb matches 3 if score #azX mb matches ..40 if score #azAs mb matches 3000.. run scoreboard players set #azPxF mb 1

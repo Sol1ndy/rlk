@@ -58,8 +58,8 @@ scoreboard players add @s cboIdle 1
 execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0
 execute if score @s cboIdle matches 20.. run scoreboard players set @s comboStep 0
 
-# 닷지: 재사용 대기 / 이동. 무적(dashInvT)은 닷지가 아닌 것(원소폭발 시전 · 로노바 부활 · 추락 뒤)만 쓴다
-execute if score @s dashCool matches 1.. run scoreboard players remove @s dashCool 1
+# 닷지: 재사용 대기(박자가 세계를 멈춘 틱 #btHold cb 에는 흐르지 않는다: 적의 시계와 같이 감) / 이동. 무적(dashInvT)은 닷지가 아닌 것(원소폭발 시전 · 로노바 부활 · 추락 뒤)만 쓴다
+execute if score @s dashCool matches 1.. unless score #btHold cb matches 1 run scoreboard players remove @s dashCool 1
 execute if score @s dashInvT matches 1.. run scoreboard players remove @s dashInvT 1
 execute if score @s dashMoveT matches 1.. at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_move_tick
 # 살짝 전진(찌르기 등). 닷지가 시작되면 멈춘다

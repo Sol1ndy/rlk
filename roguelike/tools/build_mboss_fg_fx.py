@@ -53,6 +53,9 @@ API reference: scratchpad mb3/fg_fx_api.md. Other generators import card(), tele
 hud() and the colour constants from this file.
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -1846,7 +1849,7 @@ def engine(W):
         f'execute if score #fkDly mb matches 1.. run data modify storage {STO} a.z set value "0f,0f,0f"',
         f'function {E}spawn with storage {STO} a',
         f'execute if score #fkTel mb matches 1 run tag {SEL}_new] add {TAG}_t',
-        'execute store result score #fkNow mb run time query gametime',
+        'execute store result score #fkNow mb run time query gametime', 'scoreboard players operation #fkNow mb -= #btLag cb',
         'scoreboard players add #fkNow mb 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -1889,9 +1892,11 @@ def engine(W):
         '# Ages the kit\'s cards once per tick while any is alive (scheduled from e/make and from itself, so it runs at',
         '# the end of the server tick; no hook in rlk:tick). A dead or reviving player clears them.',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run return run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run return run function {FN}clear',
-        'execute store result score #fkNow mb run time query gametime',
+        'execute store result score #fkNow mb run time query gametime', 'scoreboard players operation #fkNow mb -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute store result score #fkN mb if entity {SEL},tag=!{TAG}_t]',
         f'execute store result score #fkTN mb if entity {SEL}_t]',

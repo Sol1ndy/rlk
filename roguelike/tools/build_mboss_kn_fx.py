@@ -42,6 +42,9 @@ fx/clear + fx/hud/clear, pause / death_start -> fx/clear, uninstall -> fx/uninst
 Run: python3 tools/build_mboss_kn_fx.py --resourcepack <unpacked RP>   (or --skip-rp: the datapack + manifest only)
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -1531,7 +1534,7 @@ def engine(W):
         f'data modify storage {STO} fx.a.z set from storage {STO} fx.a.s0',
         f'execute if score #dly {OBJ} matches 1.. run data modify storage {STO} fx.a.z set value "0f,0f,0f"',
         f'function {E}spawn with storage {STO} fx.a',
-        'execute store result score #now ' + OBJ + ' run time query gametime',
+        'execute store result score #now ' + OBJ + ' run time query gametime', 'scoreboard players operation #now ' + OBJ + ' -= #btLag cb',
         f'scoreboard players add #now {OBJ} 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -1574,9 +1577,11 @@ def engine(W):
         '# Ages the kit\'s cards once per tick while any is alive (scheduled from e/make and itself, so it runs at the',
         '# end of the server tick; no hook in rlk:tick). A dead or reviving player clears every card (fx/clear).',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run function {FN}clear',
-        f'execute store result score #now {OBJ} run time query gametime',
+        f'execute store result score #now {OBJ} run time query gametime', f'scoreboard players operation #now {OBJ} -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute store result score #n {OBJ} if entity {SEL},tag={TAG}_c]',
         f'execute store result score #dn {OBJ} if entity {SEL},tag=!{TAG}_c]',
@@ -1896,7 +1901,7 @@ def decals(W):
                                 mac(card('flood', fl2, '0 0', s0=('$(s)', 1, '$(s)'), s1=('$(s)', 1, '$(s)'), life='$(fl)',
                                          dly='$(h)', col=WHITE, pool='dc'))])
     W.w('decal/e/flood_re', ['# Internal (macro): re-time the flood shown (it stays to the new t + 14) and flash it again.',
-                             'execute store result score #now knFx run time query gametime', 'scoreboard players add #now knFx 1',
+                             'execute store result score #now knFx run time query gametime', 'scoreboard players operation #now knFx -= #btLag cb', 'scoreboard players add #now knFx 1',
                              f'$scoreboard players set #a {OBJ} $(l)',
                              f'execute as {SEL.replace(TAG, TAG + "_fl")}] run function {D}e/retime',
                              f'function {D}e/flood_flash with storage {PA}'])

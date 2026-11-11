@@ -1,0 +1,1285 @@
+{
+ "note": "Round V, lane VP: the avatar's perfect-parry and perfect-dodge motions (review/v/ref_pd.md 4), one body track for all seven characters. Authored like the other clips (-Z forward, right = -X, torso / root negative X leans forward, arm / leg positive X swings forward, right arm positive Z crosses the body). Sparse keys; tools/build_player_beat.mjs samples every tick, solves the weapon so its blade points along `blade` (a direction in the same frame; `blade: \"arm\"` = along the forearm) and feeds the dense clips to build_player_rig.mjs (rig characters: clips pparry / pparry_i / pdodge / pdodge_i) and to the stand-in rig of the mannequin characters (char/motion/lite). Ticks are real game ticks: pparry starts on the contact tick, pdodge 5 ticks after the dodged hit (the slow motion is authored slow: ticks 1-9 are the x1/3 beat). `ground` lists tick ranges in which the lower foot is put exactly on the floor (shift Y is solved; the authored value is ignored there).",
+ "clips": {
+  "pparry": {
+   "length": 16,
+   "keys": [
+    {
+     "tick": 0,
+     "note": "guard: blade upright in front of the head",
+     "pose": {
+      "shift": [
+       0,
+       -0.03,
+       -0.02
+      ],
+      "root": [
+       -4,
+       20,
+       0
+      ],
+      "torso": [
+       -4,
+       10,
+       0
+      ],
+      "head": [
+       3,
+       -28,
+       0
+      ],
+      "right_arm": [
+       80,
+       -20,
+       20
+      ],
+      "right_elbow": [
+       35,
+       0,
+       0
+      ],
+      "left_arm": [
+       40,
+       10,
+       25
+      ],
+      "left_elbow": [
+       40,
+       0,
+       0
+      ],
+      "right_leg": [
+       -12,
+       0,
+       -5
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       16,
+       0,
+       6
+      ],
+      "left_knee": [
+       -12,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      0.1,
+      0.97,
+      -0.2
+     ]
+    },
+    {
+     "tick": 1,
+     "note": "the deflect: the blade swept across the body to the lower left",
+     "pose": {
+      "shift": [
+       0,
+       -0.09,
+       -0.11
+      ],
+      "root": [
+       -8,
+       -8,
+       0
+      ],
+      "torso": [
+       -8,
+       -14,
+       0
+      ],
+      "head": [
+       4,
+       20,
+       0
+      ],
+      "right_arm": [
+       55,
+       0,
+       45
+      ],
+      "right_elbow": [
+       40,
+       0,
+       0
+      ],
+      "left_arm": [
+       10,
+       0,
+       30
+      ],
+      "left_elbow": [
+       30,
+       0,
+       0
+      ],
+      "right_leg": [
+       -24,
+       0,
+       -5
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       32,
+       0,
+       5
+      ],
+      "left_knee": [
+       -38,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      0.75,
+      -0.2,
+      -0.55
+     ]
+    },
+    {
+     "tick": 2,
+     "note": "the freeze pose: wide lunge, rear leg straight back, torso twisted, sword arm thrown up past the head",
+     "pose": {
+      "shift": [
+       0,
+       -0.15,
+       -0.28
+      ],
+      "root": [
+       -14,
+       -30,
+       0
+      ],
+      "torso": [
+       -8,
+       -18,
+       0
+      ],
+      "head": [
+       6,
+       42,
+       0
+      ],
+      "right_arm": [
+       168,
+       0,
+       -18
+      ],
+      "right_elbow": [
+       20,
+       0,
+       0
+      ],
+      "left_arm": [
+       -40,
+       0,
+       28
+      ],
+      "left_elbow": [
+       22,
+       0,
+       0
+      ],
+      "right_leg": [
+       -48,
+       0,
+       -4
+      ],
+      "right_knee": [
+       -4,
+       0,
+       0
+      ],
+      "left_leg": [
+       62,
+       0,
+       4
+      ],
+      "left_knee": [
+       -78,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.15,
+      0.78,
+      0.6
+     ]
+    },
+    {
+     "tick": 5,
+     "note": "held through the freeze (a breath of drift)",
+     "pose": {
+      "shift": [
+       0,
+       -0.16,
+       -0.29
+      ],
+      "root": [
+       -14,
+       -31,
+       0
+      ],
+      "torso": [
+       -8,
+       -18,
+       0
+      ],
+      "head": [
+       6,
+       43,
+       0
+      ],
+      "right_arm": [
+       170,
+       0,
+       -20
+      ],
+      "right_elbow": [
+       20,
+       0,
+       0
+      ],
+      "left_arm": [
+       -42,
+       0,
+       28
+      ],
+      "left_elbow": [
+       22,
+       0,
+       0
+      ],
+      "right_leg": [
+       -48,
+       0,
+       -4
+      ],
+      "right_knee": [
+       -4,
+       0,
+       0
+      ],
+      "left_leg": [
+       62,
+       0,
+       4
+      ],
+      "left_knee": [
+       -78,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.15,
+      0.76,
+      0.63
+     ]
+    },
+    {
+     "tick": 10,
+     "note": "ready guard: sword diagonal, tip toward the enemy",
+     "pose": {
+      "shift": [
+       0,
+       -0.05,
+       -0.05
+      ],
+      "root": [
+       -3,
+       14,
+       0
+      ],
+      "torso": [
+       -3,
+       8,
+       0
+      ],
+      "head": [
+       2,
+       -20,
+       0
+      ],
+      "right_arm": [
+       58,
+       -10,
+       22
+      ],
+      "right_elbow": [
+       42,
+       0,
+       0
+      ],
+      "left_arm": [
+       30,
+       0,
+       22
+      ],
+      "left_elbow": [
+       35,
+       0,
+       0
+      ],
+      "right_leg": [
+       -12,
+       0,
+       -6
+      ],
+      "right_knee": [
+       -10,
+       0,
+       0
+      ],
+      "left_leg": [
+       18,
+       0,
+       6
+      ],
+      "left_knee": [
+       -16,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      0.3,
+      0.62,
+      -0.72
+     ]
+    },
+    {
+     "tick": 16,
+     "pose": {},
+     "blade": [
+      0.3,
+      0.62,
+      -0.72
+     ]
+    }
+   ],
+   "ground": [
+    [
+     0,
+     16
+    ]
+   ]
+  },
+  "pdodge": {
+   "length": 21,
+   "keys": [
+    {
+     "tick": 0,
+     "note": "out of the dash: upright, facing the attacker",
+     "pose": {
+      "shift": [
+       0,
+       0,
+       0
+      ],
+      "root": [
+       2,
+       0,
+       0
+      ],
+      "torso": [
+       2,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       70,
+       0,
+       -20
+      ],
+      "right_elbow": [
+       30,
+       0,
+       0
+      ],
+      "left_arm": [
+       70,
+       0,
+       20
+      ],
+      "left_elbow": [
+       30,
+       0,
+       0
+      ],
+      "right_leg": [
+       -4,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -6,
+       0,
+       0
+      ],
+      "left_leg": [
+       4,
+       0,
+       3
+      ],
+      "left_knee": [
+       -6,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.2,
+      0.9,
+      -0.3
+     ]
+    },
+    {
+     "tick": 2,
+     "note": "slow motion: both arms raised above the head",
+     "pose": {
+      "root": [
+       4,
+       0,
+       0
+      ],
+      "torso": [
+       5,
+       0,
+       0
+      ],
+      "head": [
+       6,
+       0,
+       0
+      ],
+      "right_arm": [
+       150,
+       0,
+       -18
+      ],
+      "right_elbow": [
+       15,
+       0,
+       0
+      ],
+      "left_arm": [
+       150,
+       0,
+       18
+      ],
+      "left_elbow": [
+       15,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.2,
+      0.85,
+      0.3
+     ]
+    },
+    {
+     "tick": 8,
+     "note": "slowly arching back, knees loading",
+     "pose": {
+      "shift": [
+       0,
+       -0.06,
+       0.03
+      ],
+      "root": [
+       16,
+       0,
+       0
+      ],
+      "torso": [
+       16,
+       0,
+       0
+      ],
+      "head": [
+       20,
+       0,
+       0
+      ],
+      "right_arm": [
+       176,
+       0,
+       -10
+      ],
+      "right_elbow": [
+       8,
+       0,
+       0
+      ],
+      "left_arm": [
+       176,
+       0,
+       10
+      ],
+      "left_elbow": [
+       8,
+       0,
+       0
+      ],
+      "right_leg": [
+       -10,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -22,
+       0,
+       0
+      ],
+      "left_leg": [
+       -6,
+       0,
+       3
+      ],
+      "left_knee": [
+       -22,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.25,
+      0.75,
+      0.6
+     ]
+    },
+    {
+     "tick": 9,
+     "note": "full speed: the feet leave the floor",
+     "pose": {
+      "shift": [
+       0,
+       0.12,
+       0.08
+      ],
+      "root": [
+       48,
+       0,
+       0
+      ],
+      "torso": [
+       18,
+       0,
+       0
+      ],
+      "head": [
+       24,
+       0,
+       0
+      ],
+      "right_arm": [
+       178,
+       0,
+       -8
+      ],
+      "right_elbow": [
+       6,
+       0,
+       0
+      ],
+      "left_arm": [
+       178,
+       0,
+       8
+      ],
+      "left_elbow": [
+       6,
+       0,
+       0
+      ],
+      "right_leg": [
+       -20,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -10,
+       0,
+       0
+      ],
+      "left_leg": [
+       -14,
+       0,
+       3
+      ],
+      "left_knee": [
+       -10,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.6,
+      0.6,
+      0.5
+     ]
+    },
+    {
+     "tick": 10,
+     "note": "passing horizontal, face up",
+     "pose": {
+      "shift": [
+       0,
+       0.36,
+       0.18
+      ],
+      "root": [
+       98,
+       0,
+       0
+      ],
+      "torso": [
+       14,
+       0,
+       0
+      ],
+      "head": [
+       22,
+       0,
+       0
+      ],
+      "right_arm": [
+       180,
+       0,
+       -10
+      ],
+      "left_arm": [
+       180,
+       0,
+       10
+      ],
+      "right_leg": [
+       -12,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -6,
+       0,
+       0
+      ],
+      "left_leg": [
+       30,
+       0,
+       3
+      ],
+      "left_knee": [
+       -6,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -1,
+      0.1,
+      0.1
+     ]
+    },
+    {
+     "tick": 11,
+     "pose": {
+      "shift": [
+       0,
+       0.52,
+       0.26
+      ],
+      "root": [
+       148,
+       0,
+       0
+      ],
+      "torso": [
+       8,
+       0,
+       0
+      ],
+      "head": [
+       10,
+       0,
+       0
+      ],
+      "right_arm": [
+       180,
+       0,
+       -12
+      ],
+      "left_arm": [
+       180,
+       0,
+       12
+      ],
+      "right_leg": [
+       -42,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       52,
+       0,
+       3
+      ],
+      "left_knee": [
+       -8,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -1,
+      0.05,
+      0
+     ]
+    },
+    {
+     "tick": 12,
+     "note": "the apex: inverted, hands near the floor, legs split front and back",
+     "pose": {
+      "shift": [
+       0,
+       0.62,
+       0.32
+      ],
+      "root": [
+       190,
+       0,
+       0
+      ],
+      "torso": [
+       0,
+       0,
+       0
+      ],
+      "head": [
+       -10,
+       0,
+       0
+      ],
+      "right_arm": [
+       176,
+       0,
+       -14
+      ],
+      "right_elbow": [
+       10,
+       0,
+       0
+      ],
+      "left_arm": [
+       176,
+       0,
+       14
+      ],
+      "left_elbow": [
+       10,
+       0,
+       0
+      ],
+      "right_leg": [
+       -58,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -8,
+       0,
+       0
+      ],
+      "left_leg": [
+       64,
+       0,
+       3
+      ],
+      "left_knee": [
+       -8,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -1,
+      0.05,
+      0
+     ]
+    },
+    {
+     "tick": 13,
+     "note": "the legs come over, one after the other",
+     "pose": {
+      "shift": [
+       0,
+       0.52,
+       0.32
+      ],
+      "root": [
+       236,
+       0,
+       0
+      ],
+      "torso": [
+       -4,
+       0,
+       0
+      ],
+      "head": [
+       -8,
+       0,
+       0
+      ],
+      "right_arm": [
+       150,
+       0,
+       -30
+      ],
+      "right_elbow": [
+       15,
+       0,
+       0
+      ],
+      "left_arm": [
+       150,
+       0,
+       30
+      ],
+      "left_elbow": [
+       15,
+       0,
+       0
+      ],
+      "right_leg": [
+       70,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -6,
+       0,
+       0
+      ],
+      "left_leg": [
+       -20,
+       0,
+       3
+      ],
+      "left_knee": [
+       -14,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -1,
+      0.05,
+      0
+     ]
+    },
+    {
+     "tick": 14,
+     "pose": {
+      "shift": [
+       0,
+       0.3,
+       0.28
+      ],
+      "root": [
+       286,
+       0,
+       0
+      ],
+      "torso": [
+       -8,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       100,
+       0,
+       -50
+      ],
+      "right_elbow": [
+       20,
+       0,
+       0
+      ],
+      "left_arm": [
+       100,
+       0,
+       50
+      ],
+      "left_elbow": [
+       20,
+       0,
+       0
+      ],
+      "right_leg": [
+       74,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -6,
+       0,
+       0
+      ],
+      "left_leg": [
+       10,
+       0,
+       3
+      ],
+      "left_knee": [
+       -30,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -1,
+      0,
+      -0.05
+     ]
+    },
+    {
+     "tick": 15,
+     "note": "the first foot reaches the floor, the torso rises",
+     "pose": {
+      "shift": [
+       0,
+       0.08,
+       0.22
+      ],
+      "root": [
+       330,
+       0,
+       0
+      ],
+      "torso": [
+       -6,
+       0,
+       0
+      ],
+      "head": [
+       8,
+       0,
+       0
+      ],
+      "right_arm": [
+       40,
+       0,
+       -75
+      ],
+      "right_elbow": [
+       10,
+       0,
+       0
+      ],
+      "left_arm": [
+       40,
+       0,
+       75
+      ],
+      "left_elbow": [
+       10,
+       0,
+       0
+      ],
+      "right_leg": [
+       30,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -4,
+       0,
+       0
+      ],
+      "left_leg": [
+       -10,
+       0,
+       3
+      ],
+      "left_knee": [
+       -20,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.9,
+      -0.3,
+      -0.1
+     ]
+    },
+    {
+     "tick": 16,
+     "note": "landed facing the attacker: arms straight out sideways, sword tip down",
+     "pose": {
+      "shift": [
+       0,
+       0,
+       0.16
+      ],
+      "root": [
+       360,
+       0,
+       0
+      ],
+      "torso": [
+       0,
+       0,
+       0
+      ],
+      "head": [
+       0,
+       0,
+       0
+      ],
+      "right_arm": [
+       0,
+       0,
+       -86
+      ],
+      "right_elbow": [
+       0,
+       0,
+       0
+      ],
+      "left_arm": [
+       0,
+       0,
+       86
+      ],
+      "left_elbow": [
+       0,
+       0,
+       0
+      ],
+      "right_leg": [
+       0,
+       0,
+       -5
+      ],
+      "right_knee": [
+       0,
+       0,
+       0
+      ],
+      "left_leg": [
+       0,
+       0,
+       5
+      ],
+      "left_knee": [
+       0,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.7,
+      -0.7,
+      -0.1
+     ]
+    },
+    {
+     "tick": 17,
+     "pose": {
+      "shift": [
+       0,
+       -0.02,
+       0.12
+      ]
+     },
+     "blade": [
+      -0.7,
+      -0.7,
+      -0.1
+     ]
+    },
+    {
+     "tick": 19,
+     "pose": {
+      "shift": [
+       0,
+       -0.06,
+       0.05
+      ],
+      "root": [
+       358,
+       6,
+       0
+      ],
+      "torso": [
+       -2,
+       3,
+       0
+      ],
+      "head": [
+       1,
+       -9,
+       0
+      ],
+      "right_arm": [
+       30,
+       -4,
+       -30
+      ],
+      "right_elbow": [
+       22,
+       0,
+       0
+      ],
+      "left_arm": [
+       14,
+       0,
+       50
+      ],
+      "left_elbow": [
+       16,
+       0,
+       0
+      ],
+      "right_leg": [
+       -7,
+       0,
+       -5
+      ],
+      "right_knee": [
+       -10,
+       0,
+       0
+      ],
+      "left_leg": [
+       10,
+       0,
+       5
+      ],
+      "left_knee": [
+       -14,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      -0.25,
+      0.05,
+      -0.95
+     ]
+    },
+    {
+     "tick": 21,
+     "note": "sinks into a low ready stance",
+     "pose": {
+      "shift": [
+       0,
+       -0.1,
+       0
+      ],
+      "root": [
+       356,
+       12,
+       0
+      ],
+      "torso": [
+       -4,
+       6,
+       0
+      ],
+      "head": [
+       3,
+       -18,
+       0
+      ],
+      "right_arm": [
+       55,
+       -8,
+       20
+      ],
+      "right_elbow": [
+       40,
+       0,
+       0
+      ],
+      "left_arm": [
+       28,
+       0,
+       22
+      ],
+      "left_elbow": [
+       32,
+       0,
+       0
+      ],
+      "right_leg": [
+       -14,
+       0,
+       -6
+      ],
+      "right_knee": [
+       -18,
+       0,
+       0
+      ],
+      "left_leg": [
+       20,
+       0,
+       6
+      ],
+      "left_knee": [
+       -26,
+       0,
+       0
+      ]
+     },
+     "blade": [
+      0.3,
+      0.6,
+      -0.74
+     ]
+    }
+   ],
+   "ground": [
+    [
+     0,
+     8
+    ],
+    [
+     16,
+     21
+    ]
+   ]
+  }
+ }
+}

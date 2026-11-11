@@ -199,8 +199,23 @@ ALLOW[LANE_FB] = (
        F + r'boss/tachy/(?:bal_on|core/ground|p/l/.+|p/mantle/nova/.+)\.mcfunction',
        F + r'boss/arlecchino/(?:core/np|p/(?:f1|g1|q4|q5a|q5b|q6)/.+)\.mcfunction',
        F + r'cm/(?:ar/shoot|cc/flock|ci/r_hit|ci/r_hit_own)\.mcfunction'])
+# Round V, lane VP (11-11, wip/v-player; tools/dev/plan/combat/vp_progress.md): the perfect parry / perfect dodge beat and its
+# presentation - the hand files of player/def/** (fx, beat), the beat's gates and clock users (rlk:tick, mob/tick, cm worlds,
+# player/tick, hurt_elem, the three core hooks + the three beat dispatchers, the six effect kits' clocks, 야타용왕 / 역장 stamps),
+# the avatar's clips and stand-in rig, load / uninstall lines. Gone: the old glyph titles, the jolt and the ground arc.
+LANE_VP = 'round V lane VP (11-11): the perfect parry / dodge beat, tiers, the avatar clips and the weapon glow'
+ALLOW[LANE_VP] = (
+    [F + r'player/def/.+', F + r'(?:tick|load|uninstall)\.mcfunction', F + r'mob/tick\.mcfunction', F + r'cm/(?:pj/)?world\.mcfunction',
+     F + r'player/(?:tick|hurt_elem|dash_go)\.mcfunction', F + r'combat/(?:do_swing|on_skill)\.mcfunction',
+     F + r'mboss/(?:main|np_gate|pl_dot2|d/beat_parried|d/beat_release|d/beat_rock)\.mcfunction',
+     F + r'char/motion/(?:beat|lite)/.+', F + r'char/motion/clips/(?:arle|skirk|navia)/p(?:parry|dodge)(?:_i)?/.+',
+     F + r'char/motion/(?:(?:arle|skirk|navia)_fx|events/(?:arle|skirk|navia))/p(?:parry|dodge)(?:_i)?\.mcfunction',
+     F + r'(?:boss/(?:apep|azhdaha|tachy|arlecchino)|mboss/(?:butterfly|fieldgen))/fx/.+',
+     F + r'boss/azhdaha/(?:ai/sample4|on_hit)\.mcfunction', F + r'mboss/fieldgen/(?:on_hit|field/banner|hud/banner_cut)\.mcfunction',
+     r'data/rlk/tags/entity_type/beat_disp\.json'])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
-ALLOW_GONE = {LANE_R,                               # lane R's removals
+ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
+              LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash
               'combat P late-game lag (11-10)'}     # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]

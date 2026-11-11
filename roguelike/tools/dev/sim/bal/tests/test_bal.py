@@ -109,9 +109,9 @@ def t_hooks():
         return anchor in L and line in L and L.index(line) > L.index(anchor)
 
     ck(R, 'H1 mob/setup: bal/init after rlk_mob', has_after('mob/setup', 'tag @s add rlk_mob', 'function rlk:bal/init'))
-    ck(R, 'H2 mob/tick: bal/tick (every enemy but Raiden, whose own tick runs it) after the stun clock',
+    ck(R, 'H2 mob/tick: bal/tick (every enemy but Raiden, whose own tick runs it; round V: not on a tick the beat holds) after the stun clock',
        has_after('mob/tick', 'execute if score @s stunT matches 0 run function rlk:mob/unstun',
-                 'execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] run function rlk:bal/tick'))
+                 'execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] unless score #btHold cb matches 1 run function rlk:bal/tick'))
     L = lines('combat/apply_mods')
     hook = 'execute if score @s balMax matches 1.. run function rlk:bal/mods'
     ck(R, 'H3 combat/apply_mods: one line for the groggy bonus and the sources, before the boss incoming hooks (HP floors)',

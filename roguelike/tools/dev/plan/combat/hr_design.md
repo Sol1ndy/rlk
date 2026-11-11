@@ -762,3 +762,11 @@ written; where these lines differ, they are the targets the balance pass measure
 - **HA-08**: `q`'s grab kb 0.
 - **HA-09**: a full gauge forces `rings` in the near band only; from the mid band `ai/ult_close` glides her in (0.3 b/t to 4 b,
   at most 40 t), then the decision starts the rings.
+
+## Round V addendum (lane VP, 11-11): the perfect parry / dodge beat
+What this document says about the player's parry / dodge effects (the streak, the 1.5-degree jolt, "does not stop or slow the
+server", tier 2's star) is replaced by `v_brief.md` §3 "VP" + §5 as built: README 3 「효과」 · 「박자」 and `vp_progress.md`. For her
+fight this means: a perfect parry or perfect dodge of any cut freezes / slows her whole module (pattern clock, rig, gauntlet,
+shield and ULT clocks, hazards) through `mboss/main`'s first line and resumes it 5 / 7 ticks later with nothing else changed;
+the pips (`q_pf0` / `q_pf1`, `#mbDodgeOk`) read the beat's clock; her effect kit must subtract `#btLag cb` from its game-time
+reads (request to lane VB in `vp_progress.md`).

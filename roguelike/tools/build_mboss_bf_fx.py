@@ -41,6 +41,9 @@ API reference: scratchpad mb2/bf_fx_api.md. Other generators import card(), card
 look() and the colour constants from this file.
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -1410,7 +1413,7 @@ def engine(W):
         'execute if score #bkDly mb matches 1.. run data modify storage rlk:bfkit a.z set value "0f,0f,0f"',
         f'function {E}spawn with storage rlk:bfkit a',
         f'execute if score #bkTel mb matches 1 run tag {SEL}_new] add rlk_bk_t',
-        'execute store result score #bkNow mb run time query gametime',
+        'execute store result score #bkNow mb run time query gametime', 'scoreboard players operation #bkNow mb -= #btLag cb',
         '# The ager (e/world, scheduled 1t) runs at the end of this same server tick, when the game time already',
         '# reads +1: count the stages from that tick, so the main interpolation starts one tick after the summon (the',
         '# client first gets the start state; merged in the summon tick it would never animate) and every stage, the',
@@ -1457,9 +1460,11 @@ def engine(W):
         '# Ages the kit\'s cards once per tick while any is alive (scheduled from e/make and from itself; no hook in',
         '# rlk:tick). A dead or reviving player clears them, like Navia\'s cards.',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run return run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run return run function {FN}clear',
-        'execute store result score #bkNow mb run time query gametime',
+        'execute store result score #bkNow mb run time query gametime', 'scoreboard players operation #bkNow mb -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute store result score #bkN mb if entity {SEL},tag=!rlk_bk_t]',
         f'execute store result score #bkTN mb if entity {SEL}_t]',
