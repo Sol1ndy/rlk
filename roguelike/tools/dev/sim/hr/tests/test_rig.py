@@ -2,7 +2,7 @@
 """test_rig.py [--dp ROGUELIKE] [--rp RP] [--rebuild] [-v] — the S2a suite of the 홍련 (Scarlet) rig (run from HR/tests, outside the
 datapack; S2b takes it over with the manifest, api.HANDOVER).
 
-  manifest   api.check_manifest (29 parts in order, the 47 clips with identical len / loop / events / ids, anchors, looks, calls),
+  manifest   api.check_manifest (29 parts in order, the 59 clips with identical len / loop / events / ids, anchors, looks, calls),
              parents / re-parent table == api, the 39 S2a clips authored and the 8 cine clips owned by S2b, UUIDs, every
              api.RIG_CALLS + play / start per clip + face/set exist, function references, objectives hrRig* only, no negative
              add / remove literals, lowercase ids, budgets (atlas <= 0.15 M px, elements at rest <= 6 500)
@@ -155,7 +155,8 @@ try:
     check('manifest: api.check_manifest (parts, 47 clips len / loop / events / ids, anchors, looks, calls)', True)
 except AssertionError as e:
     check('manifest: api.check_manifest', False, str(e))
-check(f'manifest: 47 clips ({len(MAN["clips"])})', len(MAN['clips']) == 47 == len(api.CLIPS))
+NCLIPS = 59          # the rebuilt contract (hr_design §8.2; lane H1's interface: 47 + the 12 fight clips of lane H1c)
+check(f'manifest: {NCLIPS} clips ({len(MAN["clips"])})', len(MAN['clips']) == NCLIPS == len(api.CLIPS))
 check('manifest: parents == api.PARENTS', {p['name']: p['parent'] for p in MAN['parts']} == dict(api.PARENTS))
 check('manifest: the re-parent table == api.REPARENT', {(r['part'], r['look']): r['parent'] for r in MAN['reparent']} == dict(api.REPARENT))
 own = {n: c['owner'] for n, c in MAN['clips'].items()}
@@ -1776,7 +1777,7 @@ if RET:
         print('angles: the exempt spans (the declared patches): ' + ', '.join(f'{P["id"]} {P["clip"]} {P["span"][0]}-{P["span"][1]}' for P in DUMP['patches'])
               + f'; channels differ inside {", ".join(sorted(used))}')
         check(f'angles: every angle channel of the retarget + overlay pose == the source (1e-9) outside the declared patch spans '
-              f'({sum(len(r) for r in DUMP["clips"].values())} ticks of {len(DUMP["clips"])} clips)', len(DUMP['clips']) == 47 and not outside,
+              f'({sum(len(r) for r in DUMP["clips"].values())} ticks of {len(DUMP["clips"])} clips)', len(DUMP['clips']) == NCLIPS and not outside,
               '; '.join(outside[:6]) + f' ({len(outside)})')
         check('angles: the exempt spans == the manifest PATCHES', [(P['id'], P['clip'], P['span']) for P in DUMP['patches']]
               == [(P['id'], P['clip'], [P['in'][0], P['out'][1]]) for P in RET['patches']])

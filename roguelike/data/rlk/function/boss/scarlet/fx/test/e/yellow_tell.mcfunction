@@ -2,3 +2,5 @@
 # Demo "yellow_tell" events (as the stand-in; #dt = the demo tick).
 execute if score #dt hrFx matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~1.3 ~ run function rlk:boss/scarlet/fx/p/yellow_tell {t:12}
 execute if score #dt hrFx matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~1.3 ~ run function rlk:boss/scarlet/fx/snd/yellow_chime
+execute if score #dt hrFx matches 30 at @s rotated as @s rotated ~ 0 positioned ~ ~1.3 ~ run function rlk:boss/scarlet/fx/p/yellow_tell {t:112}
+execute if score #dt hrFx matches 30 at @s rotated as @s rotated ~ 0 positioned ~ ~1.3 ~ run function rlk:boss/scarlet/fx/snd/yellow_chime

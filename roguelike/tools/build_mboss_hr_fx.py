@@ -366,6 +366,62 @@ GLYPHS = {
     'white': (api.OVERLAYS['white'], P.glyph_flat('#FFFFFF', 0.92), OVL_PX, OVL_H, OVL_ASC),
     'vig': (api.VIG, P.glyph_vignette, OVL_PX, OVL_H, OVL_ASC),
 }
+# ===== H1 block, part 1 of 2 (lane H1c; hr_design §2.2 U, §5.1): the `web` screen overlay ============================
+# U's "shattered glass" (video 152.85-153.5, ref/ult_space_cut.jpg): long straight pink-white cut lines across the whole
+# screen, each with a cyan and a red fringe, the facets between them tinted a little differently; mostly clear, so the
+# fight stays visible under it. 256 x 144 texture px at the same on-screen size as the 144 x 81 glyphs (height 144): the
+# lines stay thin. Font glyphs are not in the items atlas (0 px of the sprite budget).
+WEB_PX = (256, 144)
+WEB_HUBS = ((-0.62, 0.20), (0.74, -0.24), (0.10, 0.58))    # the points the cuts pass near (x in screen heights)
+
+
+def _web_cuts():
+    rnd = random.Random(1146)
+    out = []
+    for k in range(15):
+        hx, hy = WEB_HUBS[k % 3]
+        ang = math.radians(12 * k + rnd.uniform(-5, 5))
+        out.append((hx + rnd.uniform(-0.16, 0.16), hy + rnd.uniform(-0.16, 0.16), -math.sin(ang), math.cos(ang),
+                    rnd.uniform(0.7, 1.0)))
+    return out
+
+
+WEB_CUTS = _web_cuts()
+_WEB_MEMO = {}
+
+
+def glyph_web(x, y):
+    """the `web` overlay: x / y -1..1 over the 16:9 screen"""
+    key = (round(x, 6), round(y, 6))
+    if key in _WEB_MEMO:
+        return _WEB_MEMO[key]
+    xs = x * 16 / 9
+    ds = [((xs - ox) * nx + (y - oy) * ny, br) for ox, oy, nx, ny, br in WEB_CUTS]
+    # the facets: one pale tint per region of the first eight cuts
+    h = sum(1 << k for k, (d, _b) in enumerate(ds[:8]) if d > 0)
+    f = ((h * 2654435761) >> 7 & 255) / 255
+    out = P.mix('#FFD9F1', '#CFF1FF', f) + (0.03 + 0.10 * f * f,)
+    for d, br in ds:
+        a = abs(d)
+        if a > 0.07:
+            continue
+        cy, rd = P.glow(abs(d - 0.017), 0.013, 0.55 * br), P.glow(abs(d + 0.017), 0.013, 0.55 * br)
+        if cy > 0:
+            out = P.over(P.hexc('#6FE8FF') + (cy,), out)
+        if rd > 0:
+            out = P.over(P.hexc('#FF4F7C') + (rd,), out)
+        g = P.glow(a, 0.055, 0.5 * br)
+        if g > 0:
+            out = P.over(P.hexc('#FF8FDC') + (g,), out)
+        c = P.glow(a, 0.014, 0.98 * br)
+        if c > 0:
+            out = P.over(P.hexc('#FFF4FB') + (c,), out)
+    _WEB_MEMO[key] = out
+    return out
+
+
+GLYPHS['web'] = (api.OVERLAYS['web'], glyph_web, WEB_PX, OVL_H, OVL_ASC)
+# ===== end of the H1 block, part 1 ==========================================================================================
 assert {k: v[0] for k, v in GLYPHS.items() if k != 'vig'} == api.OVERLAYS and GLYPHS['vig'][0] == api.VIG
 # F2 (HR-30): each overlay at OVL_STEPS - 1 lower opacities (20 / 40 / 60 / 80 %), U+EC20.. . While her line is up, an
 # overlay's fade-in / fade-out is shown as these glyphs re-sent every tick at full title alpha (the title and the subtitle
@@ -986,8 +1042,18 @@ def _p_qi_cut():
 
 # --- glints, the yellow tell ------------------------------------------------------------------------------------------------
 @preset('glint', 'A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and '
-        'turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white).', split_c=True)
+        'turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white). HR rebuild: '
+        'c 2 is the parry cue at blade_mid (api.CUE_KIT): larger (1.8 b) and fuller, three crossed sparkles for 7 t.',
+        split_c=True)
 def _p_glint(c):
+    if c == api.CUE_KIT[1]['c']:
+        # H1c (hr_design §2.1, api.CUE_KIT): c 2 is the parry cue (the pink sparkle on her blade 7 t before every parryable hit):
+        # the same sparkle larger and fuller (three crossed glints to 1.8 b, bright motes) so it is seen from the F5 camera
+        # at 10 b; still no ring and no long spikes (the purple star and the yellow tell have those)
+        return [card('glint_0', '~ ~ ~', bb='center', spin=90, s0=0.3, s1=1.8, life=7, fade=3, col=TINT[c]),
+                card('glint_0', '~ ~ ~', bb='center', roll=45, spin=-60, s0=0.25, s1=1.3, life=7, fade=3, col=PINKW),
+                card('glint_0', '~ ~ ~', bb='center', roll=22, spin=40, s0=0.2, s1=0.8, life=5, fade=2, col=WHITE)] + \
+            c_parts(c, '~ ~ ~', (0.12, 0.12, 0.12), 8) + [part('end_rod', '~ ~ ~', (0.1, 0.1, 0.1), 0.02, 4)]
     return [card('glint_0', '~ ~ ~', bb='center', spin=90, s0=0.2, s1=1.1, life=6, fade=3, col=TINT[c]),
             card('glint_0', '~ ~ ~', bb='center', roll=45, spin=-60, s0=0.15, s1=0.6, life=5, fade=2, col=WHITE)] + \
         c_parts(c, '~ ~ ~', (0.08, 0.08, 0.08), 4)
@@ -1001,12 +1067,25 @@ def _p_star4():
             dust(DUSTC[1], 1.0, '~ ~ ~', (0.3, 0.3, 0.3), 6)]
 
 
+# H1c (hr_design §2.2 kcut "big: yellow_tell at diameter 2.0"): the size rides on {t} so the contract's one argument and every
+# existing call stay as they are: t >= 100 = the big tell for t - 100 ticks (the sphere 2.0 b, the flare 5 b).
+YELLOW_BIG = 100
+YELLOW_D = (16, 20)                    # the sphere's diameter (tenths): the tell / the big tell
+
+
 @preset('yellow_tell', 'The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: '
-        'her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.',
-        conv=(('t', 't', None),))
+        'her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes. HR rebuild (kcut): '
+        f't >= {YELLOW_BIG} is the big tell for t - {YELLOW_BIG} ticks (the sphere {YELLOW_D[1] / 10:.1f} b, the flare '
+        f'{YELLOW_D[1] / 4:.0f} b), e.g. {{t:{YELLOW_BIG + 6}}}.',
+        conv=(('s0', '#r', 0.025), ('s', '#r', 0.1), ('f0', '#r', 0.0375), ('f1', '#r', 0.125)),
+        pre=['$scoreboard players set #a hrFx $(t)', f'scoreboard players set #r hrFx {YELLOW_D[0]}',
+             f'execute if score #a hrFx matches {YELLOW_BIG}.. run scoreboard players set #r hrFx {YELLOW_D[1]}',
+             f'execute if score #a hrFx matches {YELLOW_BIG}.. run scoreboard players remove #a hrFx {YELLOW_BIG}',
+             f'execute store result storage {PA}.t int 1 run scoreboard players get #a hrFx'])
 def _p_yellow_tell():
-    return [mac(card('yellow_tell_0', '~ ~ ~', bb='center', s0=0.4, s1=1.6, life='$(t)', fade=2, dur=3)),
-            mac(card('yellow_tell_1', '~ ~ ~', bb='center', s0=(0.6, 1.0, 1.0), s1=(2.0, 1.4, 1.0), life='$(t)', fade=2, dur=3)),
+    return [mac(card('yellow_tell_0', '~ ~ ~', bb='center', s0='$(s0)', s1='$(s)', life='$(t)', fade=2, dur=3)),
+            mac(card('yellow_tell_1', '~ ~ ~', bb='center', s0=('$(f0)', 1.0, 1.0), s1=('$(f1)', 1.4, 1.0), life='$(t)', fade=2,
+                     dur=3)),
             dust(DUSTC[3], 1.4, '~ ~ ~', (0.5, 0.5, 0.5), 12), part('end_rod', '~ ~ ~', (1.2, 0.05, 0.05), 0.0, 6)]
 
 
@@ -1396,6 +1475,219 @@ def _p_ev_take(c):
     out = [part('end_rod', '~ ~ ~', (0.2, 0.2, 0.2), 0.15, 20)]
     out += [dust(col, 1.0, f'^{num(1.2 * x, 3)} ^ ^{num(1.2 * z, 3)}', (0, 0, 0), 1) for x, z in RING16]
     return out
+
+
+# ===== H1 block, part 2 of 2 (lane H1c; hr_design §2.1-§2.2, §5.1): the presets of the rebuilt fight ======================
+# flash_blue, ult_web, ult_burst, sky_mark, sky_pillar, qi_beam (api.KIT_PRESETS_HR). No new sprite: the blue sphere is the
+# back-blink's bubble tinted blue, the lines / beams / columns are the neutral light_column sprite tinted (qline, col_face,
+# light_column kinds), so the items atlas does not grow. Their demos: _demos() ("H1 block"); the sounds parry_cue,
+# flash_blue, ult_cut1, ult_cut2, sky_pillar are api.KIT_SOUND_RECIPES (fx/snd/<name>).
+BLUE = rgb('#3A86FF')
+BLUE_MID = rgb('#62A8FF')
+BLUE_PALE = rgb('#A9D6FF')
+PINK_HOT = rgb('#FFE2F3')
+PINK_GLOW = rgb('#FF7FD2')
+FLASH_YELLOW_T = 4                     # the yellow ring's ticks before it turns blue (hr_design §2.1)
+
+
+@preset('flash_blue', 'The blue unparriable flash (P-blue; at her chest anchor, between follow_on / follow_off so it stays '
+        f'on her): the yellow tell\'s sphere and flare for {FLASH_YELLOW_T} t, then a translucent blue sphere (1.8 b, two rims '
+        'laid together) round her for {t} ticks that swells once more over its last 5 t (the lunge follows); blue motes.',
+        pre=['$scoreboard players set #a hrFx $(t)', 'execute if score #a hrFx matches ..7 run scoreboard players set #a hrFx 8',
+             f'execute store result storage {PA}.t int 1 run scoreboard players get #a hrFx',
+             'scoreboard players remove #a hrFx 1',
+             f'execute store result storage {PA}.d2 int 1 run scoreboard players get #a hrFx'])
+def _p_flash_blue():
+    y = FLASH_YELLOW_T
+    return [card('yellow_tell_0', '~ ~ ~', bb='center', s0=0.4, s1=1.5, life=y + 1, fade=1, dur=3),
+            card('yellow_tell_1', '~ ~ ~', bb='center', s0=(0.6, 1.0, 1.0), s1=(1.8, 1.3, 1.0), life=y + 1, fade=1, dur=3),
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.25, s1=1.8, life='$(t)', fade=2, dly=y, dur=3, col=BLUE)),
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.3, s1=1.86, life='$(t)', fade=2, dly=y, dur=3, col=BLUE_MID)),
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.8, s1=2.15, life=5, fade=2, dly='$(d2)', dur=2, col=BLUE_PALE)),
+            card('glint_0', '~ ~ ~', bb='center', s0=0.4, s1=1.2, life=4, fade=2, dly=y, col=BLUE_PALE),
+            dust(DUSTC[3], 1.2, '~ ~ ~', (0.4, 0.4, 0.4), 8), dust((0.23, 0.53, 1.0), 1.3, '~ ~ ~', (0.6, 0.7, 0.6), 14),
+            part('end_rod', '~ ~ ~', (0.5, 0.6, 0.5), 0.01, 6)]
+
+
+def _web_lines():
+    """the 12 cut lines of U (executor frame): (start x, start height, start z, heading deg, pitch up deg, length, side)
+    - every line starts >= 0.5 b over the executor's level and climbs, so none dips under the floor; `side` = the side of
+    the executor it passes (+1 its right), the way ult_burst throws it"""
+    rnd = RND(57)
+    out = []
+    for k in range(12):
+        yaw = 15 + 30 * k + rnd.uniform(-10, 10)
+        off = rnd.uniform(1.5, 6.5) * (1 if k % 2 else -1)
+        ln = rnd.uniform(30, 40)
+        # low and nearly level: where they pass the executor they are 0.5-2.4 b up, under the F5 camera (3.4 b), so no line
+        # crosses the lens as a screen-wide band
+        h0, up = rnd.uniform(0.5, 1.4), rnd.uniform(0, 3)
+        dx, dz = xz(1.0, yaw)
+        px, pz = xz(1.0, yaw + 90)
+        out.append((off * px - ln / 2 * dx, h0, off * pz - ln / 2 * dz, yaw, up, ln, 1 if off > 0 else -1))
+    return out
+
+
+WEB_LINES = _web_lines()
+WEB_OVL = (2, 16, 2)                   # the screen overlay `web` beside ult_web {t:22}: in / hold / out (the module's K.ovl call;
+#                                        the presets draw the world only, like every other preset)
+# the web lies over the floor whatever the caller's height (lane H1 calls it at her body, 1.2 b up): fx/e/hgt gives the
+# executor's height #h, the cards are made at the floor point under it
+WEB_FLOOR = [f'function {FN}e/hgt', f'execute store result storage {PA}.dy double -0.01 run scoreboard players get #h {OBJ}']
+
+
+def _on_floor(line):
+    return '$execute positioned ~ ~$(dy) ~ run ' + (line[1:] if line.startswith('$') else line)
+
+
+def _web_card(i, w, col, **kw):
+    x, h, z, yaw, up, ln, _sd = WEB_LINES[i]
+    return dict(kind='qline', pos=f'^{num(x, 2)} ^{num(h, 2)} ^{num(z, 2)}', rot=f'~{ang(yaw)} {ang(-up)}', col=col, **kw), w, ln
+
+
+@preset('ult_web', 'U cut1, the "shattered glass" (at her body or the spot the cuts cross, at any height: the web is laid '
+        'over the floor under the executor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot '
+        'through the arena round the executor in 2 t, low and nearly level (0.5-2.4 b over the floor where they pass it: under '
+        'the F5 camera; none dips under the floor), and stay {t} ticks (to cut2, where ult_burst takes them over). The screen '
+        'overlay `web` is the caller\'s (fx/hud/ovl).',
+        pre=WEB_FLOOR + ['$scoreboard players set #a hrFx $(t)', 'execute if score #a hrFx matches ..4 run scoreboard players set #a hrFx 5',
+             # the lines crack in over three ticks (dly 0 / 1 / 2) and all end at t: lives t0 = t, t1 = t - 1, t2 = t - 2
+             f'execute store result storage {PA}.t0 int 1 run scoreboard players get #a hrFx',
+             f'execute store result storage {PA}.t1 int 1 run scoreboard players remove #a hrFx 1',
+             f'execute store result storage {PA}.t2 int 1 run scoreboard players remove #a hrFx 1'])
+def _p_ult_web():
+    out = []
+    for i in range(len(WEB_LINES)):
+        kw, w, ln = _web_card(i, 0.16, PINK_HOT, life=f'$(t{i % 3})', dur=2, dly=i % 3)
+        out.append(mac(card(s0=(w, w, round(ln * 0.12, 2)), s1=(w, w, round(ln, 2)), **kw)))
+        if i % 3 == 0:
+            kw, w, ln = _web_card(i, 0.45, PINK_GLOW, life='$(t0)', dur=2, dly=0)
+            out.append(mac(card(s0=(w, w, round(ln * 0.12, 2)), s1=(w, w, round(ln, 2)), **kw)))
+    out += [dust(DUSTC[2], 1.4, '~ ~1.5 ~', (4.0, 1.5, 4.0), 30), part('end_rod', '~ ~2 ~', (5.0, 2.0, 5.0), 0.02, 16)]
+    return [_on_floor(x) for x in out]
+
+
+@preset('ult_burst', 'U cut2 (the same executor as ult_web, as its {t} ends; laid over the floor like it): the 12 cut lines '
+        'fly apart, each thrown 7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards '
+        'flung out, a white glint; the white overlay and burst_radial are the caller\'s.', pre=WEB_FLOOR)
+def _p_ult_burst():
+    rnd = RND(61)
+    out = []
+    for i, (_x, _h, _z, _yaw, _up, ln, sd) in enumerate(WEB_LINES):
+        kw, w, ln = _web_card(i, 0.22, PINK_HOT if i % 3 else PINK_GLOW, life=9, fade=4, dur=7)
+        # the card frame: +x = the line's left, +y up
+        out.append(card(s0=(w, w, round(ln, 2)), s1=(0.1, 0.1, round(ln * 1.08, 2)), off=(0, 0, 0),
+                        move=(round(-sd * rnd.uniform(7, 10), 2), round(rnd.uniform(0.5, 2.0), 2), 0), **kw))
+    out += [fly(f'shards_{k % 2}', yaw, rnd.uniform(10, 50), rnd.uniform(5.0, 8.0), h=1.4, s0=0.7, s1=1.1, life=10, fade=4,
+                col=PINK_HOT, roll=rnd.randint(-60, 60)) for k, yaw in enumerate(radial(12, 10))]
+    out.append(card('glint_0', '~ ~1.4 ~', bb='center', s0=1.0, s1=3.6, life=5, fade=2, col=WHITE))
+    out += [dust(DUSTC[2], 1.6, '~ ~1.5 ~', (5.0, 2.0, 5.0), 40), part('end_rod', '~ ~2 ~', (4.0, 2.0, 4.0), 0.12, 24),
+            blockp('amethyst_block', '~ ~1.5 ~', (3.0, 1.5, 3.0), 0.2, 20)]
+    return [_on_floor(x) for x in out]
+
+
+SKY_MARK_T, SKY_MARK_H, SKY_MARK_W = 7, 12.0, 2.0
+
+
+@preset('sky_mark', 'P-q the sky mark (video 257.00, the one ground mark of the footage; at the lock point on the floor, '
+        f'rotated as the aim): a thin vertical light line from {SKY_MARK_H:.0f} b up down to the point (a white core in a pink '
+        f'glow) and a {SKY_MARK_W:.0f}-b pink flash line across the aim at the feet (0.15 b over the floor), {SKY_MARK_T} t. '
+        'Lines only: never an area on the floor (hr_design §8.6).')
+def _p_sky_mark():
+    h, w, t = SKY_MARK_H, SKY_MARK_W, SKY_MARK_T
+    # (the mark stands on the player: 3.5 b before the F5 lens, so the line is kept thin: a 0.1-b core in a 0.35-b glow)
+    return [card('col_face', '~ ~ ~', bb='vertical', s0=(0.16, h, 0.16), s1=(0.4, h, 0.4), life=t, fade=2, dur=2, col=WHITE),
+            card('col_face', '~ ~ ~', bb='vertical', s0=(0.5, h, 0.5), s1=(1.4, h, 1.4), life=t, fade=2, dur=2, col=PINK_GLOW),
+            card('qline', f'^{num(w / 2)} ^0.15 ^', '~90 0', s0=(0.1, 0.1, w), s1=(0.26, 0.26, w), life=t, fade=2, dur=2,
+                 col=PINK_GLOW),
+            card('qline', f'^{num(w / 2)} ^0.15 ^', '~90 0', s0=(0.04, 0.04, w), s1=(0.1, 0.1, w), life=t, fade=2, dur=2,
+                 col=PINK_HOT),
+            card('glint_0', '~ ~0.15 ~', bb='center', s0=0.3, s1=0.9, life=4, fade=2, col=PINK_HOT),
+            dust(DUSTC[2], 1.0, '~ ~0.2 ~', (0.6, 0.05, 0.6), 8), part('end_rod', '~ ~6 ~', (0.05, 3.0, 0.05), 0.0, 8)]
+
+
+SKY_PILLAR_H = 16.0
+
+
+@preset('sky_pillar', 'P-q the sky pillar of radius {r} (tenths; at the lock point on the floor, the hit tick): a pink-white '
+        f'light column {SKY_PILLAR_H:.0f} b tall (two crossed quads widening to 1.25 r in 2 t round a white core of 0.4 r: it lands '
+        'on the player, 3.5 b before the F5 lens), a pink shock ring of radius r on the floor (a hit effect at the contact tick), a white glint, motes rising. Upright whatever the '
+        'executor\'s pitch.',
+        conv=(('so', 'r', 0.5), ('sc', 'r', 0.17), ('sn', 'r', 0.1), ('s2', 'r', 0.06), ('s3', 'r', 0.03), ('pd', 'r', 0.04)))
+def _p_sky_pillar():
+    h = SKY_PILLAR_H
+    return [mac(card('light_column', '~ ~ ~', '~ 0', s0=('$(sc)', h, '$(sc)'), s1=('$(so)', h, '$(so)'), life=12, fade=6, dur=2,
+                     col=rgb('#FFB4E2'))),
+            mac(card('light_column', '~ ~ ~', '~45 0', s0=('$(s2)', h, '$(s2)'), s1=('$(sc)', h + 0.5, '$(sc)'), life=10, fade=5,
+                     dur=2, col=WHITE)),
+            mac(card('dive_impact', '^ ^0.05 ^', '~ 0', spin=50, s0=('$(s3)', 1, '$(s3)'), s1=('$(sn)', 1, '$(sn)'), life=9, fade=4,
+                     dur=3, col=PINKW)),
+            card('glint_0', '~ ~1.0 ~', bb='center', s0=1.0, s1=3.2, life=4, fade=2, col=WHITE),
+            mac(dust(DUSTC[2], 1.5, '~ ~0.3 ~', ('$(pd)', 0.2, '$(pd)'), 30)),
+            part('end_rod', '~ ~4 ~', (0.5, 4.0, 0.5), 0.08, 24)]
+
+
+BEAM_PITCH = 35                        # degrees down: the design's beam, used when the caller's rotation is level
+BEAM_MIN_H = 250                       # hundredths: ... and the executor is at least this far over the floor (she is in the air)
+BEAM_LOW = 105                         # hundredths more than qi_line's margin (0.32): the beam's centre line ends 1.37 b up, its
+#                                        2.6-b body over the floor at any pitch
+BEAM_W = 26                            # tenths: the body's width; narrower where the executor is lower than half of it
+BAND_Y = 135                           # hundredths: the ground band's centre line over the floor (half of BEAM_W + 0.05)
+
+
+@preset('qi_beam', 'P-q / P-n the sword-qi beam of length {len} (tenths): a broad magenta beam (2.6 b) round a pink-white '
+        'one and a white core (0.4 of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. Three '
+        'forms by the call. (1) Aimed (P-q: at her blade or chest in the air, `facing` the lock, looking down 10 deg or more): '
+        f'from the executor along its facing. (2) Level from {BEAM_MIN_H / 100:.1f} b or more over the floor: from the '
+        f'executor, drawn {BEAM_PITCH} deg down. In both the length is cut where the body would reach the floor '
+        f'(fx/e/clamp_line). (3) Level from lower (P-n: at the lock point, turned along the band): the band on the ground, '
+        f'CENTRED on the executor ({{len}} / 2 each way: a line hazard through the lock), laid {BAND_Y / 100:.2f} b over the '
+        'floor at full width whatever the call\'s height, shot from its near end to its far end.',
+        conv=(('l', '#r', 0.1), ('l1', '#r', 0.04), ('p1', '#r', 0.033), ('p2', '#r', 0.066), ('p3', '#r', 0.095)),
+        pre=[f'function {FN}e/hgt',
+             # form 3, the ground band: #b = len / 2 back (twentieths below), the executor's height taken as BAND_Y (dy lifts
+             # / lowers the cards there; the width rule below then gives the full BEAM_W)
+             '$scoreboard players set #b hrFx $(len)', f'scoreboard players set #a hrFx {BAND_Y}',
+             'scoreboard players operation #a hrFx -= #h hrFx',
+             f'execute unless score #pt hrFx matches ..9 run scoreboard players set #b hrFx 0',
+             f'execute if score #h hrFx matches {BEAM_MIN_H}.. run scoreboard players set #b hrFx 0',
+             'execute if score #b hrFx matches 0 run scoreboard players set #a hrFx 0',
+             f'execute unless score #b hrFx matches 0 run scoreboard players set #h hrFx {BAND_Y}',
+             f'execute store result storage {PA}.dy double 0.01 run scoreboard players get #a hrFx',
+             f'execute store result storage {PA}.bk double 0.05 run scoreboard players get #b hrFx',
+             # #m = the body's width (tenths): 2 (h - 0.05), at most BEAM_W (a level beam called low keeps over the floor)
+             'scoreboard players operation #m hrFx = #h hrFx', 'scoreboard players remove #m hrFx 5',
+             'scoreboard players operation #m hrFx *= #c2 hrFx', 'scoreboard players operation #m hrFx /= #c10 hrFx',
+             f'execute if score #m hrFx matches {BEAM_W + 1}.. run scoreboard players set #m hrFx {BEAM_W}',
+             'execute if score #m hrFx matches ..5 run scoreboard players set #m hrFx 6',
+             # (written here: fx/e/clamp_line below works in #m)
+             *[f'execute store result storage {PA}.{k} float {num(sc, 7)} run scoreboard players get #m hrFx'
+               for k, sc in (('w', 0.1), ('w0', 0.046), ('wi', 0.042), ('wi0', 0.019))],
+             f'execute if score #pt hrFx matches ..9 if score #h hrFx matches {BEAM_MIN_H}.. run scoreboard players set #pt hrFx '
+             f'{BEAM_PITCH}',
+             'execute if score #pt hrFx matches ..-1 run scoreboard players set #pt hrFx 0',
+             f'execute store result storage {PA}.pt int 1 run scoreboard players get #pt hrFx',
+             '$scoreboard players set #r hrFx $(len)', f'scoreboard players remove #h hrFx {BEAM_LOW}',
+             f'function {FN}e/clamp_line'])
+def _p_qi_beam():
+    rot = '~ $(pt)'
+    org = 'execute positioned ~ ~$(dy) ~ positioned ^ ^ ^-$(bk) '       # (the context is levelled: the band's near end)
+    aim = org + 'rotated ~ $(pt) run '
+
+    def at(line):
+        return org + 'run ' + line
+    return [mac(at(card('qline', '^ ^ ^', rot, s0=('$(w0)', '$(w0)', '$(l1)'), s1=('$(w)', '$(w)', '$(l)'), life=9, fade=4, dur=1,
+                        col=MAGENTA))),
+            mac(at(card('qline', '^ ^ ^', rot, s0=('$(wi0)', '$(wi0)', '$(l1)'), s1=('$(wi)', '$(wi)', '$(l)'), life=8, fade=4,
+                        dur=1, col=rgb('#FFC8EA')))),
+            mac(at(card('qline', '^ ^ ^', rot, s0=(0.15, 0.15, '$(l1)'), s1=(0.36, 0.36, '$(l)'), life=7, fade=3, dur=1,
+                        col=WHITE))),
+            mac(aim + dust(DUSTC[2], 1.5, '^ ^ ^$(p1)', (0.5, 0.5, 0.5), 10)),
+            mac(aim + dust(DUSTC[2], 1.5, '^ ^ ^$(p2)', (0.5, 0.5, 0.5), 10)),
+            mac(aim + dust(DUSTC[1], 1.5, '^ ^ ^$(p3)', (0.6, 0.6, 0.6), 12)),
+            mac(aim + part('electric_spark', '^ ^ ^$(p2)', (0.8, 0.8, 0.8), 0.1, 10)),
+            mac(aim + part('sweep_attack', '^ ^ ^$(p3)', (0.5, 0.3, 0.5), 0, 2))]
+# ===== end of the H1 block, part 2 ==========================================================================================
 
 
 assert set(PRESETS) == set(api.KIT_PRESETS), set(PRESETS) ^ set(api.KIT_PRESETS)
@@ -2544,6 +2836,19 @@ def _demos():
     D['ev_wind'] = _ev(5, 'spot', f('ev_wind', r=15))
     D['ev_palm'] = sum([_ev(5 + i, 'hand', f('ev_palm')) for i in range(16)], [])
     D['ev_take'] = _ev(5, 'chest1', f('ev_take', c=1), snd('ev_take_i')) + _ev(30, 'chest1', f('ev_take', c=2), snd('ev_take_b'))
+    # H1 block (lane H1c): the presets of the rebuilt fight; the yellow tell's big size after the plain one
+    D['yellow_tell'] += _ev(30, 'chest', f('yellow_tell', t=YELLOW_BIG + 12), snd('yellow_chime'))
+    D['flash_blue'] = _ev(5, 'chest', f('flash_blue', t=15), snd('yellow_chime')) + _ev(5 + FLASH_YELLOW_T, 'chest', snd('flash_blue'))
+    # (the web as the module calls it: at her body, t 22 = cut2 - web + 2, the overlay beside it; the burst at cut2)
+    D['ult_web'] = (_ev(5, 'chest', f('ult_web', t=22), snd('ult_cut1'),
+                        'function %shud/ovl {g:"web",in:%d,hold:%d,out:%d}' % ((FN,) + WEB_OVL))
+                    + _ev(25, 'chest', f('ult_burst'), snd('ult_cut2')))
+    D['ult_burst'] = _ev(5, 'chest', f('ult_burst'), snd('ult_cut2'))
+    D['sky_mark'] = _ev(5, 'spotg', f('sky_mark')) + _ev(12, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
+    D['sky_pillar'] = _ev(5, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
+    # (P-q's beam from the air; P-n's band as the module calls it: at a floor point, level, 0.6 b up)
+    D['qi_beam'] = (_ev(5, 'air', f('qi_beam', len=140), snd('band_sweep'))
+                    + _ev(25, 'spotg', 'execute positioned ~ ~0.6 ~ run ' + f('qi_beam', len=160), snd('band_sweep')))
     assert set(D) == set(PRESETS), set(D) ^ set(PRESETS)
     return D
 
@@ -2567,6 +2872,8 @@ DEMO_WHERE = {
     'spotf': 'at @s rotated as @s rotated ~ 0 positioned ^ ^0.1 ^4.5',
     'spot2': 'at @s rotated as @s rotated ~ 0 positioned ^ ^2 ^4.5',
     'spot3': 'at @s rotated as @s rotated ~ 0 positioned ^ ^0.3 ^4.5',
+    'spotg': 'at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3',                  # H1 block: a floor point before it
+    'air': 'at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~',                    # H1 block: her blade in the air
     'rift': 'at @s rotated as @s rotated ~ 0 positioned ^-3 ^ ^1',
 }
 

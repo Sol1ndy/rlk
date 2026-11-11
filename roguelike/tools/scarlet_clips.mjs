@@ -2,6 +2,9 @@
 // names, lengths, loops and event ticks are frozen, this file only authors the motion). S2a authors the 39 fight /
 // gauntlet / event clips here (api.CLIP_OWNER 'S2a'); the 8 cinematic clips belong to S2b's tools/scarlet_cine.mjs, and
 // until it exists build_scarlet_rig.mjs uses CINE_PLACEHOLDER below (static poses with the contract lengths / events).
+// HR rebuild (11-11, hr_design.md §2.3 / §8.3): lane H1c authors the 12 new fight clips (api.CLIP_OWNER 'H1': grog_in d4 tri rings
+// ult hcut blue kcut mx nb q_grab q_air) in the section "the rebuilt fight kit" below; a7_tell, a7_throw and g_deflect stay in the
+// rig unused.
 // Format and sampling: mboss_rig_clips.mjs (keys [tick, sparse pose, ease] merged onto DEFAULT_POSE; ease of the segment
 // arriving at a key: 'io' smooth, 'i' accelerate into the key (strikes, falls), 'o' decelerate (leaps, settles), 'l'
 // linear (spins)). Pose channels: scarlet_pose.mjs. Clip ticks are played ticks; the module schedules its hits on the
@@ -396,6 +399,307 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
     K(10, {rot: [0, 96, 0], hairS: .2})], {src: 'PLAN §7.3.2 E34-E40 (the turn away; petals and wind hide her)'});
 }
 
+// ---- the rebuilt fight kit (lane H1c, 11-11; tools/dev/plan/combat/hr_design.md §2.2-§2.3, §8.2): the 12 new fight clips.
+// Names, lengths and event ticks are the contract's (api.CLIPS); the reference is the user's video (video_notes.md §2.2:
+// P-d, P-i, P-j, U, P-h, P-blue, P-k, P-m, P-n, P-q), its wind-ups stretched to the telegraph rule. The poses are drawn for the
+// raised F5 camera (she is seen from the front, a little above): big silhouettes, one idea per beat. Left-handed as ever; a
+// parry cue (the pink glint at blade_mid, hit - 7) falls on a coiled pose with the blade clear of her body.
+// Bz: B after a flat sweep (SW leaves tw +-90 on the blade)
+const Bz = (cB, cR, th, ed, x = {}) => B(cB, cR, th, ed, {tw: 0, ...x});
+// SWr: SW sweeping toward her right, its roll written with ed -1 (the same blade: 90 (1 - ed) + tw = -90 = 270), so the keys to and
+// from the stance and the B cuts (ed -1) roll the blade the short way
+const SWr = (b, d, hb, he, hd, x = {}) => ({...SW(b, d, 1, hb, he, hd), ed: -1, tw: 90, ...x});
+const mix = (a, b, u) => +(a + (b - a) * u).toFixed(2);
+// one turn of the body keyed every tick: yaw y0 -> y1 at a steady rate over t0 .. t0 + n while the flat blade opens from bearing
+// b0 to b1 (relative to her; its edge leading toward her left: dir -1, her right: +1); x(u) adds channels
+const spin = (t0, n, y0, y1, b0, b1, dir, he, hd, x = () => ({})) => Array.from({length: n + 1}, (_, i) => {
+  const u = i / n, b = mix(b0, b1, u);
+  return K(t0 + i, {rot: [0, mix(y0, y1, u), 0], ...SW(b, 4, dir, +(b * .8).toFixed(1), he, hd), ...x(u)}, 'l');
+});
+// a cut keyed every tick: the blade in the plane (cB, cR) from th0 to th1 over t0 .. t0 + n (linear), the hit at t0 + n / 2
+const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({length: n + 1}, (_, i) => {
+  const u = i / n;
+  return K(t0 + i, {...Bz(cB, cR, mix(th0, th1, u), ed, {gL: mix(gl[0], gl[1], Math.sin(Math.PI * u))}), ...x(u)}, 'l');
+});
+{
+  // grog_in (the balance break): the guard smashed open 0-2 (both arms flung wide, the head thrown back), the knees buckle 3, she
+  // topples backward, the hat leaving her head 6 and landing beside her right leg 10 (DOWN's spot), flat on her back 10, DOWN 12
+  // (= `down` 0). blend 2: the snap out of whatever she was doing is the hit
+  const OPEN = {pos: [0, -.02, .05], tor: [16, -12, 6], head: [20, 10, 4], ...F_ST, gF: 0, gB: -75, gE: 24, gD: .7, cB: -80, cR: 0, th: 62, ed: -1, tw: 0, rh: 0,
+    aR: [50, 80, .95], hR: 'open', hairS: .3};
+  const HATP = [[0, 2.05, .78], [-.5, 2.25, .56], [-.95, 1.85, .2], [-1.25, 1.05, -.22], [-1.05, .02, -.5]];
+  C('grog_in', [K(0, ST), K(2, OPEN, 'o'),
+    K(3, {pos: [0, -.14, .1], rot: [10, 0, 0], tor: [20, -8, 4], head: [14, 8, 2], fL: [.15, .1, -.08], fR: [-.15, .1, .06], gE: 30, aR: [70, 70, .95], scHip: [-10, 0]}, 'l'),
+    K(5, {pos: [0, -.42, .16], rot: [34, 0, 0], lf: .4, tor: [14, -4, 2], head: [4, 6, 0], gB: -84, gE: 8, cR: 30, th: 44, aR: [84, 50, .95], scHip: [-38, 0]}, 'l'),
+    K(6, {pos: [0, -.56, .16], rot: [46, 0, 0], lf: .5, gE: -6, cR: 45, th: 34, scHip: [-52, 0], hat: 'world', hwP: HATP[0], hwE: [50, 0, 0]}, 'l'),
+    K(7, {hwP: HATP[1], hwE: [70, 10, 8]}, 'l'),
+    K(8, {pos: [0, -.84, .1], rot: [68, 0, 0], lf: .55, tor: [6, 0, 0], head: [-6, 14, 0], gB: -90, gE: -36, cR: 72, th: 16, aR: [50, 30, 1], scHip: [-70, 0], hwP: HATP[2], hwE: [60, 18, 12]}, 'l'),
+    K(9, {hwP: HATP[3], hwE: [26, 26, 6]}, 'l'),
+    K(10, {...DOWN, hwP: HATP[4], hwE: [0, 30, 0]}, 'i'),
+    K(12, DOWN, 'o')],
+    {blend: 2, cuts: [6], src: 'no footage (video_notes §1.7: the video never reaches a balance break); the fall = repel 68-75 (v2f_c_throw) from her feet'});
+}
+{
+  // d4 (P-d, v 112.40-114.8): the chest glint 0 (the blade laid flat across her chest), the coil to her right 3-9 (cue 7), the turn
+  // to her left 9-15 with the blade flat at chest height (the ring, h1 14); the blade low at her right front 20-31 (cue 27), the
+  // rising vertical fan 32-35 (h2 34), carried up over her head (cue 37), the two-handed vertical cut 42-45 (h3 44), the blade
+  // round to her left hip 46-51 (cue 47), the flat forehand slash across her front 52-56 (h4 54), the follow-through, recovery
+  const COIL = {pos: [0, -.16, 0], tor: [-8, 42, 0], head: [-4, -36, 0], ...F_WIDE, ...SW(120, 4, -1, 96, -12, .66), aR: [20, 50, .95]};
+  const LOWF = {rot: [0, -360, 0], pos: [0, -.2, 0], tor: [-14, 26, 0], head: [-4, -20, 0], ...F_WIDE, ...Bz(30, 0, -36, 1, {gL: .56}), rh: 0, aR: [16, 40, .95]};
+  const LHIP = {rot: [0, -360, 0], pos: [0, -.2, 0], tor: [-10, -38, 0], head: [-4, 32, 0], ...F_WIDE, ...SWr(-125, 6, -100, -28, .6), rh: 0, aR: [30, 40, .95]};
+  C('d4', [K(0, ST), K(3, {pos: [0, -.06, 0], tor: [-4, 18, 0], head: [-4, -14, 0], ...SW(70, 0, -1, 55, -8, .56)}), K(6, COIL, 'o'), K(8, {...COIL, pos: [0, -.2, 0], tor: [-9, 46, 0]}),
+    ...spin(9, 6, 0, -360, 120, 20, -1, -12, .68, u => ({tor: [-6, mix(46, 0, u), 0], head: [-4, mix(-36, 0, u), 0], pos: [0, -.14, 0], ...F_ST, aR: [30, 60, .95]})),
+    K(17, {rot: [0, -360, 0], ...SW(-30, 14, -1, -24, -20, .64), tor: [-8, -10, 0], pos: [0, -.16, 0]}, 'l'),
+    K(20, LOWF), K(27, {...LOWF, pos: [0, -.24, 0], tor: [-16, 32, 0]}), K(31, {...LOWF, pos: [0, -.26, 0], tor: [-17, 34, 0]}),
+    K(32, {...Bz(22, 0, -22, 1, {gL: .58}), tor: [-12, 24, 0], pos: [0, -.2, 0]}, 'i'), K(33, {...Bz(10, 0, 8, 1, {gL: .62}), tor: [-8, 12, 0], pos: [0, -.14, 0]}, 'l'),
+    K(34, {...Bz(0, 0, 44, 1, {gL: .64}), tor: [-2, 2, 0], pos: [0, -.08, 0], head: [-8, -2, 0]}, 'l'),
+    K(35, {...Bz(0, 0, 92, 1, {gL: .6}), tor: [6, -4, 0], pos: [0, -.03, 0], head: [-12, 0, 0]}, 'l'),
+    K(36, {...Bz(0, 0, 100, .1, {gL: .52}), rh: .4, tor: [8, -2, 0], pos: [0, -.01, 0]}, 'l'),
+    K(37, {...Bz(0, 0, 104, -1, {gL: .48}), rh: .8, tor: [10, 0, 0], pos: [0, 0, 0], ...F_ST}, 'l'), K(41, {...Bz(0, 0, 108, -1, {gL: .46}), rh: 1, tor: [12, 0, 0]}),
+    K(43, {...Bz(0, 0, 62, -1, {gL: .54}), rh: 1, tor: [-8, 0, 0], pos: [0, -.14, -.04], ...F_LUNGE}, 'i'),
+    K(44, {...Bz(0, 0, 2, -1, {gL: .6}), rh: 1, tor: [-22, 0, 0], pos: [0, -.26, -.06], head: [-2, 0, 0]}, 'l'),
+    K(45, {...Bz(0, 0, -30, -1, {gL: .56}), rh: .6, tor: [-24, 0, 0]}, 'o'),
+    K(46, {...SWr(-40, 24, -30, -30, .6), rh: .2, tor: [-20, -14, 0], pos: [0, -.24, -.04]}, 'l'), K(47, {...SWr(-88, 12, -70, -28, .6), rh: 0, tor: [-14, -28, 0], pos: [0, -.21, -.02], ...F_WIDE}, 'l'),
+    K(48, LHIP, 'l'), K(51, {...LHIP, pos: [0, -.24, 0], tor: [-11, -42, 0]}),
+    K(52, {...SWr(-95, 6, -78, -28, .62), tor: [-12, -28, 0]}, 'i'), K(53, {...SWr(-45, 6, -36, -26, .64), tor: [-12, -10, 0], head: [-4, 12, 0]}, 'l'),
+    K(54, {...SWr(5, 5, 4, -24, .66), tor: [-12, 8, 0], head: [-4, 0, 0], pos: [0, -.22, -.05], ...F_LUNGE}, 'l'),
+    K(55, {...SWr(55, 5, 45, -24, .64), tor: [-12, 24, 0], head: [-4, -12, 0]}, 'l'), K(56, {...SWr(100, 4, 82, -24, .62), tor: [-10, 36, 0], head: [-4, -24, 0]}, 'l'),
+    K(58, {...SWr(118, 8, 96, -26, .6), tor: [-9, 40, 0]}, 'o'), K(66, {...SWr(105, 18, 88, -32, .58), pos: [0, -.14, 0], tor: [-7, 30, 0], ...F_ST}), K(80, {...ST, rot: [0, -360, 0]})],
+    {src: 'v 112.40-114.80 (P-d; vid d4): the chest glint, the flat ring, the rising fan, the vertical, the small slash; video gaps 20 / 8 / 8 -> 20 / 10 / 10'});
+}
+{
+  // tri (P-i, v 146.9-149.4): the glint 0 (the blade drawn back level at her left hip, a thrust chamber), cue + lock 7, the lunge
+  // 12-14 (the module glides her <= 6 b): the thrust at full reach h0 14; she rises, the blade carried high to her right 22-35 (cue
+  // 31), three big descending crescents: 1 her upper right -> lower left 36-40 (h1 38), 2 her upper left -> lower right 46-50 (h2
+  // 48; cue 41 as the blade swings up at her left), 3 upper right -> lower left, two-handed, with the lunging step 58-62 (h3 60;
+  // cue 53), recovery
+  const CH = {pos: [0, -.34, .05], rot: [0, 0, 0], tor: [-16, -36, 0], head: [0, 32, 0], fL: [.2, .1, .34], fR: [-.2, .1, -.4], gF: 0, gB: -100, gE: -34, gD: .5,
+    cB: -16, cR: 0, th: 14, ed: -1, tw: 0, rh: 0, aR: [70, 10, .8]};
+  // (the wound blade stands up and out over her shoulder, th 118: laid further back it is hidden behind her from the front)
+  const HR = {pos: [0, -.12, 0], rot: [0, 0, 0], tor: [-2, 38, 0], head: [-8, -30, 0], ...F_WIDE, ...Bz(0, -58, 118, -1, {gL: .52}), rh: 0, aR: [24, 44, .95]};
+  const body = (sd, lunge) => u => ({tor: [mix(-4, -20, u), mix(36, -38, u) * sd, 0], head: [-6, mix(-28, 22, u) * sd, 0], pos: [0, mix(-.14, -.32, Math.min(1, u * 2)), mix(0, -.08, u)],
+    ...(u >= .25 ? lunge : {})});
+  C('tri', [K(0, ST), K(2, {pos: [0, -.14, .02], tor: [-8, -14, 0], gF: 0, gB: -60, gE: -44, gD: .56, cB: 12, cR: 0, th: -14, ed: -1, tw: 0}, 'l'), K(5, CH, 'o'),
+    K(7, {...CH, pos: [0, -.37, .06], tor: [-17, -40, 0]}), K(11, {...CH, pos: [0, -.4, .08], tor: [-18, -44, 0], gB: -108}),
+    K(12, {rot: [-14, 0, 0], pos: [0, -.34, 0], gB: -70, gE: -26, gD: .52, cB: -8, th: 6, tor: [-14, -20, 0], head: [6, 16, 0], lf: .2, fL: [.16, .16, -.2], fR: [-.17, .12, .3], hairS: -.6, skW: .8}, 'i'),
+    K(13, {rot: [-22, 0, 0], gB: -30, gE: -14, gD: .6, cB: -2, th: 2, tor: [-14, 4, 0], head: [12, -4, 0], fL: [.16, .12, -.54], fR: [-.17, .2, .46], aR: [20, 60, .95]}, 'l'),
+    K(14, {rot: [-20, 0, 0], pos: [0, -.34, -.1], lf: 0, fL: [.16, .1, -.64], fR: [-.17, .1, .52], ...Bz(0, 0, 0, -1, {gL: .7}), tor: [-12, 28, 0], head: [12, -24, 0], aR: [-10, 80, .98], hairS: -.3,
+      skW: .3}, 'l'),
+    K(17, {rot: [-16, 0, 0], pos: [0, -.35, -.1], tor: [-13, 30, 0], hairS: 0, skW: 0}), K(25, HR, 'io'), K(31, {...HR, pos: [0, -.16, 0], tor: [-3, 42, 0]}), K(35, {...HR, pos: [0, -.18, 0], tor: [-4, 44, 0]}),
+    ...cut(36, 4, 0, -58, 118, -112, -1, [.52, .66], body(1, F_LUNGE)),
+    // (the blade swings out round her left side on its way up: at the cue 41 it is side-on to the viewer, not end-on)
+    K(41, {...Bz(-96, 0, -24, -1, {gL: .6}), tor: [-16, -40, 0], pos: [0, -.26, -.05]}, 'l'), K(42, {...Bz(-104, 20, 50, -1, {gL: .54}), tor: [-8, -42, 0], pos: [0, -.18, -.02]}, 'l'),
+    K(43, {...Bz(0, 58, -242, -1, {gL: .52}), tor: [-3, -40, 0], pos: [0, -.12, 0], head: [-8, 30, 0], fL: [.25, .1, .2], fR: [-.25, .1, -.24], aR: [30, 50, .95]}, 'l'),
+    K(45, {...Bz(0, 58, -240, -1, {gL: .52}), tor: [-3, -43, 0], pos: [0, -.14, 0]}),
+    ...cut(46, 4, 0, 58, -242, -472, -1, [.52, .66], body(-1, F_LUNGE_R)),
+    K(51, {...Bz(0, 20, -512, -1, {gL: .56}), tor: [-16, 40, 0], pos: [0, -.26, -.05]}, 'l'), K(52, {...Bz(0, -20, -566, -1, {gL: .52}), tor: [-8, 44, 0], pos: [0, -.18, -.02]}, 'l'),
+    K(53, {...Bz(0, -52, -602, -1, {gL: .52}), tor: [-2, 44, 0], pos: [0, -.14, .02], head: [-8, -30, 0], ...F_WIDE}, 'l'),
+    K(57, {...Bz(0, -52, -598, -1, {gL: .52}), tor: [-1, 48, 0], pos: [0, -.2, .05]}),
+    ...cut(58, 4, 0, -52, -602, -838, -1, [.52, .68], u => ({...body(1, {fL: [.16, .1, -.64], fR: [-.17, .1, .5]})(u), pos: [0, mix(-.2, -.4, Math.min(1, u * 2)), mix(.05, -.12, u)]})),
+    K(70, {...Bz(0, -52, -828, -1, {gL: .56}), pos: [0, -.3, -.08], tor: [-17, -34, 0]}), K(84, {...ST, th: -760})],
+    {src: 'v 146.9-149.4 (P-i; vid tri): the lunge, then three big crescents descending across the frame; video gaps 24 / 10 / 12'});
+}
+{
+  // rings (P-j, v 150.0-151.9; P2 262.6-264.2): the glint 0 (the blade laid flat out at her right at chest height), cue 7, then one
+  // turn per ring with the blade flat at chest height, alternating: r1 14 to her left, r2 24 to her right, r3 34, r4 44, r5 54
+  // (P2 only). A turn runs h - 5 .. h + 1; the blade then swings on to the other side into the next coil (h + 4, the edge turned):
+  // the cue (h + 3 = the next h - 7) falls as it settles there. After r4 the P1 pattern has no fifth ring: the module plays the next
+  // clip (or `ult`) before the fifth turn starts at 49
+  const CR = {pos: [0, -.18, 0], tor: [-8, 44, 0], head: [-4, -38, 0], ...F_WIDE, ...SW(120, 4, -1, 96, -10, .66), aR: [20, 50, .95]};
+  const CL = {pos: [0, -.18, 0], tor: [-8, -44, 0], head: [-4, 38, 0], ...F_WIDE, ...SW(-120, 4, 1, -96, -10, .66), aR: [36, 44, .95]};
+  const turn = (t, y0, sd) => [...spin(t, 6, y0, y0 - 360 * sd, 120 * sd, 0, -sd, -10, .68, u => ({tor: [-6, mix(44, -10, u) * sd, 0], head: [-4, mix(-38, 8, u) * sd, 0],
+    pos: [0, mix(-.2, -.1, Math.sin(Math.PI * u)), 0], ...F_ST, aR: [30, 60, .95]})),
+    K(t + 7, {...SW(-45 * sd, 4, -sd, -36 * sd, -10, .68), tw: 54 * sd, tor: [-7, -24 * sd, 0], head: [-4, 20 * sd, 0], pos: [0, -.14, 0]}, 'l'),
+    K(t + 8, {...SW(-90 * sd, 4, -sd, -72 * sd, -10, .67), tw: -18 * sd, tor: [-8, -36 * sd, 0], head: [-4, 32 * sd, 0], pos: [0, -.17, 0], ...F_WIDE}, 'l'),
+    K(t + 9, {...(sd > 0 ? CL : CR), rot: [0, y0 - 360 * sd, 0]}, 'l')];
+  C('rings', [K(0, ST), K(3, {pos: [0, -.08, 0], tor: [-4, 20, 0], head: [-4, -16, 0], ...SW(75, 0, -1, 60, -8, .56)}), K(6, CR, 'o'), K(8, {...CR, pos: [0, -.2, 0], tor: [-9, 48, 0]}),
+    ...turn(9, 0, 1), ...turn(19, -360, -1), ...turn(29, 0, 1), ...turn(39, -360, -1), ...turn(49, 0, 1).slice(0, 7),
+    K(58, {rot: [0, -360, 0], ...SW(-60, 10, -1, -50, -20, .64), pos: [0, -.16, 0], tor: [-8, -24, 0], head: [-4, 20, 0], ...F_WIDE}, 'o'),
+    K(66, {rot: [0, -360, 0], ...SW(-70, 22, -1, -60, -34, .6), pos: [0, -.12, 0], tor: [-6, -18, 0], head: [-4, 12, 0], ...F_ST}), K(78, {...ST, rot: [0, -360, 0]})],
+    {src: 'v 150.0-151.9 (P-j; vid rings): flat rings at her chest height while she turns, one every 8-12 t -> 10 t'});
+}
+{
+  // ult (U, v 151.93-155.2): the iai stance 0-22 (deep and side-on, the blade laid back along the scabbard at her right hip, the
+  // right hand on its throat; yellow 0, star1 12), the draw 22-24: the blade whips out across her front (cut1 24, the white), held
+  // out at full reach to her left through the web 26-43 (the edge turned over at star2 34), the return cut back across 43-48 (cut2
+  // 46), the blade brought back to the hip 48-56 (settle 56), held, then the stance
+  const IAI = {pos: [0, -.34, .02], tor: [-18, 50, 0], head: [-10, -44, 0], fL: [.27, .1, -.36], fR: [-.25, .1, .32], ...SW(150, 24, -1, 62, -50, .62), rh: 0, hR: 'grip', hsR: 1,
+    aR: [20, 10, .8]};
+  const OUT = {pos: [0, -.3, -.04], tor: [-12, -34, 0], head: [-6, 26, 0], fL: [.3, .1, -.42], fR: [-.26, .1, .36], ...SW(-112, -14, -1, -100, 2, .78), hsR: 1};
+  C('ult', [K(0, ST), K(4, {...IAI, pos: [0, -.2, 0], tor: [-12, 34, 0], ...SW(130, 20, -1, 70, -40, .6)}, 'o'), K(8, IAI, 'o'), K(12, {...IAI, pos: [0, -.37, .02], tor: [-19, 52, 0]}),
+    K(21, {...IAI, pos: [0, -.4, .03], tor: [-21, 55, 0], head: [-12, -48, 0]}),
+    K(22, {...SW(128, 14, -1, 74, -42, .66), tor: [-18, 40, 0], pos: [0, -.36, 0]}, 'i'), K(23, {...SW(62, 6, -1, 44, -26, .72), tor: [-15, 10, 0], head: [-8, -10, 0], pos: [0, -.32, -.03]}, 'l'),
+    K(24, {...SW(-14, 0, -1, -12, -12, .76), tor: [-13, -14, 0], head: [-6, 12, 0], pos: [0, -.3, -.04], fL: [.3, .1, -.42], fR: [-.26, .1, .36]}, 'l'),
+    K(25, {...SW(-76, -8, -1, -66, -4, .78), tor: [-12, -28, 0], head: [-6, 22, 0]}, 'l'), K(26, OUT, 'l'), K(31, {...OUT, pos: [0, -.32, -.04], tor: [-13, -36, 0]}),
+    K(33, {tw: 150}, 'l'), K(35, {tw: 270}, 'l'), K(42, {...OUT, ...SW(-116, -16, 1, -103, 4, .78), tw: 270, pos: [0, -.33, -.04], tor: [-13, -38, 0]}),
+    K(43, {...SW(-108, -12, 1, -96, 0, .78), tw: 270}, 'i'), K(44, {...SW(-64, -6, 1, -56, -6, .77), tw: 270, tor: [-13, -22, 0], head: [-6, 14, 0]}, 'l'),
+    K(45, {...SW(-6, 0, 1, -6, -14, .76), tw: 270, tor: [-14, -2, 0], head: [-6, -4, 0]}, 'l'),
+    K(46, {...SW(50, 6, 1, 38, -24, .72), tw: 270, tor: [-15, 18, 0], head: [-8, -18, 0]}, 'l'),
+    K(47, {...SW(100, 12, 1, 62, -36, .68), tw: 270, tor: [-17, 36, 0], head: [-10, -32, 0]}, 'l'),
+    K(48, {...SW(132, 18, 1, 66, -44, .64), tw: 270, tor: [-18, 44, 0], head: [-10, -40, 0], pos: [0, -.32, 0]}, 'o'),
+    K(56, {...IAI, ...SW(150, 24, 1, 62, -50, .62), tw: 270, pos: [0, -.3, .02], tor: [-16, 48, 0]}, 'io'), K(68, {pos: [0, -.28, .02], tor: [-15, 46, 0]}),
+    K(86, ST)],
+    {src: 'v 151.93-155.2 / 264.40-267.6 (U; ref ult_space_cut): yellow, the star, the slash into the white, the web, the star, the second white'});
+}
+{
+  // hcut (P-h, v 129.0-130.2 / 231.2-232.6): from far: she drops into a long low stance, the blade trailing level behind her left
+  // side (yellow 2), held and sinking (the sparkle 8-16, lock 19), go 24 (the module dashes her <= 16 b in 2 t): the flat forehand
+  // cut at knee-to-waist height from behind her left across her front (cut 26) round to her right 24-28, held low, recovery
+  const RUN = {pos: [0, -.5, .05], rot: [-12, 0, 0], tor: [-24, -36, 0], head: [16, 32, 0], fL: [.22, .1, .5], fR: [-.2, .1, -.56], ...SWr(-118, 14, -100, -48, .64), rh: 0, aR: [70, 16, .85],
+    hR: 'open'};
+  C('hcut', [K(0, ST), K(2, {pos: [0, -.24, .02], rot: [-4, 0, 0], tor: [-12, -14, 0], head: [6, 12, 0], fL: [.18, .1, .2], fR: [-.17, .1, -.3], ...SWr(-34, 32, -30, -50, .58), rh: 0,
+      aR: [40, 12, .9], hR: 'open'}, 'l'), K(5, RUN, 'io'), K(16, {...RUN, pos: [0, -.54, .06], tor: [-26, -40, 0]}),
+    K(19, {...RUN, pos: [0, -.56, .07], tor: [-27, -42, 0], aR: [56, 20, .8]}), K(23, {...RUN, pos: [0, -.58, .09], rot: [-16, 0, 0], tor: [-28, -46, 0], ...SWr(-128, 12, -108, -48, .64), aR: [44, 24, .8]}),
+    K(24, {rot: [-24, 0, 0], pos: [0, -.42, -.04], ...SWr(-118, 12, -100, -46, .66), tor: [-22, -34, 0], head: [16, 22, 0], lf: .25, fL: [.18, .16, .2], fR: [-.18, .12, -.44], hairS: -.8, skW: 1}, 'i'),
+    K(25, {rot: [-26, 0, 0], ...SWr(-62, 9, -52, -44, .68), tor: [-20, -12, 0], head: [16, 6, 0], fL: [.18, .12, -.3], fR: [-.18, .2, .3]}, 'l'),
+    K(26, {rot: [-22, 0, 0], ...SWr(4, 7, 4, -44, .7), tor: [-20, 12, 0], head: [14, -10, 0], lf: 0, ...F_LUNGE, pos: [0, -.42, -.08]}, 'l'),
+    K(27, {rot: [-16, 0, 0], ...SWr(70, 6, 58, -42, .68), tor: [-19, 32, 0], head: [12, -26, 0]}, 'l'),
+    K(28, {rot: [-10, 0, 0], ...SWr(122, 6, 98, -40, .64), tor: [-18, 46, 0], head: [10, -38, 0], hairS: -.2, skW: .3, aR: [-20, 40, .95]}, 'o'),
+    K(38, {rot: [-6, 0, 0], ...SWr(128, 14, 102, -44, .62), pos: [0, -.38, -.06], tor: [-16, 42, 0], hairS: 0, skW: 0}), K(52, ST)],
+    {src: 'v 129.0-130.2, 231.2-232.6 (P-h): the far yellow, the sparkle at her, the huge flat disc swept at knee-to-waist height; video yellow -> cut 18 t -> 24'});
+}
+{
+  // blue (P-blue, v 136.80-137.85): she draws herself up, feet together, the blade presented high and out at her left, the arm
+  // straight (the yellow ring 0, inside the blue sphere 4-19: a long diagonal clear of the brim, flat to the viewer), draws it
+  // back into a thrust chamber beside her left cheek pointing at the player 11-15 (lock 15), the lunge 20 (the module, <= 9
+  // b): the thrust at full reach (hit 22), held, recovery
+  const UP = {pos: [0, -.01, 0], tor: [-2, -8, 0], head: [-6, 6, 0], ...F_TOG, ...Bz(-90, 0, 50, -1, {gL: .7}), tw: 90, rh: 0, hR: 'open', aR: [-14, 16, .96]};
+  const CHM = {pos: [0, -.2, .08], tor: [-8, -46, 0], head: [-4, 42, 0], fL: [.16, .1, .38], fR: [-.14, .1, -.34], gF: 0, gB: -66, gE: 24, gD: .46, cB: -24, cR: 0, th: 10, ed: -1, tw: 90,
+    rh: 0, hR: 'open', aR: [84, -16, .7]};
+  C('blue', [K(0, ST), K(2, {...Bz(-40, 0, -4, -1, {gL: .6}), tw: 45, pos: [0, -.02, 0]}, 'l'), K(4, UP, 'o'), K(10, {...UP, pos: [0, 0, 0], ...Bz(-90, 0, 54, -1, {gL: .7}), tw: 90}), K(15, CHM, 'io'), K(19, {...CHM, pos: [0, -.24, .11], tor: [-9, -50, 0], gB: -72}),
+    K(20, {rot: [-12, 0, 0], pos: [0, -.26, 0], gB: -40, gE: 16, gD: .56, cB: -12, th: 5, tor: [-9, -20, 0], head: [4, 18, 0], lf: .2, fL: [.16, .14, -.1], fR: [-.15, .12, .2], aR: [40, 30, .8], hairS: -.6,
+      skW: .8}, 'i'),
+    K(21, {rot: [-18, 0, 0], gB: -16, gE: 8, gD: .7, cB: -4, th: 2, tor: [-10, 8, 0], head: [10, -6, 0], fL: [.16, .12, -.52], fR: [-.16, .18, .44], aR: [0, 60, .9]}, 'l'),
+    K(22, {rot: [-18, 0, 0], pos: [0, -.36, -.12], lf: 0, fL: [.16, .1, -.64], fR: [-.17, .1, .52], ...Bz(0, 0, 0, -1, {gL: .7}), tw: 90, tor: [-10, 34, 0], head: [12, -30, 0], aR: [-16, 84, .98],
+      hairS: -.3, skW: .3}, 'l'),
+    K(26, {pos: [0, -.37, -.12], tor: [-11, 36, 0], hairS: 0, skW: 0}), K(32, {rot: [-12, 0, 0], pos: [0, -.32, -.1]}), K(46, ST)],
+    {src: 'v 136.80-137.85 (P-blue; ref unblockable_flashes 136.88-137.85): the yellow ring turns into the blue sphere round her, then the lunge'});
+}
+{
+  // kcut (P-k, v 158.20-159.30): the low crouch 0-3 (a sprinter's set: the right hand reaching down before her, the blade hidden
+  // behind her, its tip up over her back; yellow 3), the sparkle 9, the charge 12-19 (she sinks and trembles: the lilac glow is the
+  // module's look), lock 15, the dash through 20 (the module): the blade whipped round flat from behind her left across her front
+  // 19-22 (cut 22), up to her right 23, the return cut down across 24-27, the blade flicked out low at her left, recovery
+  const SET = {pos: [0, -.5, .02], rot: [-6, 0, 0], tor: [-32, 24, 0], head: [20, -20, 0], fL: [.26, .1, .4], fR: [-.24, .1, -.34], gF: 0, gB: -150, gE: -34, gD: .52, cB: 172, cR: 0, th: 34,
+    ed: 1, tw: 0, rh: 0, hR: 'open', aR: [58, 4, 1]};
+  C('kcut', [K(0, ST), K(1, {pos: [0, -.2, 0], tor: [-12, 10, 0], gF: 0, gB: -70, gE: -46, gD: .58, cB: 80, cR: 0, th: -14, ed: 0, tw: 0}, 'l'), K(3, SET, 'l'), K(9, {...SET, pos: [0, -.52, .02]}), K(12, {...SET, pos: [0, -.54, .03], tor: [-33, 26, 0]}), K(14, {...SET, pos: [0, -.51, .03]}), K(15, {...SET, pos: [0, -.55, .04]}),
+    K(17, {...SET, pos: [0, -.52, .04]}), K(18, {...SET, pos: [0, -.56, .05], tor: [-34, 28, 0], th: 28}),
+    K(19, {...SET, pos: [0, -.5, .02], rot: [-16, 0, 0], ...SW(-170, 6, 1, -140, -40, .6), tor: [-28, -20, 0], head: [20, 14, 0], aR: [30, 30, .9]}, 'l'),
+    K(20, {rot: [-28, 0, 0], pos: [0, -.42, -.06], ...SW(-100, 8, 1, -84, -40, .66), tor: [-24, -26, 0], head: [22, 20, 0], lf: .25, fL: [.18, .14, -.2], fR: [-.18, .14, .3], hairS: -.8, skW: 1}, 'l'),
+    K(21, {...SW(-14, 6, 1, -12, -38, .7), tor: [-22, 0, 0], head: [20, 0, 0], fL: [.18, .12, -.46], fR: [-.18, .2, .42]}, 'l'),
+    K(22, {rot: [-20, 0, 0], ...SW(70, 2, 1, 58, -32, .68), tor: [-18, 28, 0], head: [14, -22, 0], lf: 0, ...F_LUNGE, pos: [0, -.36, -.1]}, 'l'),
+    K(23, {rot: [-10, 0, 0], ...Bz(0, -50, 124, 1, {gL: .56}), tor: [-8, 42, 0], head: [2, -34, 0], pos: [0, -.26, -.08], hairS: -.2, skW: .3}, 'l'),
+    K(24, {rot: [-7, 0, 0], ...Bz(0, -50, 128, 0, {gL: .54}), tor: [-5, 42, 0], pos: [0, -.22, -.07]}, 'l'),
+    K(25, {rot: [-6, 0, 0], ...Bz(0, -50, 122, -1, {gL: .52}), tor: [-4, 40, 0], pos: [0, -.2, -.06]}, 'l'),
+    K(26, {...Bz(0, -50, 60, -1, {gL: .6}), tor: [-10, 16, 0], pos: [0, -.26, -.08]}, 'l'), K(27, {...Bz(0, -50, 0, -1, {gL: .66}), tor: [-16, -10, 0], head: [2, 8, 0], pos: [0, -.32, -.1]}, 'l'),
+    K(28, {...Bz(0, -50, -60, -1, {gL: .62}), tor: [-20, -30, 0], head: [2, 22, 0]}, 'l'), K(29, {...Bz(0, -50, -104, -1, {gL: .58}), tor: [-20, -38, 0], hairS: 0, skW: 0}, 'o'),
+    K(34, {rot: [-4, 0, 0], ...Bz(0, -50, -100, -1, {gL: .56}), pos: [0, -.28, -.08], tor: [-17, -34, 0]}), K(50, ST)],
+    {src: 'v 158.20-159.30 (P-k; ref tells_p2 158.45-159.20): the crouch, the big yellow, the lilac charge, the dash through with long cut lines; video yellow -> cuts 15 t -> 19'});
+}
+{
+  // mx (P-m, v 236.25-236.9, 244.40-246.2): the iai crouch 0 (low, the blade drawn back low behind her left; the purple star 4, lock
+  // 9), go 14 (the module streaks her to 1.6 b from the lock): the X in two strokes about its tick, the rising diagonal her lower left ->
+  // upper right 13-15, the blade turned over above her 16 (x 16), the falling one her upper left -> lower right 17-20; the blade swirled up over her right 19-23 (cue
+  // 21), the turn to her left with the blade out flat 24-30 (the dome, 28), settling, the P2 stance
+  const MC = {pos: [0, -.4, .03], tor: [-22, -38, 0], head: [8, 32, 0], fL: [.26, .1, .3], fR: [-.24, .1, -.34], ...Bz(0, -45, -138, 1, {gL: .56}), rh: 0, aR: [50, 30, .9]};
+  const SWIRL = {rot: [0, 0, 0], pos: [0, -.18, 0], ...SW(62, -48, -1, 42, 28, .58), tor: [4, 12, 0], head: [-8, -8, 0], ...F_ST, aR: [20, 40, .95]};
+  C('mx', [K(0, ST2), K(2, {pos: [0, -.26, .02], tor: [-16, -20, 0], ...Bz(20, -30, -84, 0, {gL: .56})}, 'l'), K(4, MC, 'o'), K(9, {...MC, pos: [0, -.43, .04], tor: [-23, -42, 0]}), K(12, {...MC, pos: [0, -.46, .06], rot: [-6, 0, 0], tor: [-24, -46, 0]}),
+    K(13, {rot: [-12, 0, 0], ...Bz(0, -45, -132, 1, {gL: .56}), pos: [0, -.42, 0]}, 'i'),
+    K(14, {rot: [-18, 0, 0], ...Bz(0, -45, -24, 1, {gL: .64}), tor: [-16, -12, 0], head: [10, 8, 0], pos: [0, -.32, -.06], lf: .3, fL: [.16, .14, -.3], fR: [-.17, .2, .34], hairS: -.7, skW: .8}, 'l'),
+    K(15, {rot: [-12, 0, 0], ...Bz(0, -45, 80, 1, {gL: .58}), tor: [-4, 20, 0], head: [-2, -16, 0], pos: [0, -.22, -.08], fL: [.16, .12, -.5], fR: [-.17, .14, .4]}, 'l'),
+    K(16, {rot: [-10, 0, 0], ...Bz(0, 0, 102, 0, {gL: .5}), tor: [0, 0, 0], head: [-6, 0, 0], pos: [0, -.2, -.1], lf: 0, ...F_LUNGE}, 'l'),
+    K(17, {rot: [-8, 0, 0], ...Bz(0, 45, 118, -1, {gL: .52}), tor: [-2, -20, 0], head: [-6, 16, 0], pos: [0, -.22, -.1]}, 'l'),
+    K(18, {rot: [-6, 0, 0], ...Bz(0, 45, 24, -1, {gL: .66}), tor: [-14, 4, 0], head: [0, -4, 0], pos: [0, -.32, -.1], hairS: -.2, skW: .2}, 'l'),
+    K(19, {rot: [-3, 0, 0], ...Bz(0, 45, -66, -1, {gL: .62}), tor: [-20, 26, 0], head: [2, -18, 0], pos: [0, -.36, -.1]}, 'l'), K(20, {rot: [-2, 0, 0], ...Bz(0, 45, -102, -1, {gL: .58}), tor: [-20, 32, 0]}, 'o'),
+    K(22, SWIRL, 'io'), K(23, {...SWIRL, pos: [0, -.2, 0], tor: [5, 16, 0]}),
+    K(24, {rot: [0, -30, 0], ...SW(95, -15, -1, 75, 0, .6), tor: [-2, 14, 0], pos: [0, -.2, 0]}, 'l'), K(25, {rot: [0, -95, 0], ...SW(90, 8, -1, 78, -24, .64), tor: [-6, 18, 0]}, 'l'),
+    K(26, {rot: [0, -165, 0]}, 'l'), K(27, {rot: [0, -235, 0]}, 'l'), K(28, {rot: [0, -300, 0]}, 'l'), K(29, {rot: [0, -345, 0], tor: [-8, 10, 0]}, 'l'), K(30, {rot: [0, -360, 0]}, 'l'),
+    K(33, {rot: [0, -376, 0], ...SW(70, 15, -1, 60, -30, .6), pos: [0, -.2, 0]}, 'o'), K(40, {rot: [0, -372, 0], ...SW(60, 25, -1, 50, -35, .58), pos: [0, -.16, 0]}), K(60, {...ST2, rot: [0, -360, 0]})],
+    {src: 'v 236.25-236.9, 244.40-246.2 (P-m; ref tells_p2): the purple star, two crossing crescents with a star burst, the dome'});
+}
+{
+  // nb (P-n, v 261.00-262.05): the crouch 0, the leap 2 (the module: 5 b up, <= 6 b toward the player), at the apex 8 she hangs
+  // bowed over the player, the blade wound high at her right (cue + lock 13); three bands thrown down: the cut from her upper
+  // right down to her left front 18-22 (b1 20; its plane 30 deg to the left of her aim), wound high at her left (cue 23), the cut
+  // from her upper left down to her right front 28-32 (b2 30; 30 deg to the right), the
+  // blade raised before her in both hands (cue 33), the straight chop 38-41 (b3 40); she drops 41-46 and lands low 46, the P2 stance
+  const HANG = {...ST2, ...AIR, lf: 1, pos: [0, .34, 0], rot: [-16, 0, 0], tor: [-10, 34, 0], head: [-14, -28, 0], fL: [.14, .72, -.28], fR: [-.13, .6, -.04], ...Bz(-30, -40, 108, -1, {gL: .52}),
+    rh: 0, aR: [40, 60, .9], hR: 'open', hairS: .2, skW: -.2};
+  const airCut = (t, cR, sd) => cut(t, 4, -30 * sd, cR, 108, -80, -1, [.52, .66], u => ({tor: [mix(-10, -22, u), mix(34, -30, u) * sd, 0], head: [-14, mix(-28, 22, u) * sd, 0]}));
+  C('nb', [K(0, ST2), K(2, {...CROUCH, pos: [0, -.32, 0], tor: [-22, 8, 0], ...Bz(30, 0, -30, -1, {gL: .55})}),
+    K(4, {pos: [0, .06, 0], tor: [6, 6, 0], head: [-10, -4, 0], lf: .5, fL: [.12, .2, -.04], fR: [-.12, .18, .08], aR: [60, 30, .95], hairS: -.5, skW: .4, ...Bz(-10, 0, -20, -1, {gL: .58})}, 'o'),
+    K(8, HANG, 'o'), K(13, {...HANG, pos: [0, .36, 0], tor: [-9, 38, 0]}), K(17, {...HANG, pos: [0, .37, 0], tor: [-8, 40, 0]}),
+    ...airCut(18, -40, 1), K(23, {...Bz(-10, -10, -132, -1, {gL: .56}), tor: [-18, -34, 0]}, 'l'), K(24, {...Bz(15, 20, -196, -1, {gL: .52}), tor: [-12, -38, 0]}, 'l'),
+    K(25, {...Bz(30, 40, -252, -1, {gL: .52}), tor: [-10, -38, 0], head: [-14, 28, 0], fL: [.13, .6, -.04], fR: [-.14, .72, -.28]}, 'l'), K(27, {...Bz(30, 40, -250, -1, {gL: .52}), tor: [-8, -40, 0]}),
+    ...cut(28, 4, 30, 40, -252, -440, -1, [.52, .66], u => ({tor: [mix(-10, -22, u), mix(-38, 30, u), 0], head: [-14, mix(28, -22, u), 0]})),
+    // (the blade back up before her the short way, both hands: the chop's wind-up; flat to the viewer)
+    K(33, {...Bz(16, 20, -404, -1, {gF: .6, gB: 0, gE: 10, gD: .55, gL: .56}), tor: [-18, 16, 0], rh: .3}, 'l'),
+    K(34, {...Bz(0, 0, -338, -1, {gF: .2, gB: 0, gE: 20, gD: .55}), tw: 45, tor: [-12, 6, 0], head: [-16, -4, 0], rh: .7}, 'l'),
+    K(35, {...Bz(0, 0, -268, -1, {gF: 0, gB: 0, gE: 28, gD: .56}), tw: 90, tor: [-6, 0, 0], head: [-18, 0, 0], rh: 1, hR: 'grip', fL: [.13, .7, -.2], fR: [-.13, .66, -.1]}, 'l'),
+    K(38, {...Bz(0, 0, -264, -1, {gF: 0, gB: 0, gE: 30, gD: .56}), tw: 90, tor: [-4, 0, 0], pos: [0, .38, 0]}),
+    K(39, {...Bz(0, 0, -312, -1, {gF: .6, gL: .56}), tw: 40, tor: [-14, 0, 0]}, 'i'), K(40, {...Bz(0, 0, -362, -1, {gL: .62}), rh: 1, tor: [-24, 0, 0], head: [-10, 0, 0], pos: [0, .3, 0]}, 'l'),
+    K(41, {...Bz(0, 0, -392, -1, {gL: .6}), rh: .8, tor: [-26, 0, 0]}, 'o'),
+    K(44, {rot: [-6, 0, 0], pos: [0, .12, 0], lf: .6, fL: [.14, .34, -.16], fR: [-.14, .3, .1], tor: [-18, 0, 0], head: [0, 0, 0], hairS: .5, skW: -.5}, 'l'),
+    K(46, {...LOW, rot: [0, 0, 0], lf: 0, pos: [0, -.44, -.04], ...Bz(0, 0, -388, -1, {gL: .6}), rh: .8, tor: [-30, 0, 0], head: [8, 0, 0], hairS: 0, skW: 0}, 'i'),
+    K(50, {pos: [0, -.42, -.04], tor: [-28, 2, 0], rh: 0, hR: 'open'}), K(66, {...ST2, th: -390})],
+    {src: 'v 261.00-262.05 (P-n; ref tells_p2 261.20 / 262.05): two huge diagonal bands from above, then a third; video gaps 6-12 t / 8 t -> 10 / 10'});
+}
+{
+  // q_grab (P-q, v 247.00-247.60; ref hr_grab_4fps): from far: the glint 0, she sinks, the blade trailing behind her left, the open
+  // right hand reaching out at the player (the ghost form 4 and the purple star 8 are the module's; lock 13), the ghost lunge 16-20
+  // (the module, <= 14 b): flat out, the arm stretched ahead; the hand closes at the player's chest (grab 20), held 21. From 21
+  // the miss (landed -> q_air at 21): she snatches at the air, pulls the empty fist in, straightens, the P2 stance at 34
+  const REACH = {...ST2, pos: [0, -.34, .04], rot: [-6, 0, 0], tor: [-18, -30, 0], head: [8, 26, 0], fL: [.2, .1, .36], fR: [-.2, .1, -.44], ...SWr(-116, 22, -100, -44, .6), rh: 0,
+    hR: 'open', aR: [118, -10, .86], pR: [.3, -.6, .4]};
+  const FLY = {rot: [-44, 0, 0], pos: [0, .03, 0], lf: .8, tor: [-8, -8, 0], head: [34, 6, 0], fL: [.13, .55, .1], fR: [-.13, .5, .22], ...SWr(-165, 4, -140, -30, .62), aR: [150, -6, 1],
+    hairS: -.8, skW: 1};
+  C('q_grab', [K(0, ST2), K(2, {pos: [0, -.24, .02], tor: [-12, -12, 0], ...SWr(-50, 30, -44, -48, .58), rh: 0, aR: [60, 0, .7], hR: 'open'}, 'l'), K(4, REACH, 'o'),
+    K(8, {...REACH, pos: [0, -.37, .05], aR: [120, -10, .9]}), K(13, {...REACH, pos: [0, -.4, .06], tor: [-19, -34, 0], aR: [122, -8, .96]}),
+    K(15, {...REACH, pos: [0, -.42, .08], rot: [-12, 0, 0], tor: [-20, -36, 0], aR: [124, -8, 1]}),
+    K(16, {...FLY, rot: [-30, 0, 0], lf: .4, pos: [0, -.14, 0], fL: [.16, .2, -.1], fR: [-.16, .3, .3]}, 'i'), K(17, FLY, 'l'), K(19, {...FLY, rot: [-40, 0, 0], aR: [146, -4, 1]}),
+    K(20, {rot: [-8, 0, 0], lf: 0, pos: [0, -.2, -.08], ...F_LUNGE_R, tor: [-12, -26, 0], head: [2, 22, 0], ...SWr(-140, 14, -116, -40, .6), aR: [98, -18, .74], hR: 'grip', hairS: -.2, skW: .3}, 'i'),
+    K(21, {}),      // (held: the module takes the landed branch at 21 = api.Q_AIR_T0; q_air 0 is this pose)
+    K(22, {pos: [0, -.22, -.08], tor: [-13, -22, 0], aR: [92, -22, .6], hairS: 0, skW: 0}), K(26, {rot: [-2, 0, 0], pos: [0, -.16, -.04], tor: [-8, -10, 0], head: [-2, 2, 0], aR: [70, -10, .5], hR: 'open'}),
+    K(34, {...ST2, pos: [0, -.13, 0]}), K(40, ST2)],
+    {src: 'v 247.00-247.60 (P-q; ref hr_grab_4fps 246.80-247.55): the far lilac glint, the lilac ghost lunge = the grab'});
+}
+{
+  // q_air (P-q, v 247.8-258.2; ref hr_grab_4fps, p2_aerial_grab): from the grab: both arms heave upward (throw 0), she rises with
+  // the motion 2-10 (the module); hanging, the blade wound high at her right (cue + lock 15), the diagonal beam cut 20-24 (beam
+  // 22); the blade raised before her in both hands (cue + lock 31), the dive 34 (the module): the blade driven down (hit 38),
+  // landing low 40; the second leap 46, at the apex 52 the blade thrust straight up at the sky, the free arm spread (the purple
+  // star 62, lock 67), brought down to point at the player 72-74 (the pillar 74); she drops 78, lands 84, the P2 stance
+  const G0 = {...ST2, rot: [-8, 0, 0], lf: 0, pos: [0, -.2, -.08], ...F_LUNGE_R, tor: [-12, -26, 0], head: [2, 22, 0], ...SWr(-140, 14, -116, -40, .6), rh: 0, aR: [98, -18, .74],
+    hR: 'grip'};     // (= q_grab 20-21)
+  const HANG = {...ST2, ...AIR, rot: [-14, 0, 0], lf: 1, pos: [0, .34, 0], tor: [-10, 34, 0], head: [-14, -28, 0], fL: [.14, .72, -.28], fR: [-.13, .6, -.04], ...Bz(0, -42, 108, -1, {gL: .52}),
+    rh: 0, aR: [40, 60, .9], hR: 'open', hairS: .2, skW: -.2};
+  // (the dive's wind-up: the blade reversed, point down before her in both hands, the fists before her brow: a plunging stab)
+  const GUARD = {...ST2, ...AIR, rot: [-8, 0, 0], lf: .9, pos: [0, .8, 0], tor: [-2, 2, 0], head: [-16, -2, 0], fL: [.13, .76, -.2], fR: [-.13, .7, -.08], ...Bz(0, 0, -82, -1, {gF: 0, gB: 0, gE: -40, gD: .8}),
+    tw: 90, rh: 1, hR: 'grip', aR: [60, 30, .9]};
+  const SKY = {...ST2, ...AIR, rot: [0, 0, 0], lf: 1, pos: [0, .34, 0], tor: [6, -6, 0], head: [-16, 6, 0], fL: [.12, .5, -.16], fR: [-.13, .66, -.02], ...Bz(0, 0, 92, -1, {gL: .68}), tw: 90, rh: 0, hR: 'open',
+    aR: [24, 84, .96], hairS: 0, skW: 0};
+  C('q_air', [K(0, G0), K(1, {rot: [-4, 0, 0], pos: [0, -.1, -.04], tor: [0, -12, 0], head: [8, 10, 0], cB: -124, th: 30, gB: -100, gE: -14, gD: .62, aR: [140, 0, .9], hR: 'open'}, 'l'),
+    K(2, {rot: [0, 0, 0], pos: [0, .02, 0], lf: .4, fL: [.13, .16, -.06], fR: [-.13, .14, .08], tor: [12, 0, 0], head: [16, 0, 0], cB: -108, th: 72, gB: -84, gE: 14, gD: .64, aR: [168, 16, 1],
+      hR: 'open', hairS: -.5, skW: .5}, 'l'),
+    K(5, {...AIR, pos: [0, .2, 0], lf: 1, tor: [2, 12, 0], head: [-4, -10, 0], fL: [.13, .6, -.2], fR: [-.13, .5, .04], ...Bz(-10, -30, 120, -1, {gL: .56}), aR: [90, 40, .95]}, 'io'),
+    K(10, HANG, 'o'), K(15, {...HANG, pos: [0, .36, 0], tor: [-9, 38, 0]}), K(19, {...HANG, pos: [0, .37, 0], tor: [-8, 40, 0]}),
+    ...cut(20, 4, 0, -42, 108, -84, -1, [.52, .66], u => ({tor: [mix(-10, -24, u), mix(34, -30, u), 0], head: [-14, mix(-28, 22, u), 0]})),
+    K(27, {...Bz(0, -16, -84, -1, {gF: .3, gB: -10, gE: 0, gD: .7, gL: .6}), tw: 40, tor: [-12, -10, 0], head: [-12, 8, 0], rh: .4}), K(30, GUARD, 'io'), K(33, {...GUARD, pos: [0, .82, 0], tor: [0, 2, 0]}),
+    K(34, GUARD), K(36, {rot: [-10, 0, 0], tor: [-2, 0, 0], head: [-10, -2, 0], ...Bz(0, 0, -64, -1, {gF: 0, gB: 0, gE: -37, gD: .78}), tw: 90, rh: 1, lf: .8, pos: [0, .62, 0], fL: [.12, .56, .1], fR: [-.12, .5, .18], hairS: .5,
+      skW: -.5}, 'i'),
+    K(37, {rot: [-12, 0, 0], ...Bz(0, 0, -50, -1, {gF: 0, gB: 0, gE: -34, gD: .72}), tw: 60, tor: [-12, 0, 0], lf: .6, pos: [0, .34, 0], fL: [.13, .4, 0], fR: [-.13, .36, .1]}, 'l'),
+    K(38, {rot: [-8, 0, 0], ...Bz(0, 0, -36, -1, {gF: 0, gB: 0, gE: -30, gD: .66}), tw: 30, lf: .4, pos: [0, 0, 0], tor: [-24, 0, 0], head: [4, 0, 0], fL: [.2, .22, -.16], fR: [-.2, .2, .2]}, 'l'),
+    K(40, {...LOW, rot: [0, 0, 0], lf: 0, ...Bz(0, 0, -30, -1, {gL: .6}), rh: 1, pos: [0, -.46, -.04], tor: [-34, 0, 0], head: [10, 0, 0], hairS: 0, skW: 0}, 'i'),
+    K(44, {pos: [0, -.44, -.04], tor: [-30, 0, 0], rh: .5}), K(46, {pos: [0, -.48, -.02], tor: [-32, 4, 0], rh: 0, hR: 'open', ...Bz(20, 0, -34, -1, {gL: .56})}),
+    K(48, {pos: [0, .06, 0], tor: [6, 4, 0], head: [-8, 0, 0], lf: .5, fL: [.12, .2, -.04], fR: [-.12, .18, .08], ...Bz(0, 0, 30, -1, {gL: .6}), aR: [50, 50, .95], hairS: -.5, skW: .4}, 'o'),
+    K(52, SKY, 'o'), K(62, {...SKY, pos: [0, .36, 0], tor: [8, -6, 0]}), K(67, {...SKY, pos: [0, .37, 0], tor: [9, -6, 0], head: [-20, 6, 0]}), K(71, {...SKY, pos: [0, .38, 0], tor: [10, -4, 0]}),
+    K(72, {...Bz(0, 0, 84, -1, {gL: .68}), tw: 90, tor: [6, 0, 0]}, 'i'), K(73, {...Bz(0, 0, 30, -1, {gL: .68}), tw: 45, tor: [-8, 4, 0], head: [-18, 0, 0]}, 'l'),
+    K(74, {...Bz(0, 0, -32, -1, {gL: .66}), tor: [-18, 8, 0], head: [-14, -4, 0], aR: [-20, 50, .95]}, 'l'), K(75, {...Bz(0, 0, -40, -1, {gL: .64}), tor: [-20, 8, 0]}, 'o'),
+    K(78, {pos: [0, .34, 0], tor: [-18, 6, 0]}), K(82, {rot: [-4, 0, 0], pos: [0, .1, 0], lf: .6, fL: [.14, .34, -.16], fR: [-.14, .3, .1], tor: [-14, 4, 0], head: [-2, 0, 0], hairS: .5, skW: -.5}, 'l'),
+    K(84, {...CROUCH, rot: [0, 0, 0], lf: 0, pos: [0, -.36, 0], tor: [-22, 6, 0], head: [4, -4, 0], ...Bz(30, 0, -34, -1, {gL: .56}), aR: [20, 30, .95], hairS: 0, skW: 0}, 'i'),
+    K(88, {pos: [0, -.32, 0], tor: [-18, 6, 0]}), K(96, ST2)],
+    {src: 'v 247.8-258.2 (P-q; ref hr_grab_4fps 247.80-257.80): the throw upward, the diagonal beam 252.80, the dive 254.00, she floats high 256.4, the pillar 257.40'});
+}
 // ---- the cinematic placeholder (S2b replaces it with tools/scarlet_cine.mjs): every cine clip holds a static pose with the
 // contract's length and events; the looks keyed where the plan's table says (hat / sword / scabbard / face) -----------------------
 const P = (name, pose, extra = {}) => ({name, keys: [K(0, pose), K(1, pose)], placeholder: true, note: 'placeholder (S2b: tools/scarlet_cine.mjs)', ...extra});
@@ -411,21 +715,6 @@ export const CINE_PLACEHOLDER = [
   P('repel', LOCK),
   P('ending', H_POSE),
 ];
-// STAND-IN (H1): replaced at the merge by lane H1c's clips. hr_design §2.3: the 12 new fight clips as static poses of the
-// contract length (tools/mboss_scarlet/api.py CLIPS; the events are the contract's), so the rig builds before the motion lands.
-const PF = (name, pose) => clips.push({...P(name, pose), note: 'placeholder (STAND-IN H1: lane H1c authors the motion)'});
-PF('grog_in', DOWN);
-PF('d4', ST);
-PF('tri', {...ST, ...F_LUNGE});
-PF('rings', ST2);
-PF('ult', ST2);
-PF('hcut', {...ST, ...CROUCH});
-PF('blue', {...ST, ...F_LUNGE});
-PF('kcut', {...ST, ...LOW});
-PF('mx', {...ST, ...CROUCH});
-PF('nb', AIR);
-PF('q_grab', {...ST, ...F_LUNGE});
-PF('q_air', AIR);
 // ---- export --------------------------------------------------------------------------------------------------------------------
 export const CLIPS = clips;
 export const accumulate = (c, defaults = DEFAULT_POSE) => accumulateLib(c, defaults);

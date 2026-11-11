@@ -30,7 +30,7 @@ execute if score #demo hrFx matches 12 if score #dt hrFx matches 74.. run functi
 execute if score #demo hrFx matches 13 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/star4
 execute if score #demo hrFx matches 13 if score #dt hrFx matches 50.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 14 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/yellow_tell
-execute if score #demo hrFx matches 14 if score #dt hrFx matches 50.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 14 if score #dt hrFx matches 75.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 15 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/ghost_burst
 execute if score #demo hrFx matches 15 if score #dt hrFx matches 50.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 16 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/ghost_trail
@@ -103,14 +103,26 @@ execute if score #demo hrFx matches 49 as @e[type=minecraft:armor_stand,tag=rlk_
 execute if score #demo hrFx matches 49 if score #dt hrFx matches 65.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 50 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/ev_take
 execute if score #demo hrFx matches 50 if score #dt hrFx matches 75.. run function rlk:boss/scarlet/fx/test/e/end
-execute if score #demo hrFx matches 51 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/disc
-execute if score #demo hrFx matches 51 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
-execute if score #demo hrFx matches 52 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/petal_big
-execute if score #demo hrFx matches 52 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
-execute if score #demo hrFx matches 53 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/moon_halo
-execute if score #demo hrFx matches 53 if score #dt hrFx matches 140.. run function rlk:boss/scarlet/fx/test/e/end
-execute if score #demo hrFx matches 54 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/lotus
-execute if score #demo hrFx matches 54 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
-execute if score #demo hrFx matches 55 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/seat_rock
-execute if score #demo hrFx matches 55 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 51 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/flash_blue
+execute if score #demo hrFx matches 51 if score #dt hrFx matches 54.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 52 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/ult_web
+execute if score #demo hrFx matches 52 if score #dt hrFx matches 70.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 53 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/ult_burst
+execute if score #demo hrFx matches 53 if score #dt hrFx matches 50.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 54 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/sky_mark
+execute if score #demo hrFx matches 54 if score #dt hrFx matches 57.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 55 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/sky_pillar
+execute if score #demo hrFx matches 55 if score #dt hrFx matches 50.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 56 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/qi_beam
+execute if score #demo hrFx matches 56 if score #dt hrFx matches 70.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 57 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/disc
+execute if score #demo hrFx matches 57 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 58 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/petal_big
+execute if score #demo hrFx matches 58 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 59 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/moon_halo
+execute if score #demo hrFx matches 59 if score #dt hrFx matches 140.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 60 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/lotus
+execute if score #demo hrFx matches 60 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 61 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/seat_rock
+execute if score #demo hrFx matches 61 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
 schedule function rlk:boss/scarlet/fx/test/e/tick 1t replace

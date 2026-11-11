@@ -43,6 +43,9 @@ export const HAT_FLIGHTS = {
   ending: {t0: 26, t1: 39, from: {spot: 'face'}, to: {state: 'hand', t: 40}},
 };
 export function setHatFace(spot) { HAT_REST.face = spot; }
+// lane H1c (11-11): grog_in, the balance break (hr_design.md §1.4): the hat leaves her head as she topples backward (6) and lands on
+// DOWN's spot beside her right leg (10), where `down` and `kipup` expect it
+HAT_FLIGHTS.grog_in = {t0: 6, t1: 10, from: {state: 'worn', t: 5}, to: {spot: 'leg'}};
 // the face spot from probe solves of the ending (probe(t) -> {o}: LY, the hat over her face): parallel to the face at the probe
 // where the face stands highest (0 / 13 / 26), its front toward her feet (as the source's face hat and the flight that lifts it
 // at 27: no spin as it leaves), 0.012 off the face's outer layer; then
@@ -402,6 +405,7 @@ if (process.argv[1] && process.argv[1].endsWith('scarlet_retarget.mjs') && proce
     'print(json.dumps({n: {"len": c[0]} for n, c in api.CLIPS.items()}))'], {cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8'}));
   for (const c of [...C.CLIPS, ...cine]) {
     if (which !== 'all' && c.name !== which) continue;
+    if (!api[c.name]) continue;      // (lane H1c, 11-11) a clip outside the contract (a cinematic row the rebuilt contract dropped) is not built either
     const L = api[c.name].len, cc = {...c, len: L}, base = c.base || C.DEFAULT_POSE, ks = C.accumulate(cc, base);
     const rows = [];
     for (let t = 0; t <= L; t++) {
