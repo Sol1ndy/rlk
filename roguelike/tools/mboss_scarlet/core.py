@@ -24,6 +24,7 @@ import help_lib as H
 from . import api
 from . import s3lib as S
 from .s3lib import sset, fn, part, placed
+from . import blade as B
 
 L, K = api.L, api.K
 OBJ = api.OBJ
@@ -206,7 +207,9 @@ def build(W, ctx):
     w('tick', ['# Hook tick (@s = body, at it, fight state #mbSt 1): the phase machine, then the rig tick (the shown clip tick ==',
                '# the pattern / sequence clock).',
                f'execute if score #ph {OBJ} matches {PH["intro"]} run {fn("core/intro/done")}',
-               fn('core/fight'), api.rig('tick')])
+               fn('core/fight'), api.rig('tick'),
+               # round W (lane WB): the blade's trail cards that ride her model, to it (blade.RIDE_CMD: the rig's root part)
+               B.RIDE_CMD])
     amb1, amb2 = K.p('ambient_p1'), K.p('ambient_p2')
     w('core/fight', [
         '# One fight tick (@s = body): the module clock, the look requests, the floor, the state of the phase, the arena ambience,',
@@ -434,7 +437,7 @@ def pattern_files(W, ctx):
           '# gauge -> ult at once, unless a floor step is reserved (#fl: HA-01, the step starts at the next decision, no ult);',
           '# mx may repeat once at <= 30 % HP; after A6 the decision at once with the far rule; else the recovery.',
           sset('#done', 0), f'scoreboard players operation #dec {OBJ} = #pat {OBJ}', sset('#pat', 0), sset('#pt', 0), sset('#ppf', 0),
-          f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground'),
+          f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground'), *B.end_lines(),
           f'execute unless score #dec {OBJ} matches {TID["a6"]} unless score #dec {OBJ} matches {TID["ult"]} run {fn("core/gauge/pat")}']
     if 'rings' in present and 'ult' in present:
         # HA-01 (review H-A, lead ruling): a floor reached during the forced rings ends the chain there (as mx's repeat)
@@ -467,7 +470,9 @@ def pattern_files(W, ctx):
         f'# hr_design §1.5: a perfect parry on the running pattern\'s last / single hit (@s = body; the pattern\'s PP window): she',
         f'# flinches (clip flinch) and the pattern ends {api.PP_FLINCH} t later (core/ppf instead of its tick).',
         f'execute if score #ppf {OBJ} matches 1.. run return 0',
-        sset('#ppf', api.PP_FLINCH), fn('core/stop_move'), api.play('flinch')])
+        sset('#ppf', api.PP_FLINCH), fn('core/stop_move'), api.play('flinch')]
+      # round W: the swing's trail stops with it (the band goes, the rest fades; core/pat_end takes what is left)
+      + B.stop_lines())
     w('core/ppf', ['# One tick of the perfect-parry flinch (@s = body): she turns to the player; at its end the pattern ends.',
                    f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}',
                    f'scoreboard players remove #ppf {OBJ} 1',
@@ -611,7 +616,7 @@ def phase_files(W, ctx):
         '# survived G2 fail): #gres decides. Gauge 0 -> the repel {at:60} (G1) / {at:5} (G2), started in this tick. G1 fail -> P2',
         '# (the fail-60 hit and g_reform were the gauntlet\'s). G2 fail (the instant death did not end the run) -> the revive',
         '# stance -> G2 again. A test\'s forced fail (#pipoff, tests 23 / 29) applies to this one judge only.',
-        sset('#done', 0), sset('#pat', 0), sset('#pt', 0), sset('#pipoff', 0),
+        sset('#done', 0), sset('#pat', 0), sset('#pt', 0), sset('#pipoff', 0), *B.end_lines(),
         f'execute if score #gres {OBJ} matches 1 run return run {fn("core/repel/start")}',
         f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/p2/from_fail")}',
         fn('core/revive/start')])

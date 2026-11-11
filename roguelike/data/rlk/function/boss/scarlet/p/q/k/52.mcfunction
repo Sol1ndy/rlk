@@ -5,9 +5,8 @@ execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/fx/follow_on
 execute if score #q_hit hr matches 1 at @s rotated as @s rotated ~ 0 positioned ^-0.001 ^3.953 ^0.472 run function rlk:boss/scarlet/fx/p/glint {c:2}
 execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/fx/follow_off
 execute if score #q_hit hr matches 1 at @s run function rlk:boss/scarlet/fx/snd/parry_cue
-execute if score #q_hit hr matches 1 run tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute if score #q_hit hr matches 1 run tag @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] add rlk_hr_swt
-execute if score #q_hit hr matches 1 at @s rotated as @s rotated ~ 0 positioned ^0.031 ^0.203 ^0.637 facing entity @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] feet run function rlk:boss/scarlet/core/sw/aim {dy:"0"}
-execute if score #q_hit hr matches 1 run tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute if score #q_hit hr matches 1 store result storage rlk:hr core.sw.d double 0.125 run scoreboard players get #sw_n hr
-execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1b21] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0324f,1.7973f,0.4117f],left_rotation:[-0.4639f,-0.4639f,0.5337f,-0.5337f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #q_hit hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_44]
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_46] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_48] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+execute if score #q_hit hr matches 1 run tag @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_50] remove rlk_hr_trr

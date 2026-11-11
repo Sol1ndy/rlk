@@ -1217,11 +1217,12 @@ if HR_PRESETS:
     check(api.OVERLAYS.get('web') == 0xEC18 and 'web' in G.GLYPHS and all(f'web_{k}' in G.GLYPHS for k in range(1, G.OVL_STEPS)),
           'hr1c: the web overlay U+EC18 and its opacity steps')
     # (review H-A, HA-07: the parry cue's own 64 x 64 sprite is the one new sprite: 4 096 px)
-    # round V (lane VB): + the blade path, its head and the slash sector's three frames (16 640 px)
-    check(G.SPRITE_PX == 237_568 + 4_096 + 16_640 and 'flash_blue' not in G.SPRITES and 'cue' in G.SPRITES
-          and all(k in G.SPRITES for k in ('sw_path', 'sw_head', 'sw_arc'))
-          and G.atlas_px() == 237_568 + 4_096 + 16_640 + G.GATE_PX,
-          f'hr1c: the new sprites: the cue (4 096 px) and round V\'s sw_path / sw_head / sw_arc (16 640 px): {G.SPRITE_PX}')
+    # round V (lane VB): + the flashes' rimmed star (sw_head); round W (lane WB): the blade's trail - band / ribbon / rim wall
+    # (sw_rib), the swept wedge (sw_arc) and strip (sw_quad), three frames each (17 920 px with sw_head; round V's sw_path is gone)
+    check(G.SPRITE_PX == 237_568 + 4_096 + 17_920 and 'flash_blue' not in G.SPRITES and 'cue' in G.SPRITES
+          and all(k in G.SPRITES for k in ('sw_rib', 'sw_head', 'sw_arc', 'sw_quad')) and 'sw_path' not in G.SPRITES
+          and G.atlas_px() == 237_568 + 4_096 + 17_920 + G.GATE_PX,
+          f'hr1c: the new sprites: the cue (4 096 px), round V\'s sw_head and round W\'s trail (17 920 px): {G.SPRITE_PX}')
     want_snd = {'parry_cue': (('block.note_block.iron_xylophone', 0.7, 1.8),), 'flash_blue': (('block.beacon.activate', 0.5, 1.8),),
                 'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),
                 'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),

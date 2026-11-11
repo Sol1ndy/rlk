@@ -1,6 +1,8 @@
 # TRI pattern tick 42
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri38]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri38_38] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri38_40] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_tri48] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_tri48,limit=1] ^1.938 ^2.255 ^0.459
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5545f,1.4823f,-0.3888f],left_rotation:[-0.7523f,0.417f,-0.2473f,0.4461f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_36] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_38] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_40] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_41,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.397f,1.1859f,-0.154f],left_rotation:[0.6034f,0.4147f,0.4576f,0.5047f],scale:[0.7326f,0.18f,1.8921f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_41,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.1846f,1.1998f,-0.2033f],left_rotation:[0.3719f,0.6496f,0.4011f,0.5281f],scale:[0.7824f,0.18f,2.0414f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_41,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.2361f,1.2483f,-0.1979f],left_rotation:[0.0987f,0.8115f,0.2996f,0.492f],scale:[0.7654f,0.18f,1.9853f],right_rotation:[0f,0f,0f,1f]}}

@@ -160,11 +160,13 @@ SPRITES = {
     'moon_halo': [(f'moon_halo_{k}', (96, 96), UNIT, P.make_halo(k), 2) for k in range(2)],
     'disc': [(f'disc_{k}', (64, 64), UNIT, P.make_disc(k), 2) for k in range(2)],
     'seat_rock': [],                    # vanilla items (tuff, a potion bottle, a flower-pot cup): 0 px
-    # round V (lane VB; v_brief.md §3 VB 2-3; api.KIT_SPRITES_HR): the drawn blade path, its head, the slash sector's three
-    # fading frames. tools/mboss_scarlet/blade.py summons their cards from the rig's blade track (not through fx/card).
-    'sw_path': [('sw_path', (16, 16), (-0.5, 0.5, 0, 1), P.paint_sw_path, 4)],
+    # round V (lane VB) / round W (lane WB; w_brief.md §2 WB; api.KIT_SPRITES_HR): the blade's trail - the band / ribbon / rim
+    # wall (sw_rib), the swept sector (sw_arc) and strip (sw_quad), three fading frames each; sw_head is the flashes' rimmed star
+    # (round V's path head is gone). tools/mboss_scarlet/blade.py summons the trail's cards from the rig's blade track.
+    'sw_rib': [(f'sw_rib_{k}', (16, 16), (-0.5, 0.5, 0, 1), P.make_sw_rib(k), 4) for k in range(3)],
     'sw_head': [('sw_head', (64, 64), UNIT, P.paint_sw_head, 3)],
     'sw_arc': [(f'sw_arc_{k}', (64, 64), (-0.5, 0.5, 0, 1), P.make_sw_arc(k), 3) for k in range(3)],
+    'sw_quad': [(f'sw_quad_{k}', (16, 16), (-0.5, 0.5, 0, 1), P.make_sw_quad(k), 4) for k in range(3)],
 }
 GATE_ICON = ('gate_icon', (64, 64), UNIT, P.paint_gate_icon, 2)      # rlk:mboss/hr_kit/gate_icon (api.GATE_ICON_MODEL)
 TEXTURES = {stem: (wh, box, fn, ss) for rows in SPRITES.values() for stem, wh, box, fn, ss in rows}
@@ -198,6 +200,11 @@ assert GATE_PX <= api.GATE_ICON_PX_CAP, GATE_PX
 # vertical quad along local +z: beams seen from any side), lancex (a flat and a face quad along local x: long strips
 # whose texture width is their length; the kit yaws them -90 so +a points along the aim).
 SQ = (-0.5, 0.5, -0.5, 0.5)
+# round W (lane WB): the trail's band starts at the guard (the blade's base) of the sword part, whose pivot it shares: bladeLo / tip
+# from the rig's blade track (tools/build_scarlet_rig.mjs writes it first: README 0-4's order); the swept sector's corners' chord
+_BL = json.loads((HERE / 'scarlet_blade_track.json').read_text(encoding='utf-8')).get('blade', [0.165, 1.6])
+BAND_B0 = round(_BL[0] / _BL[1], 4)
+FAN_CHORD = 1.0                       # the wedge's rim wall: the chord b = 1 between its corners (blade.FAN_CHORD)
 KINDS = {
     **{f'qi_arc_{k}': ('flat', f'qi_arc_{k}', ARC_BOX, False, f'sword-qi crescent sweep frame {k} (rim at r 0.8)') for k in range(4)},
     'qi_ring_0': ('flat', 'qi_ring_0', UNIT, False, 'flat lilac sword-qi ring (unit radius)'),
@@ -247,11 +254,16 @@ KINDS = {
     **{f'qi_arcf_{k}': ('face', f'qi_arc_{k}', ARC_BOX, False, f'sword-qi crescent frame {k} standing across the aim '
                         '(a slanted slash, rolled in the screen plane)') for k in range(4)},
     'qi_wedgef': ('face', 'qi_wedge', (-0.25, 0.25, 0, 1), False, 'sword-qi wedge standing across the aim, the point at b 1'),
-    # round V (lane VB): the cards of tools/mboss_scarlet/blade.py (literal summons on pattern ticks; never through fx/card)
-    'sw_path': ('lance', 'sw_path', (-0.5, 0.5, 0, 1), True, 'the drawn blade path: one straight piece along +z (tinted)'),
-    'sw_head': ('face', 'sw_head', SQ, True, 'the head running along the blade path (tinted)'),
-    **{f'sw_arc_{k}': ('flat', f'sw_arc_{k}', (-0.5, 0.5, 0, 1), True, f'the slash: one sector of the blade\'s sweep, apex at b 0, '
-                       f'fading frame {k} (tinted)') for k in range(3)},
+    # round W (lane WB): the cards of tools/mboss_scarlet/blade.py (literal summons on pattern ticks; never through fx/card)
+    'sw_head': ('face', 'sw_head', SQ, True, 'a rimmed four-ray star (the flashes; tinted)'),
+    'sw_band': ('lance', 'sw_rib_0', (-0.5, 0.5, BAND_B0, 1), True, 'the trail\'s band on her blade: a lance along +z from the guard '
+                '(BAND_B0 of the tip\'s distance from the sword\'s pivot) to the tip at 1 (tinted)'),
+    **{f'sw_rib_{k}': ('lance', f'sw_rib_{k}', (-0.5, 0.5, 0, 1), True, f'a trail ribbon / struck line along +z, fading frame {k} '
+                       '(tinted)') for k in range(3)},
+    **{f'sw_fan_{k}': ('fanw', f'sw_arc_{k}', (-0.5, 0.5, 0, 1), True, f'a swept sector of the trail (apex at b 0, the tip\'s way at '
+                       f'radius 1) with its rim wall on the corners\' chord, fading frame {k} (tinted)') for k in range(3)},
+    **{f'sw_quad_{k}': ('stripw', f'sw_quad_{k}', (-0.5, 0.5, 0, 1), True, f'a swept strip of the trail (the blade\'s base at b 0, its '
+                        f'tip at 1) with its rim wall at the tip, fading frame {k} (tinted)') for k in range(3)},
 }
 # The arrival tear: the dungeon rift's item models (tools/build_rift.py), referenced (no px of ours); without them in the
 # pack the item definitions fall back to the ghost flash card.
@@ -346,12 +358,27 @@ def model_json(kind):
                        {'east': f([0, 0, 16, 16], 90), 'west': f([0, 0, 16, 16], 270)})]
     elif plane == 'lancex':
         els = [flat, face]
+    elif plane in ('fanw', 'stripw'):
+        # round W: the swept piece + its rim wall (texture #1: the sw_rib frame of the same fade; its core across the wall's
+        # height): on the chord of the sector's corners (b = FAN_CHORD, a = +-ARC_TAN b) / across the strip's tip (b 1). Its
+        # length scales with the card's width, its height with the card's y scale (the wall height).
+        bw = FAN_CHORD if plane == 'fanw' else 1.0
+        aw = 0.5 * bw if plane == 'fanw' else 0.5
+        zz = 8 - 16 * bw
+
+        def f1(uv, rot=0):
+            d = {'uv': uv, 'texture': '#1', 'tintindex': 0, 'rotation': rot}
+            return d
+        els = [flat, q([8 - 16 * aw, 0, zz], [8 + 16 * aw, 16, zz], {'south': f1([0, 0, 16, 16], 90), 'north': f1([0, 0, 16, 16], 270)})]
     else:
         raise ValueError(plane)
     for e in els:
         for v in e['from'] + e['to']:
             assert -16 <= v <= 32, (kind, e)
-    return {'ambientocclusion': False, 'textures': {'0': tex, 'particle': tex}, 'elements': els}
+    texs = {'0': tex, 'particle': tex}
+    if plane in ('fanw', 'stripw'):
+        texs['1'] = NS_TEX + 'sw_rib_' + kind[-1]
+    return {'ambientocclusion': False, 'textures': texs, 'elements': els}
 
 
 def item_json(kind, model=None):

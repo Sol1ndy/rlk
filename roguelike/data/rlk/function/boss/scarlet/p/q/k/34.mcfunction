@@ -1,8 +1,5 @@
 # Q pattern tick 34
 execute unless score #q_hit hr matches 1 run scoreboard players set #done hr 1
-execute if score #q_hit hr matches 1 run tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute if score #q_hit hr matches 1 run tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute if score #q_hit hr matches 1 at @s rotated as @s rotated ~ 0 positioned ^-0.635 ^3.195 ^0.094 facing entity @e[tag=rlk_body,limit=1] feet run function rlk:boss/scarlet/core/sw/aim {dy:"0"}
-execute if score #q_hit hr matches 1 run tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute if score #q_hit hr matches 1 store result storage rlk:hr core.sw.d double 0.1667 run scoreboard players get #sw_n hr
-execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1b21] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3853f,2.0777f,0.5813f],left_rotation:[-0.7553f,-0.2899f,0.2106f,0.5488f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #q_hit hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_tr_q1_26]
+execute if score #q_hit hr matches 1 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_q","rlk_hr_trr","rlk_hr_trq","rlk_hr_tr_q1_34","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2946f,2.1088f,0.3036f],left_rotation:[-0.3988f,-0.7039f,-0.1862f,0.5575f],scale:[0f,0.18f,1.435f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_quad_0","minecraft:custom_model_data":{colors:[16771496]}}}}

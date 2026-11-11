@@ -1,9 +1,6 @@
 # A13 pattern tick 226.
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_c220_220]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_c220_222] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s rotated as @s rotated ~ 0 positioned ^0.089 ^3.703 ^0.907 facing entity @e[tag=rlk_body,limit=1] feet run function rlk:boss/scarlet/core/sw/aim {dy:"0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.0833 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13b225] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0606f,2.1665f,0.3945f],left_rotation:[-0.7875f,0.0008f,-0.0014f,0.6163f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_218]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_220] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_225,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.0565f,2.1377f,0.4043f],left_rotation:[-0.5764f,0.5828f,0.4065f,0.4037f],scale:[0.4397f,0.18f,1.5963f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a13","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a13_226","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.0564f,2.147f,0.3993f],left_rotation:[-0.6092f,-0.6026f,-0.3617f,0.3663f],scale:[0f,0.18f,1.6088f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[14060543]}}}}

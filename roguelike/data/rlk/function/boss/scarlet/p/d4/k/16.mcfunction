@@ -1,8 +1,7 @@
 # D4 pattern tick 16
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_d414] ~ ~ ~ ~ 0
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_d414_10]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_d414_12] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_d414_14] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_swn","rlk_hr_sw_d414_16"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0779f,1.1314f,0.2892f],left_rotation:[0.0642f,-0.0597f,-0.0958f,0.9915f],scale:[0.8955f,1f,1.9909f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.22f,1.043f,0.4646f],left_rotation:[-0.2649f,-0.0984f,-0.6556f,-0.7002f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_10] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_12] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_14] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_15,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.0779f,1.1315f,0.2891f],left_rotation:[0.0642f,-0.0597f,-0.0958f,0.9915f],scale:[0.801f,0.26f,1.7807f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_d4_16","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.0657f,1.1246f,0.1961f],left_rotation:[0.072f,0.0528f,-0.1238f,0.9883f],scale:[0f,0.26f,1.9194f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16774616]}}}}

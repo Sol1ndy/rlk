@@ -12,4 +12,6 @@ execute if score #pt hr matches 217 run return run function rlk:boss/scarlet/p/a
 execute if score #pt hr matches 218 run return run function rlk:boss/scarlet/p/a8/k/218
 execute if score #pt hr matches 219 run return run function rlk:boss/scarlet/p/a8/k/219
 execute if score #pt hr matches 220 run return run function rlk:boss/scarlet/p/a8/k/220
+execute if score #pt hr matches 221 run return run function rlk:boss/scarlet/p/a8/k/221
+execute if score #pt hr matches 222 run return run function rlk:boss/scarlet/p/a8/k/222
 execute if score #pt hr matches 223 run return run function rlk:boss/scarlet/p/a8/k/223

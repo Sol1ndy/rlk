@@ -5,17 +5,19 @@ Branch `wip/w-boss` (from `origin/wip/w` 2613c47f0, + the brief's §4 / §5 merg
 `Claude Opus 5.5`). Scratch `<S>/wb/` (`dbg/` = the rig's debug frames for fightcam, `before/`, `after/` strips, logs).
 
 ## Status
-- [x] read the briefs, the round V lane (vb_progress), the integration (vi_progress), t3's overview sheets
-- [x] the rig track sidecar carries `f0` per clip (the tick the sword's first key ends at; before it the rig blends in from the
-      pose shown before the clip): `tools/build_scarlet_rig.mjs` (+3 lines), `tools/scarlet_blade_track.json` regenerated
-- [ ] `tools/mboss_scarlet/blade.py`: round V's path / head / target line / mark / static lines removed; the trail (band, pieces,
-      ribbon, wave) generated from the track — WIP (written, not wired)
-- [ ] p1.py / p_ghost.py / core.py / shield.py wired to the trail; the hook's ride line; core/pp + pat_end clean-up
-- [ ] kit sprites / models (`build_mboss_hr_fx.py`, `mboss_hr_fx_paint.py`, api.KIT_SPRITES_HR): sw_rib_0..2, sw_fan_0..2,
-      sw_quad_0..2; sw_path gone (sw_head stays: the flashes' star uses it)
-- [ ] test_blade rewritten (nothing ahead, trail every tick, thickness, fade), test_vi beatpat on the trail, test_kit pins
-- [ ] fightcam: the trail rendered + measured at 4 / 7 / 10 b, both fields, FOV 90; before / after strips
-- [ ] gates, docs (README 홍련, hr_design), push
+- [x] read the briefs, the round V lane (vb_progress), the integration (vi_progress), t3's overview sheets, the fight review
+      (`review/w/findings_fight.json`: T3-06 / 08 / 09 / 11 are this lane's)
+- [x] the rig track sidecar carries `f0` (the sword's first key ends there: the blend-in before it) and `sp` / `sq` (the sword part's
+      translation / rotation as the client shows them each tick) and the top-level `blade` [bladeLo, tip]: `build_scarlet_rig.mjs`
+- [x] `blade.py`: round V's path / head / target line / tall mark / static lines and their run-time (`core/sw/aim|march|head`) removed;
+      the trail (band, pieces, ribbon, wave) generated from the shown sword
+- [x] p1.py / p_ghost.py / core.py / shield.py / s3lib.py wired (every pattern, both gauntlets, the ghost form); the fight hook's ride
+      line; core/pp stops it, core/pat_end + core/g/end take what is left; core/cam_ok + core/cam_clear (T3-06)
+- [x] kit sprites / models: sw_rib_0..2, sw_quad_0..2 new; sw_arc_0..2 repainted (a wedge with a chord rim: ribbon + ink + faint fill,
+      T3-11); sw_path gone; sw_head kept (the flashes' star); models sw_band, sw_rib_k, sw_fan_k (wedge + rim wall), sw_quad_k
+- [x] test_blade rewritten (347 checks), test_vi beatpat on the trail, test_kit's sprite pin; all hr suites pass (test_vi rerun)
+- [ ] fightcam: trail measure at 4 / 7 / 10 b both fields (FOV 90); before / after strips
+- [ ] full gates (regen twice, loadcheck, gen_check_hr, hrfair quick), docs (README 홍련, hr_design), final push
 
 ## Design (decided)
 Nothing is drawn where the blade is going. The trail is generated from the blade the rig SHOWS on the pattern clock

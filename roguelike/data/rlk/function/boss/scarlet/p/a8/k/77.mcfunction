@@ -13,3 +13,4 @@ function rlk:mboss/mv/face
 execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
 execute at @s run function rlk:boss/scarlet/fx/snd/g_appear
 function rlk:boss/scarlet/g/cut/make {s:91,t:14,dmg:37,kb:0,n:1}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_69]

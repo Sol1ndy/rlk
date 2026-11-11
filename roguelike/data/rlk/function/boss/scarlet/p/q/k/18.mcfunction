@@ -1,4 +1,4 @@
 # Q pattern tick 18
-execute store result storage rlk:hr core.sw.d double 0.4583 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
-execute at @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_m20,limit=1] ~ ~2.293 ~
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_q0b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3532f,1.0992f,-0.1236f],left_rotation:[-0.6974f,0.7038f,-0.1167f,0.0678f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_q0_16] remove rlk_hr_trr
+execute at @s rotated as @s rotated ~ 0 positioned ^0.396 ^1.088 ^-0.283 run function rlk:boss/scarlet/core/sw/rib

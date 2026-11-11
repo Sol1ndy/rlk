@@ -369,28 +369,72 @@ def paint_cue(a, b):
     return mix(WHITE, CUE_GOLD, gold) + (min(1.0, al * 0.6),)
 
 
-# ---- round V (lane VB; v_brief.md §3 VB 2-3): the drawn blade path, its head and the slash sector --------------------------
-# All three are neutral (white, tinted per hit) with a DARK rim: a tell must read on the pale straw grass and her white hat of
-# the P1 field as well as on the crimson P2 field (review v C2: a white-gold star on a white hat over pale grass was lost).
-SW_CORE = 0.56                         # the path's bright core: this share of the card's width (blade.PATH_CORE)
+# ---- round V (lane VB) / round W (lane WB; w_brief.md §2 WB): the blade's trail ---------------------------------------------------
+# All are neutral (white, tinted per hit) with a DARK rim: a tell must read on the pale straw grass and her white hat of the P1
+# field as well as on the crimson P2 field (review v C2; review w T3-08: round V's white-gold line was lost on the P1 wheat).
+SW_CORE = 0.70                         # the band / ribbon's bright core: this share of the card's width (blade.RIB_CORE)
 SW_ARC_TAN = 0.5                       # the sector's edges: a = +-SW_ARC_TAN b (blade.ARC_TAN)
-SW_ARC_INNER = 0.30                    # it fades out below this radius (blade.ARC_INNER)
-SW_ARC_ALPHA = (1.0, 0.62, 0.3)        # the fading frames
+SW_ALPHA = (1.0, 0.62, 0.3)            # the fading frames
+# the swept piece (sector / strip): a bright ribbon along the tip's way (the outer RIBBON of the radius / the strip's length),
+# ink at its outer edge, and only a faint fill inward (review w T3-11: round V's full translucent sheet covered up to 45 % of
+# the frame when she cut near the camera)
+SW_RIB_IN, SW_RIB_OUT, SW_FILL_IN = 0.70, 0.93, 0.45
 
 
-def paint_sw_path(a, b):
-    """sw_path (a lance card, a across its width -0.5 .. 0.5, b along its length): a solid bright core SW_CORE of the width,
-    a dark rim, nothing outside. Even along its length (a card is stretched to its piece of the path)."""
-    x = abs(a) * 2
-    if x <= SW_CORE:
-        return WHITE + (1.0,)
-    if x <= 0.86:
-        return SW_INK + (0.9,)
-    return SW_INK + (0.9 * (1 - smooth(0.86, 1.0, x)),)
+def make_sw_rib(k):
+    """sw_rib frame k (a lance card, a across its width -0.5 .. 0.5, b along its length: the band on the blade, a ribbon behind
+    her, a struck line, a piece's rim wall): a solid bright core SW_CORE of the width, a dark rim, even along its length; frames
+    1, 2 = the same at SW_ALPHA (the fade)."""
+    A = SW_ALPHA[k]
+
+    def paint(a, b):
+        x = abs(a) * 2
+        if x <= SW_CORE:
+            return WHITE + (A,)
+        if x <= 0.9:
+            return SW_INK + (0.9 * A,)
+        return SW_INK + (0.9 * A * (1 - smooth(0.9, 1.0, x)),)
+    return paint
+
+
+def _swept(r, A):
+    """the swept piece's profile at r (the share of the tip's radius / the strip's length from the blade's base)"""
+    if r > 1.0 or r < SW_FILL_IN:
+        return CLEAR
+    if r >= SW_RIB_OUT:
+        return SW_INK + (0.9 * A,)
+    if r >= SW_RIB_IN:
+        return WHITE + (A,)
+    t = (r - SW_FILL_IN) / (SW_RIB_IN - SW_FILL_IN)
+    return mix(hexc('#D8D8D8'), WHITE, t) + (A * (0.12 + 0.3 * t),)
+
+
+def make_sw_arc(k):
+    """sw_arc frame k (sw_fan's swept wedge: a flat card, the apex at a 0 b 0, the axis along b): the chord b = 1 between its
+    corners (the tips of the two blade positions) as a bright ribbon with ink outside it, a faint fill inward; cut hard on the two
+    edges a = +-SW_ARC_TAN b so that the pieces of a sweep close up; frames 1, 2 = the same at SW_ALPHA (the fade). (The rim is
+    the chord, not a circle: the card is squeezed across to each piece's angle, and a circle would bulge past the tip's way.)"""
+    A = SW_ALPHA[k]
+
+    def paint(a, b):
+        if b <= 0 or abs(a) > SW_ARC_TAN * b:
+            return CLEAR
+        return _swept(b, A)
+    return paint
+
+
+def make_sw_quad(k):
+    """sw_quad frame k (sw_quad's strip between two blade lines: a flat card, a across the way, b from the blade's base 0 to the
+    tip 1): the same profile as the sector along b."""
+    A = SW_ALPHA[k]
+
+    def paint(a, b):
+        return _swept(b, A)
+    return paint
 
 
 def paint_sw_head(a, b):
-    """sw_head (the head that runs along the path; billboard): a round white core, four short rays, a dark rim round all."""
+    """sw_head (round V's path head; now the flashes' rimmed star only): a round white core, four short rays, a dark rim."""
     r = math.hypot(a, b)
     ang = math.atan2(b, a)
     reach = 0.42 + 0.44 * abs(math.cos(2 * ang)) ** 8
@@ -399,27 +443,6 @@ def paint_sw_head(a, b):
     if r <= reach + 0.13:
         return SW_INK + (0.92,)
     return SW_INK + (0.92 * (1 - smooth(reach + 0.13, reach + 0.2, r)),)
-
-
-def make_sw_arc(k):
-    """sw_arc frame k (the slash: one sector of the blade's sweep; flat card, the apex at a 0 b 0, the axis along b): a white
-    rim at the radius 1 (the tip's way), the body fading inward to nothing at SW_ARC_INNER (the blade's base), cut hard on the
-    two edges a = +-SW_ARC_TAN b so that neighbouring pieces close up; frames 1, 2 = the same at SW_ARC_ALPHA (the fade)."""
-    A = SW_ARC_ALPHA[k]
-
-    def paint(a, b):
-        if b <= 0 or abs(a) > SW_ARC_TAN * b:
-            return CLEAR
-        r = math.hypot(a, b)
-        if r > 1.0 or r < SW_ARC_INNER:
-            return CLEAR
-        if r >= 0.93:
-            return WHITE + (A,)
-        if r >= 0.90:
-            return mix(SW_INK, WHITE, 0.35) + (0.75 * A,)
-        t = (r - SW_ARC_INNER) / (0.90 - SW_ARC_INNER)
-        return mix(hexc('#C9C9C9'), WHITE, t) + (A * 0.82 * t ** 1.3,)
-    return paint
 
 
 def paint_star4(a, b):

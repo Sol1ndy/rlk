@@ -1,3 +1,4 @@
 # A8 pattern tick 87.
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c91] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c91,limit=1] ^-0.889 ^0.016 ^1.456
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_79]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_81] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.251 ^0.644 ^0.171 run function rlk:boss/scarlet/core/sw/rib

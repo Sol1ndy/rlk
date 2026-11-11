@@ -1,10 +1,14 @@
 # TRI pattern tick 53
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri48_47]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri48_49] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_tri48_51] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
 function rlk:boss/scarlet/fx/follow_on
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.061 ^3.134 ^0.133 run function rlk:boss/scarlet/fx/p/glint {c:2}
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_tri60] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_tri60,limit=1] ^-0.847 ^2.495 ^0.608
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2156f,1.5443f,0.5946f],left_rotation:[-0.7729f,-0.377f,0.2237f,0.4587f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_47] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_49] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_51] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_52,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4352f,1.3116f,0.3623f],left_rotation:[-0.2586f,-0.9145f,-0.2086f,0.2308f],scale:[0.7369f,0.18f,1.7299f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_52,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4548f,1.3985f,0.3557f],left_rotation:[-0.1511f,-0.8615f,-0.2718f,0.4013f],scale:[0.7236f,0.18f,1.6961f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_52,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4249f,1.5201f,0.3564f],left_rotation:[-0.0363f,-0.7678f,-0.3222f,0.5527f],scale:[0.6997f,0.18f,1.6378f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_tri","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_tri_53","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.0856f,1.8188f,0.3752f],left_rotation:[-0.7032f,0.0553f,0.6512f,0.2793f],scale:[0f,0.18f,1.1221f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_tri","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_tri_53","rlk_hr_tr_i1"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.1226f,1.8202f,0.3604f],left_rotation:[-0.7031f,0.0563f,0.6515f,0.2787f],scale:[0f,0.18f,1.1048f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}

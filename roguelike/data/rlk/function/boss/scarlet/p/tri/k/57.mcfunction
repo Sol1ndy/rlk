@@ -1,4 +1,6 @@
 # TRI pattern tick 57
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_tri48_51]
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_tri60] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_tri60,limit=1] ^-0.088 ^1.714 ^1.947
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.434f,1.6598f,0.4646f],left_rotation:[-0.7704f,-0.3758f,0.2258f,0.4629f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_49]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_51] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_53] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_tri","rlk_hr_trr","rlk_hr_trq","rlk_hr_tr_tri_57","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.1918f,1.6723f,0.4731f],left_rotation:[-0.848f,-0.1758f,0.3233f,0.3814f],scale:[0f,0.18f,1.435f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_quad_0","minecraft:custom_model_data":{colors:[16771496]}}}}

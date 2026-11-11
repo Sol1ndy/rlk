@@ -112,6 +112,7 @@ def ground(pb):
 
 
 def finish(pb, key):
+    trail_of(pb, key)
     pb.write()
     TABLE[key] = pb.hits
     MOVES[key] = pb.motions
@@ -120,27 +121,49 @@ def finish(pb, key):
     return pb
 
 
-# ================================================================================================= round V: the blade's own effects
-# Round V (lane VB; v_brief.md §3 VB 2-4): every path and slash is drawn from the rig's blade track (blade.py), none is placed by
-# hand any more (the kit's qi_arc / qi_vert / qi_fan / qi_wedge / qi_line / qi_cut / qi_ring calls at the hits are gone: they
-# stood beside or across her whatever the blade did, review v S1). A hit of a swing: blade.ride (the path riding her + the slash);
-# a hit her body carries the blade into (a dash, a plunge): the target line from her to the locked spot + the slash of the cut.
+# ================================================================================================= the blade's trail (round W)
+# Round W (lane WB; w_brief.md §2 WB): nothing shows where the blade is going to go (round V's drawn path, its head, the dash /
+# dive target lines, the tall mark and kcut's / nb's standing lines are gone); the blade leaves a trail of where it has been
+# (blade.py: the band on the blade, the pieces it sweeps, the ribbon behind her where her body carries it, the wave of a line
+# struck beyond its reach on the hit tick). Every pattern's trail is generated from the clips it plays (blade.Shown) when it is
+# written (finish -> trail_of); the builders only name the moves her body carries the blade on (rib) and the struck lines (wave).
 DASH_SHORT = 2.0     # b: a dash-through stops this far before the locked spot (v_brief §3 VB 4: never within 1.2 b of the
 #                      player: the F5 lens ended up inside her; the blade and the hazard still reach through the spot)
 LAND_SHORT = 1.4     # b: a dive lands this far from the locked spot on her side (the blade comes down on the spot)
+WAVE_Y = 1.0         # b over the floor: a struck line's wave (the blade's height in the dash)
+CAM_BACK, CAM_R, CAM_STEP = 4.0, 1.3, 1.8    # b: the camera line behind the player's eyes; her body's clearance from it; the step out
 _RT = set()
 
 
 def sw_runtime(W):
-    if id(W) not in _RT and 'core/sw/aim'.startswith(W.prefixes):      # (S4's writer calls what S3's wrote)
+    if id(W) not in _RT and 'core/sw/rib'.startswith(W.prefixes):      # (S4's writer calls what S3's wrote)
         _RT.add(id(W))
         B.runtime(W, fn, sset)
+        # round W (review t3 T3-06: her dash ended at the camera - hat and body over half the frame): the camera is not at the
+        # player but CAM_BACK b behind their eyes along their view (the seat's vanilla F5 camera: client_facts.md §1,
+        # view/ride_set d 3.5); a stop point must keep her body out of that line
+        pts = [k * 0.5 for k in range(int(CAM_BACK * 2) + 1)]
+        W.w('core/cam_ok', [
+            f'# 1 when the executing floor point keeps her out of the player\'s camera line: her body (the point + 1 b) farther than',
+            f'# {num(CAM_R)} b from the player\'s eyes and from every point 0.5 .. {num(CAM_BACK)} b behind them along their view.',
+            f'summon minecraft:marker ~ ~1 ~ {{Tags:["rlk_hr_camp","rlk_room","rlk_mb_aux"]}}', sset('#sw_c', 0)]
+            + [f'execute at {S.PL} anchored eyes positioned ^ ^ ^-{num(k)} if entity @e[type=minecraft:marker,tag=rlk_hr_camp,'
+               f'distance=..{num(CAM_R)}] run {sset("#sw_c", 1)}' for k in pts]
+            + ['kill @e[type=minecraft:marker,tag=rlk_hr_camp]', f'execute if score #sw_c {OBJ} matches 1 run return fail', 'return 1'])
+        W.w('core/cam_clear', [
+            '# After a move (@s = the body): standing in the player\'s camera line (the player moved since her stop was chosen) she',
+            f'# steps {num(CAM_STEP)} b out of it in 2 t - to her right, her left or back - wherever mv/ok and core/cam_ok pass.',
+            f'execute at @s positioned ~ {CY} ~ if function {api.NS}core/cam_ok run return 0']
+            + [f'execute at @s positioned ~ {CY} ~ rotated as @s rotated ~{yaw} 0 positioned ^ ^ ^{num(CAM_STEP)} if function rlk:mboss/mv/ok '
+               f'if function {api.NS}core/cam_ok run return run function rlk:mboss/mv/glide {{t:2}}' for yaw in (-90, 90, 180)])
         W.w('core/near', [
             '# {d,t} Glide (@s = the body, facing the lock marker) in t ticks to the point d blocks before the locked spot on her',
-            '# side, on the floor (round V: she never lands on / dashes through the player\'s spot); a point that fails mv/ok: the',
-            '# locked spot itself (core/clamp made it safe).',
-            f'$execute at {S.LOCK_M} facing entity @s feet rotated ~ 0 positioned ^ ^ ^$(d) if function rlk:mboss/mv/ok run return run '
-            'function rlk:mboss/mv/glide {t:$(t)}',
+            '# side, on the floor (round V: she never lands on / dashes through the player\'s spot); round W: nor on the player\'s',
+            '# camera (core/cam_ok); a point that fails: 1.5 b farther back, else the locked spot itself (core/clamp made it safe).',
+            f'$execute at {S.LOCK_M} facing entity @s feet rotated ~ 0 positioned ^ ^ ^$(d) if function rlk:mboss/mv/ok if function '
+            f'{api.NS}core/cam_ok run return run function rlk:mboss/mv/glide {{t:$(t)}}',
+            f'$execute at {S.LOCK_M} facing entity @s feet rotated ~ 0 positioned ^ ^ ^$(d) positioned ^ ^ ^1.5 if function rlk:mboss/mv/ok '
+            f'if function {api.NS}core/cam_ok run return run function rlk:mboss/mv/glide {{t:$(t)}}',
             f'$execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:$(t)}}'])
 
 
@@ -148,37 +171,61 @@ def near(d, t):
     return f'function {api.NS}core/near {{d:{num(d, 2)},t:{int(t)}}}'
 
 
-def dash_line(pb, key, show, lock, h, idx=0, pre=S.PLAYER, post=S.LOCK_M, cond=None):
-    """The target line of a dash hit: from her at blade height to the target, the head arriving on h."""
+def cam_clear(pb, t, cond=None):
+    """The step out of the player's camera line after a move that ended at pattern tick t - 1 (core/cam_clear)."""
     sw_runtime(pb.W)
-    out = B.Out()
-    col, cname = B.colour_of(key, idx)
-    r = B.target_line(out, key, show, lock, h, col, 'at @s facing entity {T} feet positioned ~ ~1.0 ~', pre, post, dy='-1.0')
-    # the dash comes straight at the lens: the tall mark over the locked spot from the lock on (the head comes down it)
-    B.target_mark(out, key, f'm{h}', lock, h, col, f'at {post}')
-    out.into(pb, cond)
-    B.DRAWN.setdefault(key, []).append(dict(kind='line', hit=h, show=r['show'], lead=h - r['show'], col=cname, first=True, lock=lock))
+    pb.at(t, S.gate(cond, fn('core/cam_clear')) if cond else fn('core/cam_clear'))
 
 
-def drop_line(pb, key, clip, show, lock, h, idx=0, t0=0, pre=S.PLAYER, post=S.LOCK_M, cond=None):
-    """The target line of a plunge: from her blade's tip (where the clip holds it at the lock tick) to the locked spot."""
+def rib(pb, ta, tb, idx=0, seg=99, cond=None):
+    """Her body carries the blade from pattern tick ta to tb (a glide / leap called at ta): the ribbon behind her (blade.ribbon),
+    in the colour of api.HITS[key][idx]."""
+    pb.ribs = getattr(pb, 'ribs', []) + [dict(ta=ta, tb=tb, idx=idx, seg=seg, cond=cond)]
+
+
+def wave(pb, h, where, idx=0, length=None, store=None, cond=None):
+    """A struck line beyond her blade's reach (blade.wave), ON the hit tick h."""
+    pb.waves = getattr(pb, 'waves', []) + [dict(h=h, where=where, idx=idx, length=length, store=store, cond=cond)]
+
+
+def spec(pb, **kw):
+    """One stretch of the pattern's trail (default: the whole pattern, its first clip, all its hits): segs [(tick, clip)], only
+    (HITS indices), t_lo / t_hi (pattern ticks), cond (an execute condition), t0_of {clip: its tick 0}."""
+    pb.specs = getattr(pb, 'specs', []) + [kw]
+
+
+def trail_of(pb, key):
+    """The trail of the pattern (blade.trail + its ribbons and waves) into pb (called by finish / _finish before write)."""
+    if not api.HITS.get(key):
+        return
     sw_runtime(pb.W)
-    out = B.Out()
-    col, cname = B.colour_of(key, idx)
-    tip = B.track(clip)['t'][lock - t0]
-    r = B.target_line(out, key, show, lock, h, col, f'at @s rotated as @s rotated ~ 0 positioned {B.car(tip)} facing entity {{T}} feet',
-                      pre, post, dy='0')
-    out.into(pb, cond)
-    B.DRAWN.setdefault(key, []).append(dict(kind='line', hit=h, show=r['show'], lead=h - r['show'], col=cname, first=True, lock=lock))
-
-
-def flourish(pb, key, clip, a, b, col=api.C_LILAC, t0=0, cond=None):
-    """The slash of a blade sweep that is not a hit (a spin, a flip): the same pieces, from the same track."""
-    out = B.Out()
-    sw = B.Swing(clip, b, a=a, b=b)
-    pcs = B.slash(out, key, sw, t0, B.SLASH[col], f'{clip}f{a}')
-    out.into(pb, cond)
-    B.DRAWN.setdefault(key, []).append(dict(kind='flourish', clip=clip, hit=None, sw=sw, t0=t0, pieces=pcs))
+    specs = getattr(pb, 'specs', None) or [{}]
+    pb.shown = None
+    for i, sp in enumerate(specs):
+        segs = sp.get('segs') or [(0, api.HITS[key][0][0])]
+        t0_of = sp.get('t0_of') or {c: t for t, c in segs}
+        hits = B.pattern_hits(key, t0_of, sp.get('only'))
+        t_hi = sp.get('t_hi', B.end_of(hits))
+        sh = B.Shown(segs, last=t_hi + 1)
+        lo = sp.get('t_lo', 0)
+        t0 = next((t for t in range(lo, t_hi + 1) if sh.known(t)), t_hi)
+        col_at, hot_at = B.colours(hits)
+        cond = sp.get('cond')
+        out = B.Out()
+        B.trail(out, key, f'{key}{i}' if len(specs) > 1 else key, sh, t0, t_hi, col_at, hot_at, (lambda t, c=cond: c))
+        out.into(pb)
+        if pb.shown is None or sp.get('ribs'):
+            pb.shown = sh
+    for n, r in enumerate(getattr(pb, 'ribs', [])):
+        out = B.Out()
+        sh = r.get('shown') or pb.shown
+        B.ribbon(out, key, f'{key}r{n}', sh, r['ta'], r['tb'], B.colour_of(key, r['idx'])[0], cond=r['cond'], seg=r['seg'])
+        out.into(pb)
+    for n, w_ in enumerate(getattr(pb, 'waves', [])):
+        out = B.Out()
+        B.wave(out, key, f'{key}w{n}', w_['h'], B.colour_of(key, w_['idx'])[0], w_['where'], length=w_['length'],
+               store=w_['store'], cond=w_['cond'])
+        out.into(pb)
 
 
 # ================================================================================================= A1 회전 반월참
@@ -197,7 +244,6 @@ def build_a1(W):
     # 13: 189 card px from the default F5 camera), centred at the body + 1.1 so its foot stays 0.3 b over the floor
     pb.at(fan, S.snd('a1_fan'))
     pb.hit(0, tell_from=0)
-    B.ride(pb, key, 0)
     pb.at(hit, S.snd('a1_hit'))
     pb.pp_window(hit)
     tail(pb, hit, end)
@@ -218,7 +264,6 @@ def build_a2(W):
     pb.at(glow, look('blade', 'lilac'))
     pb.cancel_lines.append(f'execute as {S.BODY} run {look("blade", "edge")}')
     pb.hit(0, tell_from=0)
-    B.ride(pb, key, 0)
     pb.at(hit, S.snd('a2_hit'), look('blade', 'edge'))
     pb.pp_window(hit)
     tail(pb, hit, end)
@@ -253,7 +298,6 @@ def build_a3(W, key='a3'):
             else:
                 step_in(pb, prev, t)
         pb.hit(i, tell_from=0 if i == 0 else prev)
-        B.ride(pb, key, i, prev=prev if i else None)
         pb.at(t, S.snd(f'a3_{ev_}'))
         prev = t
     pb.pp_window(prev)
@@ -298,21 +342,20 @@ def build_a4(W):
     pb.at(flip, S.snd('a4_flip'))
     # round V: the plunge's way drawn from her raised blade to the locked spot (the head lands with her), the flip's and the
     # cut's sweeps as the slash; she lands LAND_SHORT before the spot, the blade on it
-    drop_line(pb, key, key, hit - B.SHOW_FIRST, lock, hit)
-    B.ride(pb, key, 0, path=False)
+    rib(pb, dive, hit, 0)
     pb.at(dive, near(LAND_SHORT, hit - dive))
     pb.motions.append((dive, hit, 'dive'))
     g = pb.group(hit - 1)
     pb.hit(0, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(hit, S.fx('dive_impact', [part(S.DUST['lilac'], 1.0, 0.1, 1.0, 0, 30)], pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~',
                     r=26), S.snd('a4_impact', pos=f'at {S.LOCK_M}'))
+    cam_clear(pb, hit + 1)
     # A5: the straight slash line (cosmetic), the aim locks again (lock2), she spins ~1 b off the ground, the ring round her
     pb.track(hit + 1, lock2 - 1, TRK['deg'])
     pb.at(ring, f'execute at @s positioned ~ {CY + 1} ~ run function rlk:mboss/mv/glide {{t:2}}')
     pb.at(E(key, 'ring') + 2, S.snd('a5_spin'))
     pb.motions.append((ring, ring + 2, 'rise'))
     pb.hit(1, tell_from=hit)
-    B.ride(pb, key, 1, prev=hit)
     pb.at(hit2, f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land - hit2}}}')
     pb.motions.append((hit2, land, 'land'))
     tail(pb, hit2, end, moved=land)
@@ -393,13 +436,18 @@ def dash_through(pb, key, go, cut, row=0, grp=True):
         f'execute at @s facing entity {S.LOCK_M} feet as {S.PROBE_M} run tp @s ~ ~ ~ ~ 0',
         f'execute as {S.PROBE_M} at @s run {fn(f"p/{key}/pstep")}',
         f'scoreboard players operation #{key}_n {OBJ} = #t2 {OBJ}',
+        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]',
+        f'data modify storage {DASH_STO} set value {{len:0,w:{int(round(w * 10))},tell:1,dmg:{api.DMG[h[4]]}}}',
+        f'execute store result storage {DASH_STO}.len int 5 run scoreboard players get #{key}_n {OBJ}',
         # round V (v_brief §3 VB 4): her body stops DASH_SHORT before the locked spot (in front of the avatar, in the camera's
         # view), the hazard line keeps the probed length through the spot; nearer than that already: she cuts from where she is
         f'execute at @s positioned ~ {CY} ~ unless entity {S.LOCK_M[:-1]},distance=..{num(DASH_SHORT + 0.3, 2)}] at {S.LOCK_M} facing entity @s feet '
-        f'rotated ~ 0 positioned ^ ^ ^{num(DASH_SHORT, 2)} if function rlk:mboss/mv/ok run function rlk:mboss/mv/glide {{t:{cut - go}}}',
-        f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]',
-        f'data modify storage {DASH_STO} set value {{len:0,w:{int(round(w * 10))},tell:1,dmg:{api.DMG[h[4]]}}}',
-        f'execute store result storage {DASH_STO}.len int 5 run scoreboard players get #{key}_n {OBJ}'])
+        f'rotated ~ 0 positioned ^ ^ ^{num(DASH_SHORT, 2)} if function rlk:mboss/mv/ok if function {api.NS}core/cam_ok run return run '
+        f'function {api.NS}p/{key}/go {{t:{cut - go}}}',
+        # round W (T3-06): a stop in the player's camera line: 1.5 b farther back along her way, else she cuts from where she is
+        f'execute at @s positioned ~ {CY} ~ unless entity {S.LOCK_M[:-1]},distance=..{num(DASH_SHORT + 1.8, 2)}] at {S.LOCK_M} facing entity @s feet '
+        f'rotated ~ 0 positioned ^ ^ ^{num(DASH_SHORT + 1.5, 2)} if function rlk:mboss/mv/ok if function {api.NS}core/cam_ok run '
+        f'function {api.NS}p/{key}/go {{t:{cut - go}}}'])
     W.w(f'p/{key}/pstep', [
         f'# {key.upper()} probe step (@s = the probe, at / rotated as it): 0.5 b on while mv/ok passes, at most #t steps; once within',
         f'# 0.5 b of the locked spot the cap becomes {nb} more steps ({num(beyond)} b beyond it).',
@@ -409,6 +457,7 @@ def dash_through(pb, key, go, cut, row=0, grp=True):
         'tp @s ^ ^ ^0.5',
         f'scoreboard players add #t2 {OBJ} 1',
         f'execute at @s run {fn(f"p/{key}/pstep")}'])
+    W.w(f'p/{key}/go', [f'# {{t}} {key.upper()}: the dash glide to here (p/{key}/dash chose the stop).', '$function rlk:mboss/mv/glide {t:$(t)}'])
     W.w(f'p/{key}/past', [f'# {key.upper()} probe at the locked spot (once): the cap = the steps so far + {nb}, at most {nmax}.',
                           f'scoreboard players operation #t {OBJ} = #t2 {OBJ}', f'scoreboard players add #t {OBJ} {nb}',
                           f'execute if score #t {OBJ} matches {nmax + 1}.. run {sset("#t", nmax)}',
@@ -445,19 +494,19 @@ def build_a9(W):
     lock = min(E(key, 'lock'), cut - S.LOCK)
     pb.at(0, FACE, api.play(key))
     pb.track(1, lock - 1, TRK['deg'])
-    flourish(pb, key, key, E(key, 'spin'), E(key, 'yellow'))      # the spin's sweep (was a ring placed at her waist)
     pb.at(lock, lock_dash(pb, key))
-    dash_line(pb, key, cut - B.SHOW_FIRST, lock, cut)
-    B.ride(pb, key, 0, path=False, slash_col=api.C_MAGENTA)
     pb.at(flash, [x for x in (api.K.ovl('magenta', 0, 3, 6),) if x], S.snd('a9_flash'))
     # one strike group: the dash line from the start point along the dash + the disc at the locked spot (one landing);
     # the flashes of the group are the row 0's: yellow 8, purple 16 (exactly 12 t before the cut)
     g = pb.group(cut - 1)
     ds = dash_through(pb, key, go, cut)
     pb.at(go, *afterimage(int(api.DASH_LEN[key] * 10)))
+    rib(pb, go, cut, 0)
+    wave(pb, cut, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.note_hit(0, cut, tell_from=0, grp=g)
     pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(cut, S.snd('a9_cut'))
+    cam_clear(pb, cut + 1)
     tail(pb, cut, end)
     return finish(pb, key)
 
@@ -499,8 +548,7 @@ def build_a10(W):
     pb.motions.append((apex + 1, lock - 1, 'drift'))
     pb.track(apex + 1, lock - 1, 20)
     pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
-    drop_line(pb, key, key, hit - B.SHOW_FIRST, lock, hit)
-    B.ride(pb, key, 0, path=False)
+    rib(pb, dive, hit, 0)
     pb.at(dive, near(LAND_SHORT, hit - dive),
           S.fx('claw_streaks', [part(S.DUST['lilac'], 0.6, 2.0, 0.6, 0, 20)], pos=f'at {S.LOCK_M} positioned ~ {CY + 2} ~', r=15),
           S.snd('a10_dive'))
@@ -510,6 +558,7 @@ def build_a10(W):
     pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(hit, S.fx('burst_radial', [part(S.DUST['lilac'], 1.4, 0.2, 1.4, 0, 36), part('minecraft:end_rod', 0.2, 1.5, 0.2, 0.05, 10)],
                     pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~', r=35), S.snd('a10_impact', pos=f'at {S.LOCK_M}'))
+    cam_clear(pb, hit + 1)
     tail(pb, hit, end)
     ground(pb)
     return finish(pb, key)
@@ -532,7 +581,6 @@ def build_d4(W):
         else:
             pb.advance(1, t - S.LOCK, TRK['step'], TRK['min'])
         pb.hit(i, tell_from=0 if i == 0 else prev)
-        B.ride(pb, key, i, prev=prev if i else None)
         pb.at(t, S.snd(('g_ring', 'a3_h2', 'a3_h4', 'a3_h5')[i]))
         prev = t
     pb.pp_window(prev)
@@ -571,15 +619,14 @@ def build_tri(W):
     pb.hit(0, tell_from=0, made=go)
     pb.at(go, fn(f'p/{key}/lunge'), S.snd('lunge'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(dmax * 10)))
     pb.motions.append((go, h0, 'lunge'))
-    dash_line(pb, key, max(1, h0 - B.SHOW_FIRST), lock0, h0, post=S.PLAYER)
-    B.ride(pb, key, 0, path=False)
+    rib(pb, go, h0, 0)
     pb.at(h0, S.snd('a2_hit'))
+    cam_clear(pb, h0 + 1)
     prev = h0
     for i, t in enumerate(hs):
         track_to(pb, prev, t)
         step_in(pb, prev, t)
         pb.hit(i + 1, tell_from=prev)
-        B.ride(pb, key, i + 1, prev=prev)
         pb.at(t, S.snd(('a3_h1', 'a3_h3', 'a3_h5')[i]))
         prev = t
     pb.pp_window(prev)
@@ -611,16 +658,13 @@ def build_rings(W):
         pb.motions.append((prev + 1, t - S.LOCK, 'step'))
         if i < 3:
             pb.hit(i, tell_from=0 if i == 0 else prev)
-            B.ride(pb, key, i, prev=prev if i else None)
             pb.at(t, ring_fx())
         elif i == 3:
             pb.hit(3, tell_from=prev)          # P1: the last ring (T2, kb 3)
             pb.hit(4, tell_from=prev)          # P2: a chain ring
-            B.ride(pb, key, 3, prev=prev)
             pb.at(t, ring_fx())
         else:
             pb.hit(5, tell_from=prev)          # P2 only: the last ring
-            B.ride(pb, key, 5, prev=prev, cond=P2c)
             pb.at(t, [S.gate(P2c, x) for x in ring_fx()])
         prev = t
     e1, e2 = api.RINGS_END[1], api.RINGS_END[2]
@@ -639,6 +683,10 @@ def build_rings(W):
         if fp == 1:
             pb.at(e, S.gate(cnd, sset('#done', 1)))
     TAILS[key] = ts[3] + api.TAIL_MOVE
+    # the trail: r1-r4 in both phases, r5 in P2 (in P1 the pattern ends 10 t after r4: core/pat_end takes what is left)
+    r4 = B.pattern_hits(key, only=(0, 1, 2, 3))
+    spec(pb, only=(0, 1, 2, 3))
+    spec(pb, only=(5,), t_lo=B.end_of(r4) + 1, cond=P2c)
     pb.end(e2)
     return finish(pb, key)
 
@@ -656,8 +704,6 @@ def build_ult(W):
     pb.at(0, sset('#ultq', 0), api.play(key))
     pb.track(1, cut1 - S.LOCK, TRK['deg'])
     pb.hit(0, tell_from=0, pos=full)
-    B.ride(pb, key, 0)
-    B.ride(pb, key, 1)
     pb.at(cut1, [x for x in (K.ovl('white', 0, 2, 2),) if x], S.snd('ult_cut1'))
     pb.at(web, S.fx('ult_web', [part(S.DUST['white'], 6.0, 1.5, 6.0, 0, 80), part(S.DUST['lilac'], 6.0, 1.5, 6.0, 0, 60)],
                     pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', t=cut2 - web + 2),
@@ -687,14 +733,15 @@ def build_hcut(W):
     for t in range(sparkle, sparkle + 9, 4):
         pb.at(t, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['white'], 0.08, 0.08, 0.08, 0, 6)], c=api.C_WHITE)))
     pb.at(lock, lock_dash(pb, key))
-    dash_line(pb, key, cut - B.SHOW_FIRST, lock, cut)
-    B.ride(pb, key, 0, path=False)
     g = pb.group(cut - 1)
     ds = dash_through(pb, key, go, cut)
+    rib(pb, go, cut, 0)
+    wave(pb, cut, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.at(go, S.snd('g_dash'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
     pb.note_hit(0, cut, tell_from=0, grp=g)
     pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(cut, S.snd('a9_cut'))
+    cam_clear(pb, cut + 1)
     tail(pb, cut, end)
     return finish(pb, key)
 
@@ -711,12 +758,13 @@ def build_blue(W):
     pb.at(0, FACE, api.play(key))
     pb.track(1, lock - 1, TRK['deg'])
     pb.at(lock, lock_dash(pb, key))
-    dash_line(pb, key, hit - B.SHOW_FIRST, lock, hit)
-    B.ride(pb, key, 0, path=False)
     ds = dash_through(pb, key, go, hit, grp=False)
+    rib(pb, go, hit, 0)
+    wave(pb, hit, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.at(go, S.snd('lunge'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
     pb.note_hit(0, hit, tell_from=0)
     pb.at(hit, S.snd('a2_hit'))
+    cam_clear(pb, hit + 1)
     tail(pb, hit, end)
     return finish(pb, key)
 
@@ -738,23 +786,21 @@ def build_kcut(W):
     pb.at(go, look('blade', 'edge'))
     pb.cancel_lines.append(f'execute as {S.BODY} run {look("blade", "edge")}')
     pb.at(lock, lock_dash(pb, key))
-    dash_line(pb, key, cut - B.SHOW_FIRST, lock, cut)
-    B.ride(pb, key, 0, path=False)
     g = pb.group(cut - 1)
     ds = dash_through(pb, key, go, cut)
+    rib(pb, go, cut, 0)
+    wave(pb, cut, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.at(go, S.snd('kcut_go'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
     pb.note_hit(0, cut, tell_from=0, grp=g)
     ln = api.HITS[key][1][3][0]
     for i, yaw in enumerate(api.KCUT_YAW):
         at = f'at {S.LOCK_M} rotated as {DS_M} rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)} positioned ~ {CY} ~'
         pb.hit(i + 1, tell_from=0, grp=g, pos=at)
-        # round V: the three crossing lines drawn in the air through the locked spot from the lock on (her aim is locked: the
-        # dash runs along it), burning white at the cut
-        out = B.Out()
-        B.static_line(out, key, f'k{i}', lock, cut, B.colour_of(key, 0)[0],
-                      f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ^ ^1.0 ^-{num(ln / 2)}', ln)
-        out.into(pb)
+        # round W: the three crossing lines flash ON the cut (round V drew them from the lock on: a path ahead)
+        wave(pb, cut, f'at {S.LOCK_M} rotated as {DS_M} rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)} positioned ~ {num(CY + WAVE_Y, 2)} ~',
+             0, length=ln)
     pb.at(cut, S.snd('a9_cut'))
+    cam_clear(pb, cut + 1)
     tail(pb, cut, end)
     return finish(pb, key)
 

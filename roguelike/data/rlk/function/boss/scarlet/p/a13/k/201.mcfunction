@@ -1,3 +1,3 @@
 # A13 pattern tick 201.
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_c206] ~ ~ ~ ~ 0
-execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_c206,limit=1] ^0.541 ^0.82 ^1.676
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_193]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a13_195] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"

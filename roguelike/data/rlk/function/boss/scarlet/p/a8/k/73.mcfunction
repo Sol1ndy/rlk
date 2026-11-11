@@ -1,3 +1,5 @@
 # A8 pattern tick 73.
 function rlk:boss/scarlet/rig/state/hidden
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_c64_67]
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_65]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_67] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_69] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"

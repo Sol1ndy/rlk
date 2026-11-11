@@ -1,8 +1,9 @@
 # HCUT pattern tick 28
-kill @e[type=minecraft:item_display,tag=rlk_hr_sw_m26]
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_hcut26_24] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
-execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_hcut26_26] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_hcut","rlk_hr_swn","rlk_hr_sw_hcut26_28"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.0446f,0.7023f,0.4087f],left_rotation:[0.662f,0.0338f,-0.7473f,0.0473f],scale:[0.931f,1f,2.0215f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_hcut","rlk_hr_swn","rlk_hr_sw_hcut26_28"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.02f,0.7655f,0.4019f],left_rotation:[0.8123f,0.0435f,-0.5803f,0.0387f],scale:[0.9168f,1f,1.9904f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
-tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_hcutb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.2429f,0.7713f,0.2669f],left_rotation:[-0.6375f,0.5993f,0.3059f,-0.3753f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_hcut_24] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_hcut_26] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_hcut_27,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.0485f,0.7012f,0.4083f],left_rotation:[0.6617f,0.0402f,-0.7479f,0.0356f],scale:[0.8382f,0.26f,1.8199f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_hcut_27,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[-0.0238f,0.7638f,0.4006f],left_rotation:[0.8129f,0.0312f,-0.5799f,0.0438f],scale:[0.8223f,0.26f,1.7841f],right_rotation:[0f,0f,0f,1f]}}
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_hcutr0r24] remove rlk_hr_trg
+kill @e[type=minecraft:marker,tag=rlk_hr_trt]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_hcutw0w] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_rib_1"

@@ -1,7 +1,3 @@
 # TRI pattern tick 3
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ~ ~1.0 ~ run function rlk:boss/scarlet/core/sw/aim {dy:"-1.0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.0833 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3149f,0.8902f,-0.0895f],left_rotation:[-0.1207f,0.1381f,0.017f,0.9829f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_tri","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_tri_3","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.3129f,0.8937f,-0.0863f],left_rotation:[-0.0258f,0.0954f,0.3938f,0.9138f],scale:[0f,0.18f,1.6268f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}

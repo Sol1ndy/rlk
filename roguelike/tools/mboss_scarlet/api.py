@@ -1125,8 +1125,9 @@ KIT_SPRITE_CAP = 260_000
 # hr_design §5.4: 22 432 px were left; the one planned new sprite group (lane H1c), counted once the kit generator declares it
 KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),),      # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
                   'cue': ((1, 64, 64),),             # HA-07 (review H-A): the parry cue's white-gold sparkle (4 096 px)
-                  # round V (lane VB, v_brief §3 VB 2-3): the drawn blade path, its head, the slash sector (16 640 px)
-                  'sw_path': ((1, 16, 16),), 'sw_head': ((1, 64, 64),), 'sw_arc': ((3, 64, 64),)}
+                  # round V (lane VB): the flashes' rimmed star (sw_head); round W (lane WB, w_brief §2 WB): the blade's trail -
+                  # the band / ribbon / rim wall (sw_rib), the swept sector (sw_arc) and strip (sw_quad), 3 fading frames each
+                  'sw_rib': ((3, 16, 16),), 'sw_head': ((1, 64, 64),), 'sw_arc': ((3, 64, 64),), 'sw_quad': ((3, 16, 16),)}
 KIT_SPRITES.update({k: v for k, v in KIT_SPRITES_HR.items() if kit_declares('sprite', k)})
 KIT_SPRITE_PX = sum(f * w * h for rows in KIT_SPRITES.values() for f, w, h in rows)
 assert KIT_SPRITE_PX == 237_568 + sum(f * w * h for k, rows in KIT_SPRITES_HR.items() if k in KIT_SPRITES for f, w, h in rows) \

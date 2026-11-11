@@ -1,7 +1,3 @@
 # MX pattern tick 8
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-tag @e[tag=rlk_body,limit=1] add rlk_hr_swt
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ~ ~1.0 ~ run function rlk:boss/scarlet/core/sw/aim {dy:"-1.0"}
-tag @e[tag=rlk_hr_swt] remove rlk_hr_swt
-execute store result storage rlk:hr core.sw.d double 0.2083 run scoreboard players get #sw_n hr
-function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_mxb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5617f,0.8848f,-0.4303f],left_rotation:[0.3582f,-0.8627f,0.329f,-0.1384f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_mx_2] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"

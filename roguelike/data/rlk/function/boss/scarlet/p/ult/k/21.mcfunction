@@ -1,3 +1,3 @@
 # ULT pattern tick 21
-execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_ult24] ~ ~ ~ ~ 0
-execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_ult24,limit=1] ^-0.313 ^0.894 ^2.021
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_ultb1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.2752f,0.8094f,0.1269f],left_rotation:[-0.593f,-0.6686f,0.3851f,0.2302f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_ult","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_ult_21","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.1803f,0.8046f,0.2216f],left_rotation:[-0.0915f,-0.9438f,0.2246f,0.2248f],scale:[0f,0.26f,1.7415f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[15584255]}}}}
