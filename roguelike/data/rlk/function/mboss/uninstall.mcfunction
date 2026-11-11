@@ -43,6 +43,7 @@ data remove storage rlk:mboss spmet
 data remove storage rlk:mboss spforce
 data remove storage rlk:mboss spid
 data remove storage rlk:mboss spg
+data remove storage rlk:mboss camret
 data remove storage rlk:mboss built_az_cavern
 data remove storage rlk:mboss look_az_cavern
 data remove storage rlk:mboss built_ap_oasis

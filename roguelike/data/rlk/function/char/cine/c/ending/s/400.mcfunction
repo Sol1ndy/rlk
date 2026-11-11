@@ -1,0 +1,14 @@
+# ending: the pose of tick 400, no interpolation (a jump of #cavT lands here); the next tick re-arms the running segments.
+data merge entity 524c4b4d-4349-4e45-8000-000000000000 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,1.51563f,0f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000001 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,1.51563f,0f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000002 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.34375f,1.39063f,0f],left_rotation:[0.06963f,-0.00426f,0.0609f,-0.9957f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000003 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.37392f,1.14491f,0.03479f],left_rotation:[0.19045f,-0.01165f,0.05993f,-0.9798f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000004 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.34375f,1.39063f,0f],left_rotation:[-0.02613f,-0.0016f,0.06103f,0.99779f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000005 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.37418f,1.14283f,0.01308f],left_rotation:[-0.10433f,-0.00638f,0.06071f,0.99267f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000006 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.125f,0.76563f,0f],left_rotation:[0f,-0.02996f,0f,0.99955f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000007 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.125f,0.39063f,0f],left_rotation:[0f,-0.02996f,0f,0.99955f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000008 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.125f,0.76563f,0f],left_rotation:[0f,0.02996f,0f,0.99955f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000009 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.125f,0.39063f,0f],left_rotation:[0f,0.02996f,0f,0.99955f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-00000000000a {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.41276f,0.82856f,0.16356f],left_rotation:[-0.80751f,0.04939f,0.03588f,-0.58669f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+scoreboard players set #cavP cine 400
+scoreboard players set #cavR cine 400

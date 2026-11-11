@@ -1,0 +1,3 @@
+# intro: the timeline, the ticks 215..216.
+execute if score #sq hr matches 215 run return run function rlk:boss/scarlet/seq/intro/k/215
+execute if score #sq hr matches 216 run return run function rlk:boss/scarlet/seq/intro/k/216

@@ -43,6 +43,7 @@ import {retarget, overlay, refCore, hatSwitches, bladeChannels, setHatFace, face
   IAI_DELTA, ASIDE, hipDirChannels} from './scarlet_retarget.mjs';
 import {CLIPS as AUTHORED, CINE_PLACEHOLDER, accumulate, sampleClip, DEFAULT_POSE, H_POSE} from './scarlet_clips.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, interp, shown, summonPart, summonShadow, cullOverhang} from './mboss_rig_compile.mjs';
+const FACE_BODY = '@e[tag=rlk_body,limit=1]';      // the RIGLIB look target of rig/face/player and rig/face/track
 import {qAngle, len, sub, add, rot, mul, q, times, unit, cross, dot, perp, basisQ} from './mboss_rig_math.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -898,7 +899,9 @@ fn('flash', ['# Hit feedback: the body outlines white-pink for 3 ticks. @s = the
   ...FLASH.map(n => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:16767725}`)]);
 fn('flash_tick', ['# Internal: counts the flash down.', `scoreboard players remove @s ${OBJ}F 1`, `execute if score @s ${OBJ}F matches ..0 run function ${NS}/flash_off`]);
 fn('flash_off', ['# Internal: end of the hit flash.', `scoreboard players set @s ${OBJ}F 0`, ...FLASH.map(n => `data merge entity ${uuidOf(n)} {Glowing:0b}`)]);
-compiler.writeFace({marker: 'rlk_hr_face', maxDeg: 12});
+// H2 (hr_design §5.4): her cutscenes lock the player on a camera stand (FN-cam: a spectator, far from the body), so the rig
+// faces the player's body (the avatar in the F5 view; the player in developer mode) instead of the nearest non-spectator
+compiler.writeFace({marker: 'rlk_hr_face', maxDeg: 12, target: FACE_BODY});
 
 // ---- models by look (form-aware swaps) ----------------------------------------------------------------------------------------
 // m/<part>/<value>: the hand / face model of the current form (the clips call these at their own ticks); m/hat, m/sash: the

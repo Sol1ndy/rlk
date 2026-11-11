@@ -3,5 +3,5 @@
 function rlk:boss/scarlet/fx/hud/skip {s:5}
 scoreboard players set #skip hr -1
 scoreboard players set #skp hr 0
-function rlk:boss/scarlet/core/sq/cs1/skip
+function rlk:boss/scarlet/seq/cs1/skip
 scoreboard players set #sq hr 565

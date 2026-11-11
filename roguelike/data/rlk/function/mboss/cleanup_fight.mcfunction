@@ -1,4 +1,8 @@
 # End of a fight without forgetting cur/ret (won reads them afterwards).
+# FN-cam: a held player is released first (before the module cleanup, the stands and the body go, and before the
+# callers move the player: mboss/won -> tp_out), and the request ends with the fight
+execute as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
+scoreboard players set #mbCam mb 0
 execute if score #mbId mb matches 1.. run function rlk:mboss/d/cleanup
 function rlk:mboss/cleanup_aux
 function rlk:mboss/ar/sweep

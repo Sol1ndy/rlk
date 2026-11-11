@@ -1,0 +1,5 @@
+# FN-cam: the two camera stands at the execution position (idempotent: a stand that exists is left where it is).
+# Marker armour stands: no hitbox, no gravity, invisible, eye = position, camera_distance 0; rlk_mb_aux: they go with
+# the fight's helper entities (cleanup_aux, a /reload); rlk_pet: rlk:tick's mob setup leaves them alone.
+execute unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] run summon minecraft:armor_stand ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_pet","rlk_mb_cam","rlk_mb_cam1"],Marker:1b,Invisible:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,NoBasePlate:1b,DisabledSlots:4144959,attributes:[{id:"minecraft:camera_distance",base:0d}]}
+execute unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] run summon minecraft:armor_stand ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_pet","rlk_mb_cam","rlk_mb_cam2"],Marker:1b,Invisible:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,NoBasePlate:1b,DisabledSlots:4144959,attributes:[{id:"minecraft:camera_distance",base:0d}]}

@@ -40,6 +40,8 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 own groggies' refill lines, the mob / cm / combat / burst hook lines, the cm rig ticks, Raiden's balance stun
   fix A         review A (player side) and B-05 (11-11, wip/combat-fix-a): F:combat/rclick_off (F and a right-click in one
                 tick); the rest of its changes are files of lane C / F3 (view/tick: the crosshair after an overlay)
+  lane H2       the 홍련 rebuild's cinematic lock FN-cam (11-11, wip/combat-hr2): F:mboss/cam/**, the request lines of
+                F:mboss/{main,cleanup_fight,init,uninstall}, F:tick, F:view/tick, F:lvup/tick
   fix lane FB   the enemy side after review B (11-11, wip/combat-fix-b): the framework's np / grp files, the patterns of the
                 seven bosses that hold an unparriable hit (the glint call, noparry), cm/ar/shoot, cm/cc/flock, cm/ci/r_hit(_own),
                 boss/tachy/{bal_on,core/ground}
@@ -170,6 +172,17 @@ ALLOW[LANE_B] = (
         'mboss/fieldgen/groggy/begin', 'boss/arlecchino/core/stun_start', 'boss/arlecchino/hud/bar_stun',
         'boss/tachy/el/backfire', 'boss/tachy/mantle/break', 'boss/raiden/bars', 'boss/raiden/tick',
         'boss/raiden/exhausted_start', 'boss/raiden/sg/stun_begin', 'boss/raiden/sg/stun_tick')])
+# 11-11 홍련 rebuild, lane H2 (wip/combat-hr2; tools/dev/plan/combat/hr2_progress.md): the cinematic lock FN-cam — the generated
+# F:mboss/cam/** and its request lines in the framework's shared files (tools/build_mboss_core.py), rlk:tick's hold / release
+# lines, view/tick's guard, lvup/tick's held-sneak line; the RIGLIB look target changes only her own rig (F:boss/scarlet/**)
+LANE_H2 = '홍련 rebuild H2 (11-11): the cinematic lock FN-cam'
+ALLOW[LANE_H2] = ([F + r'mboss/cam/.+\.mcfunction']
+                  + [F + f'{n}.mcfunction' for n in ('mboss/main', 'mboss/cleanup_fight', 'mboss/init', 'mboss/uninstall', 'tick',
+                                                     'view/tick', 'lvup/tick')])
+# 11-11 홍련 rebuild, lane H3 (wip/combat-hr3; tools/dev/plan/combat/h3_progress.md): the cutscene actor — the generated
+# rlk:char/cine/** and its manifest (tools/build_player_cine.mjs, run by build_player_rig.mjs). It changes and removes nothing.
+LANE_H3 = 'scarlet rebuild H3 (11-11): the cutscene actor'
+ALLOW[LANE_H3] = [F + r'char/cine/.+', r'tools/player_motion/cine/manifest\.json']
 # 11-11 combat overhaul, fix lane FB (wip/combat-fix-b; tools/dev/plan/combat/fb_progress.md, review/rulings_B.md): the
 # unparriable rule without size thresholds and its warning glint at the tell (the framework's np / grp files, the seven boss
 # modules' patterns that hold an unparriable hit), one volley = one answer, the archer's arrow / the conjurer's cicins, the

@@ -134,6 +134,12 @@ execute unless score #mbGrpL2 mb matches 0.. run scoreboard players set #mbGrpL2
 # again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).
 execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0
 execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0
+# FN-cam: the cinematic lock is a per-tick request too (#mbCam 1 + the live stand #mbCamId 1 | 2; rlk:tick ->
+# mboss/cam/hold | release). A /reload ends a lock: the request is off and a held player is released here, before
+# the stands die with the other helper entities below (the module reload hook never resumes a locked sequence).
+scoreboard players set #mbCam mb 0
+execute unless score #mbCamId mb matches 1..2 run scoreboard players set #mbCamId mb 1
+execute as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
 # combat overhaul C: the unparriable-attack glint spacing (np_gate) and a module that draws its own warnings (#mbNpOwn 1)

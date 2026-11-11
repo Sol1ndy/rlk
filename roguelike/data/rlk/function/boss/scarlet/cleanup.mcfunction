@@ -6,14 +6,14 @@
 function rlk:boss/scarlet/core/stop_all
 scoreboard players set #mbNpOwn mb 0
 scoreboard players set #mbBalOff mb 0
-function rlk:boss/scarlet/core/sq/intro/cancel
-function rlk:boss/scarlet/core/sq/cs1/cancel
-function rlk:boss/scarlet/core/sq/lead60/cancel
-function rlk:boss/scarlet/core/sq/repel/cancel
-function rlk:boss/scarlet/core/sq/lead5/cancel
-function rlk:boss/scarlet/core/sq/lead_re/cancel
-function rlk:boss/scarlet/core/sq/ending/cancel
-function rlk:boss/scarlet/core/sq/event/cancel
+function rlk:boss/scarlet/seq/intro/cancel
+function rlk:boss/scarlet/seq/cs1/cancel
+function rlk:boss/scarlet/seq/lead60/cancel
+function rlk:boss/scarlet/seq/repel/cancel
+function rlk:boss/scarlet/seq/lead5/cancel
+function rlk:boss/scarlet/seq/lead_re/cancel
+function rlk:boss/scarlet/seq/ending/cancel
+function rlk:boss/scarlet/seq/event/cancel
 function rlk:boss/scarlet/fx/clear
 function rlk:boss/scarlet/fx/hud/clear
 function rlk:boss/scarlet/fx/hud/warn {on:0}

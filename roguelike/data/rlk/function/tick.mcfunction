@@ -8,6 +8,8 @@ execute store result score #pcount tmp if entity @a[tag=player]
 execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이크] ","color":"red","bold":true},{"text":"'player' 태그는 한 명만 가질 수 있습니다. 전원 태그를 제거합니다.","color":"red"}]
 # 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 느려짐(1인칭 점프 수정자)을 먼저 푼다
 execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
+# 연출 카메라에 잡혀 있던 플레이어(mboss/cam/hold, 태그 rlk_mb_camh)도 이 길에서는 아래 줄이 돌지 않으므로 여기서 풀어 준다
+execute if score #pcount tmp matches 2.. as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
 # 전투 개편 C: 입력 앞 단계. 이번 틱의 모든 피격(아바타의 바닐라 피격 · 커스텀 몹 · 나루카미 · 중간보스)보다 먼저 F(패링)와
@@ -66,6 +68,12 @@ execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
 # 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
 execute if score #mbLive mb matches 1 run function rlk:mboss/main
+# 연출 카메라 잠금(FN-cam, tools/build_mboss_core.py mboss/cam/*): 보스 모듈이 이번 전투 틱에 요청했으면(#mbCam 1; mboss/main 이 틱마다 지우고
+# 모듈의 틱이 다시 켬) 플레이어를 관전 모드로 카메라 거치대(#mbCamId 1 = rlk_mb_cam1, 2 = rlk_mb_cam2)에 붙여 두고(관전 중 Shift 는 관전을
+# 풀므로 틱마다 다시 spectate), 요청이 멈추면(연출 끝 · 취소 · 멈춤 · 사망 · /reload · 정리) 잡혀 있던 플레이어(태그 rlk_mb_camh)를 바로 푼다:
+# 관전 해제 · 게임 모드 복구 · 아바타 자리 · 보스 쪽 시선 · 받침 다시 탑승. 잡혀 있는 동안 view/tick 은 쉰다(그 파일의 한 줄)
+execute if score #mbCam mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/cam/hold
+execute unless score #mbCam mb matches 1 as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 # 전투 개편 C: 퍼펙트 닷지 창 동안 보스의 위험 지대 · 투사체를 닷지를 시작한 자리에서 한 번 더 판정(mboss/near_all; 몸이 이미 빠져나간 퍼펙트 닷지)
 execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 run function rlk:mboss/near_all
 execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
