@@ -50,6 +50,7 @@ LOW = 1.05                    # an eye lower than this over the stage floor can 
 FRAMES = ('ST', 'ST2', 'HR', 'W')
 CLAMP = 'function rlk:mboss/ar/clampw'
 FIX = L.cam('fix')
+TEXT = L.cam('text')
 
 
 def ST(r, u, f):
@@ -115,9 +116,12 @@ class Key:
 
 
 class Shot:
-    def __init__(self, t, cam, eye, look, name, clamp, sub=()):
+    def __init__(self, t, cam, eye, look, name, clamp, sub=(), full=False):
         self.t, self.cam, self.eye, self.look, self.name, self.clamp = t, cam, eye, look, name, clamp
         self.sub = tuple(sub)     # who the shot is of: 'her' / 'actor' / 'moon' (their heads / the disc must be in frame, unhidden)
+        # (round W) a shot of BOTH figures ('her' and 'actor' in sub) keeps both heads inside the picture on every tick at a
+        # field of view of 70, 90 and 110, clear of the dialogue box (test_seq F5); `full`: head to foot (a wide shot)
+        self.full = bool(full)
         self.moves = []           # (t0, t1, eye0, eye1, look0, look1, ease, kind): kind 'move' | 'track' | 'chase'
         self.keys = []            # the placements after the first keyframe (Key), in tick order
         self.end = None           # the first tick this shot is no longer live
@@ -154,10 +158,11 @@ class Track:
         self.shots = []
 
     # ---- the table --------------------------------------------------------------------------------------------------
-    def cut(self, t, cam, eye, look, name='', sub=(), clamp=None):
+    def cut(self, t, cam, eye, look, name='', sub=(), clamp=None, full=False):
         """A hard cut to camera `cam`. sub: what the shot must show (the shot sheets check it): 'her', 'actor', 'moon';
         'actor?' = the actor as foreground of a shot from behind it, which a stage with the wall behind the actor cannot
-        give (the clamp, `over`): required only where the eye is not clamped."""
+        give (the clamp, `over`): required only where the eye is not clamped. full: a wide shot of both figures, head to
+        foot inside the picture at every checked field of view (round W)."""
         assert cam in (1, 2) and eye[0] in FRAMES and look[0] in FRAMES + ('ENT',), (self.seq, t, eye, look)
         if self.shots:
             p = self.shots[-1]
@@ -166,7 +171,8 @@ class Track:
             assert p.last_motion() < t, f'{self.seq} {t}: a move of the shot before runs into the cut'
             p.end = t
         assert all(x in ('her', 'actor', 'moon', 'actor?') for x in sub), sub
-        s = Shot(t, cam, eye, look, name, self.clamp if clamp is None else clamp, sub)
+        assert not full or ('her' in sub and 'actor' in sub), (self.seq, t, 'full is for a shot of both figures')
+        s = Shot(t, cam, eye, look, name, self.clamp if clamp is None else clamp, sub, full)
         s.end = self.t_end
         self.shots.append(s)
         return s
@@ -341,7 +347,8 @@ class Track:
                 assert s.t - PRE >= (self.shots[i - 1].t if i else 0), (self.seq, s.t)
                 add(s.t - 3, L.cam('spawn'), L.cam_dur(s.cam, 0))      # a camera that was killed is back for this cut (idempotent)
                 add(s.t - 2, *self.put(s.cam, s.eye, s.look, s.clamp))
-            add(s.t, f'scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {s.cam}')
+            # the cut: the other camera live, and the line / the hint with it (round W: only the live camera carries a text)
+            add(s.t, f'scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {s.cam}', TEXT)
             dur = 0
             for k in s.keys:
                 if k.dur != dur:

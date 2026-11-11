@@ -52,6 +52,10 @@
 //   scB scE scR        the scabbard in the right hand: its body direction from the mouth (bearing, elevation; yaw frame)
 //                      and its roll about the body (edge side); scOff where the hand grips it (blocks from the mouth)
 //   cupP, botP [x,y,z] (unused: the rock state is never keyed);  cupT, botT  the cup / bottle tilt in the hand (deg, pouring)
+//   lipL 0..1          (round W, lane WC: drinking from the bottle) the left fist to her lips: the bottle's rim on SK.lipBottle
+//                      (before her mouth, head frame);  botW 0..1 blends the bottle from the forearm's frame (botT) to the
+//                      HEAD's: botH = its tilt there (deg: 0 upright, + the base swings forward and up, the rim to her mouth),
+//                      so the bottle tips WITH the head. All three 0 = the old behaviour, bit for bit.
 //   discrete: hat (worn|back|hand|world|gone), sword (hand|sheathed|gone), scab (hip|hand|gone), face (calm|smile|closed),
 //             hL, hR (open|grip|brim), cup, bottle (none|hand|rock)
 //   ph                 the loop phase 0..1 (idle sway, set by the sampler)
@@ -72,6 +76,7 @@ export const SK = {
   swing: [0, .55, 0], twoHand: .22, hilt: HILT_OFF, throat: .16,
   anchors: {head: [0, .25, -.02], chest: [0, .30, -.06]}, vis: .30,
   lipMouth: [0, .09, -(.28125 + CUP.r + .02)],
+  lipBottle: [0, .085, -(.28125 + .035)],
 };
 export const ARM_REACH = .995 * (SK.armU + SK.fore), LEG_REACH = .995 * (SK.thigh + SK.shin);
 const ARM_TURN = 85, ARM_FOLD = .15;
@@ -587,6 +592,11 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     if (side > 0 && (p.hiL || 0) > 0) { const H = hiltOf(); T = lerp(T, H, p.hiL); if (p.hiL >= FULL) cts.push({kind: 'hilt', T: H, w: p.hiL}); }
     if (side < 0 && (p.hsR || 0) > 0) { const H = throatOf(); T = lerp(T, H, p.hsR); if (p.hsR >= FULL) cts.push({kind: 'throat', T: H, w: p.hsR}); }
     if (side < 0 && wLip > 0) { const M = add(Nb, rot(Hq, SK.lipMouth)), H = sub(M, times(prevAx('forearm_r'), CUP.hand)); T = lerp(T, H, wLip); if (wLip >= FULL) cts.push({kind: 'lips', T: H, w: wLip}); }
+    if (side > 0 && (p.lipL || 0) > 0) {
+      // the bottle at her lips: its rim (BOTTLE.h - BOTTLE.neck above the fist along the bottle) on the mouth point
+      const bq = mul(Hq, q([p.botH || 0, 0, 0])), H = sub(add(Nb, rot(Hq, SK.lipBottle)), rot(bq, [0, BOTTLE.h - BOTTLE.neck, 0]));
+      T = lerp(T, H, p.lipL); if (p.lipL >= FULL) cts.push({kind: 'lipsL', T: H, w: p.lipL});
+    }
     if (side < 0 && p.hatX && p.hatX.hold) {
       // the hat hand-overs: the right hand to the hat's hold point (the pre-roll before a pickup, the put-on before a release)
       const hp = hatHoldPoint(p.hatX.hold);
@@ -1359,7 +1369,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     else part('cup', cupBase, cupQ, 0);
     // the bottle held by the neck: its neck point (BOTTLE.neck above the base) in the left fist, tilted about it (botT)
     const fl = o.forearm_l.q;
-    const botQ = mul(fl, q([p.botT || 0, 0, 0]));
+    let botQ = mul(fl, q([p.botT || 0, 0, 0]));
+    if ((p.botW || 0) > 0) botQ = slerp(botQ, mul(o.head.q, q([p.botH || 0, 0, 0])), Math.min(1, p.botW));
     const botBase = sub(gripL, rot(botQ, [0, BOTTLE.neck, 0]));
     if (bot === 'hand') part('bottle', botBase, botQ);
     else part('bottle', botBase, botQ, 0);

@@ -87,7 +87,7 @@ def run_records(dp, name, stage, cache):
     out = {}
     for sq_name, recs in by.items():
         out[sq_name] = {str(t): dict(sq=r['sq'], live=r['live'], cam={str(k): v for k, v in r['cam'].items()}, body=r['body'],
-                                     stage=r['stage'], stage2=r['stage2'], held=r['held']) for t, r in recs.items()}
+                                     stage=r['stage'], stage2=r['stage2'], held=r['held'], props=r.get('props', [])) for t, r in recs.items()}
     if cache:
         Path(cache).write_text(json.dumps(out))
     return out
@@ -159,6 +159,15 @@ def main():
                 sp = to_frame(api.SEAT_POS, fr)
                 sw = render_xyz(sp)
                 ln += [x.replace('~ ~ ~', f'{sw[0]:.3f} {sw[1]:.3f} {sw[2]:.3f}') for x in seat if 'tuff' in x]
+            # (round W) the sequence's prop cards (the petals) where the run has them: billboards with their model and scale
+            for pr in r.get('props', []):
+                if not pr.get('model'):
+                    continue
+                pw_ = render_xyz(to_frame(pr['pos'], fr))
+                k = pr.get('scale', 1.0)
+                ln.append(f'summon minecraft:item_display {pw_[0]:.3f} {pw_[1]:.3f} {pw_[2]:.3f} {{billboard:"center",item_display:"none",'
+                          f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{pr["model"]}"}}}},'
+                          f'transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[{k}f,{k}f,{k}f],right_rotation:[0f,0f,0f,1f]}}}}')
             (fdir / f'p{i}.mcfunction').write_text('\n'.join(ln) + '\n')
             out = Path(td) / f'p{i}.png'
             if not (dbg / f'data/rlk/function/hr_dbg/{clip}/{ct}.mcfunction').exists():
@@ -218,11 +227,9 @@ def main():
                 import framing as FR
                 import mboss_lib as ML
                 def box(spec, width, col):
-                    ty, tz, k = ML.cam_text_geom(spec)
-                    half = (ML.CAM_BACK - tz) * math.tan(math.radians(a.fov / 2))
-                    px = 0.025 * k
-                    bx, y0, y1 = (width / 2 + 1) * px / (half * 16 / 9), (ty - px) / half, (ty + 10 * px) / half
-                    d.rectangle(((0.5 - bx / 2) * pw, (0.5 - y1 / 2) * ph, (0.5 + bx / 2) * pw, (0.5 - y0 / 2) * ph), outline=col, width=1)
+                    x0, x1, y0, y1 = ML.cam_text_box(spec, width, a.fov)        # half picture heights from the middle
+                    ar = 16 / 9
+                    d.rectangle(((0.5 + x0 / ar / 2) * pw, (0.5 - y1 / 2) * ph, (0.5 + x1 / ar / 2) * pw, (0.5 - y0 / 2) * ph), outline=col, width=1)
                 if ls:
                     box(ML.CAM_LINE, 192, (255, 170, 220))
                 box(ML.CAM_HINT, 96, (150, 150, 160))

@@ -3435,14 +3435,21 @@ scoreboard players set #mbCine mb 0
 def _cam_text_nbt(tag, spec):
     ty, tz, k = L.cam_text_geom(spec)
     f = lambda v: L.num(v, 5) + 'f'   # noqa: E731
-    return ('{id:"minecraft:text_display",Tags:["rlk_room","rlk_mb_aux","rlk_pet","%s","%s"],billboard:"center",alignment:"center",'
+    return ('{id:"minecraft:text_display",Tags:["rlk_room","rlk_mb_aux","rlk_pet","%s","%s","%%s"],billboard:"center",alignment:"center",'
             'line_width:%d,shadow:1b,see_through:0b,background:0,text:"",brightness:{sky:15,block:15},'
-            'transformation:{translation:[0f,%s,%s],left_rotation:[0f,0f,0f,1f],scale:[%s,%s,%s],right_rotation:[0f,0f,0f,1f]}}'
-            % (L.CAM_PART_TAG, tag, spec['width'], f(ty), f(tz), f(k), f(k), f(k)))
+            'transformation:{translation:[%s,%s,%s],left_rotation:[0f,0f,0f,1f],scale:[%s,%s,%s],right_rotation:[0f,0f,0f,1f]}}'
+            % (L.CAM_PART_TAG, tag, spec['width'], f(L.cam_text_tx(spec)), f(ty), f(tz), f(k), f(k), f(k)))
 
 
+# %s x 3: the camera's own tag, then its texts' tag (twice: the line, the hint): cam_nbt(camera tag, texts' tag)
 CAM_NBT = ('{Tags:["rlk_room","rlk_mb_aux","rlk_pet","%s","%s","%%s"],teleport_duration:0,Passengers:[%s,%s]}'
            % (L.CAM_PART_TAG, L.CAM_TAG, _cam_text_nbt(L.CAM_LINE_TAG, L.CAM_LINE), _cam_text_nbt(L.CAM_HINT_TAG, L.CAM_HINT)))
+
+
+def cam_nbt(cam_tag, text_tag):
+    return CAM_NBT % (cam_tag, text_tag, text_tag)
+
+
 CAM_HALF = L.num(L.CAM_GRID / 2, 6)                    # half a grid step (rounding to the nearest step)
 CAM_K = '0.71111112'                                   # 256 / 360, a hair above: (k + 0.5) * it floors to k for every byte k
 assert all(math.floor((k * L.CAM_GRID + float(CAM_HALF)) * float(CAM_K)) == k for k in range(-128, 129)), 'grid rounding'
@@ -3452,7 +3459,7 @@ w('cam/spawn', [
     '# FN-cam: the two cameras at the execution position (idempotent: a camera that exists is left where it is). Empty',
     '# item_displays (nothing is drawn, also not to a spectator), each carrying its dialogue line and its hint (text_displays,',
     '# empty until mboss_lib.cam_line / cam_hint fill them); rlk_mb_aux: they go with the fight\'s helper entities.',
-    *[f'execute unless entity {L.cam_sel(i)} run summon minecraft:item_display ~ ~ ~ {CAM_NBT % L.CAM_TAGS[i]}' for i in (1, 2)]])
+    *[f'execute unless entity {L.cam_sel(i)} run summon minecraft:item_display ~ ~ ~ {cam_nbt(L.CAM_TAGS[i], L.CAM_TEXT_OF[i])}' for i in (1, 2)]])
 w('cam/grid', [
     '# FN-cam (@s = a camera or a helper marker standing AT a viewpoint, aimed): its rotation onto the grid the client gets',
     f'# (360 / 256 = {L.num(L.CAM_GRID, 5)} degrees, the nearest step: half a step is added, the byte index floored and written back',
@@ -3492,12 +3499,35 @@ w('cam/spawn_at', [
     'data remove storage rlk:mboss camsp'])
 w('cam/spawn_in', [
     '# FN-cam: {id, yaw, pitch} (mboss/cam/spawn_at): the camera summoned at the execution position with that rotation.',
-    '$summon minecraft:item_display ~ ~ ~ ' + (CAM_NBT % 'rlk_mb_cam$(id)').replace('{Tags:', '{Rotation:[$(yaw)f,$(pitch)f],Tags:', 1)])
+    '$summon minecraft:item_display ~ ~ ~ ' + cam_nbt('rlk_mb_cam$(id)', 'rlk_mb_camx$(id)').replace('{Tags:', '{Rotation:[$(yaw)f,$(pitch)f],Tags:', 1)])
+TXT_BLANK = '{text:"",background:0}'
 w('cam/kill', f"""
-# FN-cam: the cameras and their texts gone (a module's sequence end / cancel / cleanup). A player still spectating one
-# falls back to their own view by the game itself; rlk:tick's release (the request has stopped) puts them back.
+# FN-cam: the cameras and their texts gone (a module's sequence end / cancel / cleanup), the stored line and hint blank
+# (new cameras start without a text). A player still spectating one falls back to their own view by the game itself;
+# rlk:tick's release (the request has stopped) puts them back.
 kill @e[tag={L.CAM_PART_TAG}]
+data modify storage {L.CAM_TXT_STORE} set value {{line:{TXT_BLANK},hint:{TXT_BLANK}}}
 """)
+
+
+def _cam_text_lines():
+    out = []
+    for live, idle in ((1, 2), (2, 1)):
+        cond = 'if score #mbCamId mb matches 2' if live == 2 else 'unless score #mbCamId mb matches 2'
+        t = lambda tag, i: f'@e[type=minecraft:text_display,tag={tag},tag={L.CAM_TEXT_OF[i]}]'   # noqa: E731
+        out += [f'execute {cond} as @e[type=minecraft:text_display,tag={L.CAM_TEXT_OF[idle]}] run data merge entity @s {TXT_BLANK}',
+                f'execute {cond} as {t(L.CAM_LINE_TAG, live)} run data modify entity @s {{}} merge from storage {L.CAM_TXT_STORE}.line',
+                f'execute {cond} as {t(L.CAM_HINT_TAG, live)} run data modify entity @s {{}} merge from storage {L.CAM_TXT_STORE}.hint']
+    return out
+
+
+w('cam/text', [
+    '# FN-cam (round W): the dialogue line and the hint on the LIVE camera only (#mbCamId mb 2 = rlk_mb_cam2, else',
+    '# rlk_mb_cam1: the rule of mboss/cam/hold). The texts are billboards riding their camera, 0.3 b before the eye of whoever',
+    '# looks THROUGH it; the idle camera stands somewhere in the world (prepared for the next cut, or left at the last',
+    "# shot's place), and a text on it showed small and far away in the picture. mboss_lib.cam_line / cam_hint store the",
+    f'# component in storage {L.CAM_TXT_STORE} and call this; a module calls it again at every cut (the other camera goes live).',
+    *_cam_text_lines()])
 w('cam/hold', f"""
 # FN-cam, from rlk:tick right after mboss/main while #mbCam mb is 1 (@s = the tagged player): the player watches the
 # live camera (#mbCamId mb 1 = rlk_mb_cam1, 2 = rlk_mb_cam2) in spectator mode.

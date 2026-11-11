@@ -85,7 +85,9 @@ def want(n):
 CUTS = {
     'intro': [(0, 1), (76, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (690, 1), (750, 2),
               (790, 1), (820, 2), (838, 1), (960, 2), (980, 1), (1040, 2), (1230, 1), (1260, 2), (1290, 1), (1350, 2), (1406, 1)],
-    'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (110, 1), (180, 2), (220, 1), (276, 2), (340, 1), (380, 2), (500, 1), (608, 2), (654, 1)],
+    # (round W) cs1: S2 from 9 (S1 holds the lunge), S5 from above 180 + S5b the waiting actor 198, S9b the drink 446
+    'cs1': [(0, 1), (9, 2), (34, 1), (84, 2), (110, 1), (180, 2), (198, 1), (220, 2), (276, 1), (340, 2), (380, 1), (446, 2), (500, 1),
+            (608, 2), (654, 1)],
     'repel': [(0, 1), (26, 2), (52, 1), (68, 2), (78, 1), (102, 2), (128, 1), (132, 2)],
     'ending': [(0, 1), (50, 2), (94, 1), (118, 2), (150, 1), (190, 2), (204, 1), (240, 2), (276, 1), (314, 2), (338, 1), (378, 2),
                (420, 1), (470, 2), (556, 1), (616, 2), (700, 1), (846, 2), (882, 1), (910, 2), (1038, 1), (1072, 2), (1212, 1)],
@@ -235,14 +237,14 @@ def static():
             if len(kl) != 1 or f'unless {held}' not in kl[0]:
                 why.append((n, i, 'kit line', kl))
             typed = [(tt, m.group(1)) for tt in range(t, t + sp) for ln in k.get(tt, [])
-                     for m in [re.search(r'tag=rlk_mb_camt\] run data merge entity @s \{text:\{text:"([^"]*)",color:"#F2D0E8"\},background:(-?\d+)\}', ln)] if m]
+                     for m in [re.search(r'data modify storage rlk:mboss camtx\.line set value \{text:\{text:"([^"]*)",color:"#F2D0E8"\},background:(-?\d+)\}', ln)] if m]
             pages = api.LINE_PAGES.get(i) or (api.LINES[i],)
             full = [x for _tt, x in typed if x in pages]
             if [x for x in full] != list(pages) or typed[0][0] != t or len(typed[0][1].replace(' ', '')) > 2:
                 why.append((n, i, 'typed', typed[:2], full))
             if not all(any(pg.startswith(x) for pg in pages) for _tt, x in typed):
                 why.append((n, i, 'not a prefix of the line', [x for _tt, x in typed][:3]))
-            if not any('tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}' in ln for ln in k.get(t + sp, [])):
+            if not any('data modify storage rlk:mboss camtx.line set value {text:"",background:0}' in ln for ln in k.get(t + sp, [])):
                 why.append((n, i, 'not cleared at', t + sp))
         allc = [(t, int(m.group(1))) for t, ls in k.items() for ln in ls for m in [re.search(r'fx/hud/line \{id:(\d+)\}', ln)] if m]
         ok &= sorted(allc) == sorted((t, i) for i, t in tab.items())
@@ -598,6 +600,26 @@ def run():
                f'{FR.CLOSE} b from it)', not far, str(far[:4]))
             over = FR.spans(FR.face_under_text(rows, L))
             ck(f'F4 {key} (VC 10): on no tick of a line does the text box lie over her face', not over, str(over[:6]))
+            # (round W, WC 3) a shot of both figures: both heads whole inside the 16 : 9 picture at a field of view of 70, 90
+            # and 110 on every tick, never under the line box; a wide one (Shot.full) head to foot
+            tf = FR.two_figure_bad(rows, L)
+            n2 = sorted({(r['seq'], r['shot']) for r in rows if 'her' in r['sub'] and 'actor' in r['sub']})
+            ck(f'F5 {key} (WC 3): both figures inside the picture at 70 / 90 / 110 on every tick of its {len(n2)} two-figure shots',
+               not tf and (n2 or key in ('intro',)), str([(r['seq'], r['shot'], r['sq'], fov, w) for r, fov, w in tf[:6]]))
+            # (round W, WC 7) the stray line: on every held tick every text display that shows something rides the LIVE camera
+            # (the idle one stands somewhere in the world, its billboard text in the live picture); while a line plays the
+            # live camera shows it
+            stray, shown = [], []
+            for sn_, by_ in parts.items():
+                lt = {r['sq'] for r in rows if r['seq'] == sn_ and r['line'] and not r['gone']}
+                stray += [(sn_, t, by_[t]['live'], by_[t].get('texts')) for t in sorted(by_) if by_[t]['held']
+                          and any(c != by_[t]['live'] for c, _tg, _x in by_[t].get('texts', []))]
+                if sn_ != 'event':          # (the coda's lines need the core's branch #hrEv, which this run does not set)
+                    shown += [(sn_, t) for t in sorted(lt) if t in by_ and by_[t]['held'] and not by_[t].get('text')]
+            ck(f'X1 {key} (WC 7): no text on any camera but the live one on any held tick; the line on the live camera on every '
+               'line tick', not stray and not shown, f'{stray[:3]} {shown[:5]}')
+            if key == 'cs1':
+                petal_checks(parts['cs1'], rows, L)
             if key == 'ending':
                 n_line = sum(1 for r in rows if r['line'] and not r['gone'])
                 ck('F2 ... the ending\'s lines 17-23 and the coda\'s 24 / 25 (while she is there) were measured', n_line >= 600, str(n_line))
@@ -615,6 +637,91 @@ def run():
             ck(f'R8 {key} hand-back: the avatar where it stood, she 9.0 b ahead facing it',
                abs(math.dist(b.pos[::2], av.pos[::2]) - 9.0) < 0.05
                and ang(b.rot[0], math.degrees(math.atan2(-(av.pos[0] - b.pos[0]), av.pos[2] - b.pos[2]))) < 0.5, f'{av.pos} {b.pos} {b.rot}')
+
+
+def petal_checks(by, rows, L):
+    """(round W, WC 2; the user: the petal too small, cut hanging in the air) the S11 petal on the live camera's picture at a
+    field of view of 90 (the user's): it enters from above and falls with a sway for >= 1.5 s before the cut, is still
+    falling at the cut, is >= 60 px tall at 1080p there, her blade passes through it on that tick, its halves fall on apart;
+    no petal card over her face on a line tick (any field of view: the projection scales alike)."""
+    import framing as FR
+    tracks = json.loads((DP / 'tools/dev/sim/hr/cine/her_tracks.json').read_text())['clips']
+    tag, ta, tb = SEQ.PETAL[2], SEQ.PETAL[2] + '_a', SEQ.PETAL[2] + '_b'
+    cut, fall, art = SEQ.CUT_T, SEQ.PETAL_FALL, SEQ.PETAL_ART
+    tv = math.tan(math.radians(45))
+
+    def prop(t, tg):
+        return next((p for p in by.get(t, {}).get('props', []) if tg in p['tags']), None)
+
+    def scr(t, p):
+        """(sx, sy in -1..1, depth, height px at 1080p) of a prop card on the live camera's picture at FOV 90."""
+        eye, rot = by[t]['cam'][by[t]['live']]
+        f, r, u = CS_basis(rot)
+        d = [p['pos'][i] - eye[i] for i in range(3)]
+        z = sum(d[i] * f[i] for i in range(3))
+        if z <= 0.05:
+            return None
+        return (sum(d[i] * r[i] for i in range(3)) / (z * tv * 16 / 9), sum(d[i] * u[i] for i in range(3)) / (z * tv), z,
+                art[1] * p['scale'] / (z * tv) * 540)
+    ys = [(t, prop(t, tag)) for t in range(cut - fall, cut + 1)]
+    ok_all = all(p is not None for _t, p in ys)
+    dy = [ys[i + 1][1]['pos'][1] - ys[i][1]['pos'][1] for i in range(len(ys) - 1)] if ok_all else []
+    ck(f'P1 the petal falls from {cut - fall} to the cut at {cut}: down every tick ({min(dy, default=0):.3f}..{max(dy, default=0):.3f} b / t), '
+       f'still falling at the cut', ok_all and dy and max(dy) < -0.03 and dy[-1] < -0.03, str(dy[:4]))
+    vis = [t for t, p in ys if p and scr(t, p) and abs(scr(t, p)[0]) < 1 and abs(scr(t, p)[1]) < 1]
+    first = scr(vis[0], prop(vis[0], tag)) if vis else None
+    ck(f'P2 ... in the picture (FOV 90) for {len(vis)} t >= 30 (1.5 s) before the cut, entering from above (first seen at sy '
+       f'{first[1] if first else None})', len(vis) >= 30 and vis[-1] == cut and first is not None and first[1] > 0.6 and all(vis[i + 1] == vis[i] + 1 for i in range(len(vis) - 1)))
+    sx = [scr(t, prop(t, tag))[0] for t in vis]
+    ck(f'P2 ... with a visible sway (the picture x of its centre turns {sum(1 for i in range(1, len(sx) - 1) if (sx[i] - sx[i - 1]) * (sx[i + 1] - sx[i]) < 0)} times, '
+       f'{(max(sx) - min(sx)) * 960 if sx else 0:.0f} px wide)', sx and (max(sx) - min(sx)) * 960 >= 40
+       and sum(1 for i in range(1, len(sx) - 1) if (sx[i] - sx[i - 1]) * (sx[i + 1] - sx[i]) < 0) >= 2)
+    pc = prop(cut, tag)
+    h = scr(cut, pc)[3] if pc and scr(cut, pc) else 0
+    ck(f'P3 ... at the cut it is {h:.0f} px tall at 1080p, FOV 90 (>= 60; {h * math.tan(math.radians(45)) / math.tan(math.radians(55)):.0f} at 110)', h >= 60)
+    rc = by[cut]
+    hilt, tip = FR.her_point(tracks, 'cs1', rc, 'hilt'), FR.her_point(tracks, 'cs1', rc, 'tip')
+    dist = seg_dist(pc['pos'], hilt, tip) if pc and hilt and tip else 9
+    ck(f'P4 ... her blade passes through it on the cut tick ({dist:.3f} b from its centre to the blade, <= 0.15)', dist <= 0.15)
+    ha = [prop(cut + k, ta) for k in range(1, SEQ.HALF_T)]
+    hb = [prop(cut + k, tb) for k in range(1, SEQ.HALF_T)]
+    okh = all(ha) and all(hb)
+    da = [ha[i + 1]['pos'][1] - ha[i]['pos'][1] for i in range(len(ha) - 1)] if okh else [0]
+    db = [hb[i + 1]['pos'][1] - hb[i]['pos'][1] for i in range(len(hb) - 1)] if okh else [0]
+    gap = [math.dist(a['pos'], b['pos']) for a, b in zip(ha, hb)] if okh else [0]
+    ck(f'P5 the halves fall on (each down every tick until the floor) and apart ({gap[0]:.2f} -> {gap[-1]:.2f} b)',
+       okh and all(v < 0 or abs(a['pos'][1] - 201.0 - SEQ.HALF_FLOOR) < 0.02 for v, a in zip(da, ha[1:])) and all(v < 0 or abs(b['pos'][1] - 201.0 - SEQ.HALF_FLOOR) < 0.02 for v, b in zip(db, hb[1:]))
+       and gap[-1] > gap[0] + 0.3 and prop(cut + SEQ.HALF_T, ta) is None and prop(cut + 1, tag) is None)
+    # no petal card over her face while a line plays
+    over = []
+    for r in rows:
+        if not r['line'] or r['seq'] != 'cs1' or r['her'] is None or r['her'][0] is None:
+            continue
+        t = r['sq']
+        hx, hy, hz = FR.at_fov(r['her'], 90)
+        hr = FR.HEAD_R / (hz * tv)
+        for p in by[t].get('props', []):
+            q = scr(t, p)
+            if q is None:
+                continue
+            pw, ph = art[0] * p['scale'] / (q[2] * tv) / 2, art[1] * p['scale'] / (q[2] * tv) / 2
+            if abs(q[0] * 16 / 9 - hx * 16 / 9) < pw + hr and abs(q[1] - hy) < ph + hr and q[2] < hz:
+                over.append((t, p['tags']))
+    ck('P6 no petal card lies over her face (before it) on any line tick of CS1', not over, str(over[:4]))
+
+
+def CS_basis(rot):
+    y, p = math.radians(rot[0]), math.radians(rot[1])
+    f = (-math.sin(y) * math.cos(p), -math.sin(p), math.cos(y) * math.cos(p))
+    r = (-math.cos(y), 0.0, -math.sin(y))
+    u = (r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0])
+    return f, r, u
+
+
+def seg_dist(p, a, b):
+    ab = [b[i] - a[i] for i in range(3)]
+    u = max(0.0, min(1.0, sum((p[i] - a[i]) * ab[i] for i in range(3)) / max(1e-9, sum(v * v for v in ab))))
+    return math.dist(p, [a[i] + ab[i] * u for i in range(3)])
 
 
 # ============================================================================================================ stages

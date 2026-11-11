@@ -5,7 +5,8 @@
 # 1289 and the next tick plays intro_end from its tick 0. The actor shows its tick 1290 by itself (#cavT cine follows
 # #sq). Line 11 is typed on the camera text, under the black until that has faded.
 function rlk:boss/scarlet/fx/hud/clear
-execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
+data modify storage rlk:mboss camtx.line set value {text:"",background:0}
+function rlk:mboss/cam/text
 function rlk:boss/scarlet/fx/hud/ovl {g:"black",in:0,hold:20,out:6}
 stopsound @a[tag=player] * minecraft:item.elytra.flying
 execute if data storage rlk:mboss {look_hr_field:"moon"} as @e[type=minecraft:item_display,tag=rlk_hr_deco_moon_halo] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}

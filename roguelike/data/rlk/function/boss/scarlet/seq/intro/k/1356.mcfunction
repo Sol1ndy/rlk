@@ -1,5 +1,6 @@
 # intro: the timeline at #sq 1356 (@s = the body).
-execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
+data modify storage rlk:mboss camtx.line set value {text:"",background:0}
+function rlk:mboss/cam/text
 function rlk:mboss/title {title:"홍련",sub:"월하곡",color:"#E8466A"}
 function rlk:boss/scarlet/fx/snd/draw
 function rlk:boss/scarlet/rig/anchor/blade_tip

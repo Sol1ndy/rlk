@@ -4,7 +4,8 @@
 # mark now (RIG_NOW), both cameras made anew on S10; seq/cs1/skipgo then sets #sq to 565. Line 15, line 16 and the
 # slash follow.
 function rlk:boss/scarlet/fx/hud/clear
-execute as @e[type=minecraft:text_display,tag=rlk_mb_camt] run data merge entity @s {text:"",background:0}
+data modify storage rlk:mboss camtx.line set value {text:"",background:0}
+function rlk:mboss/cam/text
 function rlk:boss/scarlet/fx/hud/ovl {g:"black",in:0,hold:20,out:6}
 scoreboard players set @a[tag=player] hudHold 2
 kill @e[type=minecraft:item_display,tag=rlk_hr_sqp]

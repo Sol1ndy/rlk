@@ -158,10 +158,19 @@ def static():
         ok &= re.search(r'Tags:\[([^\]]*)\]', head).group(1) == f'"rlk_room","rlk_mb_aux","rlk_pet","rlk_mb_camx","rlk_mb_cam","rlk_mb_cam{n_}"'
         ps = re.findall(r'\{id:"minecraft:text_display",Tags:\[([^\]]*)\]', nbt)
         ok &= len(ps) == 2 and '"rlk_mb_camt"' in ps[0] and '"rlk_mb_camk"' in ps[1] and all('"rlk_mb_camx"' in x and '"rlk_mb_aux"' in x for x in ps)
+        ok &= all(f'"rlk_mb_camx{n_}"' in x and f'"rlk_mb_camx{3 - n_}"' not in x for x in ps)      # (round W) whose texts they are
         ok &= nbt.count('billboard:"center"') == 2 and nbt.count('see_through:0b') == 2 and nbt.count('background:0,text:""') == 2
     ck('S6 cam/spawn: two EMPTY item_displays (no item, no living entity), each carrying its line and its hint text_display '
        '(billboard center, empty), rlk_room rlk_mb_aux, idempotent', ok, str(sp)[:300])
-    ck('S6 cam/kill removes the cameras and their texts', cmds('mboss/cam/kill') == ['kill @e[tag=rlk_mb_camx]'])
+    ck('S6 cam/kill removes the cameras and their texts and blanks the stored line and hint',
+       cmds('mboss/cam/kill') == ['kill @e[tag=rlk_mb_camx]', 'data modify storage rlk:mboss camtx set value {line:{text:"",background:0},hint:{text:"",background:0}}'])
+    tx = cmds('mboss/cam/text')
+    ck('S6 (round W) cam/text: per live camera the OTHER camera\'s texts blanked, the live one\'s line and hint from storage; the live rule is '
+       'cam/hold\'s (2, else 1)', len(tx) == 6 and all(l.startswith('execute unless score #mbCamId mb matches 2 as ') for l in tx[:3])
+       and all(l.startswith('execute if score #mbCamId mb matches 2 as ') for l in tx[3:])
+       and 'tag=rlk_mb_camx2] run data merge entity @s {text:"",background:0}' in tx[0] and 'tag=rlk_mb_camx1] run data merge entity @s {text:"",background:0}' in tx[3]
+       and all(f'tag={tg},tag=rlk_mb_camx{n_}] run data modify entity @s {{}} merge from storage rlk:mboss camtx.{k}' in tx[i]
+               for i, tg, n_, k in ((1, 'rlk_mb_camt', 1, 'line'), (2, 'rlk_mb_camk', 1, 'hint'), (4, 'rlk_mb_camt', 2, 'line'), (5, 'rlk_mb_camk', 2, 'hint'))), str(tx)[:300])
     h = cmds('mboss/cam/hold')
     ck('S6 cam/hold: spectate is the last command of both branches (issued every held tick); the tick advancement armed before it',
        h[-1] == 'spectate @e[type=minecraft:item_display,tag=rlk_mb_cam1,limit=1]'
@@ -682,40 +691,68 @@ def text():
     import mboss_lib as L
     s, pl = held_world()
     line = '{text:"낭자 생각은 어떤가?",color:"#F2D0E8"}'
-    s.cmd(split(L.cam_line(line)), C0)
+    hint = '{text:"",extra:[{text:"⊙ 건너뛰기",color:"#FFFFFF"},{text:" · Space 길게",color:"#A8A8B0"}]}'
+
+    def run(lines):
+        for ln in lines:
+            s.cmd(split(ln), C0)
+
+    def of(cam, tag):
+        return [e for e in s.cam_texts(tag) if f'rlk_mb_camx{cam}' in e.tags]
+    run(L.cam_line(line))
     tx = s.cam_texts(CS.LINE_TAG)
-    ck('T1 (VC 10) cam_line: the text on the line display of BOTH cameras, on a dark backdrop',
-       len(tx) == 2 and all(e.data['text'] == '낭자 생각은 어떤가?' and (e.data['bg'] & 0xFF000000) >= 0x80000000 and (e.data['bg'] & 0xFFFFFF) == 0 for e in tx),
-       str([(e.data['text'], e.data['bg']) for e in tx]))
-    s.cmd(split(L.cam_hint('{text:"",extra:[{text:"⊙ 건너뛰기",color:"#FFFFFF"},{text:" · Space 길게",color:"#A8A8B0"}]}')), C0)
+    lv, idle = of(1, CS.LINE_TAG), of(2, CS.LINE_TAG)
+    ck('T1 (VC 10; round W) cam_line: the text on the line display of the LIVE camera only, on a dark backdrop; the idle camera\'s is empty',
+       len(tx) == 2 and len(lv) == 1 and len(idle) == 1 and lv[0].data['text'] == '낭자 생각은 어떤가?' and (lv[0].data['bg'] & 0xFF000000) >= 0x80000000
+       and (lv[0].data['bg'] & 0xFFFFFF) == 0 and idle[0].data['text'] == '' and idle[0].data['bg'] == 0, str([(e.data['text'], e.data['bg']) for e in tx]))
+    run(L.cam_hint(hint))
     hx = s.cam_texts(CS.HINT_TAG)
-    ck('T1 cam_hint: on the hint display of both cameras; the line untouched', len(hx) == 2 and all('건너뛰기' in e.data['text'] and 'Space' in e.data['text'] for e in hx)
-       and all(e.data['text'] == '낭자 생각은 어떤가?' for e in tx), str([e.data['text'] for e in hx]))
-    s.cmd(split(L.cam_line(None)), C0)
-    s.cmd(split(L.cam_hint(None)), C0)
+    ck('T1 cam_hint: on the hint display of the live camera only; the line untouched', len(hx) == 2
+       and '건너뛰기' in of(1, CS.HINT_TAG)[0].data['text'] and 'Space' in of(1, CS.HINT_TAG)[0].data['text'] and of(2, CS.HINT_TAG)[0].data['text'] == ''
+       and lv[0].data['text'] == '낭자 생각은 어떤가?', str([e.data['text'] for e in hx]))
+    # a cut: the other camera live -> mboss/cam/text (cam.py calls it at every cut) moves both texts with it
+    s.cam_req = 2
+    H.set_mb(s, '#mbCamId', 2) if hasattr(H, 'set_mb') else s.setsc('#mbCamId', 'mb', 2)
+    run([L.cam('text')])
+    ck('T1 (round W) after a cut (the other camera live + mboss/cam/text): the line and the hint are on the new live camera, the old one\'s are blank',
+       of(2, CS.LINE_TAG)[0].data['text'] == '낭자 생각은 어떤가?' and '건너뛰기' in of(2, CS.HINT_TAG)[0].data['text']
+       and all(e.data['text'] == '' and e.data['bg'] == 0 for e in of(1, CS.LINE_TAG) + of(1, CS.HINT_TAG)),
+       str([(sorted(t for t in e.tags if 'camx' in t), e.data['text']) for e in tx + hx]))
+    # a camera made anew (a skip): mboss/cam/kill blanks the store, new cameras start empty
+    run(L.cam_line(None))
+    run(L.cam_hint(None))
     ck('T1 cleared: empty text, no backdrop', all(e.data['text'] == '' and e.data['bg'] == 0 for e in tx + hx))
+    run(L.cam_line(line))
+    run([L.cam('kill')])
+    st = s.storage.get('rlk:mboss', {}).get('camtx', {})
+    ck('T1 (round W) cam/kill: the stored line and hint are blank (a camera made afterwards cannot show an old line)',
+       st.get('line') == {'text': '', 'background': 0} and st.get('hint') == {'text': '', 'background': 0}, str(st))
     # the geometry (TextDisplayRenderer: the block's bottom edge is the origin, a line 9 font px of 0.025 x scale; billboard
-    # "center": translation x right, y up, z toward the eye, which is 4 b behind the camera entity)
+    # "center": translation x right, y up, z toward the eye, which is 4 b behind the camera entity). Round W: checked at the
+    # fields of view 70 / 90 / 110 (mboss_lib.CAM_FOVS; 90 is the user's): the line in the lower part and whole on a 16 : 9
+    # picture, the hint in the top right and whole, the two never overlapping, glyph sizes at 1080p
     rows = []
-    for name, spec, need in (('line', L.CAM_LINE, 28), ('hint', L.CAM_HINT, 16)):
-        ty, tz, k = L.cam_text_geom(spec)
-        d = 4.0 - tz
-        for fov in (70, 80, 90):
-            half = d * math.tan(math.radians(fov / 2))
-            mid = (ty + 0.025 * k * 4.5) / half                  # the block's middle, -1 = the bottom edge of the picture
+    AR = 16 / 9
+    for name, spec, width, need in (('line', L.CAM_LINE, 192, {70: 36, 90: 32, 110: 22}), ('hint', L.CAM_HINT, 96, {70: 20, 90: 18, 110: 12})):
+        for fov in L.CAM_FOVS:
+            x0, x1, y0, y1 = L.cam_text_box(spec, width, fov)
             glyph = 8 * L.cam_text_px(spec, fov)
-            width = 192 * L.cam_text_px(spec, fov)
-            rows.append((name, fov, round(mid, 3), round(glyph, 1), round(width)))
-            ck(f'T2 the {name} at a field of view of {fov}: in the lower third ({mid:.2f} of the half height), glyphs {glyph:.0f} px >= {need} '
-               f'at 1080p, the widest page {width:.0f} px', mid <= -1 / 3 and mid - 0.025 * k * 4.5 / half > -0.98 and glyph >= need and width < 1700)
+            rows.append((name, fov, round((y0 + y1) / 2, 3), round(glyph, 1), round((x1 - x0) * 540)))
+            inside = -AR * 0.98 < x0 and x1 < AR * 0.98 and -0.98 < y0 and y1 < 0.98
+            where = (y1 < -1 / 3 and abs((x0 + x1) / 2) < 1e-9) if name == 'line' else (y0 > 0.38 and x0 > 0.5)
+            ck(f'T2 the {name} at a field of view of {fov:.0f}: whole on a 16 : 9 picture (x {x0:.2f}..{x1:.2f} of +-{AR:.2f}, y {y0:.2f}..{y1:.2f}), '
+               f'{"centred in the lower part" if name == "line" else "in the top right"}, glyphs {glyph:.0f} px >= {need[int(fov)]} at 1080p',
+               inside and where and glyph >= need[int(fov)])
+    for fov in L.CAM_FOVS:
+        a, b = L.cam_text_box(L.CAM_LINE, 192, fov), L.cam_text_box(L.CAM_HINT, 96, fov)
+        ck(f'T2 at {fov:.0f} the line and the hint do not overlap', b[2] > a[3] + 0.05)
     lt, ht = L.cam_text_geom(L.CAM_LINE), L.cam_text_geom(L.CAM_HINT)
-    ck('T2 the texts are 0.3 b before the eye (nothing of a shot is nearer to the lens) and do not overlap',
-       abs(4.0 - lt[1] - 0.3) < 1e-9 and ht[0] + 0.025 * ht[2] * 9 + 0.004 < lt[0], f'{lt} {ht}')
+    ck('T2 the texts are 0.3 b before the eye (nothing of a shot is nearer to the lens)', abs(4.0 - lt[1] - 0.3) < 1e-9 and abs(4.0 - ht[1] - 0.3) < 1e-9, f'{lt} {ht}')
     sp = cmds('mboss/cam/spawn')[0]
-    tr = re.findall(r'translation:\[0f,(-?[0-9.]+)f,(-?[0-9.]+)f\]', sp)
-    ck('T2 the summon NBT carries that geometry', len(tr) == 2 and abs(float(tr[0][0]) - lt[0]) < 1e-4 and abs(float(tr[1][0]) - ht[0]) < 1e-4
-       and all(abs(float(z) - 3.7) < 1e-9 for _y, z in tr), str(tr))
-    print('   text geometry (name, fov, middle, glyph px, 192-px page width):', rows)
+    tr = re.findall(r'translation:\[(-?[0-9.]+)f,(-?[0-9.]+)f,(-?[0-9.]+)f\]', sp)
+    ck('T2 the summon NBT carries that geometry', len(tr) == 2 and abs(float(tr[0][1]) - lt[0]) < 1e-4 and abs(float(tr[1][1]) - ht[0]) < 1e-4
+       and abs(float(tr[0][0])) < 1e-9 and abs(float(tr[1][0]) - L.cam_text_tx(L.CAM_HINT)) < 1e-4 and all(abs(float(z) - 3.7) < 1e-9 for _x, _y, z in tr), str(tr))
+    print('   text geometry (name, fov, middle y, glyph px, box width px at 1080p):', rows)
 
 
 # ============================================================================================================ idem

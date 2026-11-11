@@ -27,7 +27,8 @@ const DEG = Math.PI / 180;
 // a flip about her centre of mass (c b above the pelvis pivot): the pelvis offset keeping it in place at pitch pt; y0 lifts it
 const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG))).toFixed(3), +(-c * Math.sin(pt * DEG)).toFixed(3)];
 // the clips' base pose: DEFAULT_POSE + gN (0: gD in S2a units, retargeted; 1: gD native, blocks)
-const BASE = {...DEFAULT_POSE, gN: 0};
+// (round W: lipL / botW / botH = the bottle at her lips, scarlet_pose.mjs; 0 everywhere but the CS1 drink)
+const BASE = {...DEFAULT_POSE, gN: 0, lipL: 0, botW: 0, botH: 0};
 const FULL = p => ({...BASE, ...p});               // a key that resets every channel (hand-over poses)
 
 // ---- the contract (hr_design.md §4.1; 'end' = the length) ----------------------------------------------------------------------
@@ -490,23 +491,36 @@ const cs1Lock = (t, G = K1_G[t]) => xLock('cs1', t, 'K1', G, K1_POS[t], {tor: [t
   const ELB = [.1, -1, .3];
   k.k(280, {face: 'smile', head: [-4, -4, 4]}).k(300, {pL: ELB}).k(316, {aL: [70, 20, .62], botT: -100, tor: [-3, -4, 0]}, 'io').k(330, {aL: [86, 24, .6], botT: -120, head: [-2, -8, 6]}, 'io')
     .k(360, {aL: [84, 24, .6], head: [-3, -6, 5]}).k(384, {});
-  // S9: eyes closed 384-400, the offer 404-430 (the bottle upright at arm's length), the look down at it 434-452, the drink 458-492
-  // (the bottle tipped to her lips, base up, the head back and turned to it)
-  k.k(384, {face: 'closed', head: [-2, -4, 8]}).k(400, {face: 'smile'}).k(404, {}).k(418, {aL: [84, 2, .97], botT: -90, tor: [-6, -8, 0], head: [-4, -4, 2]}, 'io').k(430, {aL: [86, 0, .98]})
-    .k(434, {}).k(444, {head: [-22, -8, 0], aL: [70, 10, .8], botT: -100}, 'io').k(452, {head: [-24, -8, 0]})
-    .k(458, {aL: [120, 40, .5], botT: -60, head: [-4, -10, 0]}, 'io').k(466, {aL: [140, 55, .5], botT: -30, head: [18, -22, 4], tor: [4, -4, 0]}, 'io')
-    .k(486, {aL: [142, 55, .5], botT: -24, head: [22, -22, 4]}).k(492, {aL: [90, 10, .6], botT: -100, head: [2, -4, 0], tor: [-2, 0, 0]}, 'io')
-    .k(499, {aL: [40, 8, .8], botT: -20, head: [-6, 0, 0]}, 'io');
+  // S9 (round W; the user: "the drinking motion looks odd" - the bottle hung beside her ear with the arm out to the side, after a
+  // nod that hid her face under the brim): eyes closed 384-400; the offer 404-430 (the bottle upright at arm's length, a little
+  // to her left so the arm is not end-on to the lens); she draws it back 434-446 with a glance at it; lifts it to her lips
+  // UPRIGHT 446-457 (lipL: the fist, with the rim a finger above it, comes to her mouth; botW 1: the bottle stands in her head's
+  // frame); from the drink event 458 the bottle and the head tip back TOGETHER (botH 0 -> 98: the base swings forward and up
+  // about the rim; head 26 back), held 466-486 with two swallows (the sequence's sips 464 / 478); 486-491 both come level again,
+  // 491-499 the bottle is lowered. The rim stays within 0.06 b of her mouth point 457-490 (test_cine D1).
+  const SIP = (t, h, hd) => k.k(t, {botH: h, head: [hd, 0, 0]}, 'io');
+  k.k(384, {face: 'closed', head: [-2, -4, 8]}).k(400, {face: 'smile'}).k(404, {})
+    .k(418, {aL: [80, 22, .93], botW: 1, botH: 0, tor: [-6, -8, 0], head: [-4, -6, 2]}, 'io').k(430, {aL: [82, 20, .94]})
+    .k(434, {}).k(446, {aL: [74, 16, .62], head: [-8, -6, 0], tor: [-3, -4, 0]}, 'io')
+    .k(457, {lipL: 1, aL: [100, -20, .5], pL: [.8, -.75, .15], head: [-1, 0, 0], tor: [-2, 0, 0], face: 'calm'}, 'io').k(458, {});
+  SIP(466, 98, 26); SIP(472, 92, 23); SIP(478, 102, 27); SIP(486, 98, 26);
+  k.k(466, {tor: [5, 0, 0]}).k(486, {tor: [5, 0, 0]})
+    .k(491, {botH: 0, head: [1, 0, 0], tor: [-1, 0, 0]}, 'io').k(492, {lipL: 1})
+    .k(499, {lipL: 0, aL: [44, 10, .78], head: [-6, 0, 0], tor: [-4, 2, 0]}, 'io');
   // S10: the bottle gone; the right forearm across her mouth 506-566, lowered 568-580; the head under the brim
-  k.k(500, {bottle: 'none', hL: 'open', face: 'calm', aL: [8, 10, .96], pL: [.55, -.35, .75], botT: 0}).k(506, {}).k(516, {aR: [112, -44, .5], pR: [.8, .3, .3], head: [-14, 10, 0], tor: [-6, 4, 0]}, 'io')
+  k.k(500, {bottle: 'none', hL: 'open', face: 'calm', aL: [8, 10, .96], pL: [.55, -.35, .75], botT: 0, botW: 0, botH: 0, lipL: 0}).k(506, {}).k(516, {aR: [112, -44, .5], pR: [.8, .3, .3], head: [-14, 10, 0], tor: [-6, 4, 0]}, 'io')
     .k(540, {aR: [112, -14, .5], head: [-14, -8, 0]}, 'io').k(566, {aR: [108, -4, .52], head: [-16, -10, 0]}).k(580, {aR: [6, 10, .96], pR: [.55, -.35, .75], head: [-20, 0, 0], tor: [-8, 0, 0]}, 'io')
     .k(600, {head: [-20, 0, 0]}).k(605, {aL: [40, 30, .8], aR: [20, 24, .9]}, 'io');
   // S11: the iai stance 610, held; S12 the draw 642-649 (every tick); S13 the slash 650
   k.k(610, {...IAI, hat: 'worn'}, 'io').k(626, {head: [-20, 16, 0], tor: [-17, -22, 0]}).k(639, {head: [-22, 18, 0], tor: [-19, -22, 0]})
     .k(641, {pos: [0, -.3, 0], tor: [-20, -26, 0]});
   k.k(642, {sword: 'hand', hold: 1, hiL: 0, shW: 1, sh: 1, gF: 0, gN: 0, gB: 40, gE: -24, gD: .5, cB: 150, cR: 0, th: -10, ed: -1, rh: 0, hsR: 1}, 'l');
+  // (round W: the cut is LEVEL at her waist through the petal - the sequence's S11 petal falls onto the blade's line at
+  // CUT_T = 647, seq.py - not a sweep along the ground: the grip rises and the point comes up to level 646-648, then both
+  // drop into the post-slash crouch; DRAW_GE / DRAW_TH per tick 643..649)
+  const DRAW_GE = [-26, -26, -24, -20, -14, -10, -18], DRAW_TH = [-12, -10, -4, 2, 12, 6, -4];
   k.all(every(643, 649, u => ({shW: +lerp(.7, 0, Math.min(1, u * 1.3)).toFixed(2), sh: +lerp(.5, 0, Math.min(1, u * 2)).toFixed(2),
-    gB: +lerp(20, -100, u).toFixed(1), gE: -26, gD: +lerp(.55, .7, u).toFixed(2), cB: +lerp(110, -110, u).toFixed(1), th: -12,
+    gB: +lerp(20, -100, u).toFixed(1), gE: DRAW_GE[Math.round(u * 6)], gD: +lerp(.55, .7, u).toFixed(2), cB: +lerp(110, -110, u).toFixed(1), th: DRAW_TH[Math.round(u * 6)],
     tor: [-22, +lerp(-24, -40, u).toFixed(1), 0], pos: [0, +lerp(-.32, -.4, u).toFixed(3), 0], hsR: +lerp(1, 0, u).toFixed(2)})));
   k.k(650, {...SLASHED, hat: 'worn', shW: 0, sh: 0, gN: 0}, 'o').k(656, {tor: [-24, -48, 0]}).k(670, {pos: [0, -.41, 0], tor: [-23, -46, 0], head: [-2, 32, 0]})
     .k(700, {pos: [0, -.42, 0], tor: [-24, -44, 0], head: [-4, 30, 0]}).k(720, FULL(SLASH_UP), 'io');

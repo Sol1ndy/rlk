@@ -2210,8 +2210,8 @@
     "music": 676
    },
    "owner": "H2",
-   "key_files": 379,
-   "keys": 2129,
+   "key_files": 388,
+   "keys": 2153,
    "keys_per_tick": 3,
    "source": "v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬",
    "note": "",
@@ -2536,7 +2536,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 256086691
+  "version": 116196250
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -19092,6 +19092,186 @@
      74
     ],
     [
+     457,
+     "lipsL",
+     1
+    ],
+    [
+     458,
+     "lipsL",
+     1
+    ],
+    [
+     459,
+     "lipsL",
+     1
+    ],
+    [
+     460,
+     "lipsL",
+     1
+    ],
+    [
+     461,
+     "lipsL",
+     1
+    ],
+    [
+     462,
+     "lipsL",
+     1
+    ],
+    [
+     463,
+     "lipsL",
+     1
+    ],
+    [
+     464,
+     "lipsL",
+     1
+    ],
+    [
+     465,
+     "lipsL",
+     1
+    ],
+    [
+     466,
+     "lipsL",
+     1
+    ],
+    [
+     467,
+     "lipsL",
+     1
+    ],
+    [
+     468,
+     "lipsL",
+     1
+    ],
+    [
+     469,
+     "lipsL",
+     1
+    ],
+    [
+     470,
+     "lipsL",
+     1
+    ],
+    [
+     471,
+     "lipsL",
+     1
+    ],
+    [
+     472,
+     "lipsL",
+     1
+    ],
+    [
+     473,
+     "lipsL",
+     1
+    ],
+    [
+     474,
+     "lipsL",
+     1
+    ],
+    [
+     475,
+     "lipsL",
+     1
+    ],
+    [
+     476,
+     "lipsL",
+     1
+    ],
+    [
+     477,
+     "lipsL",
+     1
+    ],
+    [
+     478,
+     "lipsL",
+     1
+    ],
+    [
+     479,
+     "lipsL",
+     1
+    ],
+    [
+     480,
+     "lipsL",
+     1
+    ],
+    [
+     481,
+     "lipsL",
+     1
+    ],
+    [
+     482,
+     "lipsL",
+     1
+    ],
+    [
+     483,
+     "lipsL",
+     1
+    ],
+    [
+     484,
+     "lipsL",
+     1
+    ],
+    [
+     485,
+     "lipsL",
+     1
+    ],
+    [
+     486,
+     "lipsL",
+     1
+    ],
+    [
+     487,
+     "lipsL",
+     1
+    ],
+    [
+     488,
+     "lipsL",
+     1
+    ],
+    [
+     489,
+     "lipsL",
+     1
+    ],
+    [
+     490,
+     "lipsL",
+     1
+    ],
+    [
+     491,
+     "lipsL",
+     1
+    ],
+    [
+     492,
+     "lipsL",
+     1
+    ],
+    [
      610,
      "hilt",
      1
@@ -25491,7 +25671,7 @@
      "bPush": 10.74,
      "closeY-": 28,
      "gripClear": 24.88,
-     "handClearL": 19.06,
+     "handClearL": 19.37,
      "handClearR": 2.44,
      "hatClear": 25.09,
      "scab": 1.5,
@@ -25501,6 +25681,7 @@
     "contacts": {
      "brim": 0,
      "hat": 0,
+     "lipsL": 0,
      "hilt": 0.01,
      "throat": 0,
      "sheathe": 0
@@ -25510,13 +25691,13 @@
     "support_dy": 0.047,
     "lift": 0,
     "clear": {
-     "guard.head": -0.034,
+     "guard.head": -0.036,
      "guard.torso": -0.017,
-     "hand_l.head": -0.062,
+     "hand_l.head": -0.015,
      "hand_l.torso": -0.001,
      "hand_r.head": -0.017,
      "hand_r.torso": -0.1,
-     "hilt.head": -0.092,
+     "hilt.head": -0.034,
      "hilt.torso": -0.014
     }
    },
@@ -25635,10 +25816,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 64,
-  "key_files": 3456,
-  "keys": 28860,
-  "rig_functions": 4216,
-  "rig_bytes": 8834472,
+  "key_files": 3465,
+  "keys": 28884,
+  "rig_functions": 4227,
+  "rig_bytes": 8839741,
   "cull_overhang_ticks": 0
  },
  "sprites": {

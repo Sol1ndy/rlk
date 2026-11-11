@@ -5,11 +5,11 @@ scoreboard players set @a[tag=player] hudHold 2
 execute if score #sq hr matches ..719 unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/cs1/lock
 function rlk:boss/scarlet/seq/cs1/skipin
 execute if score #sq_skn hr matches 1 run return run scoreboard players set #sq_skn hr 0
-execute if score #sq hr matches 6..22 run return run function rlk:boss/scarlet/seq/cs1/kb/6_22
-execute if score #sq hr matches 24..118 run return run function rlk:boss/scarlet/seq/cs1/kb/24_118
-execute if score #sq hr matches 162..272 run return run function rlk:boss/scarlet/seq/cs1/kb/162_272
-execute if score #sq hr matches 464..591 run return run function rlk:boss/scarlet/seq/cs1/kb/464_591
-execute if score #sq hr matches 592..602 run return run function rlk:boss/scarlet/seq/cs1/kb/592_602
-execute if score #sq hr matches 603..642 run return run function rlk:boss/scarlet/seq/cs1/kb/603_642
-execute if score #sq hr matches 645..658 run return run function rlk:boss/scarlet/seq/cs1/kb/645_658
-execute if score #sq hr matches 659..720 run return run function rlk:boss/scarlet/seq/cs1/kb/659_720
+execute if score #sq hr matches 6..32 run return run function rlk:boss/scarlet/seq/cs1/kb/6_32
+execute if score #sq hr matches 34..238 run return run function rlk:boss/scarlet/seq/cs1/kb/34_238
+execute if score #sq hr matches 240..592 run return run function rlk:boss/scarlet/seq/cs1/kb/240_592
+execute if score #sq hr matches 593..607 run return run function rlk:boss/scarlet/seq/cs1/kb/593_607
+execute if score #sq hr matches 608..622 run return run function rlk:boss/scarlet/seq/cs1/kb/608_622
+execute if score #sq hr matches 623..637 run return run function rlk:boss/scarlet/seq/cs1/kb/623_637
+execute if score #sq hr matches 638..652 run return run function rlk:boss/scarlet/seq/cs1/kb/638_652
+execute if score #sq hr matches 653..720 run return run function rlk:boss/scarlet/seq/cs1/kb/653_720

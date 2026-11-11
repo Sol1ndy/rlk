@@ -269,7 +269,7 @@ def say(s, t, lid, cond=''):
     for dt, text in line_steps(lid, hold):
         comp = None if text is None else f'{{text:"{text}",color:"{api.LINE_COLOR}"}}'
         cl = L.cam_line(comp)
-        s.at(t + dt, f'execute {cond} {cl[8:]}' if cond else cl)
+        s.at(t + dt, gate(cond, cl) if cond else cl)
         if text is not None:
             s.at(t + dt, f'execute {pre}if {held} {TYPE_SND[8:]}')
     return s
@@ -344,7 +344,7 @@ def skip_files(W, name, tr):
     for k in range(api.SKIP_STEPS + 1):
         a, b = (0, 0) if k == 0 else ((k - 1) * 5 + 1, k * 5 if k < api.SKIP_STEPS else api.SKIP_HOLD - 1)
         rng = f'{a}..{b}' if a != b else str(a)
-        rows += [f'execute if score {SKIP_FP} {OBJ} matches {rng} unless score {SKIP_STEP_FP} {OBJ} matches {k} {L.cam_hint(comp(k))[8:]}',
+        rows += [*gate(f'if score {SKIP_FP} {OBJ} matches {rng} unless score {SKIP_STEP_FP} {OBJ} matches {k}', L.cam_hint(comp(k))),
                  f'execute if score {SKIP_FP} {OBJ} matches {rng} unless {held} run title @a[tag=player] actionbar {comp(k)}',
                  f'execute if score {SKIP_FP} {OBJ} matches {rng} run {sset(SKIP_STEP_FP, k)}']
     W.w(f'seq/{name}/skipin', [
@@ -362,7 +362,7 @@ def skip_files(W, name, tr):
         f'execute if score {SKIP_FP} {OBJ} matches {api.SKIP_HOLD}.. run return run function {base}/skipgo',
         *rows, HUD_HOLD])
     W.w(f'seq/{name}/skipoff', [f'# The {name} skip prompt off for good (the window ended, the skip).',
-                                sset(SKIP_DONE_FP, 1), L.cam_hint(None),
+                                sset(SKIP_DONE_FP, 1), *L.cam_hint(None),
                                 f'execute unless {held} run title @a[tag=player] actionbar ""'])
     W.w(f'seq/{name}/skipgo', [
         f'# The {name} skip (@s = the body): the prompt gone, the sequence\'s skip (the black, its state at tick {to}), then the',
@@ -470,7 +470,7 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
     # a cancel releases everything at once (the core cancels on a pause / reload and goes to the end state itself): the lock
     # request of this tick taken back (the framework then releases the player in this tick), the kit's line / overlay off,
     # the HUD hold ended
-    release = [x for x in (f'scoreboard players set {L.CAM_REQ[0]} {L.CAM_REQ[1]} 0', K.hud('clear'), L.cam_line(None), L.cam_hint(None),
+    release = [x for x in (f'scoreboard players set {L.CAM_REQ[0]} {L.CAM_REQ[1]} 0', K.hud('clear'), *L.cam_line(None), *L.cam_hint(None),
                            HUD_FREE) if x]
     skipin = skip_files(W, name, track) if skip else []
     skip0 = [sset(SKIP_FP, 0), sset(SKIP_STEP_FP, -1), sset(SKIP_DONE_FP, 0), sset(SKIP_NOW_FP, 0), sset('#skip', -1)] if skip else []
@@ -667,14 +667,19 @@ def sig(name):
 PETAL_BB = 'data merge entity @s {billboard:"center"}'
 
 
-def petal_summon(tag, pos, cam=None, look='whole'):
+def petal_scale(k):
+    return f'data merge entity @s {{transformation:{{scale:[{num(k)}f,{num(k)}f,{num(k)}f]}}}}'
+
+
+def petal_summon(tag, pos, cam=None, look='whole', scale=None):
+    """scale: the card's scale instead of the kit's 0.8 (set again after every look: the kit's dress resets it)."""
     c = K.prop('petal_big', look=look)
     if not c:
         return []
     sel = f'@e[type=minecraft:item_display,tag={tag},limit=1]'
     return [f'kill @e[type=minecraft:item_display,tag={tag}]',
             f'execute {pos} run summon minecraft:item_display ~ ~ ~ {{Tags:{tags(PROP_T, tag)},teleport_duration:1,view_range:2f}}',
-            f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}']
+            f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}', *([f'execute as {sel} run {petal_scale(scale)}'] if scale else [])]
 
 
 def petal_move(tag, pos, cam=None):
@@ -683,14 +688,46 @@ def petal_move(tag, pos, cam=None):
     return f'execute as @e[type=minecraft:item_display,tag={tag},limit=1] {pos} run tp @s ~ ~ ~'
 
 
-def petal_look(tag, look):
+def petal_look(tag, look, scale=None):
     c = K.prop('petal_big', look=look)
     sel = f'@e[type=minecraft:item_display,tag={tag},limit=1]'
-    return [f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}'] if c else None
+    return [f'execute as {sel} run {c}', f'execute as {sel} run {PETAL_BB}', *([f'execute as {sel} run {petal_scale(scale)}'] if scale else [])] if c else None
 
 
 def petal_kill(tag):
     return f'kill @e[type=minecraft:item_display,tag={tag}]'
+
+
+# The two halves of a cut petal (round W): the kit's whole petal texture on two half cards of the pack (item models
+# rlk:hr_cine/petal_half_a = the upper half, _b = the lower: tools/build_blank_tex.py; no new texture), each its own
+# billboard display with the centre of the whole card as its origin, so both start exactly where the whole petal was.
+HALF_MODEL = 'rlk:hr_cine/petal_half_{}'
+
+
+def _half_sel(tag, which):
+    return f'@e[type=minecraft:item_display,tag={tag}_{which},limit=1]'
+
+
+def half_summon(tag, which, pos, scale):
+    k = num(scale)
+    return (f'execute {pos} run summon minecraft:item_display ~ ~ ~ {{Tags:{tags(PROP_T, f"{tag}_{which}")},teleport_duration:1,view_range:2f,'
+            f'billboard:"center",item_display:"none",brightness:{{sky:15,block:15}},shadow_radius:0f,'
+            f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{HALF_MODEL.format(which)}"}}}},'
+            f'transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[{k}f,{k}f,{k}f],right_rotation:[0f,0f,0f,1f]}}}}')
+
+
+def half_move(tag, which, pos):
+    return f'execute as {_half_sel(tag, which)} {pos} run tp @s ~ ~ ~'
+
+
+def half_turn(tag, which, angle, over):
+    """The half turns in the picture's plane by `angle` rad over `over` ticks (one interpolation, started now)."""
+    return (f'execute as {_half_sel(tag, which)} run data merge entity @s {{start_interpolation:0,interpolation_duration:{int(over)},'
+            f'transformation:{{left_rotation:{{angle:{num(angle)}f,axis:[0f,0f,1f]}}}}}}')
+
+
+def half_kill(tag):
+    return [f'kill @e[type=minecraft:item_display,tag={tag}_{w}]' for w in ('a', 'b')]
 
 
 def before_cam(cam, x, y, d):
@@ -778,7 +815,8 @@ def build_intro(W):
     tr.move(1298, 1312, eye=HR(0.15, 1.85, 1.4), ease='io')
     tr.cut(1350, B, HR(0.4, 1.4, 1.6), HR(0, 1.3, 0), 'I19 draw, stance', ('her',))
     tr.move(1350, 1400, eye=HR(0.6, 1.3, 3.2))
-    tr.cut(1406, A, ST(0.6, 1.8, 3.0), ST(0, 1.5, 6.5), 'I20 back to the player', ('her', 'actor'))
+    # ('actor?': the lens starts before the actor and arcs back over its head: the actor is in the picture from 1426 on)
+    tr.cut(1406, A, ST(0.6, 1.8, 3.0), ST(0, 1.5, 6.5), 'I20 back to the player', ('her', 'actor?'))
     tr.move(1406, 1421, eye=ST(0.3, 2.9, 0.0))                       # the arc over the actor's head ...
     tr.move(1421, 1436, eye=ST(0, 2.6, -3.4))                        # ... to the F5 camera's place
     TRACKS['intro'] = tr
@@ -878,7 +916,7 @@ def build_intro(W):
         '# it she stayed on the rock until the fight began), both cameras are made anew on I18; seq/intro/skipgo then sets #sq to',
         '# 1289 and the next tick plays intro_end from its tick 0. The actor shows its tick 1290 by itself (#cavT cine follows',
         '# #sq). Line 11 is typed on the camera text, under the black until that has faded.',
-        *[c for c in (K.hud('clear'), L.cam_line(None), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False), HUD_HOLD, KILL_PROPS,
+        *[c for c in (K.hud('clear'), *L.cam_line(None), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False), HUD_HOLD, KILL_PROPS,
         STOP, rock_kill(), api.rig('look/props/none'),
         f'execute {floor_pt(END_F)} run {TP}', FACE_ACTOR, RIG_NOW,
         *skip_cams(tr, b18)])
@@ -891,9 +929,44 @@ HER_F = 9.0                                                          # her mark:
 S13_T = 654                                                          # (HF-B) the wide of 홍련일섬 after line 16 (618 + 36)
 S11_T = 608                                                          # the cut to S11: two ticks before she sinks into the iai
 #                                                                      stance (609: in S10's close frame her face would dip under line 15)
-S11_EYE = HR(-0.5, 1.2, 2.05)                                        # the S11 lens: 2.15 b from her head
-S11_PETAL = HR(-0.1, 1.0, 0.62)                                      # the S11 petal: 1.5 b before the lens, under her face
+# ---- S11 (round W; the user: "the petal is too small, and it feels like cutting one that hangs in the air, not one coming
+# down"). The petal FALLS: summoned high above the frame during S10 (behind that lens), it drifts down with a sway through
+# S11's foreground, on her left of the frame, and is still falling when her draw meets it: at CUT_T the blade of her clip
+# (cs1 643-649, a level cut at her waist: tools/scarlet_cine.mjs DRAW_GE / DRAW_TH) passes through S11_CUT, the petal's
+# place on that tick (test_seq P1: within 0.15 b of the blade's line by her_tracks.json). After it the two halves (the
+# pack's half-petal models, tools/build_blank_tex.py) fall apart and on. The lens is 1.2 b from the cut point: the petal is
+# about 370 px tall at 1080p at a field of view of 90 (520 at 70, 260 at 110); her face is 100 px clear of it on its
+# other side for the whole of line 16 (test_seq P3).
+CUT_T = 647                                                          # the tick her blade passes the petal
+S11_CUT = HR(-1.0, 0.92, 1.15)                                       # ... there (on her blade's line at CUT_T): 1.15 b before her, 1 b to her left, waist high
+S11_EYE = HR(-0.75, 1.15, 2.3)                                       # the S11 lens: 2.0 b from her head, 1.2 b from the cut point
+S11_LOOK = HR(-0.65, 1.38, 0.5)
+PETAL_S = 0.95                                                       # the cut petal's card (the kit's is 0.8): 0.82 b of petal
+PETAL_ART = (0.625, 0.86)                                            # the petal's art on its card (width, height; petal_big_0)
+PETAL_FALL, PETAL_V = 46, 0.055                                      # ticks it falls before the cut, b / t (1.1 b / s)
+PETAL_SWAY, PETAL_SWAY_T = 0.12, 26                                  # the sway across the picture (b), its period (t)
+HALF_T = 17                                                          # ticks the halves fall on after the cut
+HALF_FLOOR = 0.06                                                    # ... and no lower than this over the floor
+
+
+def petal_fall(t):
+    """The falling petal's centre at tick t <= CUT_T (in her frame): straight down at PETAL_V with a sway along her
+    left-right (across S11's picture), on S11_CUT at CUT_T with its full downward speed."""
+    n = CUT_T - t
+    return HR(S11_CUT[1] + PETAL_SWAY * math.sin(2 * math.pi * n / PETAL_SWAY_T), S11_CUT[2] + PETAL_V * n, S11_CUT[3])
+
+
+def half_fall(which, k):
+    """A half's centre k ticks after the cut: both keep falling; the upper one ('a') is carried along the blade's way (to
+    her left and back) and falls slower at first, the lower one ('b') drops on at the petal's speed and drifts the other way."""
+    vx, vy, vz, g = {'a': (-0.050, -0.012, -0.030, 0.0030), 'b': (0.022, -PETAL_V - 0.005, 0.012, 0.0020)}[which]
+    return HR(S11_CUT[1] + vx * k, max(HALF_FLOOR, S11_CUT[2] + vy * k - g * k * k), S11_CUT[3] + vz * k)   # never under the floor
+
+
 K1 = ST(*api.CONTACT['K1'][2])                                       # the blade lock
+S2_T = 9                                                             # the cut to the clash (she arrives at 10)
+S9B_T = 446                                                          # the cut to the drink's profile shot
+S5_UP, S5B_T = 6.5, 198                                              # the overhead shot's height; the cut to the waiting actor
 
 
 def her_mark(mv):
@@ -908,25 +981,36 @@ def build_cs1(W):
     s, mv = Seq('cs1'), Moves('cs1')
     e = lambda k, d=0: ev('cs1', k, d)                                # noqa: E731
     tr = C.Track('cs1', {'ST': STAGE, 'HR': BODY}, LOCK['cs1'][1], lift=LIFT, over=OVER, her=her_of('cs1'), inside=CAMIN)
-    tr.cut(0, A, ST(-9.0, 2.2, 4.5), ST(0, 1.2, 4.5), 'S1 apart', ('her', 'actor'))
-    tr.cut(6, B, ST(-2.6, 1.3, 0.8), K1, 'S2 clash', ('her', 'actor'))
-    tr.move(10, 22, eye=ST(-1.3, 1.4, 0.8))
+    # (round W: S1 holds through her lunge 6-9, both figures whole in the wide frame; S2 opens on the blades meeting)
+    tr.cut(0, A, ST(-9.0, 2.2, 4.5), ST(0, 1.2, 4.5), 'S1 apart', ('her', 'actor'), full=True)
+    tr.cut(S2_T, B, ST(-2.6, 1.3, 0.8), K1, 'S2 clash', ('her', 'actor'))
+    tr.move(S2_T + 1, 22, eye=ST(-1.3, 1.4, 0.8))
     tr.cut(34, A, ST(-13.0, 3.0, 4.0), ST(0, 1.0, 4.0), 'S3 pushed apart', ('her', 'actor'))
     tr.cut(84, B, ST(0.55, 1.75, -1.3), ST(0, 1.4, 9.0), 'S4 over the shoulder', ('her', 'actor?'))
     # (HF-B, HB-06) line 13 (110-161) on a close shot of her: the over-the-shoulder wide keeps the beat before it
     tr.cut(110, A, HR(0.45, 1.65, 1.7), HR(0, 1.6, 0), 'S4b her (line 13)', ('her',))
-    tr.cut(180, B, ST(0, 5.0, 4.5), ST(0, 0, 4.55), 'S5 the grass', ())   # straight down, screen-up = the stage's forward
-    tr.cut(220, A, HR(0.5, 1.6, -1.6), ST(0, 1.2, 0), 'S6 hat swing', ('her', 'actor'))
-    tr.cut(276, B, HR(0.2, 1.45, 1.9), HR(0, 1.45, 0), 'S7 the bottle', ('her',))
+    # S5 (round W, the user: "the view from above does not show both avatars"): straight down from 6.5 b over the middle
+    # of the stage axis, the axis lying ACROSS the picture (screen-up = the actor's right: she on the left, the actor on the
+    # right, as in S1): both figures head to foot inside the picture at a field of view of 70, 90 and 110 (at 70 the picture
+    # is 16.2 x 9.1 b on the floor; the figures stand 9 b apart). It was 5 b up with the axis running up the picture: 7 b
+    # of floor at 70 (10 b at 90), the two figures just outside the top and the bottom edge. S5b: the actor waiting, while
+    # she sheathes and takes the bottle (the clip's cut at 200: off screen)
+    tr.cut(180, B, ST(0, S5_UP, 4.5), ST(0.05, 0, 4.5), 'S5 from above', ('her', 'actor'), full=True)
+    tr.cut(S5B_T, A, ST(0.85, 1.55, 2.3), ST(0, 1.4, 0), 'S5b the actor waits', ('actor',))
+    tr.cut(220, B, HR(0.5, 1.6, -1.6), ST(0, 1.2, 0), 'S6 hat swing', ('her', 'actor'))
+    tr.cut(276, A, HR(0.2, 1.45, 1.9), HR(0, 1.45, 0), 'S7 the bottle', ('her',))
     # S8: on the actor's left (the design's ST(0.5, 1.5, 1.8) is where the point of its blade comes up in the half guard
     # 350-370: 0.15 b from the lens by lane H3's manifest)
-    tr.cut(340, A, ST(-0.7, 1.5, 2.1), ST(0, 1.45, 0), 'S8 the actor', ('actor',))
-    tr.cut(380, B, HR(-0.3, 1.5, 1.5), HR(0, 1.5, 0), 'S9 offer, drink', ('her',))
+    tr.cut(340, B, ST(-0.7, 1.5, 2.1), ST(0, 1.45, 0), 'S8 the actor', ('actor',))
+    tr.cut(380, A, HR(-0.3, 1.5, 1.5), HR(0, 1.5, 0), 'S9 the offer', ('her',))
+    # S9b (round W, the drink): from her right front, three quarters on her face: the bottle comes up before her mouth and
+    # tips back with her head in profile (from straight ahead its base covered her face); no line plays here
+    tr.cut(S9B_T, B, HR(1.05, 1.55, 0.8), HR(0, 1.52, -0.1), 'S9b the drink', ('her',))
     tr.cut(500, A, HR(0.1, 1.38, 0.95), HR(0, 1.6, 0), 'S10 under the brim', ('her',))
-    # (HF-B, HB-06) line 16 (618-653): S11 is a close shot of her in the iai stance with the petal held in the foreground
-    # (the video's ECU of the petal had her out of focus behind it); it holds through the draw and the slash to the line's end
-    # (round V: the petal 1.5 b before the lens, at her waist: petal-sized and under her face)
-    tr.cut(S11_T, B, S11_EYE, HR(0, 1.3, 0), 'S11 the petal, her iai', ('her',))
+    # (HF-B, HB-06) line 16 (618-653): S11 is a close shot of her in the iai stance from her front left; it holds through
+    # the draw and the slash to the line's end. Round W: the petal falls through its foreground on the other side of the
+    # picture from her face and is cut on its way down (S11_CUT, CUT_T: see above)
+    tr.cut(S11_T, B, S11_EYE, S11_LOOK, 'S11 the petal, her iai', ('her',))
     # (the design's eye r 0.4 hides her behind the actor: 1.2 b to the right shows both, the actor near, her beyond)
     tr.cut(S13_T, A, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor?'))
     TRACKS['cs1'] = tr
@@ -970,22 +1054,27 @@ def build_cs1(W):
         u = (t - 590) / 16
         s.at(t, petal_move(p1, face(1.5 - 3.0 * u, 2.0 - 0.3 * u)))
     s.at(606, petal_kill(p1))
-    # ---- S11: the second petal held before her, low in the close frame (610-649): a faint glint 620, its glowing line 624
-    # (look cut); it turns to the live lens every tick
-    pp = S11_PETAL
-    s.at(610, petal_summon(p2, at_pt(pp)))
-    s.at(620, f'execute {at_pt(pp)} run {K.p("glint", c=api.C_WHITE)}' if K.p('glint', c=api.C_WHITE) else None)
-    s.at(624, petal_look(p2, 'cut'), snd('petal_cut'))
+    # ---- S11 (round W): the second petal FALLS through the close frame's foreground (CUT_T - PETAL_FALL .. CUT_T: 601-647,
+    # in the picture from about 609 at a field of view of 90) and her draw meets it at CUT_T: the glowing line and the
+    # glint on that tick; the two halves fall apart from the next
+    pp = S11_CUT
+    t0 = CUT_T - PETAL_FALL
+    s.at(t0, petal_summon(p2, at_pt(petal_fall(t0)), scale=PETAL_S))
+    for t in range(t0 + 1, CUT_T + 1):
+        s.at(t, petal_move(p2, at_pt(petal_fall(t))))
+    s.at(CUT_T, petal_look(p2, 'cut', scale=PETAL_S), snd('petal_cut'))
+    s.at(CUT_T, f'execute {at_pt(pp)} run {K.p("glint", c=api.C_WHITE)}' if K.p('glint', c=api.C_WHITE) else None)
     # ---- S12: the draw at 642: negative 3 t, pink-white 3 + 4 t
     s.at(e('draw'), K.ovl('negative', 0, 3, 0), snd('negative')).at(e('draw', 3), K.ovl('pinkwhite', 0, 3, 4))
-    # ---- S13 홍련일섬: the halves blow off (649-664), the red line across the view through the actor's chest (650), the petal
-    # burst at her, the red tint, the slash; the arena turns crimson and the rig's P2 accents at 660; the dark leaves in two
-    # halves on consecutive ticks (one burst of 40 is too many commands for a tick); music 2 at 676
-    s.at(649, petal_look(p2, 'split'))
-    for t in range(650, 664):
-        u = (t - 649) / 15
-        s.at(t, petal_move(p2, at_pt(HR(pp[1] - 0.9 * u, pp[2] - 1.0 * u * u, pp[3] + 0.5 * u))))
-    s.at(664, petal_kill(p2))
+    # ---- S13 홍련일섬: the red line across the view through the actor's chest (650), the petal burst at her, the red tint,
+    # the slash; the arena turns crimson and the rig's P2 accents at 660; the dark leaves in two halves on consecutive
+    # ticks (one burst of 40 is too many commands for a tick); music 2 at 676. The petal's halves (CUT_T + 1 .. + HALF_T):
+    # each its own card, falling on and apart, turning
+    s.at(CUT_T + 1, petal_kill(p2), half_summon(p2, 'a', at_pt(half_fall('a', 1)), PETAL_S), half_summon(p2, 'b', at_pt(half_fall('b', 1)), PETAL_S))
+    s.at(CUT_T + 2, half_turn(p2, 'a', -1.1, HALF_T - 2), half_turn(p2, 'b', 0.8, HALF_T - 2))
+    for k in range(2, HALF_T):
+        s.at(CUT_T + k, half_move(p2, 'a', at_pt(half_fall('a', k))), half_move(p2, 'b', at_pt(half_fall('b', k))))
+    s.at(CUT_T + HALF_T, half_kill(p2))
     s.st(e('slash'), ST(0, 1.3, 0), K.p('scarlet_line', len=600, yaw=90, roll=13))
     s.at(e('slash'), K.ovl('red_tint', 0, 4, 20), snd('iai_slash'))      # (HI) the kit's 홍련일섬 recipe, was a raw stand-in
     s.me(e('slash'), K.p('petal_burst', r=20))
@@ -1010,7 +1099,7 @@ def build_cs1(W):
         f'# moved to tick {to - 1} (the rig shows {to} at the next rig/tick: the clip keys every part there), her model put at the',
         f'# mark now (RIG_NOW), both cameras made anew on S10; seq/cs1/skipgo then sets #sq to {to - 1}. Line 15, line 16 and the',
         '# slash follow.',
-        *[c for c in (K.hud('clear'), L.cam_line(None), K.ovl('black', 0, 20, 6)) if c], HUD_HOLD, KILL_PROPS, STOP, mark, FACE_ACTOR,
+        *[c for c in (K.hud('clear'), *L.cam_line(None), K.ovl('black', 0, 20, 6)) if c], HUD_HOLD, KILL_PROPS, STOP, mark, FACE_ACTOR,
         RIG_NOW,
         api.rig('look/sword/sheathed'), api.rig('look/hat/worn'), api.rig('look/scabbard/hip'), api.rig('look/props/none'),
         api.rig('look/face/calm'), *seek,
