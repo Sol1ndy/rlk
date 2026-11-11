@@ -25,8 +25,10 @@ both are removed at the end. The generators of this boss (contract §1 / PLAN §
   G4  ownership: a stray file inside each owned folder (scarlet's core/ seq/ p/q/, the rig's rig/, the arena's
       mboss/arena/hr_field/) is spared by every other generator and removed by its owner
   G5  the rig's resource-pack side twice into the pack copy: the second build changes no byte, the pack equals the given one
+      (the items atlas compared as a set: its source order follows the order the generators ran, README 0-9)
 """
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -65,7 +67,9 @@ def owned(gen, rel):
     if gen == 'arena':
         return rel.startswith(FN + 'mboss/arena/')
     if gen == 'rig':
-        return rel.startswith(FN + 'boss/scarlet/rig/') or rel == 'tools/scarlet_rig_manifest.json'
+        # (+ lane H2c, 11-11: her points per tick for the contact suites, written next to them)
+        return (rel.startswith(FN + 'boss/scarlet/rig/') or rel == 'tools/scarlet_rig_manifest.json'
+                or rel == 'tools/dev/sim/hr/cine/her_tracks.json')
     if gen == 'kit':
         return rel.startswith(FN + 'boss/scarlet/fx/') or rel == 'tools/mboss_hr_fx_manifest.json'
     if gen == 'scarlet':
@@ -108,10 +112,17 @@ def snap(root, with_time=False):
     return out
 
 
-def rp_hash(rp):
+def rp_hash(rp, atlas_set=False):
+    """sha1 of the pack; atlas_set: the items atlas's sources as a sorted set (README 0-9: their ORDER follows the order the
+    generators ran - the rig re-appends its skin entry, the player rig its block aliases and skins - the entries are the same)"""
     h = hashlib.sha1()
     for p in sorted(x for x in rp.rglob('*') if x.is_file()):
-        h.update(p.relative_to(rp).as_posix().encode() + b'\0' + hashlib.sha1(p.read_bytes()).digest())
+        b = p.read_bytes()
+        if atlas_set and p.relative_to(rp).as_posix() == 'assets/minecraft/atlases/items.json':
+            j = json.loads(b)
+            j['sources'] = sorted(j['sources'], key=lambda x: json.dumps(x, sort_keys=True))
+            b = json.dumps(j, sort_keys=True).encode()
+        h.update(p.relative_to(rp).as_posix().encode() + b'\0' + hashlib.sha1(b).digest())
     return h.hexdigest()
 
 
@@ -163,17 +174,24 @@ def main():
         shutil.copytree(RPSRC, rp)
         same('G0 the copy = the tested tree', ref, snap(root))
         # G1 / G2: every generator twice, watched
+        rp_runs = []
         for gen in ORDER:
             ok1, stray1 = run_watched(root, rp, gen)
             s1 = snap(root)
+            if gen == 'rig':
+                rp_runs.append(rp_hash(rp))
             ok2, stray2 = run_watched(root, rp, gen)
+            if gen == 'rig':
+                rp_runs.append(rp_hash(rp))
             same(f'G1 {gen}: the first run reproduces the tested tree', ref, s1)
             same(f'G1 {gen}: a second run changes nothing', s1, snap(root))
             check(f'G2 {gen}: writes only its owned paths (two runs)', ok1 and ok2 and not stray1 and not stray2,
                   (stray1 + stray2)[:6])
         # G5: the rig's RP side twice
-        check('G5 the rig\'s resource-pack side, built twice into the pack copy: equal to the given pack, unchanged by the '
-              'second build', rp_hash(rp) == rp_ref, (rp_hash(rp), rp_ref))
+        check('G5 the rig\'s resource-pack side, built twice into the pack copy: unchanged by the second build (every byte), equal to '
+              'the given pack (the items atlas as a set: its order follows the generators\' run order, README 0-9)',
+              len(rp_runs) == 2 and rp_runs[0] == rp_runs[1] and rp_hash(rp, True) == rp_hash(RPSRC, True),
+              (rp_runs, rp_hash(rp, True), rp_hash(RPSRC, True)))
         # G3: wiped F:boss/scarlet, documented order and the reverse
         for name, order in (('documented', ORDER), ('reverse', [g for g in reversed(ORDER) if g != 'check'] + ['check'])):
             shutil.rmtree(root / FN / 'boss/scarlet')

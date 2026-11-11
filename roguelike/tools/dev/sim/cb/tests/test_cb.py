@@ -415,9 +415,11 @@ def t_static():
     ck('static: hz/hurt_pm calls the judge (no own dash check)', 'player/def/judge' in fns['mboss/hz/hurt_pm']
        and 'dashInvT' not in fns['mboss/hz/hurt_pm'])
     near = [l for l in tick if 'mboss/near_all' in l]
-    ck('static: rlk:tick runs mboss/near_all right after mboss/main, only in the window (live, not paused); hz/near and pj/near '
+    # (HI, 11-11: lane H2's FN-cam hold / release lines sit right after mboss/main as well - they alone may stand between)
+    ck('static: rlk:tick runs mboss/near_all right after mboss/main (FN-cam\'s lines only between), only in the window (live, not paused); hz/near and pj/near '
        'are dodgeable-only; mboss/world, hz/all, pj/all and pj/tick carry no lane C line',
-       len(near) == 1 and tick.index(near[0]) == i_mb + 1 and '#dgOpen cb matches 1' in near[0] and '#mbPause mb matches 1' in near[0]
+       len(near) == 1 and tick.index(near[0]) > i_mb and all('rlk:mboss/cam/' in l for l in tick[i_mb + 1:tick.index(near[0])])
+       and '#dgOpen cb matches 1' in near[0] and '#mbPause mb matches 1' in near[0]
        and 'mboss/hz/near' in fns['mboss/near_all'] and 'mboss/pj/near' in fns['mboss/near_all']
        and 'unless score @s mbHzND matches 0 run return 0' in fns['mboss/hz/near']
        and 'unless score @s mbPjND matches 0 run return 0' in fns['mboss/pj/near']
@@ -1425,8 +1427,10 @@ def t_readers():
     s.ents = [x for x in s.ents if x.alive]
     nopress(s)
     P(s, 'dashCool', 0)
-    pip = rd('boss/scarlet/shield/pip')
-    ck('readers: 홍련 shield/pip reads q_pf0 at s and q_pf1 at s + 1 (no dashInvT)', 'q_pf0' in pip and 'q_pf1' in pip and 'dashInvT' not in pip)
+    # (HI, 11-11: the rebuilt 홍련 takes a gauntlet segment on a judged perfect parry only, hr_design §1.2 - no q_pf query)
+    pip = rd('boss/scarlet/shield/tick') or ''
+    ck('readers: 홍련 shield/tick takes a segment on a judged perfect parry (#mbDodgeOk + #parT 3; no dashInvT, no q_pf query)',
+       '#mbDodgeOk mb' in pip and 'unless score #parT tmp matches 3 run return 0' in pip and 'dashInvT' not in pip and 'q_pf' not in pip)
     ck('readers: the shield rush contact ends on a perfect parry', 'execute if score #parT tmp matches 3 run tag @s add rlk_sh_rhit' in rd('cm/sh/rcontact'))
     ck('readers: Apep\'s organism bolt ends when parried (tier 3) and flies on when dodged',
        'execute if score #dodged tmp matches 1 unless score #parT tmp matches 3 run return 0' in rd('boss/apep/org/pj_end'))

@@ -48,6 +48,31 @@ Found at HI (not in hi_todo): `test_bal_hr` q rows failed on the merged tree —
 balance damage on an untargetable body, and q's ghost lunge (4-20) is `rlk_mb_inv`: the break there is refused, not pending.
 Rebased: refused during the ghost, pending from the grab to the pattern's end (49 / 49).
 
+## Gates (the final tree)
+| gate | result |
+|---|---|
+| build twice (rig → kit → player rig + actor → `regen_all.sh --mobs`, two rounds) | no file of `data/` or the generated `tools/` changed in either round; pack hash `e6b8b2dd…` after round 0, 1 and 2 (`$S/hi_tools/twice.sh`) |
+| `check_mboss_pack.py` | 0 problems (4 mid, 4 chapter, 3 special, 7 arenas) |
+| loadcheck (26.3 server) | `hi`: 0 function load failures, `Loaded 1870 advancements` |
+| `rplint` / `atlas_px` | 0 problems / 12 935 424 px (≤ 13.2 M; +16 384 = H3's four actor skins) |
+| other bosses' output vs `wip/combat` | only the shared framework lines: `mboss/{main,init,cleanup_fight,fight_vars,uninstall}` + `tick` · `view/tick` · `lvup/tick` (FN-cam), `bal/boss/may` + `fight_vars` / `cleanup_fight` (FN-bal), `mboss/register` (her registry entry intro 1450 / death 1494); no other boss module file |
+| hr suites | pat_p1 531, pat_p2 67, pat_ghost 65, test_gauge 22, test_bal_hr 49, test_scarlet 47, test_special_hr all, test_reward all, test_moon 55, test_hwamu 283, test_arena_hr 94, test_kit 15 796, test_rig 162, ev_dry 82, ident_hr pass, test_seq 392 (all sections, 9.5 min), test_cam all, test_actor 217 (`--rebuild`, reference = the pack without the actor), test_cine 159, test_contact 86 (with the actor's manifest), test_clips_h1c 297, test_flow 40 — all passing; gen_check_hr: see below |
+| combat suites | test_cb 296, test_rm all, test_np 125, test_bal 117, test_bal_boss 117 — all passing |
+| cost | test_flow per phase / sequence ≤ 429 (budget 830), the whole fight 353 |
+
+Suite fixes made at HI for lane interactions (none hides a defect; each now checks the merged behaviour):
+- `test_bal_hr` q rows: FB's untargetable-body rule vs q's ghost lunge (above).
+- `test_cb` / `bossloop_cb` (lane C): rlk:tick's near pass "right after mboss/main" — H2's FN-cam hold / release lines sit
+  there too (test_cam pins them right after main); now: only FN-cam lines may stand between. `test_cb`'s 홍련 reader row:
+  the rebuilt pip is `shield/tick` on a judged perfect parry (no `shield/pip`, no `q_pf` query).
+- `test_bal_boss` (lane B): "every flagged boss has a case here" accepts 홍련's rows in `hr/tests/test_bal_hr.py` (H1 moved them).
+- `ident_hr`: allow-list group for wip/combat's be0016710 (Azhdaha's brand cleanse comment, after the lanes branched).
+- `gen_check_hr`: the rig also owns `tools/dev/sim/hr/cine/her_tracks.json` (H2c); G5 compares the items atlas as a set
+  (README 0-9: its source order follows the generators' run order; with the documented order rig → kit → player rig the
+  player rig's aliases come last, a rig-only build re-appends the scarlet skin entry) and requires the second build
+  byte-identical. First run (before the fix, 19 min): only those two rows failed; G3 (documented and reverse order), G4
+  (strays incl. `p/q/`, hi_todo 4) passed.
+
 ## The full-fight run (`tools/dev/sim/hr/tests/test_flow.py`, 40 checks, ~1 min)
 Real rift, core, sequences with the lock (camsim), kit; the actor's calls modelled as seqsim does (test_actor runs the real
 `char/cine`). A perfect parrier (F at h − 1 for every cue). CS0 locked 1438 of 1440 t → hand-back clean → P1 1500 t (cues,
@@ -78,7 +103,9 @@ bash $S/hi_tools/run_suites.sh     # every hr suite but test_seq / gen_check_hr 
   (+ gold, web and their fade steps)
 - added: `assets/rlk/textures/font/mboss_hr/{gold,gold_1..4,web,web_1..4}.png`, `assets/rlk/textures/skin/lumine.png`,
   `assets/rlk/{items,models/item}/player_motion/{lumine,clorinde,ronova,nefer}/*` (80), `assets/rlk/items/player_motion/weapons/cine_sword.json`
-- `README.md`: see below (hand-written; not in git)
+- `README.md` (hand-written, not in git): the actor's folders / skin / generator row and the `mboss_hr` font row (8 overlays,
+  U+EC10–EC18, steps to U+EC3F, 41 glyphs); the exact change is `tools/dev/plan/combat/hi_rp_readme.diff` (apply to the
+  release pack's README). The integration pack: `<S>/hi_out/rlk_hud_resourcepack_hi.zip` (11 919 KB, 4 868 files).
 
 ## Next
 - collect the gate results (below), pack README, commit, push, final report.

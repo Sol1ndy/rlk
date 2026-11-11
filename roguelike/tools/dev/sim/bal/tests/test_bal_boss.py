@@ -337,8 +337,11 @@ for bid, cfg in BOSSES.items():
         traceback.print_exc()
         ck(f'{bid} crashed', False, repr(ex))
 if not ONLY:
-    missing = sorted(flag - set(BOSSES))
-    ck('every flagged boss has a case here', not missing, missing)
+    # (HI: 홍련's balance rows moved to hr/tests/test_bal_hr.py with the rebuild, hr_design §6.1 - she is covered there)
+    ELSEWHERE = {'scarlet': 'tools/dev/sim/hr/tests/test_bal_hr.py'}
+    missing = sorted(flag - set(BOSSES) - set(ELSEWHERE))
+    ck('every flagged boss has a case here (or in its own suite: ' + ', '.join(f'{k} {v}' for k, v in ELSEWHERE.items()) + ')',
+       not missing and all((DP / v).exists() for v in ELSEWHERE.values()), missing)
 bad = [r for r in R if not r[1]]
 print(f'\n{len(R) - len(bad)}/{len(R)} passed' + (f', {len(bad)} FAILED' if bad else ''))
 sys.exit(1 if bad else 0)

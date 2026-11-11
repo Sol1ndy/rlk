@@ -158,6 +158,9 @@ ALLOW[LANE_C] = ([F + f'{n}.mcfunction' for n in _LANE_C_FN]
 # 11-11 combat overhaul, fix lane A (wip/combat-fix-a; tools/dev/plan/combat/fa_progress.md): review A (player side) and B-05.
 # Its other files are lane C's (player/def/**, player/dash*, f_key, the lores, load, tick ...) and F3's view/tick; new here:
 ALLOW['combat fix A (11-11): review A (player side), B-05'] = [F + 'combat/rclick_off.mcfunction']
+# ... and its hand-off A-10 (f), done on wip/combat for the 11-11 release (be0016710): the comment of Azhdaha's brand cleanse
+# names the new rule (tools/mboss_azhdaha/brand.py)
+ALLOW['11-11 release (be0016710): Azhdaha brand cleanse comment'] = [F + 'boss/azhdaha/brand/dodge.mcfunction']
 # 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
 # the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
 # call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's
