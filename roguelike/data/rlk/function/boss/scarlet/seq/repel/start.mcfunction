@@ -19,7 +19,7 @@ scoreboard players set #sq_h hr 0
 scoreboard players set @a[tag=player] hudHold 2
 title @a[tag=player] actionbar ""
 execute unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/repel/lock
-function rlk:boss/scarlet/fx/hud/ovl {g:"white",in:0,hold:4,out:3}
+function rlk:boss/scarlet/fx/hud/ovl {g:"gold",in:0,hold:4,out:3}
 function rlk:boss/scarlet/fx/snd/deflect
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^0 ^1.55 ^0.65 run function rlk:boss/scarlet/fx/p/clash_gold
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] positioned ^0 ^1.55 ^0.65 run function rlk:boss/scarlet/fx/p/light_column
