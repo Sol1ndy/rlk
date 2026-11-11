@@ -690,4 +690,4 @@ G2's cut count (9-11), `PP_FLINCH` 0-10. The item (`sword_hwamu`) and the buff a
    may hold her out of reach longer, and none hovers idle.
 6. **The sky mark** stays a line (the light line and the 2-b line at the feet): never an area on the floor.
 7. Commit trailer for every lane from now on:
-   `Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
+   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
