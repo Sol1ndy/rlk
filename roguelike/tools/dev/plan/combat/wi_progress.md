@@ -3,8 +3,8 @@
 Branch `wip/w-int` (from `origin/wip/w` 02a162a03), worktree `<S>/cb/wt_wi`, pack `<S>/rp_wi` (from `<S>/rp_rel3`, the 11-12 release
 pack); `<S>` = the scratchpad of `w_brief.md`. Contract: the lead's brief for lane WI, `w_brief.md`, the three lanes' progress files
 (`wc_progress.md`, `wp_progress.md`, `wb_progress.md`). The release entries (README 0-1, 0-10, the build stamp, the pack's version
-line) are the lead's and are NOT written. Scratch `<S>/wi/` (`fullregen.sh <rounds>`, `suites.sh <tag> <dir:suite[:args]> …`,
-`gates_final.sh`, logs in `out/`).
+line) are the lead's and are NOT written. The scratch (`<S>/wi/`: the regeneration / suite scripts, a trial-merge worktree, logs)
+was deleted at the end; "How to run" has the commands.
 
 ## Steps
 - [x] merges (merge commits): `wip/w-cam` c9a427f4e, `wip/w-player` 47ad3b270, `wip/w-boss` final head 8ab0f2e91 (its re-timing
@@ -116,3 +116,71 @@ the rows is the F without the whiff ladder and the re-timed gauntlets. No damage
 Without the ladder the free-fight masher (F every 4 t; no band: T7 looks at the gauntlets only) blocks more: intake 191 / 190 ->
 118 / 129 %/min (P1 / P2), perfect parries 30 / 36 -> 93 / 84, groggies 0 -> 0.67 / 0.44 per minute. Lane WB's `--only g,metro,chain`
 rows (T7m: metronome 8-30 from every phase, 0 of 437 clears in G1 and G2) are the same tree's.
+
+## Budgets
+- **Items atlas**: 13 109 184 px (13.109 M <= 13.2 M; 1 510 sources) = 11-12 13.108 M + lane WB 1 280 px (`sw_rib_*` 3 x 256 +
+  `sw_quad_*` 3 x 256 - `sw_path` 256); lane WC's half petals and lane WP's `tint` / `_hot` keep their sizes. 0.091 M left.
+- **Commands per tick** (budget 830): test_scarlet P1 505, P2 524 (11-12: 500 / 519); test_flow the whole fight 381 (p1 451, p2 472,
+  G1 402, G2 414, cs1 342, repel 395, lead5 431, ending 286). The integration adds: one gated line in `rlk:tick` (the stand-in rig
+  without a beat), one self-tag test in `player/tick` (the dodge cut), one per `combat/apply` hit (her numbers; `test_m0diff` A
+  +0.18-0.20 per tick against the release, its 40 failures unchanged).
+- **Displays**: her rig 29 parts (`test_rig` 162 / 162, the elements budget unchanged); trail cards alive in a pattern <= 29
+  (`test_blade`; round V's sweep cards 48), her kit cards <= 52 alive (`test_vi`, the ultimate), kit sprites 259 584 of 260 000 px.
+
+## Gates (the final tree 1ac1e1cde + docs; suites from fresh copies of tools/dev/sim outside the tree)
+| gate | result |
+|---|---|
+| regeneration (README 0-4 order) | after the WB merge rounds 1-4: `git status` empty every round; pack hash `4fdebef21ccd9807` in rounds 2, 3, 4 (round 1 re-sorted `items.json` of the WC + WP pack) |
+| `check_mboss_pack.py` | 0 problems (4 mid-boss, 4 chapter, 3 special modules, 7 arenas) |
+| loadcheck `wi_a` (WC + WP + fixes) and `wi_fin` (the final data) on the 26.3 server | 0 function load failures; `Starting minecraft server version 26.3`, `Loaded 1871 advancements`, `Done (1.439s)!` |
+| `rplint.py rp_wi` / `atlas_px.py` | 0 problems / 13 109 184 px |
+| hr: test_wi / test_vi | 215 / 215 / 208 / 208 |
+| hr: test_cine / test_cam / test_seq / test_contact / test_actor / test_rig | 172 / ALL (164) / ALL (572) / 102 / 157 / 162 |
+| hr: test_flow / ev_dry / test_scarlet / pat_p1 / pat_p2 / pat_ghost | 40 / 82 / 48 / 559 / 70 / 65 |
+| hr: test_gauge / test_bal_hr / test_metro / test_input_hr / test_clips_h1c | 33 / 79 / 33 / 19 / 297 |
+| hr: test_kit / test_blade / test_moon / test_hwamu / test_arena_hr | 15 361 / 347 (after the clock-check fix below) / 55 / 283 / 94 |
+| hr: test_special_hr / test_reward / ident_hr / gen_check_hr (`--rp`) | ALL (98) / ALL (61) / passes / 28 of 28 (1352 s) |
+| cb: test_cb / test_np / test_rm / chainparry | 400 / 125 / ALL (72) / 624 of 624 perfect, 0 refused, 117 patterns |
+| bal: test_bal / test_bal_boss | 117 / 117 |
+| 아를레키노: test_arlecchino / pat_p1 / pat_p2 / test_cm_ar / test_arena_fl | ALL / ALL / ALL / ALL / ALL |
+| 아를레키노: test_rig | 67 of 67 with the 11-12 pack as `--ref-rp`; its source skin `S:ar/src/skin_33.png` is gone from this container, so the run used the 11-12 pack's `skin_p2.png` as that file (the two checks that compare against it then pin the pack's texture). `test_kit`: not runnable (the branch `wip/ar-s3` is missing, as before) |
+| `az/tests_cm/run_all.sh` | the known statuses of README 0-9: fails `test_m0diff` (40, the release's 40), `test_px` 4e, `ident` (stale), the M0 suites that were never moved (files missing), the validators' missing baselines (`macro` / `lint`); ok `test_chapter`, `test_fw_az`, `test_fw_ap`, `gen_check`, `check_nbtpath` (invalid 0), `check_mboss_pack` |
+| validators against the 11-12 release tree | `check_refs`: the same findings (only the function count differs); `lint_mc`: 53 011 problems on both, the same lines; `check_macro`: 3 878 -> 3 753 problems, every new one of the known "called with storage" kind (the new dodge clips' `pose/N {step}`, `dash_face` / `lite/face`, the side-number macros); `check_nbtpath` invalid 0 on both |
+
+Found by the gates and fixed: **`test_blade`'s clock check** (lane WB) counted lane WC's `kill @e[…,tag=rlk_hr_sw]` lines at the
+sequence starts / skips (`seq.KILL_FIGHT_FX`) as trail commands outside a pattern-tick file; a `kill` (also behind `execute … run`)
+is a clean-up and no longer counts — every other line naming the trail's tags still must sit in a pattern-tick file.
+
+## Files outside 홍련 (`boss/scarlet/**`), the camera (`mboss/cam/**`, `char/cine/**`) and the player (`player/**`, `char/motion/**`) that differ from `origin/wip/w`
+| files | why |
+|---|---|
+| `combat/apply`, new `combat/text_normal_side`, `text_normal_side_n`, `text_crit_side` | the integration: her damage numbers (T3-09) |
+| `tick` | the integration: the stand-in rig's tick without a beat |
+| `combat/rc_hold`, `load` | lane WP: the held right-click's repeat flag (no double dodge from a held F5 press); the dodge set's constants (`#dgChW`, the cooldown pair), the ladder's constants gone |
+| tools: `mboss_lib.py` | lane WC: the camera texts live on the live camera only (`mboss/cam/text`) |
+| tests: `test_m0diff.py`, `ident_hr.py`, `test_cam.py`, `test_blade.py` | the integration: `LANE_WI_CMD`, the group `LANE_WI` (+ lane WP's `player/f_key`), D1 reads the round W groups, the clock check's kills |
+No file of 파수꾼, the proto bosses, 나루카미, the other chapter / special bosses, the chapter 1-3 mobs, the arenas or the rooms differs.
+
+## Pack files (`<S>/rp_wi` against `<S>/rp_rel3`, all from the generators; + the README)
+Lane WC: `items/hr_cine/petal_half_{a,b}.json`, `models/item/hr_cine/petal_half_{a,b}.json` (`build_blank_tex.py`). Lane WP:
+`textures/font/cb/tint.png`, the 31 `textures/player_motion/weapons/*_hot.png`. Lane WB: `textures/mboss/hr_kit/sw_rib_0..2`,
+`sw_quad_0..2` (new), `sw_arc_0..2` (repainted), `sw_path.png` gone; models / item definitions `mboss/hr_kit/{sw_band, sw_rib_0..2,
+sw_fan_0..2, sw_quad_0..2}` new, `{sw_path, sw_arc_0..2}` gone. Shared: `atlases/items.json`. The integration: `README.md` (rows for
+the half petals, the trail kit, `tint` / `_hot`, the atlas total; diff `wi_rp_readme.diff`; the version line is the lead's).
+
+## Open (for the lead)
+- **T1 on seed 33 is 0.97** on the final tree, as on the 11-12 release tree (pooled 1.01): no balance value changed.
+- **A direction-less double dodge goes along the view** (lane WP's `dash_dir`): facing her, the cartwheel goes into her (0.58 b in
+  `dodgecam`). The reference's double dodge is a sideways cartwheel; whether to send it sideways / back when no direction is held is a
+  design call (README 0-9 「홍련 — 남긴 것」).
+- **T3-09's rest**: the skills' smoke / flames / pillars over her are each character's own effects: not touched.
+- **The free-fight masher** blocks more without the ladder (intake 191 -> 118 %/min in P1, 30 -> 93 perfect parries): no band
+  covers it (T7 looks at the gauntlets, which no metronome clears).
+- **`test_m0diff`**: the integration's per-hit line is named apart (`LANE_WI_CMD` 0.2); the budget decision stays the lead's.
+- The old chapter-boss fair sims model the pre-11-10 dash (lane WP's list): not gated, not changed.
+- The pack's version line, README 0-1 / 0-10 and the build stamp: the lead's.
+
+## Only a person in the game can check
+The merged, deduplicated list is README 0-9 「홍련 — 게임에서 확인할 것」, the 11-12 round W line W①-W⑳ (the cutscenes W①-W⑧, the
+player W⑨-W⑭, the fight W⑮-W⑳); it replaces round V's ⑩ (the petals), ⑫ ⑬ (the drawn path and the slash pieces), ⑱'s path part and
+⑳ (the beat with the path).
