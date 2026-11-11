@@ -48,7 +48,10 @@ Clip authoring loop: `node tools/build_scarlet_rig.mjs --resourcepack <throwaway
    a spot 4.5 b before the player and ends over the spot 2 b before them; the fail's column is a 0.3-b path card for 5 t.
 5. **The gauge**: `#buSubSeg bu 5` -> four dividers over the under bar (`tools/build_bossbar.py`, glyph U+E440 3 x 7 px).
 6. **Balance**: hit ticks / shapes / tiers / weights untouched; pat_p1 / pat_p2 / pat_ghost / test_bal_hr / test_metro / test_gauge /
-   test_flow pass unchanged. hrfair 2.0 was not re-run (see Next).
+   test_flow pass unchanged. hrfair 2.0 `--quick --only p1,p2,kill` (seed 11; `<S>/vb/hrfair/run.log`): P1 / P2 walker intake
+   237.7 / 239.9 %/min (÷ 타키's 232.3 = 1.02 / 1.03; T1 1.00-1.15, T2 <= 1.25), T1b 0.49, T1c 0, T3 1.43, T4 19.0 %, T8 1,
+   T9 walker Lv15 168 s (150-185), T9b 164 s (125-170), T10 1.50 / 0 (0.8-1.6), T12 100 %, T13 ok, the 35 % rule 35 35 34 35 /
+   35 35 35 32: where the 11-11b table had 161-171 s and 162 s. The full three-seed run (~50 min) was not repeated.
 Also: the cue star `cue_0` with a dark rim, 1.9 -> 2.3 b, placed from the track (`blade.cue_point`: the blade's middle, or 0.9 b over
 her hat's crown when that is under 1.75 b or on the hat); the flashes at her head (not her chest), yellow 2.4 / 3.0 b, purple 2.4 b,
 blue 2.6 b, each with a dark-rimmed star (`sw_head`) inside.
@@ -123,7 +126,7 @@ Contrast (WCAG ratio) of a tell's dark rim / white-gold core: P1 rim vs straw gr
 | new suite | test_blade 7 812 / 7 812 |
 | hr suites | pat_p1 559, pat_p2 70, pat_ghost 65, test_scarlet 47, test_metro 30, test_flow 40, test_clips_h1c 297, test_kit 15 262, test_rig 162, test_bal_hr 79, test_gauge 33, test_input_hr 17, test_special_hr, test_reward, test_seq, test_cine 159, test_contact 94, test_actor 158, test_arena_hr 94, test_moon 55, test_hwamu 283, ev_dry 82, ident_hr: all pass |
 | test_cam | 1 check fails (D1 "only the shared files change": `bossui/draw`, `bossui/sub` = this lane's gauge dividers; `load.mcfunction` = the 11-11b build stamp, already failing on `wip/v`). Lane VC's suite: see Requests |
-| gen_check_hr (`--rp`, seven rig builds) | see the note under the table |
+| gen_check_hr (`--rp`, seven rig builds) | 28 / 28 (its rig owner list now names `tools/scarlet_blade_track.json`) |
 
 Suites touched: `test_kit.py` (the pins of the hand-placed effects / sizes rebased on round V), `test_cine.py` (g_dive's last tick 22),
 `ident_hr.py` (allow `bossui/draw`, `bossui/sub`), new `test_blade.py`.
@@ -181,9 +184,8 @@ Suites touched: `test_kit.py` (the pins of the hand-placed effects / sizes rebas
   before the fix that keeps her shown through the dive's wind-up); side by side: `<S>/vb/cmp_pose_a1_D5.jpg`
 
 ## Next (open)
-- hrfair 2.0 (`tools/dev/sim/hr/review/bal/hrfair2.py`, ~50 min) was NOT re-run: hit ticks / shapes / tiers / weights are unchanged
-  and test_bal_hr passes, but where she stands after a dash (2 b before the player instead of 3 b beyond) and after a dive (1.4 b
-  short) changes the walker's uptime a little: T9 (kill time 156-171 s in a 150-185 band) is the row to look at.
+- hrfair 2.0 in full (three seeds, the gauntlet rows T5-T7; ~50 min): only the quick run above was made. The gauntlet rows depend
+  on the cuts' strike ticks and the F rules, neither of which changed (test_metro 30 / 30).
 - test_cam D1 (lane VC's list).
 
 ## What only a person in the game can check
