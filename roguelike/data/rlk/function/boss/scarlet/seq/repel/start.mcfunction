@@ -10,13 +10,12 @@ execute rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate
 execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
 function rlk:boss/scarlet/seq/repel/m/land
 function rlk:mboss/cam/kill
+kill @e[type=minecraft:item_display,tag=rlk_hr_sw]
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^1.2 ^0.9 ^0.65
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^2.3 ^1.35 ^1
 execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/ar/clampw
 execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:boss/scarlet/seq/lib/over
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] facing ^0 ^1.55 ^0.65
-execute as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:boss/scarlet/seq/lib/lift
-execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] facing ^0 ^1.55 ^0.65
+execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] facing ^0 ^1.6 ^1
 execute at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/cam/spawn_at {id:1}
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1]
 execute as @e[type=minecraft:item_display,tag=rlk_mb_cam1,limit=1] run function rlk:boss/scarlet/seq/lib/camin

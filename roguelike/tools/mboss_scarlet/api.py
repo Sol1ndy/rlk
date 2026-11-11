@@ -500,7 +500,7 @@ STAGE_FMAX = {'cs1': 10, 'repel': 10, 'ending': 12}    # the stage's forward mus
 CS0_P0 = (881.28, 201.0, 25.55)                         # CS0 stage origin: start + CS0_WALK_BACK b toward SEAT_POS
 CS0_BEARING, CS0_WALK_BACK, CS0_END_DIST = 7.5, 6.0, 6.5
 CONTACT = {                                             # id: (sequence, (tick from, tick to), ST(r, u, f), what meets)
-    'K1': ('cs1', (10, 30), (0, 1.45, 0.75), 'blade lock (X); she stands at f 1.5'),
+    'K1': ('cs1', (10, 30), (0, 1.45, 0.95), 'blade lock (X); she stands at f 2.25 (round W: a swordfighter\'s distance)'),
     'KR': ('repel', (0, 26), (0, 1.55, 0.65), 'her blade pressing down on the actor\'s high guard'),
     'KW': ('repel', (36, 48), (0.15, 1.95, 0.85), 'the actor\'s left hand on her sword wrist (her anchor hand_l)'),
     'KH': ('repel', (49, 49), (0, 2.20, 1.10), 'the actor\'s hilt on her hat crown (her anchor hat_crown)'),
@@ -508,13 +508,14 @@ CONTACT = {                                             # id: (sequence, (tick f
     'KT1': ('repel', (88, 88), (0, 2.95, 1.9), 'her pelvis over the top'),
     'KT2': ('repel', (101, 101), (0, 0.25, 3.0), 'her pelvis on the ground (head toward +f)'),
     'KK': ('repel', (129, 129), (0, 0.35, 2.7), 'the actor\'s right foot on her flank'),
-    'KG': ('ending', (52, 52), (0, 2.05, 2.35), 'the actor\'s blade tip on the near edge of her brim'),
-    'KE2': ('ending', (56, 80), (0, 1.5, 2.1), 'blade lock (X)'),
-    'KE5': ('ending', (190, 204), (0, 1.5, 3.25), 'blade lock (X)'),
-    'KA1': ('ending', (228, 228), (0, 6.9, 2.55), 'passing cuts, edge on edge'),
-    'KA2': ('ending', (262, 262), (0, 7.3, 2.6), 'her overhead cut on the actor\'s horizontal guard'),
-    'KA3': ('ending', (286, 286), (0, 6.8, 2.5), 'cut on cut (the big flash)'),
-    'KA4': ('ending', (298, 304), (0, 6.9, 2.6), 'blade lock (X), then both push off'),
+    'KG': ('ending', (52, 52), (0, 2.05, 2.95), 'the actor\'s blade tip on the near edge of her brim'),
+    'KE2': ('ending', (56, 80), (0, 1.5, 2.2), 'blade lock (X)'),
+    'KE5': ('ending', (190, 204), (0, 1.5, 3.45), 'blade lock (X)'),
+    # (round W, lane WC: w_brief §4.6, the aerial duel is gone) the exchange on the ground, her root at f 4.75, the actor's at 2.5
+    'KA1': ('ending', (228, 228), (0, 1.45, 3.5), 'her diagonal cut on the actor\'s block'),
+    'KA2': ('ending', (262, 262), (0, 1.85, 3.05), 'her overhead cut on the actor\'s horizontal guard (she has stepped in to f 4.35)'),
+    'KA3': ('ending', (286, 286), (0, 1.25, 3.55), 'cut on cut (the big flash)'),
+    'KA4': ('ending', (298, 304), (0, 1.5, 3.45), 'blade lock (X), then both push off'),
 }
 CONTACT['KT1'] = ('repel', (88, 88), (0.28, 1.4, 2.0), 'her pelvis over the actor\'s right shoulder')   # HF-B (HB-01): the low throw
 CONTACT_TOL = {'blade': 0.08, 'body': 0.12}             # b: blades; hands and feet

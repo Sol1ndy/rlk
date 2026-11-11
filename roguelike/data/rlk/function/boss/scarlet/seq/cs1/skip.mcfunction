@@ -20,6 +20,7 @@ function rlk:boss/scarlet/rig/look/props/none
 function rlk:boss/scarlet/rig/look/face/calm
 scoreboard players set @s hrRigT 565
 execute unless score #sq_cx hr matches 1 run function rlk:mboss/cam/kill
+execute unless score #sq_cx hr matches 1 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw]
 execute unless score #sq_cx hr matches 1 at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
 execute unless score #sq_cx hr matches 1 at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ^-0.1 ^1.38 ^0.95
 execute unless score #sq_cx hr matches 1 as @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run function rlk:mboss/ar/clampw

@@ -64,21 +64,20 @@ export const ROOTS = {
   intro: [R(0, 840, [0, 0, 20.73], undefined, 0, 0), R(840, 880, [0, 0, 20.73], undefined, 0, 0, 180), R(880, 1052, [0, 0, 20.73]),
     R(1052, 1148, [0, 0, 20.73], [0, 0, 13.5]), R(1234, 1258, [0, 0, 13.5], [0, 0, 6.5], 4.5), R(1258, 1440, [0, 0, 6.5])],
   // CS1 (§3.2): f 9.0; the lunge 6-10 to 1.5; the leap back 34-50 (apex 1.2) to 9.0
-  cs1: [R(0, 6, [0, 0, 9]), R(6, 10, [0, 0, 9], [0, 0, 1.5]), R(34, 50, [0, 0, 1.5], [0, 0, 9], 1.2), R(50, 720, [0, 0, 9])],
+  cs1: [R(0, 6, [0, 0, 9]), R(6, 10, [0, 0, 9], [0, 0, 2.25]), R(34, 50, [0, 0, 2.25], [0, 0, 9], 1.2), R(50, 720, [0, 0, 9])],
   // the repel (§3.4): 1 b above ST(0, 0, 1.0), down to f 1.3 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-64); thrown 78-101 over
   // the actor's shoulder (HF-B: a low arc, apex THROW_H; her pelvis rides its own path over the shoulder) to 3.0; kicked 129:
   // slides to 8.0 by 135, on to 9.0 by 140 (at 5 % the sequence ends at 129: the ending)
-  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.3]), R(30, 36, [0, 0, 1.3], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], THROW_H),
+  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.95]), R(30, 36, [0, 0, 1.95], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], THROW_H),
     R(129, 135, [0, 0, 3], [0, 0, 8]), R(135, 140, [0, 0, 8], [0, 0, 9])],
   // the ending (§3.5; ST, from E8 = 338 on ST2 with her landing mark 9.0 b ahead; = lane H2's seq.py moves): placed on her back at
-  // 4.2 at tick 0 (under the seam's white); up to 4.6 (6-22); the lunge to 2.9 (50-54: at the graze tick 52 she is half way, 3.75);
-  // shoved to 6.0 (80-86); springs back to 11 (116-136, apex 1.2); runs in to 4.0 (150-188); the aerial duel: up 204-216 to
-  // (0, 6.0, 3.6), in to f 3.2 for the passing cut (222-228), up to u 6.4 f 3.4 for the overhead (250-262), to (0, 6.0, 3.3) for
-  // the big one (276-286); flies back 314-334 (apex 4.0) to the mark 9.0; turned away 650-700, back to the actor 1072-1094;
-  // walks in 1094-1154 to 4.5
-  ending: [R(0, 6, [0, 0, 4.2]), R(6, 22, [0, 0, 4.2], [0, 0, 4.6]), R(50, 54, [0, 0, 4.6], [0, 0, 2.9]), R(80, 86, [0, 0, 2.9], [0, 0, 6]),
-    R(116, 136, [0, 0, 6], [0, 0, 11], 1.2), R(150, 188, [0, 0, 11], [0, 0, 4]), R(204, 216, [0, 0, 4], [0, 6, 3.6]), R(222, 228, [0, 6, 3.6], [0, 6, 3.2]),
-    R(250, 262, [0, 6, 3.2], [0, 6.4, 3.4]), R(276, 286, [0, 6.4, 3.4], [0, 6, 3.3]), R(314, 334, [0, 6, 3.3], [0, 0, 9], 4),
+  // 4.8 at tick 0 (under the seam's white); up to 5.2 (6-22); the lunge to 3.5 (50-54: at the graze tick 52 she is half way, 4.35);
+  // shoved to 6.6 (80-86); springs back to 11 (116-136, apex 1.2); runs in to 4.75 (150-188); round W: the exchange on the ground
+  // (the aerial duel is gone): a step in to 4.35 for the overhead (254-262) and back (266-274); pushed off to 5.3 (304-310); a low
+  // spring back 314-334 (apex 1.0) to the mark 9.0; turned away 650-700, back to the actor 1072-1094; walks in 1094-1154 to 4.5
+  ending: [R(0, 6, [0, 0, 4.8]), R(6, 22, [0, 0, 4.8], [0, 0, 5.2]), R(50, 54, [0, 0, 5.2], [0, 0, 3.5]), R(80, 86, [0, 0, 3.5], [0, 0, 6.6]),
+    R(116, 136, [0, 0, 6.6], [0, 0, 11], 1.2), R(150, 188, [0, 0, 11], [0, 0, 4.75]), R(254, 262, [0, 0, 4.75], [0, 0, 4.35]), R(266, 274, [0, 0, 4.35], [0, 0, 4.75]),
+    R(304, 310, [0, 0, 4.75], [0, 0, 5.3]), R(314, 334, [0, 0, 5.3], [0, 0, 9], 1.0),
     R(650, 700, [0, 0, 9], undefined, 0, 180, 360), R(700, 1072, [0, 0, 9], undefined, 0, 0), R(1072, 1094, [0, 0, 9], undefined, 0, 0, 180),
     R(1094, 1154, [0, 0, 9], [0, 0, 4.5]), R(1154, 1372, [0, 0, 4.5])],
 };
@@ -101,8 +100,10 @@ const rigOf = (clip, t, S) => toRig(rootAt(clip, t), S);
 
 // ---- the contacts (hr_design.md §4.3; her side; tolerance 0.08 b for blades, 0.12 b for hands, feet and her body) -----------------
 export const TOL = {blade: .08, body: .12};
-const KP = {K1: [0, 1.45, .75], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.2, 1.1], KS: [.2, 1.5, 1.6], KT1: [.28, 1.4, 2.0], KT2: [0, .25, 3], KK: [0, .35, 2.7],
-  KG: [0, 2.05, 2.35], KE2: [0, 1.5, 2.1], KE5: [0, 1.5, 3.25], KA1: [0, 6.9, 2.55], KA2: [0, 7.3, 2.6], KA3: [0, 6.8, 2.5], KA4: [0, 6.9, 2.6]};
+// (round W, lane WC: w_brief §4.5 / §4.6) the locks a swordfighter's distance apart (her root 1.3 b beyond K, the actor's hilt 0.55 b
+// before it: the torsos >= 1.2 b apart, test_contact.py GAP), and the exchange on the ground instead of the aerial duel (KA1-KA4)
+const KP = {K1: [0, 1.45, .95], KR: [0, 1.55, .65], KW: [.15, 1.95, .85], KH: [0, 2.2, 1.1], KS: [.2, 1.5, 1.6], KT1: [.28, 1.4, 2.0], KT2: [0, .25, 3], KK: [0, .35, 2.7],
+  KG: [0, 2.05, 2.95], KE2: [0, 1.5, 2.2], KE5: [0, 1.5, 3.45], KA1: [0, 1.45, 3.5], KA2: [0, 1.85, 3.05], KA3: [0, 1.25, 3.55], KA4: [0, 1.5, 3.45]};
 const CT = (id, clip, t0, t1, kind, key = id) => ({id, clip, t0, t1, kind, p: KP[key], tol: kind === 'blade' ? TOL.blade : TOL.body});
 // (HF-B, HB-01) the mutual rows: her points against the actor's (lane H3's tools/player_motion/cine/manifest.json), so that
 // neither side can meet a contact on its own. what: [her point | segment, the actor's point], tol (b); `over`: her pelvis no
@@ -333,10 +334,14 @@ const INTRO_END0 = {...LANDED, pos: [0, -.4, 0], tor: [-24, 6, 0], head: [-20, -
     .k(438, {cupT: 14, aR: [74, 8, .55]}).k(446, {cupT: -10, aR: [72, 16, .55]}).k(456, {cupT: 0, aR: [70, 12, .55], head: [-6, 0, 0]});
   // I8: the cup raised to the moon 470-500, held
   k.k(470, {}).k(500, {aR: [150, 10, .95], head: [22, 0, 0], tor: [6, 4, 0], cupT: 8}, 'io').k(518, {head: [24, -2, 0], tor: [7, 4, 1]}).k(536, {aR: [152, 8, .96], head: [24, -2, 0], tor: [6, 4, 0]});
-  // I9: the arm out with the cup 536-590, back 592-600, the drink 600-650 (head back), lowered 650-664
+  // I9: the arm out with the cup 536-590; the drink (round W: the cup comes to her lips LEVEL 590-602, then the cup and the head
+  // tip back together 602-615, held with a second sip 624, both come level again 636-644, lowered 644-664; the rim at her mouth
+  // 602-644: the SIP patch of scarlet_retarget.mjs, test_cine D2)
   k.k(560, {aR: [118, 30, .97], head: [10, 8, 0], tor: [2, 8, 0], cupT: 0}, 'io').k(590, {aR: [116, 34, .97], head: [8, 10, 0]})
-    .k(600, {aR: [116, -36, .44], cupT: 18, head: [2, 2, 0], tor: [-4, 0, 0]}, 'io').k(612, {aR: [120, -36, .43], cupT: 38, head: [12, 2, 0]}, 'io')
-    .k(644, {cupT: 40, head: [14, 2, 0]}).k(664, {aR: [70, 12, .55], cupT: 0, head: [-6, 0, 0], tor: [-6, 0, 0]}, 'io');
+    .k(600, {aR: [116, -36, .44], cupT: 0, head: [2, 2, 0], tor: [-4, 0, 0]}, 'io').k(603, {})
+    .k(615, {aR: [120, -36, .43], cupT: 52, head: [12, 2, 0], tor: [1, 0, 0]}, 'io').k(624, {cupT: 58, head: [13, 2, 0], tor: [2, 0, 0]}, 'io')
+    .k(636, {cupT: 54, head: [12, 2, 0], tor: [1, 0, 0]}, 'io').k(644, {cupT: 0, head: [3, 2, 0], tor: [-4, 0, 0]}, 'io')
+    .k(664, {aR: [70, 12, .55], cupT: 0, head: [-6, 0, 0], tor: [-6, 0, 0]}, 'io');
   // I10: the cup set down at her right 700-712
   k.k(700, {}).k(706, {aR: [40, 30, .8], tor: [-8, 8, 2]}, 'io').k(711, {plR: [-.5, .84, .06], plwR: 1, tor: [-10, 14, 6], head: [-10, 16, 0]}, 'i')
     .k(712, {cup: 'none', hR: 'open'}).k(722, {plwR: 0, aR: [24, 12, .7], tor: [-8, 2, 0], head: [-8, 2, 0]}, 'io');
@@ -562,7 +567,7 @@ const LIE = {...DOWN, hat: 'world', hwP: [...HAT_HOLD], hwE: [0, 20, 0], head: [
 // the root comes down to the floor (6); 6-22 she rises into it and leans her weight on the lock; 22-26 heaved back (heave 22).
 // The hilt is BELOW KR (design: above it, the blade down): a hand above KR sits under her own 1.3-b hat brim with the pommel
 // through it, and a blade pointing down past the guard ends in the actor (hr2c_progress.md).
-const LOCK_YAW = 48, LOCK_HS = [.1, 1.09, .85];           // the hilt in the stage through the landing (ST r, u, f)
+const LOCK_YAW = 48, LOCK_HS = [.1, 1.09, 1.5];      // (round W: she lands 1.3 b beyond KR, a swordfighter's distance)           // the hilt in the stage through the landing (ST r, u, f)
 // [pelvis pitch, yaw, pelvis height above the root, lf, torso, head]
 const R0_BODY = {0: [-60, 0, 1.666, .9, [-10, 0, 0], [-20, 0, 0]], 1: [-40, 16, 1.27, .9, [-10, 6, 0], [-14, -10, 0]], 2: [-20, 32, .87, .6, [-12, 12, 0], [-8, -24, 0]],
   3: [0, LOCK_YAW, .47, 0, [-6, 14, 0], [2, -40, 0]], 4: [0, LOCK_YAW, .5, 0, [-6, 14, 0], [2, -40, 0]], 5: [0, LOCK_YAW, .55, 0, [-4, 14, 0], [0, -40, 0]],
@@ -570,7 +575,8 @@ const R0_BODY = {0: [-60, 0, 1.666, .9, [-10, 0, 0], [-20, 0, 0]], 1: [-40, 16, 
 const R0_GRIP = {0: [.25, 1.73, .1], 1: [.3, 1.4, .05], 2: [.1, .85, -.15]};
 function r0Pose(t, G = R0_GRIP[t]) {
   const [pt, yaw, h, lf, tor, head] = R0_BODY[t], w = sm(t / 3), posN = [0, h - HIP_Y, lerp(.2, .06, w)], kk = kOf(lf);
-  const Gt = G || rigOf('repel', t, LOCK_HS);
+  // (round W: the hilt rides 0.45 b before her root as she lands back from the guard: the stage height of LOCK_HS)
+  const Gt = G || rigOf('repel', t, [LOCK_HS[0], LOCK_HS[1], rootAt('repel', t).p[2] - .45]);
   return {rot: [pt, yaw, 0], pos: posN.map(x => +(x / kk).toFixed(4)), lf, tor, head, fL: t >= 3 ? nF('L', .22, 0, -.2) : lerp3([.12, .6, .25], [.16, .3, -.1], w),
     fR: t >= 3 ? nF('R', -.22, 0, .22) : lerp3([-.12, .56, .3], [-.16, .26, .2], w), kL: [.12, 0, -1], kR: [-.12, 0, -1],
     ...bladeThru(Gt, rigOf('repel', t, KP.KR), {pos: posN, yaw}), rh: 0, hR: 'open', aR: t >= 3 ? [20, 40, .8] : [-30, 30, .9], hairS: +lerp(.6, 0, w).toFixed(2), skW: +lerp(-.8, 0, w).toFixed(2),
@@ -733,15 +739,15 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
 // ending (1372 t = H; §3.5 E1-E17; v 296.5-373.1: ref/cs_ending.jpg, hr_duel_2_5fps.jpg). Her root: ROOTS.ending.
 // E1 0-50: on her back with her hand on the hat (= repel 129; the root skids 0-4); the kip-up 6-16 taking the hat (up 6; every
 //    tick), rising 16-22 with the hat set back on (hat_on 20), stands; raises the sword high 28-42 (raise 28), holds;
-// E2 the lunge 50-54 (lunge 50; the sequence glides the root to f 2.9): at 52 the actor's point grazes her brim (graze 52: the near edge of the brim at
+// E2 the lunge 50-54 (lunge 50; the sequence glides the root to f 3.5): at 52 the actor's point grazes her brim (graze 52: the near edge of the brim at
 //    KG, the head knocked back); the X lock at KE2 56-80 (lock 56), a jolt at the burst (burst 70); shoved back 80-86 (shove 80);
 // E3 86-116 a turned guard (off screen); springs back 116-136 (back 116: airborne, legs tucked), lands low;
 // E4 the run in 150-188 (run 150: a 8-t cycle at the sequence's 0.18 b/t), the sword trailing;
 // E5 the cut into the clash at 190 (clash 190), the X lock at KE5 190-204;
-// E6 the aerial duel (the root springs up 204-216 and hangs at 6.0): tucked low under the root's height, the cuts keyed every tick
-//    into their contacts - a1 228 a level passing cut through KA1, a2 262 the overhead cut down onto KA2, a3 286 the big rising
-//    diagonal through KA3 - and the X lock at KA4 298-304 (a4 298); pushed off (off 304);
-// E7 flies back 314-334 (fly 314), lands crouched at the mark (land 334);
+// E6 (round W: the aerial duel is gone) the exchange on the ground 204-310, 2.25 b apart: the lock broken, three clashes - a1 228 the
+//    diagonal onto the actor's block at KA1, a2 262 the overhead onto its raised guard at KA2 (stepping in), a3 286 cut on cut at
+//    KA3 (the big flash) - and the X lock at KA4 298-304 (a4 298); pushed off (off 304) to f 5.3;
+// E7 springs back low 314-334 (fly 314; seen as the launch and the landing), lands crouched at the mark (land 334);
 // E8 338-378 rises, the blade lowered;
 // E9 the scabbard from the hip into the right hand (scab_up 388), raised upright 388-398, swung down to her right while the left
 //    hand lifts the blade across to its mouth 398-418 (swing 398; every tick), the blade on its axis 418-426, slid in 426-450
@@ -759,14 +765,17 @@ const ke2Lock = (t, G = KE2_G[t]) => xLock('ending', t, 'KE2', G, KE2_POS[t]);
 const KE5_G = {190: [.1, 1.2, -.55], 197: [.1, 1.2, -.55], 204: [.1, 1.21, -.54]};
 const KE5_POS = {190: [0, -.1, .06], 197: [0, -.1, .05], 204: [0, -.09, .04]};
 const ke5Lock = (t, G = KE5_G[t]) => xLock('ending', t, 'KE5', G, KE5_POS[t], {tor: [0, 14, 0]});
-// the aerial duel: tucked under the hanging root (the pelvis 0.5 b over it, the knees drawn up), the body turned 20 degrees to
-// her right; a cut = the grip and the blade's direction at its contact tick (through its K), wound up before and followed through
-const AIRP = {pos: [0, -.16, 0], rot: [-6, 20, 0], lf: 1, tor: [-8, 8, 0], head: [-4, -24, 0], fL: [.14, .8, -.3], fR: [-.14, .74, -.02], kL: [.2, .2, -1], kR: [-.2, .2, -1]};
-const AIR_N = [0, -.16, 0];                      // (lf 1: the offset is native)
-const airBlade = (G, d, x = {}) => ({...blade(G, d, {pos: AIR_N, yaw: 20}), ...x});
-const airCut = (t, Kn, G) => airBlade(G, vsub(rigOf('ending', t, KP[Kn]), G));
-const KA_G = {228: [.4, .82, -.25], 262: [.24, 1.14, -.42], 286: [.3, .62, -.38], 298: [-.1, .86, -.4], 304: [-.1, .88, -.38]};
-const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA2', 286: 'KA3', 298: 'KA4', 304: 'KA4'}[t], G)});
+// E6 (round W, w_brief §4.6: the aerial duel is gone): the exchange on the ground, her root 2.25 b from the actor's (4.75 / 2.5).
+// The guard GRD: the wide stance turned 18 degrees to her right, the blade up and forward; a cut = the grip and the blade's
+// direction at its contact tick (through its K), wound up 8 t before and followed through 4 t after (every tick around it)
+const GRD_N = [0, -.12, 0], GRD_Y = 18;
+const GRD = {...ST2, rot: [0, GRD_Y, 0], pos: nP(...GRD_N), ...F_WIDE, tor: [-8, 10, 0], head: [-4, -22, 0], lf: 0, hat: 'worn', hR: 'open', aR: [20, 40, .85]};
+const gBlade = (G, d, x = {}, edge = [0, -1, 0]) => ({...blade(G, d, {pos: GRD_N, yaw: GRD_Y, edge}), ...x});
+const GUARD = gBlade([.1, 1.05, -.42], [-.1, .7, -.7]);
+const KA_G = {228: [-.05, 1.12, -.5], 262: [.05, 1.42, -.5], 286: [.45, .92, -.5], 298: [.1, 1.2, -.55], 304: [.1, 1.21, -.54]};
+const KA_OF = {228: 'KA1', 262: 'KA2', 286: 'KA3', 298: 'KA4', 304: 'KA4'};
+const kaPose = (t, G = KA_G[t], edge = [0, -1, 0]) => ({...GRD, ...gBlade(G, vsub(rigOf('ending', t, KP[KA_OF[t]]), G), {}, edge)});
+const ka4Lock = t => xLock('ending', t, 'KA4', KA_G[t], [0, -.1, .05], {tor: [0, 14, 0]});
 {
   const k = Keys().k(0, FULL(LIE)).k(4, {tor: [3, 0, 0]}).k(5, {});
   const KIP_BLADE = {gF: 0, gN: 1, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
@@ -791,8 +800,8 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
   // the sword raised high 28-42 (the module's violet glow), held
   k.k(42, {...ST, pos: [0, -.06, 0], ...F_WIDE, tor: [-4, 0, 0], head: [-4, 0, 0], aR: [40, 70, .95], gF: 0, gB: -60, gE: 40, gD: .7, cB: -40, cR: 0, th: 130, ed: -1, rh: 0}, 'io')
     .k(48, {gE: 44, th: 136});
-  // E2: the lunge 50-54 (the sequence glides her 4.6 -> 2.9): forward on the left foot; 52 = the graze half way (root 3.75): the
-  // body thrown 0.45 b ahead of the root, the head knocked back (the brim's near edge at KG); 54 over her feet at 2.9
+  // E2: the lunge 50-54 (the sequence glides her 5.2 -> 3.5): forward on the left foot; 52 = the graze half way (root 4.35): the
+  // body thrown 0.45 b ahead of the root, the head knocked back (the brim's near edge at KG); 54 over her feet at 3.5
   k.k(50, {pos: [0, -.2, -.06], tor: [-14, 6, 0], head: [0, -6, 0], ...F_LUNGE, gB: -20, gE: 10, gD: .62, cB: -10, th: 60, aR: [10, 30, .9]}, 'i')
     // 51-53 a fleche: off the ground for three ticks, the body thrown ahead of the gliding root (52: 0.55 b), the right leg trailing
     .k(51, {...AIR, lf: .9, pos: [0, .05, -.3], rot: [0, 10, 0], tor: [-10, 8, 0], fL: [.15, .22, -.32], fR: [-.15, .3, .3], gB: -24, gE: 4, cB: 0, th: 30}, 'l')
@@ -821,25 +830,29 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
   k.k(189, {rot: [0, 30, 0], pos: nP(0, -.14, 0), tor: [-12, 10, 0], head: [0, -30, 0], fL: nF('L', .22, 0, -.2), fR: nF('R', -.22, 0, .22),
     ...blade([-.1, .95, -.4], [.7, 0, -.7], {pos: [0, -.14, 0], yaw: 30}), aR: [20, 40, .8], hairS: -.3, skW: .3}, 'l');
   for (const t of [190, 197, 204]) k.k(t, {...ke5Lock(t), hairS: 0, skW: 0}, t === 190 ? 'l' : 'io');
-  // E6: springs up 204-216 into the tuck; the three cuts and the lock (every tick into each contact)
-  const HANGB = airBlade([.36, .8, -.2], [.55, .6, -.58]);
-  k.k(207, {...CROUCH, rot: [0, 20, 0], pos: [0, -.3, 0], tor: [-16, 6, 0], lf: 0}, 'io').k(211, {...AIRP, ...HANGB, pos: [0, -.1, 0], aR: [60, 60, .9], hairS: .4, skW: -.5}, 'o')
-    .k(216, {...AIRP, ...HANGB, aR: [70, 60, .9], hairS: .2, skW: -.3}, 'io');
-  const CUT = (t, wind, follow) => {             // wind / follow: [G, dir] 6 t before and 4 t after the contact tick t
-    k.k(t - 7, {...AIRP, ...airBlade(...wind), tor: [0, 16, 0]}, 'io');
-    const Gk = KA_G[t], dk = vunit(vsub(rigOf('ending', t, KP[{228: 'KA1', 262: 'KA2', 286: 'KA3'}[t]]), Gk));
-    for (let i = 3; i >= 1; i--) { const u = 1 - i / 4; k.k(t - i, {...airBlade(lerp3(wind[0], Gk, u), slerpDir(wind[1], dk, u)), tor: [+lerp(0, -12, u).toFixed(1), +lerp(16, 0, u).toFixed(1), 0]}, 'l'); }
-    k.k(t, {...kaPose(t), tor: [-12, 0, 0]}, 'l').k(t + 1, {...airBlade(lerp3(Gk, follow[0], .4), slerpDir(dk, follow[1], .4))}, 'l')
-      .k(t + 4, {...airBlade(...follow), tor: [-10, -8, 0]}, 'o').k(t + 12, {...AIRP, ...HANGB}, 'io');
+  // E6 (round W): the lock broken 204-212 into the guard; a1 228 the diagonal from high on her right onto the actor's block; a2 262
+  // the overhead cut down onto its raised guard (the sequence steps her in to 4.35 254-262 and back 266-274); a3 286 the rising
+  // cut from low on her left on its descending cut (the big flash); the X lock at KA4 298-304; pushed off 304-310 (to 5.3)
+  k.k(212, {...GRD, ...GUARD}, 'io');
+  // (edge: the side the blade's edge faces, kept for the whole cut: a direction that passes the default edge's line flips the blade)
+  const CUT = (t, wind, follow, edge = [0, -1, 0]) => {   // wind / follow: [G, dir] 8 t before and 4 t after the contact tick t
+    const Gk = KA_G[t], dk = vunit(vsub(rigOf('ending', t, KP[KA_OF[t]]), Gk));
+    k.k(t - 8, {...GRD, ...gBlade(wind[0], wind[1], {}, edge), tor: [-2, 22, 0]}, 'io');
+    for (let i = 3; i >= 1; i--) { const u = 1 - i / 4; k.k(t - i, {...gBlade(lerp3(wind[0], Gk, u), slerpDir(wind[1], dk, u), {}, edge), tor: [+lerp(-2, -12, u).toFixed(1), +lerp(22, 4, u).toFixed(1), 0]}, 'l'); }
+    k.k(t, {...kaPose(t, Gk, edge), tor: [-12, 4, 0]}, 'l').k(t + 1, {...gBlade(lerp3(Gk, follow[0], .35), slerpDir(dk, follow[1], .35), {}, edge)}, 'l')
+      .k(t + 4, {...gBlade(follow[0], follow[1], {}, edge), tor: [-8, -6, 0]}, 'o');
   };
-  CUT(228, [[.5, .9, .05], [.85, .1, .5]], [[-.2, .85, -.4], [-.9, -.1, -.4]]);
-  CUT(262, [[.2, 1.45, -.05], [.1, .85, .5]], [[.14, 1.0, -.5], [-.1, -.7, -.7]]);
-  CUT(286, [[.4, .5, -.1], [.6, -.6, .5]], [[-.1, 1.2, -.45], [-.6, .7, -.4]]);
-  k.k(295, {...AIRP, ...airBlade([-.08, .86, -.52], [.25, .1, -.96])}, 'io').k(298, kaPose(298), 'l').k(304, {...kaPose(304), tor: [-12, 10, 0]}, 'io')
-    .k(308, {...AIRP, ...HANGB, rot: [10, 10, 0], tor: [4, 0, 0], aR: [90, 70, .9]}, 'o');
-  // E7: flies back 314-334, lands crouched 334
-  k.k(318, {rot: [18, 0, 0], tor: [4, 0, 0], aR: [90, 70, .9], hairS: .6, skW: -.7, ...airBlade([.4, .9, 0], [.7, .5, -.5])}, 'o')
-    .k(330, {rot: [6, 0, 0], fL: [.13, .5, -.2], fR: [-.13, .46, .05], lf: .6, pos: [0, -.1, 0]}, 'io')
+  CUT(228, [[-.4, 1.55, -.1], [-.35, .75, .55]], [[.3, .85, -.35], [.6, -.55, -.55]]);
+  k.k(240, {...GRD, ...GUARD}, 'io');
+  CUT(262, [[0, 1.65, -.05], [0, .65, .75]], [[.05, 1.2, -.55], [0, -.1, -1]], [0, 0, -1]);
+  k.k(274, {...GRD, ...GUARD}, 'io');
+  CUT(286, [[.35, .7, -.15], [.5, -.55, .45]], [[-.15, 1.35, -.45], [-.55, .7, -.45]]);
+  k.k(295, {...GRD, ...gBlade([.05, 1.15, -.5], [.15, .45, -.9])}, 'io').k(298, ka4Lock(298), 'l').k(304, {...ka4Lock(304), tor: [-12, 10, 0]}, 'io');
+  // pushed off 304-310 (the heels dug in, the blade knocked up), crouched 313; the spring back 314-334 (low, apex 1.0), lands crouched
+  k.k(308, {...GRD, pos: nP(0, -.18, .08), rot: [0, 26, 0], tor: [6, 4, 0], head: [6, -20, 0], ...blade([.1, 1.3, -.28], [.3, .85, -.4], {pos: [0, -.18, .08], yaw: 26}), aR: [50, 50, .9]}, 'o')
+    .k(313, {...CROUCH, rot: [0, 0, 0], pos: [0, -.34, 0], tor: [-18, 0, 0], head: [-2, -4, 0], gF: 0, gN: 0, gB: -50, gE: -20, gD: .6, cB: -40, cR: 0, th: 30, ed: -1, tw: 0}, 'io')
+    .k(318, {...AIR, pos: [0, .06, .04], rot: [10, 0, 0], tor: [-2, 6, 0], fL: [.13, .55, -.25], fR: [-.13, .5, -.1], lf: .8, ...B(-40, 0, 40, -1, {gL: .58}), gN: 0, aR: [60, 50, .9], hairS: .5, skW: -.6}, 'o')
+    .k(328, {rot: [6, 0, 0], fL: [.13, .45, -.3], fR: [-.13, .4, -.15]})
     .k(334, {...LOW, ...ST2, rot: [0, 0, 0], lf: 0, pos: [0, -.44, 0], ...F_WIDE, tor: [-26, 6, 0], head: [10, -6, 0], gF: 0, gN: 0, gB: -100, gE: -40, gD: .66,
       cB: -110, cR: 0, th: -30, ed: -1, rh: 0, aR: [20, 50, .9], hairS: 0, skW: 0, kL: [.12, 0, -1], kR: [-.12, 0, -1]}, 'i').k(338, {pos: [0, -.42, 0]});
   // E8: rises, the blade lowered at her left
@@ -891,7 +904,7 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
 }
 
 // (authoring: the native-key helpers for tools/dev/sim/hr/cine scratch scripts)
-export const _t = {nP, nF, nH, blade, bladeThru, rigOf, toRig, KP, r0Pose, lockPose, LOCK_G, R0_GRIP, hookPose, HOOK, cs1Lock, K1_G, xLock, ke2Lock, KE2_G, ke5Lock, KE5_G, kaPose, KA_G};
+export const _t = {nP, nF, nH, blade, bladeThru, rigOf, toRig, KP, r0Pose, lockPose, LOCK_G, R0_GRIP, hookPose, HOOK, cs1Lock, K1_G, xLock, ke2Lock, KE2_G, ke5Lock, KE5_G, kaPose, KA_G, ka4Lock};
 
 // ---- export ------------------------------------------------------------------------------------------------------------------
 const ORDER = ['intro', 'intro_end', 'cs1', 'lead60', 'lead5', 'lead_re', 'repel', 'ending'];

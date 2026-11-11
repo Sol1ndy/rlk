@@ -930,7 +930,7 @@ check(f'cine: ending {L_("ending")} = ev_give / ev_toast 0 states (hat worn, swo
 # authors "every tick" in tools/scarlet_cine.mjs - the draws, the hat swing, the slash, the beaten blade, the throw, the kip-ups,
 # the aerial duel, the scabbard swing
 SWING = {'intro_end': [(66, 72), (90, 100)], 'cs1': [(6, 9), (240, 252), (642, 650)], 'repel': [(26, 30), (78, 101), (133, 137)],
-         'ending': [(6, 16), (204, 298), (398, 418)]}
+         'ending': [(6, 16), (225, 229), (259, 263), (283, 287), (398, 418)]}      # (round W: the exchange's cuts; the aerial duel is gone)
 sw_bad = [(c, t) for c, spans in SWING.items() for a, b in spans for t in range(a, b + 1) if not (RIG / 'c' / c / 'k' / f'{t}.mcfunction').exists()]
 check(f'cine: big swings keyed every tick ({sum(b - a + 1 for v in SWING.values() for a, b in v)} ticks in {sum(len(v) for v in SWING.values())} spans)', not sw_bad, str(sw_bad[:6]))
 # per-clip numbers of the shipped replay (the gates above cover every clip; these are the cinematic clips' own)
@@ -1856,27 +1856,16 @@ if RET and DIMS:
     import importlib
     from mboss_scarlet import seq as _sq
     _sq = importlib.reload(_sq)
-    # (HI: the rebuilt CS1, hr_design §3.2 S10) the big petal drifts across her face 590-606, 0.6 b before her body's axis
-    # (seq.py petal_summon / petal_move at HR(r, u, 0.6)): its height follows the built head anchor (within 0.2 b) and it passes
-    # in front of her head (the anchor's forward + 0.3 b or more)
-    P_T0, P_T1 = 590, 605
-    PET = re.compile(r'positioned \^(-?[\d.]*) \^(-?[\d.]*) \^(-?[\d.]*)')
-    tag = _sq.PETAL[1]
-    ys = {}
-    for t in range(P_T0, P_T1 + 1):
-        f = DP / f'data/rlk/function/boss/scarlet/seq/cs1/k/{t}.mcfunction'
-        for ln in (f.read_text().splitlines() if f.exists() else []):
-            if tag in ln:
-                m = PET.search(ln)
-                if m:
-                    ys[t] = (float(m.group(2) or 0), float(m.group(3) or 0))
-    hd = {t: AN[(cid('cs1'), 'head')][t] for t in range(P_T0, P_T1 + 1)}
-    # round V (lane VC, T1-STAGE-1): the petal passes BEHIND her head (1.5 b or more behind the head anchor, within 0.5 b of
-    # its height): 0.6 b before her face it was a 690-px blob over her face for the whole of line 15
-    bad_p = [(t, ys.get(t), hd[t][1]) for t in range(P_T0, P_T1 + 1)
-             if t not in ys or abs(ys[t][0] - hd[t][1]) > .5 or ys[t][1] > hd[t][2] - 1.5]
-    check(f'couplings: the cs1 petal (S10, {P_T0}-{P_T1}) passes behind her head at about the built head anchor\'s height (within '
-          f'0.5 b, 1.5 b or more behind it; {len(ys)} ticks found)', len(ys) == P_T1 - P_T0 + 1 and not bad_p, bad_p[:4])
+    # round W (lane WC, T3-PETAL-I3: S10's petal behind her head was never seen): S10 has no petal; the S11 petal falls through the
+    # close frame from CUT_T - PETAL_FALL to the cut (a move on every tick: no hanging petal) and its halves after it (test_seq
+    # P1-P6 judge it in the picture and against her blade)
+    tag1, tag2 = _sq.PETAL[1], _sq.PETAL[2]
+    t0_, t1_ = _sq.CUT_T - _sq.PETAL_FALL, _sq.CUT_T
+    k_ = lambda t: (DP / f'data/rlk/function/boss/scarlet/seq/cs1/k/{t}.mcfunction')     # noqa: E731
+    txt = lambda t: k_(t).read_text() if k_(t).exists() else ''                           # noqa: E731
+    s10 = [t for t in range(560, 660) if tag1 in txt(t)]
+    falls = [t for t in range(t0_, t1_ + 1) if tag2 not in txt(t)]
+    check(f'couplings: no S10 petal (round W); the S11 petal is moved on every tick of its fall {t0_}-{t1_}', not s10 and not falls, f'{s10[:4]} {falls[:4]}')
     check(f'couplings: seq.S0 {_sq.S0} == api.ITEM_SWORD_SCALE == the manifest item_sword display scale',
           _sq.S0 == api.ITEM_SWORD_SCALE == MAN['item_sword']['display_scale'])
     check(f'couplings: seq.SWORD_R {_sq.SWORD_R} == ITEM_SWORD_LEN / 2 / ITEM_SWORD_SCALE', abs(_sq.SWORD_R - api.ITEM_SWORD_LEN / 2 / api.ITEM_SWORD_SCALE) <= .001)

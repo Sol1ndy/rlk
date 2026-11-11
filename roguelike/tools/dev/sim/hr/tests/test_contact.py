@@ -20,6 +20,10 @@ without it (the lane not merged yet) only her side is judged and the mutual rows
            forearm), KT.over (her pelvis 0-0.6 b over the actor's right shoulder, <= 0.5 b off it, at her highest tick of
            84-92), KK.kick; and through the throw (79-96) the actor's head >= 0.30 b off her torso (pelvis -> head: no head
            through her body); the builders' own mutual tables are these rows
+  gap      (with --actor; round W, w_brief §4.5: "it's a sword fight but it feels like they are talking with their bodies") in
+           every blade lock / clash span the two torsos keep a swordfighter's distance: her torso's axis (pelvis -> 0.8 of the
+           way to her head) and the actor's (waist -> chest, its manifest) >= GAP_MIN b apart on every tick; the scripted
+           grab / strike / hook / throw / kick rows (KW KH KS KT KK) are the exceptions
 """
 import json, math, re, sys
 from pathlib import Path
@@ -151,5 +155,37 @@ if AM is not None:
     ok(0 <= du <= .6 and dxz <= .5, f'mutual: KT.over her pelvis at its highest (t{top}) {du:.3f} b over the actor\'s right shoulder (0-0.6), {dxz:.3f} b off it (<= 0.5)')
     hd = min(seg(a['head'][t], h['pelvis'][t], h['head'][t]) for t in range(79, 97))
     ok(hd >= .30, f'mutual: the throw 79-96: the actor\'s head stays {hd:.3f} b off her torso axis (>= 0.30: no head through her body)')
+# ---- gap (round W) ---------------------------------------------------------------------------------------------------------------
+GAP_MIN = 1.5            # b between the torso axes (two 0.5-b torsos: >= 1 b of air between them; the 11-12 locks were 0.9-1.2)
+GAP_SPANS = [('K1', 'cs1', 10, 30), ('KR', 'repel', 6, 26), ('KE2', 'ending', 56, 80), ('KE5', 'ending', 190, 204), ('KA1', 'ending', 224, 232),
+             ('KA2', 'ending', 258, 266), ('KA3', 'ending', 282, 290), ('KA4', 'ending', 298, 304)]
+
+
+def _segd(a0, a1, b0, b1, n=12):
+    best = 9.0
+    ab = [b1[k] - b0[k] for k in range(3)]
+    for i in range(n + 1):
+        u = i / n
+        p = [a0[k] + (a1[k] - a0[k]) * u for k in range(3)]
+        w = max(0.0, min(1.0, sum((p[k] - b0[k]) * ab[k] for k in range(3)) / max(1e-9, sum(v * v for v in ab))))
+        best = min(best, math.dist(p, [b0[k] + ab[k] * w for k in range(3)]))
+    return best
+
+
+if AM:
+    for cid, clip, t0, t1 in GAP_SPANS:
+        Hc, Ac = TR['clips'][clip], AM['clips'][clip]['tick']
+        if 'waist' not in Ac:
+            ok(False, f'gap: the actor manifest has no waist / chest columns (tools/build_player_cine.mjs)')
+            break
+        worst, at = 9.0, t0
+        for t in range(t0, t1 + 1):
+            hp, hh = Hc['pelvis'][t], Hc['head'][t]
+            d = _segd(hp, [hp[k] + (hh[k] - hp[k]) * 0.8 for k in range(3)], Ac['waist'][t], Ac['chest'][t])
+            if d < worst:
+                worst, at = d, t
+        ok(worst >= GAP_MIN, f'gap: {cid} ({clip} {t0}-{t1}) the torsos {worst:.2f} b apart at their nearest (t{at}; >= {GAP_MIN})')
+
+
 print(f'test_contact: {n - len(fails)} / {n} ok' + ('' if not fails else f', {len(fails)} FAILED'))
 sys.exit(1 if fails else 0)

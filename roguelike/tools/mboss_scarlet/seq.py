@@ -200,17 +200,25 @@ def _row(t0, t1, a, b=None, h=0.0, y0=180.0, y1=None, fr='ST'):
 
 
 THROW_H = 6                                 # (HF-B) the throw's root apex, tenths (= tools/scarlet_cine.mjs THROW_H)
+# (round W, lane WC: w_brief §4.5 / §4.6) her marks for the locks and the exchange: 1.3 b beyond the contact (her torso >= 1.2 b
+# from the actor's; tools/scarlet_cine.mjs ROOTS, tools/player_motion/cine/clips.mjs)
+LOCK_F = 2.25                               # CS1: the lunge to the lock at K1 (f 0.95)
+R8_T = 118                                  # the repel's cut to the kick
+REPEL_F = 1.95                              # the repel: she lands 1.3 b beyond KR (f 0.65), pulled in to 1.1 for the grab (30-36)
+EX_F, EX_IN, EX_OFF = 4.75, 4.35, 5.3       # the ending's exchange: her mark (the actor at 2.5), the step in for the overhead, pushed off
+FLY_H = 10                                  # the spring back to her landing mark: apex 1.0 b (tenths; was 4 b: the "thrusters")
 _SF = round(math.dist(api.CS0_P0[::2], api.SEAT_POS[::2]), 2)
 HER = {
     'intro': [_row(0, 840, (0, 0, _SF), y0=0), _row(840, 880, (0, 0, _SF), y0=0, y1=180), _row(880, 1052, (0, 0, _SF)),
               _row(1052, 1148, (0, 0, _SF), (0, 0, 13.5)), _row(1234, 1258, (0, 0, 13.5), (0, 0, 6.5), 4.5), _row(1258, 1440, (0, 0, 6.5))],
-    'cs1': [_row(0, 6, (0, 0, 9)), _row(6, 10, (0, 0, 9), (0, 0, 1.5)), _row(34, 50, (0, 0, 1.5), (0, 0, 9), 1.2), _row(50, 720, (0, 0, 9))],
-    'repel': [_row(0, 6, (0, 1, 1), (0, 0, 1.3)), _row(30, 36, (0, 0, 1.3), (0, 0, 1.1)), _row(56, 64, (0, 0, 1.1), (0, 0, 1.2)),
+    'cs1': [_row(0, 6, (0, 0, 9)), _row(6, 10, (0, 0, 9), (0, 0, LOCK_F)), _row(34, 50, (0, 0, LOCK_F), (0, 0, 9), 1.2), _row(50, 720, (0, 0, 9))],
+    'repel': [_row(0, 6, (0, 1, 1), (0, 0, REPEL_F)), _row(30, 36, (0, 0, REPEL_F), (0, 0, 1.1)), _row(56, 64, (0, 0, 1.1), (0, 0, 1.2)),
               _row(78, 101, (0, 0, 1.2), (0, 0, 3), THROW_H / 10), _row(129, 135, (0, 0, 3), (0, 0, 8)), _row(135, 140, (0, 0, 8), (0, 0, 9))],
-    'ending': [_row(0, 6, (0, 0, 4.2)), _row(6, 22, (0, 0, 4.2), (0, 0, 4.6)), _row(50, 54, (0, 0, 4.6), (0, 0, 2.9)),
-               _row(80, 86, (0, 0, 2.9), (0, 0, 6)), _row(116, 136, (0, 0, 6), (0, 0, 11), 1.2), _row(150, 188, (0, 0, 11), (0, 0, 4)),
-               _row(204, 216, (0, 0, 4), (0, 6, 3.6)), _row(222, 228, (0, 6, 3.6), (0, 6, 3.2)), _row(250, 262, (0, 6, 3.2), (0, 6.4, 3.4)),
-               _row(276, 286, (0, 6.4, 3.4), (0, 6, 3.3)), _row(314, 334, (0, 6, 3.3), (0, 0, 9), 4),
+    # (round W: the bodies a swordfighter's distance apart in the locks; the exchange on the ground instead of the aerial duel)
+    'ending': [_row(0, 6, (0, 0, 4.8)), _row(6, 22, (0, 0, 4.8), (0, 0, 5.2)), _row(50, 54, (0, 0, 5.2), (0, 0, 3.5)),
+               _row(80, 86, (0, 0, 3.5), (0, 0, 6.6)), _row(116, 136, (0, 0, 6.6), (0, 0, 11), 1.2), _row(150, 188, (0, 0, 11), (0, 0, EX_F)),
+               _row(254, 262, (0, 0, EX_F), (0, 0, EX_IN)), _row(266, 274, (0, 0, EX_IN), (0, 0, EX_F)), _row(304, 310, (0, 0, EX_F), (0, 0, EX_OFF)),
+               _row(314, 334, (0, 0, EX_OFF), (0, 0, 9), FLY_H / 10),
                _row(334, 650, (0, 0, 9), fr='ST2'), _row(650, 700, (0, 0, 9), y0=180, y1=360, fr='ST2'),
                _row(700, 1072, (0, 0, 9), y0=0, fr='ST2'), _row(1072, 1094, (0, 0, 9), y0=0, y1=180, fr='ST2'),
                _row(1094, 1154, (0, 0, 9), (0, 0, 4.5), fr='ST2'), _row(1154, 1500, (0, 0, 4.5), fr='ST2')],
@@ -314,12 +322,18 @@ def _tree(W, name, kind, ticks, lines_of, head):
 HELP_SUMMON = f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(HELP_T)}}}'
 
 
+KILL_FIGHT_FX = 'kill @e[type=minecraft:item_display,tag=rlk_hr_sw]'   # (round W) a fight blade-path / slash card left standing
+# (round W, T3-HAND-1: the hand-backs jumped 50 / 165 px over 4-6 frames as the player's own view settled, unmasked) a short
+# black over every hand-back to the fight: in 3, held 5 (the release tick inside it), out 5; it starts HB_PRE ticks before
+HB_MASK, HB_PRE = ('black', 3, 5, 5), 5
+
+
 def stands(tr, first=None):
     """A locked sequence's start (and a skip's landing): the old cameras gone, both made where their first shots put them
     (cam.Track.spawn: a one-tick helper at the stage placed and aimed as the shot, mboss/cam/spawn_at: the rotation on the
     grid in the summon NBT, the entity 4 blocks before the viewpoint). The first frame anyone sees is tick 2 or later: every
     locked sequence opens on a full mask (CS0 black, CS1 and the ending white, the repel gold). `first`: {cam: shot}."""
-    return [L.cam('kill'), *tr.spawn(HELP, HELP_SUMMON, first=first)]
+    return [L.cam('kill'), KILL_FIGHT_FX, *tr.spawn(HELP, HELP_SUMMON, first=first)]
 
 
 def skip_cams(tr, shot):
@@ -754,6 +768,8 @@ WALK_F, END_F = 13.5, api.CS0_END_DIST                               # she walks
 CS0_MASK = ('black', 0, 34, 8)
 CS0_RESEND = 44                                                      # ticks the hold re-sends the camera for real (the arrival)
 I2_T = 76                                                            # the cut to the side track
+I3_P0, I3_Y = 124, (3.0, -3.0)                                      # (round W) the I3 petal: its first tick, its height before the lens
+PETAL_HAND = 0.42                                                    # (round W) the card on her hand (the kit's: 0.8)
 
 
 def build_intro(W):
@@ -805,7 +821,8 @@ def build_intro(W):
     # round V (T1-STAGE-4: from under her path she was a 40-px speck in the dome): the leap from the side, 4.6 b off the
     # axis at her landing's depth: she crosses the frame a third of its height tall; the lens follows her (chase)
     tr.cut(1230, A, ST(-4.6, 1.3, 9.2), HR(0, 1.0, 0), 'I16 leap', ('her',))
-    tr.chase(e('leap'), e('land') + 1)
+    # (round W, T3-CHASE-1: the per-tick chase stepped up to 39 px with reversals) 4-tick segments led along her arc
+    tr.track(e('leap'), e('land') + 1, every=4)
     tr.cut(1260, B, ST(1.6, 0.5, 4.2), HR(0, 0.9, 0), 'I17 landing', ('her',))
     # (HF-B, HB-07) under the brim: the lens a little over her eye line, so her low, forward-tipped brim (intro_end 0-40, head
     # about 25-44 degrees down) lies between it and her eyes (every eye pixel: the face's rows 4-5). It opens 2.0 b out on the
@@ -838,24 +855,30 @@ def build_intro(W):
     for i in range(1, 11):
         assert api.LINE_AT[i][0] == 'intro' and api.LINE_AT[i][1] == e(f'l{i}'), i
         say(s, api.LINE_AT[i][1], i)
-    # ---- I3-I4: one big petal falls through the moon shot (150-170, 1.5 b before the lens), then settles on her right hand
-    # (176 -> 190, follows the anchor), rolls off 206-216
+    # ---- I3-I4: one petal falls through the moon shot and settles on her right hand. Round W (T3-PETAL-I3 / -I4: it popped in
+    # at full size mid-frame; on her hand it was a 330 x 510 px card that rolled toward the lens and vanished at its biggest):
+    # it enters from above the picture (2.5 b before the lens, above the top edge at a field of view of 90) and falls out at the
+    # bottom (124-170); in I4 a smaller card (PETAL_HAND) drops onto her hand (176-190), rests, and is lifted off by the wind to
+    # her left, away from the lens, shrinking to nothing (207-217) before it goes
     p1 = PETAL[0]
-    s.at(150, petal_summon(p1, before_cam(A, 0.4, 0.9, 1.5)), snd('cs0_petals'))
-    for t in range(151, 170):
-        u = (t - 150) / 20
-        s.at(t, petal_move(p1, before_cam(A, 0.4 - 0.6 * u, 0.9 - 1.8 * u, 1.5)))
+    s.at(I3_P0, petal_summon(p1, before_cam(A, 0.6, I3_Y[0], 2.5)), snd('cs0_petals'))
+    for t in range(I3_P0 + 1, 170):
+        u = (t - I3_P0) / (170 - I3_P0)
+        s.at(t, petal_move(p1, before_cam(A, 0.6 - 0.9 * u + 0.12 * math.sin(u * 2 * math.pi * 1.5), I3_Y[0] + (I3_Y[1] - I3_Y[0]) * u, 2.5)))
     s.at(170, petal_kill(p1))
     if K.prop('petal_big', look='whole'):
-        on_hand = lambda h, dx=0.0: f'at {ANCHOR} positioned ~{num(dx)} ~{num(h)} ~'   # noqa: E731
-        s.at(176, api.rig('anchor/hand_r'), petal_summon(p1, on_hand(0.8), B))
+        on_hand = lambda h, x=0.0, z=0.0: f'at {ANCHOR} rotated as @s rotated ~ 0 positioned ^{num(x)} ^{num(h)} ^{num(z)}'   # noqa: E731
+        s.at(176, api.rig('anchor/hand_r'), petal_summon(p1, on_hand(0.8), B, scale=PETAL_HAND))
         for t in range(177, 207):
-            h = max(0.06, 0.8 - 0.74 * (t - 176) / 14)
+            h = max(0.05, 0.8 - 0.75 * (t - 176) / 14)
             s.at(t, api.rig('anchor/hand_r'), petal_move(p1, on_hand(h), B))
-        for t in range(207, 216):
-            u = (t - 206) / 10
-            s.at(t, api.rig('anchor/hand_r'), petal_move(p1, on_hand(0.06 - 0.5 * u * u, 0.35 * u), B))
-        s.at(216, petal_kill(p1))
+        # 207-217: lifted off her hand by the wind to her left (away from the lens), shrinking to nothing (one interpolation)
+        s.at(207, f'execute as @e[type=minecraft:item_display,tag={p1},limit=1] run data merge entity @s {{start_interpolation:0,'
+                  f'interpolation_duration:10,transformation:{{scale:[0f,0f,0f]}}}}')
+        for t in range(207, 218):
+            u = (t - 206) / 11
+            s.at(t, api.rig('anchor/hand_r'), petal_move(p1, on_hand(0.05 + 0.12 * u, 0.5 * u, -0.15 * u), B))
+        s.at(218, petal_kill(p1))
     # ---- I6-I10: the bottle (rock bare 326, pour 356, back 424), the cup to the moon (the halo brighter 474-530, the chime
     # 486), the drink 612, the cup set down 700 (rock set)
     s.at(e('take_bottle'), rock('bare')).at(e('pour', 4), snd('cs0_pour'))
@@ -892,7 +915,7 @@ def build_intro(W):
     s.at(x('draw', -4), snd('draw_spin'))
     s.at(x('draw'), L.title(*api.TITLE), snd('draw'))
     s.fx(x('draw'), 'blade_tip', K.p('glint', c=api.C_WHITE)).me(x('draw'), K.p('qi_arc', r=18, yaw=0, pitch=0, roll=0, c=api.C_LILAC))
-    s.at(x('music'), api.music(1))
+    s.at(x('music'), api.music(1)).at(LOCK['intro'][1] - HB_PRE, K.ovl(*HB_MASK))
     mv.write(W)
     head = ('CS0 intro (hr_design §3.1): 20 shots, lines 1-11; seated with the cup and the bottle, the walk, the leap; intro_end: '
             'line 11, the draw, the stance.')
@@ -983,8 +1006,8 @@ def build_cs1(W):
     tr = C.Track('cs1', {'ST': STAGE, 'HR': BODY}, LOCK['cs1'][1], lift=LIFT, over=OVER, her=her_of('cs1'), inside=CAMIN)
     # (round W: S1 holds through her lunge 6-9, both figures whole in the wide frame; S2 opens on the blades meeting)
     tr.cut(0, A, ST(-9.0, 2.2, 4.5), ST(0, 1.2, 4.5), 'S1 apart', ('her', 'actor'), full=True)
-    tr.cut(S2_T, B, ST(-2.6, 1.3, 0.8), K1, 'S2 clash', ('her', 'actor'))
-    tr.move(S2_T + 1, 22, eye=ST(-1.3, 1.4, 0.8))
+    tr.cut(S2_T, B, ST(-2.8, 1.3, 1.15), ST(0, 1.42, 1.15), 'S2 clash', ('her', 'actor'))
+    tr.move(S2_T + 1, 22, eye=ST(-1.75, 1.42, 1.15))
     tr.cut(34, A, ST(-13.0, 3.0, 4.0), ST(0, 1.0, 4.0), 'S3 pushed apart', ('her', 'actor'))
     tr.cut(84, B, ST(0.55, 1.75, -1.3), ST(0, 1.4, 9.0), 'S4 over the shoulder', ('her', 'actor?'))
     # (HF-B, HB-06) line 13 (110-161) on a close shot of her: the over-the-shoulder wide keeps the beat before it
@@ -1014,13 +1037,13 @@ def build_cs1(W):
     # (the design's eye r 0.4 hides her behind the actor: 1.2 b to the right shows both, the actor near, her beyond)
     tr.cut(S13_T, A, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor?'))
     TRACKS['cs1'] = tr
-    STAGED['cs1'] = [(0, 'ST', HER_F, 'S1 apart'), (10, 'ST', 1.5, 'the lock'), (50, 'ST', HER_F, 'landed'),
+    STAGED['cs1'] = [(0, 'ST', HER_F, 'S1 apart'), (10, 'ST', LOCK_F, 'the lock'), (50, 'ST', HER_F, 'landed'),
                      (720, 'ST', HER_F, 'the end')]
     mark = her_mark(mv)
     # ---- S1: the white mask (hides the game-mode switch, the actor's spawn and her placement)
     s.at(0, K.ovl('white', 0, 2, 2))
     # ---- S2: the lunge f 9.0 -> 1.5 (6-10), the cut stopped at K1 at 10: the gold flash, arcs 14-22, sparks every 3 t 12-30
-    lunge = mv.add('lunge', [cand(floor_pt(d), glide(e('lock') - e('lunge'))) for d in (1.5, 2.2)], 'S2 the lunge to f 1.5')
+    lunge = mv.add('lunge', [cand(floor_pt(d), glide(e('lock') - e('lunge'))) for d in (LOCK_F, LOCK_F + 0.6)], f'S2 the lunge to f {LOCK_F}')
     s.at(e('lunge'), lunge, snd('lunge'))
     for t in range(e('lunge'), e('lock'), 2):
         s.me(t, K.p('afterimage', len=20), y=0)
@@ -1045,15 +1068,8 @@ def build_cs1(W):
     s.at(e('hat_off'), snd('hat_swing')).at(e('hat_on', 2), snd('hat_swing'))
     s.at(e('drink', 6), snd('cs0_sip')).at(e('drink', 20), snd('cs0_sip'))     # (HI) the kit's sip, was a raw stand-in
     s.at(e('props_off'), api.rig('look/props/none'))
-    # ---- S10: a petal drifts past BEHIND her head from frame-left (590-606, 2 b behind her: about 3 b from the lens). Round
-    # V (T1-STAGE-1): 0.6 b before her face it was a 690-px blob over her face for the whole of line 15
-    p1, p2 = PETAL[1], PETAL[2]
-    face = lambda r, u: at_pt(HR(r, u, -2.0))                         # noqa: E731
-    s.at(590, petal_summon(p1, face(1.5, 2.0)), snd('petal_drift'))
-    for t in range(591, 606):
-        u = (t - 590) / 16
-        s.at(t, petal_move(p1, face(1.5 - 3.0 * u, 2.0 - 0.3 * u)))
-    s.at(606, petal_kill(p1))
+    # (round W, T3-PETAL-I3: S10's petal passed behind her head and was never seen: it is gone; the S11 petal falls from above)
+    p2 = PETAL[2]
     # ---- S11 (round W): the second petal FALLS through the close frame's foreground (CUT_T - PETAL_FALL .. CUT_T: 601-647,
     # in the picture from about 609 at a field of view of 90) and her draw meets it at CUT_T: the glowing line and the
     # glint on that tick; the two halves fall apart from the next
@@ -1080,7 +1096,7 @@ def build_cs1(W):
     s.me(e('slash'), K.p('petal_burst', r=20))
     s.me(e('slash', 6), K.p('leaves_dark', n=20), y=6).me(e('slash', 7), K.p('leaves_dark', n=-20), y=6)
     s.at(e('recolour'), api.arena_look('crimson'), api.rig('look/phase/p2'))
-    s.at(e('music'), api.music(2))
+    s.at(e('music'), api.music(2)).at(LOCK['cs1'][1] - HB_PRE, K.ovl(*HB_MASK))
     mv.stage(api.STAGE_FMAX['cs1'])
     head = ('CS1 (hr_design §3.2): the clash, pushed apart, the hat and the bottle, the petal, 홍련일섬, the crimson field; '
             'locked 0-720, skippable 40-560 -> 566.')
@@ -1187,8 +1203,9 @@ def build_repel(W):
     at60 = f'if score #sq_at {OBJ} matches 60'
     at5 = f'if score #sq_at {OBJ} matches 5'
     tr = C.Track('repel', {'ST': STAGE, 'HR': BODY}, LOCK['repel'][1], lift=LIFT, over=OVER, her=her_of('repel'), inside=CAMIN)
-    tr.cut(0, A, ST(-1.2, 0.9, 0.65), KR, 'R0 deflect / R1 blade lock', ('her', 'actor'))
-    tr.move(4, 26 - 1, eye=ST(-1.0, 1.0, 0.65))
+    # (round W: she lands 1.3 b beyond KR, the bodies apart: the lock from the side at its middle, both whole in the picture)
+    tr.cut(0, A, ST(-2.3, 1.35, 1.0), ST(0, 1.6, 1.0), 'R0 deflect / R1 blade lock', ('her', 'actor'))
+    tr.move(4, 26 - 1, eye=ST(-1.9, 1.35, 1.0), look=ST(0, 1.5, 1.0))
     # R2 / R3: further round to the actor's right than the design's ST(1.9, 1.5, -0.4): from there the actor, stepping in to
     # f 0.5, stands before her (shot sheet); here the seized wrist and the hilt on her hat are between the two heads
     tr.cut(26, B, ST(2.2, 1.5, 0.1), ST(0, 1.4, 0.8), 'R2 grab / R3 hat strike', ('her', 'actor'))
@@ -1200,15 +1217,16 @@ def build_repel(W):
     # higher look of H2 were for the old 2.2-b arc)
     tr.cut(78, A, ST(-2.8, 0.7, 1.8), ST(0, 1.2, 2.0), 'R6 the throw', ('her', 'actor'))
     tr.cut(102, B, ST(1.6, 1.2, 4.6), ST(0, 0.6, 2.6), 'R7 over her', ('her', 'actor'))
-    tr.cut(128, A, ST(-2.4, 0.8, 2.6), ST(0, 0.5, 2.8), 'R8 the kick', ('her',))
+    # (round W, T4-REPEL-KICK: the kick was on screen for 3 frames) R8 from 118: the leg drawn back 120-128 and the kick 129 read
+    tr.cut(R8_T, A, ST(-2.4, 0.8, 2.6), ST(0, 0.5, 2.8), 'R8 the kick', ('her',))
     tr.cut(132, B, ST(-5.0, 2.4, -2.0), ST(0, 1.0, 4.0), 'R9 apart (60 % only)', ('her', 'actor'))
     TRACKS['repel'] = tr
-    STAGED['repel'] = [(6, 'ST', 1.3, 'the lock'), (36, 'ST', 1.1, 'the grab'), (68, 'ST', 1.2, 'back to back'),
+    STAGED['repel'] = [(6, 'ST', REPEL_F, 'the lock'), (36, 'ST', 1.1, 'the grab'), (68, 'ST', 1.2, 'back to back'),
                        (101, 'ST', 3.0, 'on her back'), (135, 'ST', 8.0, 'kicked away (60 %)'), (140, 'ST', HER_F, 'the hand-back (60 %)')]
     # ---- R0: she drops onto the raised blade: 1 b above ST(0, 0, 1.0) at tick 0, down to f 1.3 by 6; the gold wash, the gold
     # star and the light column at KR, the deflect
     drop = mv.add('drop', [cand(floor_pt(1.0), 'tp @s ~ ~1 ~')], 'R0 her place at tick 0: 1 b above ST(0, 0, 1.0), the dive\'s end')
-    land = mv.add('land', [cand(floor_pt(d), glide(6)) for d in (1.3, 1.8)], 'R0 down onto the blade: f 1.3 by tick 6')
+    land = mv.add('land', [cand(floor_pt(d), glide(6)) for d in (REPEL_F, REPEL_F + 0.5)], f'R0 down onto the blade: f {REPEL_F} by tick 6')
     s.at(0, gold(0, 4, 3), snd('deflect')).st(0, KR, K.p('clash_gold')).st(0, KR, K.p('light_column'))
     # ---- R1: the blade lock (sparks every 3 t, the blade ticks 8 / 16); R2: her sword wrist seized 36, f 1.1 (30-36)
     for t in range(4, 26, 3):
@@ -1245,6 +1263,7 @@ def build_repel(W):
     up = mv.add('up', [cand(floor_pt(d), glide(5), ok) for d, ok in ((HER_F, OK), (HER_F, OKW), (8.0, OKW))],
                 'R9 to her feet at f 9.0 (135-140)')
     s.at(135, up).st(139, ST(0, 0, 0), snd('land_grass')).at(e('end'), FACE_ACTOR)     # (HI) the kit's landing, was raw
+    s.at(LOCK['repel'][1] - HB_PRE, K.ovl(*HB_MASK))                    # (round W) the hand-back under a short black
     mv.stage(api.STAGE_FMAX['repel'])
     mv.write(W)
     head = ('repel {at:60|5} (hr_design §3.4): the deflect, the blade lock, the grab, the hilt on her hat, two cuts, back to back, '
@@ -1262,7 +1281,7 @@ SEAM_CUT = ('white', 0, 2, 1)      # the opening cut (ovl g, in, hold, out): ful
 LAND_F = 9.0                       # her landing mark: 9 b from the stage origin (toward the moon, else along the stage)
 END_NEAR = 4.5                     # E16: she walks in to 4.5 b
 KE2, KE5 = ST(*api.CONTACT['KE2'][2]), ST(*api.CONTACT['KE5'][2])
-E2_BACK = (ST(4.5, 1.8, 2.2), ST(0, 1.3, 2.7))     # (HF-B, HB-04) E2's eye / look after the pull-back with the shove (80-90)
+E2_BACK = (ST(5.0, 1.8, 2.8), ST(0, 1.3, 3.0))     # (HF-B, HB-04) E2's eye / look after the pull-back with the shove (80-90)
 E16_D = 1.75                                       # (HF-B) E16: the lens before her face, b
 KA = [ST(*api.CONTACT[k][2]) for k in ('KA1', 'KA2', 'KA3', 'KA4')]
 
@@ -1271,21 +1290,25 @@ def build_ending(W):
     s, mv = Seq('ending'), Moves('ending')
     e = lambda k, d=0: ev('ending', k, d)                             # noqa: E731
     tr = C.Track('ending', {'ST': STAGE, 'ST2': STAGE2, 'HR': BODY}, LOCK['ending'][1], lift=LIFT, over=OVER, her=her_of('ending'), inside=CAMIN)
-    tr.cut(0, A, ST(-3.2, 1.3, 2.6), ST(0, 1.1, 3.0), 'E1 she rises', ('her', 'actor'))
-    tr.cut(50, B, ST(1.3, 1.5, 2.2), KE2, 'E2 clash', ('her', 'actor'))
-    # (HF-B, HB-04) the shove (80-90: she to f 6.0, the actor to -0.6) left the close frame empty from 84: B pulls back and
-    # pans with it, both stay in the picture to the cut
+    # (round W: her marks 0.6 b farther from the actor - the locks a swordfighter's distance apart - and the aerial duel replaced by
+    # the exchange on the ground in close shots between face and abdomen, cut between her side, the actor's side and the blades)
+    tr.cut(0, A, ST(-3.6, 1.3, 2.9), ST(0, 1.1, 3.2), 'E1 she rises, the lunge', ('her', 'actor'), full=True)
+    tr.cut(54, B, ST(1.6, 1.45, 2.4), ST(0, 1.45, 2.4), 'E2 clash', ('her', 'actor'))
+    # (HF-B, HB-04) the shove (80-90: she to f 6.6, the actor to -0.6) left the close frame empty: B pulls back and pans with it
     tr.move(80, 90, eye=E2_BACK[0], look=E2_BACK[1], ease='io')
     tr.cut(94, A, ST(1.2, 0.35, 1.2), ST(0, 1.0, -0.4), 'E3 the actor (skid)', ('actor',))
     tr.cut(118, B, ST(-1.8, 0.5, 3.6), ST(0, 1.1, 1.0), 'E3 the actor (dash-cut)', ('actor',))
     tr.cut(150, A, ST(-14.0, 2.2, 5.5), ST(0, 1.0, 5.5), 'E4 the run', ('her', 'actor'))
-    tr.cut(190, B, ST(1.4, 1.5, 3.3), KE5, 'E5 gold flash', ('her', 'actor'))
-    tr.cut(204, A, ST(-3.5, 3.0, 2.8), ST(0, 2.0, 2.9), 'E6 aerial duel (from below)', ('her', 'actor'))
-    tr.move(204, 216, look=ST(0, 6.3, 2.8))                         # the tilt up with the spring
-    tr.cut(240, B, ST(2.6, 6.8, 5.6), ST(0, 6.4, 2.6), 'E6 aerial duel (level)', ('her', 'actor'))
-    tr.cut(276, A, ST(-1.6, 6.2, 0.2), ST(0, 6.5, 2.8), 'E6 aerial duel (behind the actor)', ('her', 'actor'))
-    tr.cut(314, B, ST(-16.0, 3.0, 2.0), HR(0, 1.74, 0), 'E7 apart', ('her',))
-    tr.chase(314, 336)                                              # her arc back to the landing mark (314-334)
+    tr.cut(190, B, ST(1.75, 1.45, 3.6), ST(0, 1.42, 3.6), 'E5 gold flash', ('her', 'actor'))
+    tr.cut(212, A, ST(-1.75, 1.45, 3.65), ST(0, 1.42, 3.65), 'E6 the guard (side)', ('her', 'actor'))
+    tr.cut(222, B, HR(0.85, 1.42, 1.05), HR(0.1, 1.3, 0.45), 'E6 a1, her side', ('her',))
+    tr.cut(234, A, ST(-1.0, 1.5, 3.35), ST(0.05, 1.4, 2.5), 'E6 the actor', ('actor',))
+    tr.cut(250, B, ST(1.6, 1.05, 3.45), ST(0, 1.65, 3.3), 'E6 a2, the blades (low)', ('her', 'actor'))
+    tr.cut(270, A, HR(-0.8, 1.42, 1.0), HR(-0.1, 1.3, 0.4), 'E6 her, the wind-up', ('her',))
+    tr.cut(280, B, ST(-1.45, 1.85, 6.0), ST(0.1, 1.35, 3.0), 'E6 a3, over her shoulder', ('actor', 'her'))
+    tr.cut(292, A, ST(-1.75, 1.45, 3.65), ST(0, 1.42, 3.65), 'E6 a4 the lock (side)', ('her', 'actor'))
+    # E7: the spring back seen at its landing: low before her landing mark (ST2 is made at the push-off, 304)
+    tr.cut(312, B, ST2(1.3, 0.75, 10.6), ST2(0, 1.0, 8.2), 'E7 the spring, the landing', ('her',))
     tr.cut(338, A, WP(880, 206, 30), MOON, 'E8 the field', ('moon',))
     tr.cut(378, B, ST2(0.8, 1.2, 4.6), HR(0, 1.3, 0), 'E9 sheathe', ('her',))
     # (HF-B, HB-06: lines 17-22 on shots close on her) line 17 (420-477): the sheathe from 1.3 b, her face over the hands at
@@ -1312,18 +1335,19 @@ def build_ending(W):
     tr.move(1094, 1153, eye=ST2(0.4, 1.6, END_NEAR - E16_D))
     tr.cut(1212, A, HR(0.15, 1.5, 1.15), HR(0, 1.6, 0), 'E17 the hat tip', ('her',))
     TRACKS['ending'] = tr
-    STAGED['ending'] = [(0, 'ST', 4.2, 'lying'), (22, 'ST', 4.6, 'up'), (54, 'ST', 2.9, 'the lunge'), (86, 'ST', 6.0, 'shoved back'),
-                        (136, 'ST', 11.0, 'out of reach'), (188, 'ST', 4.0, 'the run'), (334, 'ST2', LAND_F, 'landed'),
+    STAGED['ending'] = [(0, 'ST', 4.8, 'lying'), (22, 'ST', 5.2, 'up'), (54, 'ST', 3.5, 'the lunge'), (86, 'ST', 6.6, 'shoved back'),
+                        (136, 'ST', 11.0, 'out of reach'), (188, 'ST', EX_F, 'the run'), (262, 'ST', EX_IN, 'the overhead'),
+                        (310, 'ST', EX_OFF, 'pushed off'), (334, 'ST2', LAND_F, 'landed'),
                         (1154, 'ST2', END_NEAR, 'the greeting')]
     # ---- E1: the hard cut (a white flash at tick 0: under it the game-mode switch, the actor, her place on her back at f 4.2);
     # she kips up 6-22 to f 4.6, raises the sword (the violet glow 30-48)
-    lie = mv.add('lie', [cand(floor_pt(d), TP) for d in (4.2, 3.4, 2.6)], 'E1 her place at tick 0: on her back at f 4.2')
+    lie = mv.add('lie', [cand(floor_pt(d), TP) for d in (4.8, 4.0, 3.2)], 'E1 her place at tick 0: on her back at f 4.8')
     s.at(0, K.ovl(*SEAM_CUT))
-    s.at(e('up'), mv.add('up', [cand(floor_pt(4.6), glide(16))], 'E1 up to f 4.6'))
+    s.at(e('up'), mv.add('up', [cand(floor_pt(5.2), glide(16))], 'E1 up to f 5.2'))
     s.at(e('raise', 2), api.rig('look/blade/violet'), snd('blade_charge')).at(48, api.rig('look/blade/off'))
     # ---- E2: both lunge (50-54, she to f 2.9), the brim grazed 52, the lock at KE2 56-80 (sparks every 3 t), the burst at 70,
     # shoved back to f 6.0 (80-86)
-    s.at(e('lunge'), mv.add('lunge', [cand(floor_pt(d), glide(4)) for d in (2.9, 3.4)], 'E2 the lunge to f 2.9'))
+    s.at(e('lunge'), mv.add('lunge', [cand(floor_pt(d), glide(4)) for d in (3.5, 4.0)], 'E2 the lunge to f 3.5'))
     s.fx(e('graze'), 'hat_crown', K.p('clash_spark'))
     s.at(e('lock'), snd('blade_lock'))       # (HI) the kit's blade lock (as CS1's K1), was a raw stand-in
     for t in range(e('lock'), e('shove'), 3):
@@ -1331,7 +1355,7 @@ def build_ending(W):
     s.at(e('burst'), gold(0, 1, 2), snd('bolt_crackle')).st(e('burst'), KE2, K.p('clash_gold'))
     for t in (e('burst'), e('burst', 2), e('burst', 4)):
         s.st(t, KE2, K.p('clash_arc'))
-    s.at(e('shove'), mv.add('shove', [cand(floor_pt(d), glide(6)) for d in (6.0, 5.0)], 'E2 shoved back to f 6.0'))
+    s.at(e('shove'), mv.add('shove', [cand(floor_pt(d), glide(6)) for d in (6.6, 5.6)], 'E2 shoved back to f 6.6'))
     # ---- E3: the actor skids (steps 96 / 100), dash-cuts into the air (120-124: the white crescent and the afterimage at it);
     # she springs back out of reach to f 11 (116-136)
     s.st(96, ST(0, 0, -1.0), snd('grass_step')).st(100, ST(0, 0, -1.4), snd('grass_step'))
@@ -1339,22 +1363,26 @@ def build_ending(W):
     s.st(120, ST(0, 1.2, 0.5), raw('entity.player.attack.sweep', 0.7, 1.3))
     s.st(121, ST(0, 1.2, 0.8), K.p('qi_arc', r=26, yaw=0, pitch=0, roll=0, c=api.C_WHITE)).st(121, ST(0, 0, 0.2), K.p('afterimage', len=20))
     # ---- E4: both run in (150-188; she f 11 -> 4.0 at 0.18 b/t), steps every 4 t; E5: cut meets cut at KE5 at 190 (gold)
-    s.at(e('run'), mv.add('run', [cand(floor_pt(d), glide(38)) for d in (4.0, 4.6)], 'E4 the run to f 4.0'))
+    s.at(e('run'), mv.add('run', [cand(floor_pt(d), glide(38)) for d in (EX_F, EX_F + 0.6)], f'E4 the run to f {EX_F}'))
     for t in range(e('run'), 188, 4):
         s.at(t, snd('grass_step'))
     s.at(e('clash'), gold(0, 6, 6), snd('clash_big')).st(e('clash'), KE5, K.p('clash_gold'))
-    # ---- E6: the aerial duel: both spring up 204-216 (she to ST(0, 6.0, 3.6)), the cuts at 228 / 262 / 286, the lock 298-304
-    air = lambda r, u, f, t: cand(at_pt(ST(r, u, f)), glide(t))       # noqa: E731
-    s.at(e('rise'), mv.add('rise', [air(0, 6.0, 3.6, 12)], 'E6 up to ST(0, 6.0, 3.6)'))
-    s.at(222, mv.add('a1', [air(0, 6.0, 3.2, 6)], 'E6 the passing cut: in to f 3.2'))
-    s.at(250, mv.add('a2', [air(0, 6.4, 3.4, 12)], 'E6 the overhead cut: up to u 6.4'))
-    s.at(276, mv.add('a3', [air(0, 6.0, 3.3, 10)], 'E6 the big one'))
+    # ---- E6 (round W, w_brief §4.6; the user: the aerial duel "as if thrusters were attached"): the exchange on the ground, 2.25 b
+    # apart. At every clash a burst of sparks at the blades' crossing point (clash_spark x 3 over 3 t, the gold flash card and arcs),
+    # a flash and a ringing sound; the lock at KA4 throws sparks every 2 t. She steps in for the overhead (254-262) and back
+    s.at(254, mv.add('ex_in', [cand(floor_pt(d), glide(8)) for d in (EX_IN, EX_F)], f'E6 the step in to f {EX_IN} (the overhead cut)'))
+    s.at(266, mv.add('ex_back', [cand(floor_pt(d), glide(8)) for d in (EX_F, EX_F + 0.4)], f'E6 back to f {EX_F}'))
     for i, k in enumerate(('a1', 'a2', 'a3', 'a4')):
-        s.st(e(k), KA[i], K.p('clash_gold'))
-        if k != 'a4':
-            s.st(e(k), KA[i], snd('air_slash'))
-    s.st(e('a2'), KA[1], snd('air_clash'))
+        t = e(k)
+        s.st(t, KA[i], K.p('clash_gold')).st(t, KA[i], K.p('clash_spark')).st(t + 1, KA[i], K.p('clash_spark')).st(t + 2, KA[i], K.p('clash_spark'))
+        s.st(t, KA[i], K.p('clash_arc')).st(t + 2, KA[i], K.p('clash_arc'))
+    for t in range(e('a4', 2), e('off'), 2):
+        s.st(t, KA[3], K.p('clash_spark'))
+    s.st(e('a1'), KA[0], snd('air_slash')).at(e('a1'), gold(0, 1, 2))
+    s.st(e('a2'), KA[1], snd('air_clash')).at(e('a2'), gold(0, 1, 2))
     s.at(e('a3'), gold(0, 3, 6)).st(e('a3'), KA[2], snd('air_white'))
+    s.st(e('a4'), KA[3], snd('blade_lock'))
+    s.at(e('off'), mv.add('off', [cand(floor_pt(d), glide(6)) for d in (EX_OFF, EX_F)], f'E6 pushed off to f {EX_OFF}'))
     # ---- E7: pushed off 304, she flies back in an arc to her landing mark (314-334): 9 b from the stage origin toward the
     # moon when that passes mv/ok, else along the stage. ST2 = the same origin facing that mark (made at 314)
     mp = api.MOON_POS
@@ -1366,9 +1394,10 @@ def build_ending(W):
         f'{api.xyz((mp[0], CY, mp[2]), 3)} run tp @s ~ ~ ~ ~ 0',
         f'execute store result storage rlk:{OBJ} seq.face.yaw float 0.01 run data get entity {STAGE2} Rotation[0] 100'],
         'E7 ST2: the stage origin facing her landing mark (toward the moon when that point passes mv/ok, else as ST)')
-    fly = mv.add('fly', [cand(floor_pt(d, frame='ST2'), leap(20, 40)) for d in (LAND_F, 8.0, 7.0)],
-                 'E7 the arc to her landing mark, 9 b from the stage origin (apex 4 b over the path)')
-    s.at(e('fly'), mk2, fly).st(316, ST(0, 3.0, 3.0), K.p('petals_wind'))
+    fly = mv.add('fly', [cand(floor_pt(d, frame='ST2'), leap(20, FLY_H)) for d in (LAND_F, 8.0, 7.0)],
+                 f'E7 the spring back to her landing mark, 9 b from the stage origin (apex {FLY_H / 10} b: round W)')
+    # (round W: ST2 is made at the push-off, so that E7's camera, prepared 3 t before the spring, can stand in it)
+    s.at(e('off'), mk2).at(e('fly'), fly, snd('leap')).st(316, ST(0, 1.5, EX_OFF), K.p('petals_wind'))
     s.st(330, ST(0, 0, 0), snd('land_far')).at(e('land'), snd('land_far'))
     # ---- E8: she rises and turns to the actor (338-350); the actor is turned to ST2 (char/cine/face, 12 t)
     face2 = [f'function rlk:char/cine/face with storage rlk:{OBJ} seq.face'] if api.actor_ready() else []

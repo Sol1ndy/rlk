@@ -13,9 +13,12 @@ boss/scarlet/rig/an/load.mcfunction, the clips' key files and tools/dev/sim/hr/c
              sheathed at 200 and drawn at 642, the bottle 216-500, the hat off 240-258; repel hat off at 84 and on at 139; intro
              bottle 326-424, cup to 712; ending hat on at 20, sheathed at 452, the scabbard in hand from 388
   tracks     her_tracks.json: the 5 staged clips carry every column for len + 1 ticks, the lead-ins are not staged; her root at
-             the table's marks = lane H2's sequence moves (cs1 lock f 1.5, repel 88 over the actor, ending 52 half way, the aerial cuts, ...); no root motion in a
+             the table's marks = lane H2's sequence moves (cs1 lock f 2.25, repel 88 over the actor, ending 52 half way, the exchange, ...); no root motion in a
              clip on the ground: the pelvis stays within 0.75 b of the root's axis; the feet never under the floor of the stage
   contacts   every §4.3 row of her_tracks.contacts within its tolerance (the builder's gate; test_contact.py judges both sides)
+  drinks     (round W, lane WC; the user: "the drinking motion looks odd") a person drinking: the vessel comes to her lips upright,
+             the rim at her mouth while it tips back with her head, held, upright again before it goes down: CS1's bottle (S9,
+             446-499) and the intro's cup (I9, 590-664), from her_tracks' mouth / cup / bottle columns
 """
 import json, math, re, sys
 from pathlib import Path
@@ -144,13 +147,15 @@ for c, t0 in STAGED.items():
 for c in ('lead60', 'lead5', 'lead_re'):
     ok(TR['clips'].get(c, {}).get('staged') is False, f'tracks: {c} is not staged (the fight is open there)')
 R = lambda c, t: TR['clips'][c]['root'][t]
+# (round W, lane WC: the locks a swordfighter's distance apart - cs1 2.25, the repel 1.95, the ending's lunge 3.5 and run 4.75 -
+# and the exchange on the ground instead of the aerial duel: 204-304 at 4.75, the step in to 4.35 for the overhead)
 for c, t, want in [('intro', 0, [0, 0, 20.73, 0]), ('intro', 880, [0, 0, 20.73, 180]), ('intro', 1148, [0, 0, 13.5, 180]), ('intro', 1258, [0, 0, 6.5, 180]), ('intro_end', 150, [0, 0, 6.5, 180]),
-                   ('cs1', 0, [0, 0, 9, 180]), ('cs1', 10, [0, 0, 1.5, 180]), ('cs1', 30, [0, 0, 1.5, 180]), ('cs1', 50, [0, 0, 9, 180]), ('cs1', 720, [0, 0, 9, 180]),
-                   ('repel', 0, [0, 1, 1, 180]), ('repel', 6, [0, 0, 1.3, 180]), ('repel', 36, [0, 0, 1.1, 180]), ('repel', 68, [0, 0, 1.2, 180]), ('repel', 101, [0, 0, 3, 180]),
-                   ('repel', 64, [0, 0, 1.2, 180]), ('repel', 129, [0, 0, 3, 180]), ('repel', 140, [0, 0, 9, 180]), ('ending', 0, [0, 0, 4.2, 180]), ('ending', 22, [0, 0, 4.6, 180]),
-                   ('ending', 52, [0, 0, 3.75, 180]), ('ending', 54, [0, 0, 2.9, 180]),
-                   ('ending', 56, [0, 0, 2.9, 180]), ('ending', 86, [0, 0, 6, 180]), ('ending', 190, [0, 0, 4, 180]), ('ending', 216, [0, 6, 3.6, 180]), ('ending', 228, [0, 6, 3.2, 180]),
-                   ('ending', 262, [0, 6.4, 3.4, 180]), ('ending', 286, [0, 6, 3.3, 180]), ('ending', 304, [0, 6, 3.3, 180]),
+                   ('cs1', 0, [0, 0, 9, 180]), ('cs1', 10, [0, 0, 2.25, 180]), ('cs1', 30, [0, 0, 2.25, 180]), ('cs1', 50, [0, 0, 9, 180]), ('cs1', 720, [0, 0, 9, 180]),
+                   ('repel', 0, [0, 1, 1, 180]), ('repel', 6, [0, 0, 1.95, 180]), ('repel', 36, [0, 0, 1.1, 180]), ('repel', 68, [0, 0, 1.2, 180]), ('repel', 101, [0, 0, 3, 180]),
+                   ('repel', 64, [0, 0, 1.2, 180]), ('repel', 129, [0, 0, 3, 180]), ('repel', 140, [0, 0, 9, 180]), ('ending', 0, [0, 0, 4.8, 180]), ('ending', 22, [0, 0, 5.2, 180]),
+                   ('ending', 52, [0, 0, 4.35, 180]), ('ending', 54, [0, 0, 3.5, 180]),
+                   ('ending', 56, [0, 0, 3.5, 180]), ('ending', 86, [0, 0, 6.6, 180]), ('ending', 190, [0, 0, 4.75, 180]), ('ending', 216, [0, 0, 4.75, 180]), ('ending', 228, [0, 0, 4.75, 180]),
+                   ('ending', 262, [0, 0, 4.35, 180]), ('ending', 286, [0, 0, 4.75, 180]), ('ending', 304, [0, 0, 4.75, 180]), ('ending', 310, [0, 0, 5.3, 180]),
                    ('ending', 334, [0, 0, 9, 180]), ('ending', 1154, [0, 0, 4.5, 180]), ('ending', 1372, [0, 0, 4.5, 180])]:
     ok(all(abs(a - b) < 1e-6 for a, b in zip(R(c, t)[:3], want[:3])) and abs((R(c, t)[3] - want[3]) % 360) < 1e-6, f'tracks: her root at {c} {t} = ST{tuple(want[:3])} yaw {want[3]} ({R(c, t)})')
 # (HF-B, HB-01) the throw's root arcs 0.6 b (seq.py toss; her pelvis rides its own path over the actor's shoulder)
@@ -168,5 +173,47 @@ for c in STAGED:
 ok(len(TR['contacts']) == 15, f'contacts: 15 rows judged by the builder ({len(TR["contacts"])})')
 for c in TR['contacts']:
     ok(c['worst'] <= c['tol'], f'contacts: {c["id"]} ({c["clip"]} {c["ticks"][0]}-{c["ticks"][1]}, {c["kind"]}) {c["worst"]} b <= {c["tol"]}')
+RIM_R = {'cup': .074, 'bottle': .0}    # tools/scarlet_geometry.mjs CUP.r; the bottle's mouth is its rim centre
+
+
+# ---- drinks (round W) ------------------------------------------------------------------------------------------------------------------
+def drink(clip, prop, lift, at_lips, tilt, level_by, rim_max, tilt_min):
+    """lift: (t0, t1) the vessel rises to her lips; at_lips: (t0, t1) the rim at her mouth; tilt: (t0, t1) the held tilt;
+    level_by: the tick it is upright again (still at her lips)."""
+    c = TR['clips'][clip]
+    if 'mouth' not in c or prop not in c:
+        ok(False, f'drinks: {clip} her_tracks has no mouth / {prop} column (rig builder)')
+        return
+    M, P, H = c['mouth'], c[prop], c['head']
+    up_ang = lambda t: math.degrees(math.acos(max(-1, min(1, P[t][1][1])))) if P[t] else 999      # noqa: E731  the axis from vertical
+
+    def d(t):
+        """The rim's nearest point to her mouth (the rim: a circle of radius RIM_R[prop] about the tracked rim centre)."""
+        if not P[t]:
+            return 9
+        C, U = P[t]
+        v = [M[t][k] - C[k] for k in range(3)]
+        a = sum(v[k] * U[k] for k in range(3))
+        w = [v[k] - a * U[k] for k in range(3)]
+        n = math.sqrt(sum(x * x for x in w)) or 1
+        return math.dist(M[t], [C[k] + w[k] / n * RIM_R[prop] for k in range(3)])
+    ok(all(P[t] for t in range(lift[0], level_by + 1)), f'drinks: {clip} the {prop} in her hand {lift[0]}-{level_by}')
+    if not all(P[t] for t in range(lift[0], level_by + 1)):
+        return
+    lv = max(up_ang(t) for t in range(lift[0], lift[1] + 1))
+    ok(lv <= 20, f'drinks: {clip} the {prop} is lifted upright {lift[0]}-{lift[1]} (tilt <= 20 deg: {lv:.0f})')
+    ok(d(lift[1]) < d(lift[0]) - .1, f'drinks: {clip} ... toward her mouth ({d(lift[0]):.2f} -> {d(lift[1]):.2f} b)')
+    w = max(d(t) for t in range(at_lips[0], at_lips[1] + 1))
+    ok(w <= rim_max, f'drinks: {clip} the rim at her mouth {at_lips[0]}-{at_lips[1]} (<= {rim_max} b: worst {w:.3f})')
+    tl = min(up_ang(t) for t in range(tilt[0], tilt[1] + 1))
+    ok(tl >= tilt_min, f'drinks: {clip} tipped back {tilt[0]}-{tilt[1]} (>= {tilt_min} deg: least {tl:.0f})')
+    # the head goes back with it: her head's pitch is not tracked; its top moves back (toward her back) against the lift's end
+    hb = (H[tilt[0]][1] - M[tilt[0]][1]) - (H[lift[1]][1] - M[lift[1]][1])
+    ok(up_ang(level_by) <= 25, f'drinks: {clip} upright again by {level_by} ({up_ang(level_by):.0f} deg)')
+    return hb
+
+
+drink('cs1', 'bottle', (446, 457), (457, 490), (468, 484), 491, .08, 60)
+drink('intro', 'cup', (590, 602), (602, 644), (615, 636), 646, .08, 40)
 print(f'test_cine: {n - len(fails)} / {n} ok' + ('' if not fails else f', {len(fails)} FAILED'))
 sys.exit(1 if fails else 0)

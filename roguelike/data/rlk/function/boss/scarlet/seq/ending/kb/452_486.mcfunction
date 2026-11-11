@@ -1,4 +1,0 @@
-# ending: the timeline, the ticks 452..486.
-execute if score #sq hr matches 452 run return run function rlk:boss/scarlet/seq/ending/k/452
-execute if score #sq hr matches 478 run return run function rlk:boss/scarlet/seq/ending/k/478
-execute if score #sq hr matches 486 run return run function rlk:boss/scarlet/seq/ending/k/486

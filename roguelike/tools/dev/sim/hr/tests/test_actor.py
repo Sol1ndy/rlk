@@ -461,7 +461,7 @@ if want('clips'):
             check(f'{k}: contact {name} within {r["tol"]}', r['worst'] <= r['tol'], f'{r["worst"]} at {r["at"]}')
     cont = {n: c for n, c in MAN['contact'].items()}
     check('clips: the 13 actor-side contacts of §4.3', set(cont) == {'K1', 'KR', 'KW', 'KH', 'KS', 'KK', 'KG', 'KE2', 'KE5', 'KA1', 'KA2', 'KA3', 'KA4'}
-          and cont['K1']['p'] == [0, 1.45, .75] and cont['KR']['p'] == [0, 1.55, .65] and cont['KA4']['p'] == [0, 6.9, 2.6] and cont['KK']['p'] == [0, .35, 2.7])
+          and cont['K1']['p'] == [0, 1.45, .95] and cont['KR']['p'] == [0, 1.55, .65] and cont['KA4']['p'] == [0, 1.5, 3.45] and cont['KK']['p'] == [0, .35, 2.7])   # (round W: the locks apart, the exchange on the ground)
     # blade rows re-measured from the manifest columns (root of the blade .. tip)
     def seg(P, a, b):
         ab = [y - x for x, y in zip(a, b)]

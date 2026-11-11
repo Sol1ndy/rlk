@@ -295,7 +295,7 @@ export function points(p) {
     hand_r: at('right_forearm', [0, -SK.fore, 0]), hand_l: at('left_forearm', [0, -SK.fore, 0]),
     foot_r: at('right_shin', [0, -SK.shin - SOLE, 0]), foot_l: at('left_shin', [0, -SK.shin - SOLE, 0]),
     knee_r: at('right_shin', [0, 0, 0]), knee_l: at('left_shin', [0, 0, 0]),
-    head: at('head', [0, .25, 0]), chest: at('body', [0, -.3, 0]), hip: A(add([0, .75, 0], p.shift)),
+    head: at('head', [0, .25, 0]), chest: at('body', [0, -.3, 0]), waist: at('body', [0, -.7, 0]), hip: A(add([0, .75, 0], p.shift)),
     shoulder_r: at('right_arm', [0, 0, 0]), shoulder_l: at('left_arm', [0, 0, 0]),
   };
 }
