@@ -12,8 +12,8 @@ the scratchpad survived, nothing was lost.)
       into an empty `boss/scarlet` + `char/cine` (scratch copy) gives the same file set and the same pack (no stale file)
 - [x] hi_todo 1 / 2 / 3 / 5 / 9 / 10 / 12 + raw sounds (3477dbf81); the full-fight run `test_flow.py`, hi_todo 11, test_rig
       green (55a18e7e5); test_bal_hr's q rows rebased on FB's rule, README (this commit)
-- [ ] the final gates on the final tree (running: `gen_check_hr --rp`, `test_seq`, the suite runner), pack README, numbers
-      below, final report
+- [x] the final gates on the final tree (c762caac1 + this commit: gen_check_hr 28 / 28), pack README (`hi_rp_readme.diff`),
+      the integration pack zip `<S>/hi_out/rlk_hud_resourcepack_hi.zip`
 
 ## Merge conflicts and how each was resolved
 | merge | file | kind | resolution |
@@ -71,7 +71,7 @@ Suite fixes made at HI for lane interactions (none hides a defect; each now chec
   (README 0-9: its source order follows the generators' run order; with the documented order rig → kit → player rig the
   player rig's aliases come last, a rig-only build re-appends the scarlet skin entry) and requires the second build
   byte-identical. First run (before the fix, 19 min): only those two rows failed; G3 (documented and reverse order), G4
-  (strays incl. `p/q/`, hi_todo 4) passed.
+  (strays incl. `p/q/`, hi_todo 4) passed. **Second run on the final tree: 28 / 28 (18 min).**
 
 ## The full-fight run (`tools/dev/sim/hr/tests/test_flow.py`, 40 checks, ~1 min)
 Real rift, core, sequences with the lock (camsim), kit; the actor's calls modelled as seqsim does (test_actor runs the real
@@ -108,4 +108,11 @@ bash $S/hi_tools/run_suites.sh     # every hr suite but test_seq / gen_check_hr 
   release pack's README). The integration pack: `<S>/hi_out/rlk_hud_resourcepack_hi.zip` (11 919 KB, 4 868 files).
 
 ## Next
-- collect the gate results (below), pack README, commit, push, final report.
+- Nothing open for this lane. After HI: the independent review, then the balance pass (hi_todo 7), then the in-game list
+  (hi_todo 8) and the release (README 0-5: build stamp, 0-10, the pack README's version line + `hi_rp_readme.diff`).
+- For the review, first: (1) the FB / H1 interaction (q's ghost lunge takes no balance: refused, not pending); (2) the lane
+  C / H2 order in rlk:tick (near pass after FN-cam's lines); (3) the camera stands outlive a pause until the resume's
+  cancel (invisible markers; the player is released at once); (4) the I18 push-in (numbers from her_tracks only); (5)
+  hi_todo 11's three bounded leftovers; (6) kit sound recipes the rebuilt sequences no longer call (cloth, draw_ring,
+  glint_ring, black_drop, brim_ring, repel_lock, tip_over, band_*, scab_swing, moon_gaze, pivot_cloth, dark_*); (7) the
+  arena build slice at 5 140 commands (11-06's theme, unchanged).
