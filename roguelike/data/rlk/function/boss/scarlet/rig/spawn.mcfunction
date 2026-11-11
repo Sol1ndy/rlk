@@ -4,7 +4,7 @@ function rlk:boss/scarlet/rig/init
 function rlk:boss/scarlet/rig/kill
 execute unless score @s hrRigForm matches 0..1 run scoreboard players set @s hrRigForm 0
 execute unless score @s hrRigPh matches 0..1 run scoreboard players set @s hrRigPh 0
-execute unless score @s hrRigBl matches 0..4 run scoreboard players set @s hrRigBl 0
+execute unless score @s hrRigBl matches 0..5 run scoreboard players set @s hrRigBl 0
 execute unless score @s hrRigFc matches 0..2 run scoreboard players set @s hrRigFc 0
 execute unless score @s hrRigHR matches 0..2 run scoreboard players set @s hrRigHR 0
 execute unless score @s hrRigHL matches 0..2 run scoreboard players set @s hrRigHL 1

@@ -155,6 +155,11 @@ SPRITES = {
     'moon_halo': [(f'moon_halo_{k}', (96, 96), UNIT, P.make_halo(k), 2) for k in range(2)],
     'disc': [(f'disc_{k}', (64, 64), UNIT, P.make_disc(k), 2) for k in range(2)],
     'seat_rock': [],                    # vanilla items (tuff, a potion bottle, a flower-pot cup): 0 px
+    # round V (lane VB; v_brief.md §3 VB 2-3; api.KIT_SPRITES_HR): the drawn blade path, its head, the slash sector's three
+    # fading frames. tools/mboss_scarlet/blade.py summons their cards from the rig's blade track (not through fx/card).
+    'sw_path': [('sw_path', (16, 16), (-0.5, 0.5, 0, 1), P.paint_sw_path, 4)],
+    'sw_head': [('sw_head', (64, 64), UNIT, P.paint_sw_head, 3)],
+    'sw_arc': [(f'sw_arc_{k}', (64, 64), (-0.5, 0.5, 0, 1), P.make_sw_arc(k), 3) for k in range(3)],
 }
 GATE_ICON = ('gate_icon', (64, 64), UNIT, P.paint_gate_icon, 2)      # rlk:mboss/hr_kit/gate_icon (api.GATE_ICON_MODEL)
 TEXTURES = {stem: (wh, box, fn, ss) for rows in SPRITES.values() for stem, wh, box, fn, ss in rows}
@@ -237,6 +242,11 @@ KINDS = {
     **{f'qi_arcf_{k}': ('face', f'qi_arc_{k}', ARC_BOX, False, f'sword-qi crescent frame {k} standing across the aim '
                         '(a slanted slash, rolled in the screen plane)') for k in range(4)},
     'qi_wedgef': ('face', 'qi_wedge', (-0.25, 0.25, 0, 1), False, 'sword-qi wedge standing across the aim, the point at b 1'),
+    # round V (lane VB): the cards of tools/mboss_scarlet/blade.py (literal summons on pattern ticks; never through fx/card)
+    'sw_path': ('lance', 'sw_path', (-0.5, 0.5, 0, 1), True, 'the drawn blade path: one straight piece along +z (tinted)'),
+    'sw_head': ('face', 'sw_head', SQ, True, 'the head running along the blade path (tinted)'),
+    **{f'sw_arc_{k}': ('flat', f'sw_arc_{k}', (-0.5, 0.5, 0, 1), True, f'the slash: one sector of the blade\'s sweep, apex at b 0, '
+                       f'fading frame {k} (tinted)') for k in range(3)},
 }
 # The arrival tear: the dungeon rift's item models (tools/build_rift.py), referenced (no px of ours); without them in the
 # pack the item definitions fall back to the ghost flash card.
@@ -1083,8 +1093,11 @@ def _p_glint(c):
         # first tick (1.5 -> 1.9 b, turning: >= 1.0 b on the F5 screen at once), a smaller white one crossing it at 45 deg and a
         # pink glint inside (the cue's old colour as an accent); end-rod motes. Unlike the flashes: no ring (yellow, purple),
         # no horizontal flare (yellow), no sphere (blue), and at her blade, not on her chest.
-        return [card('cue_0', '~ ~ ~', bb='center', spin=60, s0=1.5, s1=1.9, life=7, fade=2, col=WHITE),
-                card('cue_0', '~ ~ ~', bb='center', roll=45, spin=-40, s0=0.6, s1=1.0, life=6, fade=2, col=WHITE),
+        # Round V (lane VB, v_brief §3 VB 2; review v C2: the white-gold star was lost on her white hat over the pale straw grass
+        # of the P1 field): cue_0 now carries a dark rim round its core and rays (mboss_hr_fx_paint.paint_cue) and is larger
+        # (1.9 -> 2.3 b): it reads on white, on straw and on crimson alike.
+        return [card('cue_0', '~ ~ ~', bb='center', spin=60, s0=1.9, s1=2.3, life=7, fade=2, col=WHITE),
+                card('cue_0', '~ ~ ~', bb='center', roll=45, spin=-40, s0=0.8, s1=1.2, life=6, fade=2, col=WHITE),
                 card('glint_0', '~ ~ ~', bb='center', roll=22, spin=-60, s0=0.3, s1=0.6, life=6, fade=2, col=TINT[c])] + \
             [part('end_rod', '~ ~ ~', (0.15, 0.15, 0.15), 0.02, 6)] + c_parts(c, '~ ~ ~', (0.12, 0.12, 0.12), 4)
     return [card('glint_0', '~ ~ ~', bb='center', spin=90, s0=0.2, s1=1.1, life=6, fade=3, col=TINT[c]),
@@ -1095,7 +1108,10 @@ def _p_glint(c):
 @preset('star4', 'A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.3 b): lilac, a '
         'white glint inside, for 6 t.')
 def _p_star4():
-    return [card('glint_1', '~ ~ ~', bb='center', spin=30, s0=0.6, s1=1.3, life=6, fade=2, col=LILAC_PALE),
+    # round V (v_brief §3 VB 2: the chest flashes large enough to see past the avatar; review v C5: none could be found in the
+    # footage): the thin star in its circle 1.3 -> 2.4 b, and a bold purple star with a dark rim (sw_head) inside it
+    return [card('glint_1', '~ ~ ~', bb='center', spin=30, s0=1.2, s1=2.4, life=6, fade=2, col=FLASH_PURPLE),
+            card('sw_head', '~ ~ ~', bb='center', roll=45, s0=0.9, s1=1.5, life=6, fade=2, col=FLASH_PURPLE),
             card('glint_0', '~ ~ ~', bb='center', s0=0.3, s1=0.8, life=5, fade=2, col=WHITE),
             dust(DUSTC[1], 1.0, '~ ~ ~', (0.3, 0.3, 0.3), 6)]
 
@@ -1103,7 +1119,9 @@ def _p_star4():
 # H1c (hr_design §2.2 kcut "big: yellow_tell at diameter 2.0"): the size rides on {t} so the contract's one argument and every
 # existing call stay as they are: t >= 100 = the big tell for t - 100 ticks (the sphere 2.0 b, the flare 5 b).
 YELLOW_BIG = 100
-YELLOW_D = (16, 20)                    # the sphere's diameter (tenths): the tell / the big tell
+YELLOW_D = (24, 30)                    # the sphere's diameter (tenths): the tell / the big tell (round V: 16 / 20 -> 24 / 30,
+#                                        v_brief §3 VB 2: seen past the avatar's head from the F5 camera)
+FLASH_PURPLE = rgb('#D68BFF')          # round V: the purple flash's colour (= blade.COL['purple'], the path of its hit)
 
 
 @preset('yellow_tell', 'The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: '
@@ -1119,6 +1137,8 @@ def _p_yellow_tell():
     return [mac(card('yellow_tell_0', '~ ~ ~', bb='center', s0='$(s0)', s1='$(s)', life='$(t)', fade=2, dur=3)),
             mac(card('yellow_tell_1', '~ ~ ~', bb='center', s0=('$(f0)', 1.0, 1.0), s1=('$(f1)', 1.4, 1.0), life='$(t)', fade=2,
                      dur=3)),
+            # round V: a bold yellow star with a dark rim inside the sphere (yellow on the straw grass of P1 has no contrast)
+            mac(card('sw_head', '~ ~ ~', bb='center', s0=0.8, s1=1.3, life='$(t)', fade=2, dur=3, col=YELLOW)),
             dust(DUSTC[3], 1.4, '~ ~ ~', (0.5, 0.5, 0.5), 12), part('end_rod', '~ ~ ~', (1.2, 0.05, 0.05), 0.0, 6)]
 
 
@@ -1534,9 +1554,12 @@ def _p_flash_blue():
     y = FLASH_YELLOW_T
     return [card('yellow_tell_0', '~ ~ ~', bb='center', s0=0.4, s1=1.5, life=y + 1, fade=1, dur=3),
             card('yellow_tell_1', '~ ~ ~', bb='center', s0=(0.6, 1.0, 1.0), s1=(1.8, 1.3, 1.0), life=y + 1, fade=1, dur=3),
-            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.25, s1=1.8, life='$(t)', fade=2, dly=y, dur=3, col=BLUE)),
-            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.3, s1=1.86, life='$(t)', fade=2, dly=y, dur=3, col=BLUE_MID)),
-            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.8, s1=2.15, life=5, fade=2, dly='$(d2)', dur=2, col=BLUE_PALE)),
+            # round V (v_brief §3 VB 2; review v C5: a 25-30 px orb half hidden by the avatar's head): the sphere 1.8 -> 2.6 b and
+            # a bold blue star with a dark rim inside it
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.8, s1=2.6, life='$(t)', fade=2, dly=y, dur=3, col=BLUE)),
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=1.9, s1=2.7, life='$(t)', fade=2, dly=y, dur=3, col=BLUE_MID)),
+            mac(card('blink_bubble', '~ ~ ~', bb='center', s0=2.6, s1=3.1, life=5, fade=2, dly='$(d2)', dur=2, col=BLUE_PALE)),
+            mac(card('sw_head', '~ ~ ~', bb='center', s0=0.8, s1=1.3, life='$(t)', fade=2, dly=y, dur=3, col=BLUE_MID)),
             card('glint_0', '~ ~ ~', bb='center', s0=0.4, s1=1.2, life=4, fade=2, dly=y, col=BLUE_PALE),
             dust(DUSTC[3], 1.2, '~ ~ ~', (0.4, 0.4, 0.4), 8), dust((0.23, 0.53, 1.0), 1.3, '~ ~ ~', (0.6, 0.7, 0.6), 14),
             part('end_rod', '~ ~ ~', (0.5, 0.6, 0.5), 0.01, 6)]

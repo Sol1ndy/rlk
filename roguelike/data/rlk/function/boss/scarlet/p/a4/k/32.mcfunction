@@ -1,0 +1,9 @@
+# A4 pattern tick 32
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_sw_a434] ~ ~ ~ ~ 0
+execute at @s rotated ~ 0 run tp @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_a434,limit=1] ^-1.256 ^1.485 ^-0.797
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a434_28] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a434_30] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a4","rlk_hr_swn","rlk_hr_sw_a434_32"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,transformation:{translation:[0.7088f,1.4823f,-1.3684f],left_rotation:[-0.0043f,-0.7647f,-0.005f,0.6443f],scale:[0.36f,0.36f,0.8546f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_path","minecraft:custom_model_data":{colors:[14857471]}}}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a4","rlk_hr_swn","rlk_hr_sw_a434_32"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.34f,1.4261f,0.1695f],left_rotation:[0.0045f,-0.9956f,-0.0208f,0.0914f],scale:[1.0704f,1f,1.6987f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+execute at @s run tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn

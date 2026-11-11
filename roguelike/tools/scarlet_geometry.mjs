@@ -54,7 +54,9 @@ export const HAND_MODELS = {
 // calm = the skin's own face (no overlay); smile / closed = small overlays in the skin's colours (sprite face_fx)
 export const FACE_MODELS = {calm: 'face_calm', smile: 'face_smile', closed: 'face_closed'};
 export const PHASE_MODELS = {hat: {p1: 'hat_p1', p2: 'hat_p2'}, sash_tails: {p1: 'sash_p1', p2: 'sash_p2'}};
-export const BLADE_MODELS = {off: 'empty', lilac: 'glow_lilac', pink: 'glow_pink', violet: 'glow_violet', gold: 'glow_gold'};
+// round V (lane VB, v_brief.md §3 VB 1): `edge` = the fight's own look, a bright sheath crossed about the blade's axis (the
+// core sets it while she is fought; the cutscenes keep `off`)
+export const BLADE_MODELS = {off: 'empty', lilac: 'glow_lilac', pink: 'glow_pink', violet: 'glow_violet', gold: 'glow_gold', edge: 'glow_edge'};
 // the ghost twin of a model (same geometry, every face the texture rlk:mboss/scarlet/ghost); glows / empty have none
 export const ghostOf = m => (m === 'empty' || m.startsWith('glow_') ? m : m + '_g');
 export const GHOST_TEX = 'ghost';
@@ -233,8 +235,19 @@ function sword() {
   return e;
 }
 // the glow overlay on the blade flats, 0.004 off both faces (translucent emissive-looking sprite per look)
+// Round V (lane VB): the glow is a sheath CROSSED about the blade's axis, so the blade reads from every side (the flats alone
+// were a 2-3 px line edge-on from the fight camera, review v C1): the flats' overlay widened to GLOW_W, and a second pair of
+// half-cards across the flats (their bright side on the axis, fading outward, both faces). From any direction the sheath
+// shows >= GLOW_W x cos 45 = 0.092 b: 7.6 px at 1080p from 9.3 b (she 6 b from the avatar), 11.8 px from 6 b.
+export const GLOW_W = .13;
 function glow(sprite) {
-  return [1, -1].map(s => cardX(sprite, s * .0155, {Z0: -.048, Z1: .042, Y0: SWORD.bladeLo, Y1: SWORD.tip + .02}, {flipU: s < 0}));
+  const Y = {Y0: SWORD.bladeLo, Y1: SWORD.tip + .02}, h = GLOW_W / 2, e = [];
+  for (const s of [1, -1]) e.push(cardX(sprite, s * .0155, {Z0: -h - .003, Z1: h - .003, ...Y}, {flipU: s < 0}));
+  for (const s of [1, -1]) {
+    e.push(cardZ(sprite, s * .004, {X0: -h, X1: 0, ...Y}, {flipU: true}));
+    e.push(cardZ(sprite, s * .004, {X0: 0, X1: h, ...Y}));
+  }
+  return e;
 }
 // scabbard: pivot = its mouth; the body runs +Y 1.52 (the blade 1.445 from the guard + 0.075; edge side -Z, as the sword in it);
 // black lacquer, the spine line, pale-gold ('brass' sprite) lotus-leaf fittings at the mouth, the middle and the tip, two
@@ -344,14 +357,14 @@ function blockModels() {
   M.sash_p1 = sashTails(false); M.sash_p2 = sashTails(true);
   M.hat_p1 = hat(false); M.hat_p2 = hat(true); M.hat_strings = hatStrings();
   M.sword = sword(); M.scabbard = scabbard(); M.hilt = hiltSheathed(); M.item_sword = itemSword(); M.item_sword_icon = itemSwordIcon();
-  for (const g of ['lilac', 'pink', 'violet', 'gold']) M['glow_' + g] = glow('glow_' + g);
+  for (const g of ['lilac', 'pink', 'violet', 'gold', 'edge']) M['glow_' + g] = glow('glow_' + g);
   M.cup = cup(); M.bottle = bottle();
   return M;
 }
 // the display scale a model is shown at (the part that uses it); item_sword: the event's thrown display and the reward item
-export const MODEL_SCALE = {sword: 1.5, scabbard: 1.5, hilt: 1.5, item_sword: 1.375, glow_lilac: 1.5, glow_pink: 1.5, glow_violet: 1.5, glow_gold: 1.5};
+export const MODEL_SCALE = {sword: 1.5, scabbard: 1.5, hilt: 1.5, item_sword: 1.375, glow_lilac: 1.5, glow_pink: 1.5, glow_violet: 1.5, glow_gold: 1.5, glow_edge: 1.5};
 // models with no ghost twin (glows, the item, empty)
-const NO_GHOST = new Set(['empty', 'item_sword', 'item_sword_icon', 'glow_lilac', 'glow_pink', 'glow_violet', 'glow_gold']);
+const NO_GHOST = new Set(['empty', 'item_sword', 'item_sword_icon', 'glow_lilac', 'glow_pink', 'glow_violet', 'glow_gold', 'glow_edge']);
 // the ghost texture's three regions (scarlet_paint ghost): u 0..16/3 the body gradient, 16/3..32/3 the brim mask, 32/3..16 the
 // bead strings' mask. A tile / card face maps its own UV into the region; a skin face (a few pixels of the skin) shows the
 // whole gradient, so every box face of the ghost body glows the same (core in the middle, rim at the edges)

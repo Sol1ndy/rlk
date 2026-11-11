@@ -38,6 +38,7 @@ from collections import defaultdict
 from . import api
 from . import s3lib as S
 from .s3lib import PB, sset, fn, part, placed
+from . import blade as B
 
 L, K = api.L, api.K
 E = api.ev
@@ -104,7 +105,7 @@ SPOTS = {
            RE['D1']['dist'], 'D1 far reappear: 14 b at -40 (front-left); else +40 / 0 / +-90 at 10 b'),
     'side': ([('face', RE['D1']['end'][1], RE['D1']['end'][0]), ('face', -RE['D1']['end'][1], RE['D1']['end'][0]),
               ('face', 0, RE['D1']['end'][0]), ('face', 180, RE['D1']['end'][0])], RE['D1']['end'][0],
-             'the station at the player\'s right (1.5 b at +90): the D1 dash end, the chain cuts, the D3 / D4 landings'),
+             'the station before the player (2.2 b at +35, their front right): the D1 dash end, the chain cuts, the D3 / D4 landings'),
     'd2': ([('face', RE['D2']['bearing'], RE['D2']['dist']), ('face', -RE['D2']['bearing'], RE['D2']['dist']),
             ('face', 0, RE['D2']['dist']), ('face', RE['D2']['bearing'], 6.0), ('face', -RE['D2']['bearing'], 6.0)],
            RE['D2']['dist'], f"D2 side reappear: {num(RE['D2']['dist'])} b at {RE['D2']['bearing']:+d} (low, the player's front-right); "
@@ -117,7 +118,11 @@ SPOTS = {
             ('face', 0, RE['D4']['dist']), ('face', RE['D4']['bearing'], 8.0), ('face', -RE['D4']['bearing'], 8.0)],
            RE['D4']['dist'], f"D4 far reappear: {num(RE['D4']['dist'])} b at {RE['D4']['bearing']:+d} (the player's front-left); "
            f"else {-RE['D4']['bearing']:+d} / 0 / +-{abs(RE['D4']['bearing'])} at 8 b"),
-    'over': ([('face', 0, 0.0)], 1.5, 'the player\'s own floor spot (the A8.3 leap and the A8.9 dive add the height)'),
+    # round V (v_brief §3 VB 4): never on the player's own spot (the F5 lens ended up inside her): 1.3 b before them
+    'over': ([('face', 0, 1.3), ('face', 90, 1.3), ('face', -90, 1.3)], 1.5,
+             '1.3 b in front of the player (the A8.3 leap adds the height)'),
+    'dv': ([('face', 0, 4.5), ('face', 30, 4.5), ('face', -30, 4.5), ('face', 0, 3.0)], 3.0,
+           'the A8.9 dive\'s reappearance: 4.5 b in front of the player (the caller adds DIVE_UP): in the F5 view, the whole wind-up'),
     'land': ([('face', 0, 2.0), ('face', 90, 2.0), ('face', -90, 2.0)], 2.0,
              'the A13 fail landing 2 b in front of the player (she dove from straight above them: not toward her)'),
 }
@@ -211,7 +216,7 @@ def body_files(W):
                    f'execute at {ARENA_M} positioned ~ {CY} ~ run tp @s ~ ~ ~'])
     w('g/reset', ['# @s = the body (a cancelled ghost pattern): solid and visible in her normal colours, the blade glow off, no glide,',
                   '# on the floor. Idempotent.',
-                  f'tag @s remove {TAG_GHOST}', api.rig('look/form/normal'), api.rig('look/blade/off'), api.rig('state/normal'),
+                  f'tag @s remove {TAG_GHOST}', api.rig('look/form/normal'), api.rig('look/blade/edge'), api.rig('state/normal'),
                   fn('g/ground')])
     w('g/bolt', [f'# A decoration bolt here (@s any; the floor spot 3-6 b from the player): no hit box (PLAN §4.5, questions.md Q-A12).']
       + S.fx('deco_bolt', [part(DUST['yellow'], 0.05, 1.6, 0.05, 0, 14), part('minecraft:electric_spark', 0.1, 1.2, 0.1, 0.05, 6)],
@@ -274,12 +279,13 @@ class GB:
         self.at(t, api.rig(f'look/{ch}/{v}'))
         self.ev(t, 'look', f'{ch}/{v}', src)
 
-    def cut(self, c, count, step):
+    def cut(self, c, count, step, cue_pos=None):
         made, lock, strike, tier, kb = c
         for t, ln in api.cut(made, lock, strike, tier, kb, count):
             self.at(t, ln)
-        # the parry cue at the lock tick (hr_design §2.4): the pink glint at her blade + its chime
-        self.at(lock, S.cue())
+        # the parry cue at the lock tick (hr_design §2.4): the star + its chime (round V: at the cut's station, over the place her
+        # blade is wound at - she may still be on her way there)
+        self.at(lock, S.cue(cue_pos))
         self.ev(lock, 'cue', 'parry', ('cut', strike))
         self.cues.append(lock)
         self.hits.append(dict(kind='cut', t=strike, made=made, lock=lock, tier=tier, kb=kb, n=count, step=step,
@@ -351,35 +357,43 @@ def hide():
     return [api.rig('state/hidden')]
 
 
-# the sword-qi at each move's contact (PLAN §4.5 move table; kit args in tenths / degrees; contract §6: pass every arg)
-CONTACT = {
-    'A8.1': ('qi_ring', dict(r=22, c=api.C_LILAC), 0.8, lambda: ring_fb(2.2), 'g_ring'),
-    'A8.2': ('qi_band', dict(len=70, yaw=0, pitch=35, roll=0, sw=25), 0.3,
-             lambda: [part(DUST['lilac'], 0.9, 1.2, 0.9, 0, 26)], 'g_rise'),
-    'A8.3': ('qi_arc', dict(r=45, yaw=0, pitch=0, roll=-40, c=api.C_LILAC), 1.2,
-             lambda: [part(DUST['lilac'], 1.6, 0.6, 1.6, 0, 30), part(DUST['white'], 1.2, 0.4, 1.2, 0, 10)], 'g_leap_cut'),
-    'A8.4': ('qi_ring', dict(r=30, c=api.C_LILAC), 0.1, lambda: ring_fb(3.0), 'g_sweep'),
-    'A8.5': ('qi_x', dict(r=25), 0.1, lambda: [part(DUST['lilac'], 1.4, 0.1, 1.4, 0, 30)], 'g_x'),
-    'A8.6': ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=15, c=api.C_LILAC), 0.8,
-             lambda: [part(DUST['lilac'], 1.5, 0.3, 1.5, 0, 28)], 'g_wrap'),
-    'A8.7': ('qi_dome', dict(r=35), 0.0, lambda: ring_fb(3.5) + [part(DUST['white'], 1.6, 1.4, 1.6, 0, 24)], 'g_dome'),
-    'A8.8': ('qi_vert', dict(h=34, yaw=0, c=api.C_MAGENTA), 0.0,
-             lambda: [part(DUST['magenta'], 0.2, 1.6, 0.2, 0, 26)], 'g_vert'),
-}
-# F2 (HR-12): where a contact's sword-qi stands from the cut spot in the player's facing frame (b to their left, b ahead): the
-# kit stands A8.3's slanted crescent and A8.8's vertical one across the facing, so on the cut spot itself (the player's own
-# plane) the first-person camera would see nothing; A8.8 'a tall crescent at the player's right' (PLAN §4.5)
-CONTACT_AT = {'A8.3': (0.0, 2.0), 'A8.8': (-1.5, 1.5)}
-# F2 (HR-12 / HR-45): A8.6's low wrap at thigh height (0.8 b, was 0.4: the floor clamp shrank it to a sliver from the
-# F5 camera); in first person (no avatar) A8.5's floor X sits this far ahead of the cut spot (b; still across it: its
-# arms reach 2.5 b), under the camera it would be out of view
-CONTACT_FP = {'A8.5': 1.2}
+# Round V (lane VB; v_brief §3 VB 2, 4): the station of a gauntlet cut = the place and the yaw she cuts from, fixed STATION_LEAD t
+# before the strike (an approach: when she appears) as the marker rlk_hr_gst: the drawn blade path of the cut stands THERE from
+# then on (in the player's view beside the avatar while she is still far away or unseen), she arrives on it and takes its yaw.
+ST_T = 'rlk_hr_gst'
+ST_M = f'@e[type=minecraft:marker,tag={ST_T},limit=1]'
+AT_ST = f'at {ST_M} rotated as {ST_M}'
+STATION_LEAD = 10
+
+
+def station(name, up=0.0):
+    """The station marker at spot `name` (+ up), facing the player (@s = the body)."""
+    return [f'kill @e[type=minecraft:marker,tag={ST_T}]', spot(name),
+            f'execute as {SPOT_M} at @s{up_pos(up)} facing entity {PLAYER} feet rotated ~ 0 run tp @s ~ ~ ~ ~ 0',
+            f'tag {SPOT_M} add {ST_T}', f'tag {ST_M} remove {SPOT_T}']
+
+
+def glide_st(t):
+    return [f'execute positioned as {ST_M} run function rlk:mboss/mv/glide {{t:{int(t)}}}']
+
+
+def face_st():
+    return [f'execute rotated as {ST_M} run tp @s ~ ~ ~ ~ 0']
+
+
+# each move's contact: its sound (round V: the sword-qi is the blade's own sweep, blade.py; the kit's hand-placed qi_ring / qi_band
+# / qi_arc / qi_x / qi_dome / qi_vert at the cut spot are gone, review v S1)
+CONTACT = {'A8.1': 'g_ring', 'A8.2': 'g_rise', 'A8.3': 'g_leap_cut', 'A8.4': 'g_sweep', 'A8.5': 'g_x', 'A8.6': 'g_wrap',
+           'A8.7': 'g_dome', 'A8.8': 'g_vert'}
+# the spot a move cuts from (the station; g/spot/<name>) and its height
+ST_SPOT = {'A8.3': ('over', 2.5)}
+APPROACH_END = {'D1': 'side', 'D2': 'd2e', 'D3': 'side', 'D4': 'side'}
 APPROACH = ('D1', 'D2', 'D3', 'D4')
 TRAIL = {'D1': 125, 'D2': 65, 'D4': 105}          # ghost_trail len (tenths): the nominal dash / glide / run lengths
 HANG_UP, HANG_T = 3.0, 3                          # A8.4: she springs straight up and hangs (PLAN §4.5)
 RISE_UP = 8.0                                     # A8.8: she rises 8 b up and out of view
 LEAP_UP, LEAP_T, LEAP_H = 2.5, 6, 30              # A8.3: mv/leap {t:6,h:30} over the player (gauntlets: to 2.5 b above them)
-DIVE_UP, DIVE_STOP = RE['A8.9']['up'], 1.0        # A8.9: 6 b above the player, the dive to 1 b above them
+DIVE_UP, DIVE_STOP = RE['A8.9']['up'], 1.0        # A8.9: DIVE_UP above the spot `dv` (in view), the dive to 1 b above the spot `land`
 RESTATION_T, DROP_T = 3, 2                        # the chain cuts' small glide to the station; A8.5's drop from the hang
 LAND_T = 2                                        # the fail: her landing from 1 b above the player (A8: on the impact point;
 #                                                   the lethal fail: 2 b in front of the player)
@@ -421,22 +435,30 @@ class Walk:
             g.at(te, hide())
             g.ev(te, 'rig', 'state/hidden', (clip, 'end'))
 
-    def contact_fx(self, step, s):
+    def contact_fx(self, step, s, clip, t):
+        """The contact of a move at strike s (clip started at t): its sound, the drawn path of the cut at the station from the
+        station's tick on (the head arrives on s), the slash as the blade sweeps."""
         g = self.gb
-        name, a, h, fb, sound = CONTACT[step]
-        pos = at_cut(s, h) if s in self.strikes else at_player(h)
-        if step in CONTACT_AT:
-            pos += ' positioned ^{} ^ ^{}'.format(*(num(v, 2) for v in CONTACT_AT[step]))
-        if step in CONTACT_FP:
-            g.at(s, S.fx(name, [], pos=f'{FIRST_PERSON} {pos} positioned ^ ^ ^{num(CONTACT_FP[step], 2)}', **a))
-            pos = f'{AVATAR} {pos}'
-        g.fx(s, name, fb(), pos, src=('hit', step), **a)
-        g.snd(s, sound, pos=at_cut(s) if s in self.strikes else at_player(), src=('hit', step))
+        g.snd(s, CONTACT[step], pos=at_cut(s) if s in self.strikes else at_player(), src=('hit', step))
+        sw = B.Swing(clip, E(clip, 'hit'))
+        q = self.st_tick[s]
+        out = B.Out()
+        # the path stands at the station (her place and yaw at the strike)
+        r = B.path_ride(out, self.key, sw, t, max(q, s - B.SHOW_FIRST), B.COL['P'], f'c{s}', at=f'at {ST_M}')
+        for tt in sorted(out.t):
+            g.at(tt, out.t[tt])
+        out2 = B.Out()
+        pcs = B.slash(out2, self.key, sw, t, B.SLASH[api.C_LILAC], f'c{s}')
+        for tt in sorted(out2.t):
+            g.at(tt, out2.t[tt])
+        g.ev(r['show'], 'fx', 'sw_path', ('hit', step))
+        B.DRAWN.setdefault(self.key, []).append(dict(kind='ride', clip=clip, event='hit', hit=s, first=False, col='P', sw=sw, t0=t,
+                                                     show=r['show'], lead=s - r['show'], pts=r['pts'], end=r['end'], pieces=pcs, step=step))
 
     def restation(self, s):
         """A chain cut: at its lock (s - LOCK_LEAD) she shifts to the station beside the locked spot and faces the player."""
         lk = s - api.LOCK_LEAD
-        self.gb.at(lk, FACE, glide_spot('side', RESTATION_T))
+        self.gb.at(lk, face_st(), glide_st(RESTATION_T))
         self.gb.moves.append((lk, lk + RESTATION_T, 'station'))
 
     # ------------------------------------------------------------------ steps
@@ -459,7 +481,8 @@ class Walk:
         g.snd(t, 'g_appear', src=('g_dash', 'appear'))
         g.at(go, FACE)
         g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], at_body(0.95), src=('g_dash', 'go'), len=TRAIL['D1'])
-        g.at(go, glide_spot('side', arr - go))
+        g.at(go, glide_st(arr - go))
+        g.at(arr, face_st())
         g.moves.append((go, arr, 'dash side'))
         g.snd(go, 'g_dash', src=('g_dash', 'go'))
 
@@ -472,7 +495,8 @@ class Walk:
         g.snd(t, 'g_appear', src=('g_glide', 'appear'))
         g.at(go, FACE)
         g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.2, 0.3, 0, 10)], at_body(0.45), src=('g_glide', 'go'), len=TRAIL['D2'])
-        g.at(go, glide_spot('d2e', stop - go))
+        g.at(go, glide_st(stop - go))
+        g.at(stop, face_st())
         g.moves.append((go, stop, 'glide d2e'))
         g.snd(go, 'g_dash', src=('g_glide', 'go'))
 
@@ -486,7 +510,8 @@ class Walk:
         g.fx(gone, 'ghost_burst', puff_fb(c='white'), at_body(1.1), src=('g_drop', 'gone'))
         g.at(app, tp_spot('d3', RE['D3']['up']))
         g.moves.append((app, app, 'reappear d3 (up)'))
-        g.at(app, glide_spot('side', land - app))
+        g.at(app, glide_st(land - app))
+        g.at(land, face_st())
         g.moves.append((app, land, 'drop side'))
 
     def s_d4(self, t):
@@ -498,7 +523,8 @@ class Walk:
         g.fx(t, 'ghost_burst', puff_fb(), at_body(0.8), src=('g_run', 'appear'))
         g.at(run, FACE)
         g.fx(run, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.3, 0.3, 0, 10)], at_body(0.8), src=('g_run', 'run'), len=TRAIL['D4'])
-        g.at(run, glide_spot('side', lunge - run))
+        g.at(run, glide_st(lunge - run))
+        g.at(lunge, face_st())
         g.moves.append((run, lunge, 'run side'))
         for i in range(3):                           # footsteps x3 during the run-in
             g.snd(run + i * (lunge - run) // 3, 'g_step', src=('g_run', 'run'))
@@ -509,16 +535,16 @@ class Walk:
         s = t + E(clip, 'hit')
         g.play(t, clip)
         if step == 'A8.3':
-            lk, lp = s - api.LOCK_LEAD, s - LEAP_T       # the lock (she faces the player), the leap (coil + 3 -> the hit, 6 t)
-            g.at(lk, FACE)
+            lk, lp = s - api.LOCK_LEAD, s - LEAP_T       # the lock (she takes the station's yaw), the leap (coil + 3 -> the hit, 6 t)
+            g.at(lk, face_st())
             g.snd(lp, 'g_leap', src=('plan', 'A8.3 breeze.jump at 3'))
-            g.at(lp, leap_spot('over', LEAP_T, LEAP_H, LEAP_UP))
+            g.at(lp, f'execute positioned as {ST_M} run function rlk:mboss/mv/leap {{t:{LEAP_T},h:{LEAP_H}}}')
             g.moves.append((lp, s, 'leap over (2.5 b up)'))
             self.ends_vanished(t, clip, 'gone')
         elif step == 'A8.5':
             lk = s - api.LOCK_LEAD
-            g.at(lk, FACE)
-            g.at(t + E('g_x', 'drop'), glide_spot('side', DROP_T))
+            g.at(lk, face_st())
+            g.at(t + E('g_x', 'drop'), glide_st(DROP_T))
             g.moves.append((t, t + DROP_T, 'drop side'))
             self.ends_vanished(t, clip, 'gone')
         elif self.prev_step(t) not in APPROACH:
@@ -534,12 +560,18 @@ class Walk:
             g.fx(glow, 'glint', [part(DUST['magenta'], 0.1, 0.1, 0.1, 0, 8)], f'at {S.ANCHOR_M} rotated as @s',
                  src=('g_vert', 'glow'), c=api.C_MAGENTA)
             g.snd(glow, 'g_glow', src=('g_vert', 'glow'))
-            g.look(s, 'blade', 'off', ('g_vert', 'hit'))
-            g.at(rs, rise(RISE_UP, gone - rs))
-            g.moves.append((rs, gone, 'rise out of view'))
-            g.at(gone, hide())
-            g.ev(gone, 'rig', 'state/hidden', ('g_vert', 'gone'))
-        self.contact_fx(step, s)
+            g.look(s, 'blade', 'edge', ('g_vert', 'hit'))
+            # round V: the dive's reappearance comes before the clip's own `gone` now: she rises until 2 t before it, bursts
+            # and is hidden there (the rise's height in proportion)
+            nxt = self.next_clip_t(t)
+            end = gone if nxt is None or nxt - 2 >= gone else max(rs + 1, nxt - 2)
+            g.at(rs, rise(round(RISE_UP * (end - rs) / (gone - rs), 2), end - rs))
+            g.moves.append((rs, end, 'rise out of view'))
+            if end < gone:
+                g.fx(end, 'ghost_burst', puff_fb(), at_body(0.95), src=('g_vert', 'gone'))
+            g.at(end, hide())
+            g.ev(end, 'rig', 'state/hidden', ('g_vert', 'gone'))
+        self.contact_fx(step, s, clip, t)
 
     def s_dive(self, t):                              # A8.9: normal colours, 6 b above the player, the dive (the judge)
         g = self.gb
@@ -548,14 +580,24 @@ class Walk:
         g.look(t, 'form', 'normal', ('g_dive', 'appear'))
         g.at(t, f'tag @s remove {TAG_GHOST}')
         g.ev(t, 'tag', 'ghost-', ('g_dive', 'appear'))
-        g.at(t, tp_spot('over', DIVE_UP))
-        g.moves.append((t, t, 'reappear 6 b above the player'))
+        # round V (v_brief §3 VB 4): she reappears IN the F5 view, DIVE_UP over the spot `dv` 4.5 b before the player, the blade
+        # raised, for the whole wind-up (the clip's 15 t), the plunge's way drawn from her blade to the player (the head lands on
+        # the judge tick); the dive ends 1 b over the spot `land` 2 b before the player, never on them
+        g.at(t, tp_spot('dv', DIVE_UP))
+        g.fx(t, 'ghost_burst', puff_fb(c='white'), at_body(1.1), src=('g_dive', 'appear'))
+        g.moves.append((t, t, f'reappear {num(DIVE_UP, 1)} b up, 4.5 b before the player'))
         g.snd(dv, 'g_dive', src=('g_dive', 'dive'))
-        g.at(dv, glide_spot('over', hit - dv, DIVE_STOP))
-        g.moves.append((dv, hit, 'dive to 1 b above the player'))
-        # the thin vertical blade line 1-2 t before the impact
-        g.fx(hit - 2, 'qi_line', [part(DUST['white'], 0.03, 1.2, 0.03, 0, 10)], f'at @s rotated ~ 90 positioned ~ ~0.8 ~',
-             src=('g_dive', 'dive'), len=40)
+        g.at(dv, glide_spot('land', hit - dv, DIVE_STOP))
+        g.moves.append((dv, hit, 'dive to 1 b above the spot before the player'))
+        P1F.sw_runtime(g.W)
+        out = B.Out()
+        tip = B.track('g_dive')['t'][E('g_dive', 'dive')]
+        r = B.target_line(out, self.key, t, dv, hit, B.COL['purple'],
+                          f'at @s rotated as @s rotated ~ 0 positioned {B.car(tip)} facing entity {{T}} feet', PLAYER, PLAYER, dy='0')
+        for tt in sorted(out.t):
+            g.at(tt, out.t[tt])
+        g.ev(t, 'fx', 'sw_line', ('g_dive', 'appear'))
+        B.DRAWN.setdefault(self.key, []).append(dict(kind='line', hit=hit, show=r['show'], lead=hit - r['show'], col='purple', first=True, lock=dv))
 
     def s_judge(self, jt):
         g = self.gb
@@ -599,8 +641,12 @@ class Walk:
             fail = [f'# {key.upper()} fail (#gres 2 at T + {jt}; not lethal: ULT{60 if key == "a8" else 5}_LETHAL {lethal}; @s = the body): the dive lands on the',
                     f'# player: ult/fail60 at the player\'s floor spot ({api.FAIL60_PM} per mille, never kills, the push ring there blows them',
                     f'# ~{num(api.FAIL60_PUSH[0] + 0.5, 1)} b off it); she lands on the impact point (from 1 b above it in {LAND_T} t), g_reform.',
-                    f'execute at {PLAYER} positioned ~ {CY} ~ run {api.shield("fail60")}', api.play('g_reform'), FACE] + glide_spot('over', LAND_T)
+                    f'execute at {PLAYER} positioned ~ {CY} ~ run {api.shield("fail60")}', api.play('g_reform'), FACE] + glide_spot('land', LAND_T)
             g.ev(jt, 'fail', 'fail60', 'JUDGE_T')
+            from . import shield as SH
+            col = B.SEL.format(SH.FAIL_COL_TAG)
+            g.at(jt + SH.FAIL_COL_T, f'kill {col}')
+            g.cancel_lines.append(f'kill {col}')
         g.W.w(f'p/{key}/fail', fail)
         g.at(jt + E('g_reform', 'end'), S.gate(f'if score #gres {OBJ} matches 2', api.play('idle2')))
         g.end(api.FAIL60_P2_T if key == 'a8' else jt + FAIL_END)
@@ -608,6 +654,26 @@ class Walk:
     # ------------------------------------------------------------------ the whole script
     def build(self):
         g, key = self.gb, self.key
+        # the stations (round V): per strike s the tick its station is fixed: an approach's start for the cut the approach
+        # leads into, else STATION_LEAD before the strike (never before the tick after the strike before it)
+        self.st_tick = {}
+        moves = [(t, step, clip) for t, step, clip, _c in self.rows if step in CONTACT]
+        self.cut_clip = {t + E(clip, 'hit'): (clip, t) for t, step, clip in moves}      # strike -> the move that delivers it
+        prev_s = None
+        for t, step, clip in moves:
+            s = t + E(clip, 'hit')
+            before = [r for r in self.clip_rows if r[0] < t]
+            app = before[-1] if before and before[-1][1] in APPROACH else None
+            if app:
+                q, name, up = app[0], APPROACH_END[app[1]], 0.0
+            else:
+                q = max((prev_s or 0) + 1, s - STATION_LEAD)
+                name, up = ST_SPOT.get(step, ('side', 0.0))
+            self.st_tick[s] = q
+            g.at(q, station(name, up))
+            g.ev(q, 'station', name, (step, s))
+            prev_s = s
+        g.cancel_lines.append(f'kill @e[type=minecraft:marker,tag={ST_T}]')
         for t, step, clip, c in self.rows:
             if step == 'A8.T':
                 self.s_tell(t)
@@ -628,7 +694,9 @@ class Walk:
             else:
                 raise ValueError((key, step))
             if c:
-                g.cut(c, 1 if self.gauntlet else 0, step)
+                cl, ct = self.cut_clip[c[2]]
+                cp = B.cue_point(cl, max(0, B.swing_of(cl, 'hit').a))
+                g.cut(c, 1 if self.gauntlet else 0, step, cue_pos=f'at {ST_M} positioned {B.car(cp)}')
         for t in EXTRA_VANISH.get(key, ()):
             g.fx(t, 'ghost_burst', puff_fb(), at_body(0.95), src=('script', 'vanish'))
             g.at(t, hide())
@@ -715,11 +783,13 @@ def build_mx(W):
           S.snd('g_dash'), S.fx('afterimage', pos=at_body(1.2), len=90))
     pb.motions.append((go, x, 'streak'))
     pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
-    pb.at(x, S.fx('qi_x', [part(DUST['lilac'], 1.4, 0.1, 1.4, 0, 30)], pos=f'at {S.LOCK_M} rotated as @s positioned ~ ~0.1 ~', r=25),
-          S.snd('g_x'))
+    P1F.dash_line(pb, key, x - B.SHOW_FIRST, lock, x)
+    B.ride(pb, key, 0, path=False)
+    pb.at(x, S.snd('g_x'))
     pb.track(x + 1, dome - S.LOCK, TRK['deg'])
     pb.hit(1, tell_from=x)
-    pb.at(dome, S.fx('qi_dome', ring_fb(3.2) + [part(DUST['white'], 1.5, 1.3, 1.5, 0, 22)], pos=at_body(0.0), r=35), S.snd('g_dome'))
+    B.ride(pb, key, 1, prev=x)
+    pb.at(dome, S.snd('g_dome'))
     pb.pp_window(dome)
     P1F.tail(pb, dome, end)
     return _finish(pb, key)
@@ -767,6 +837,12 @@ def build_nb(W):
         yaw = api.NB_YAW[i]
         org = f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)}'
         pb.hit(i, tell_from=0 if i == 0 else prev, pos=f'{org} positioned ~ {CY} ~')
+        # round V: the cut's path on her blade (in the air) + the band's own line through the locked spot at chest height from
+        # the lock on (white-gold: parryable), burning white as the band strikes
+        B.ride(pb, key, i, prev=bs[i - 1] if i else None)
+        out = B.Out()
+        B.static_line(out, key, f'n{i}', lk, t, B.COL['P'], f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ^ ^1.2 ^-{num(ln / 2)}', ln)
+        out.into(pb)
         pb.at(t, S.fx('qi_beam', [part(DUST['lilac'], 0.5, 0.3, 4.0, 0, 40), part(DUST['white'], 0.3, 0.2, 3.0, 0, 12)],
                       pos=f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ~ ~0.6 ~', len=int(ln * 10)), S.snd('g_sweep'))
         prev = t + 1
@@ -833,6 +909,7 @@ def build_q(W):
           S.fx('ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], pos=at_body(0.95), len=int(dmax * 10)))
     pb.motions.append((go, grab, 'ghost lunge'))
     pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=1)
+    P1F.dash_line(pb, key, grab - B.SHOW_FIRST, lock, grab)
     pb.at(grab, api.rig('look/form/normal'), f'tag @s remove {TAG_GHOST}',
           S.fx('claw_streaks', [part(DUST['lilac'], 0.6, 1.0, 0.6, 0, 16)], pos=f'at {S.LOCK_M} positioned ~ {CY + 1} ~', r=12))
     # ---- the branch (the grab's result is this tick's #hpp: the hits of hers the core read)
@@ -855,14 +932,18 @@ def build_q(W):
     pb.at(A('lock1'), gh([P1F.lock_fn(pb, key), FACE_LOCK]))
     ln, wd = api.HITS[key][1][3]
     pb.hit(1, tell_from=T0, t=beam, cond=HIT, pos=f'at @s positioned ~ {CY} ~ facing entity {S.LOCK_M} feet rotated ~ 0')
+    P1F.drop_line(pb, key, 'q_air', beam - B.SHOW_FIRST, A('lock1'), beam, idx=1, t0=T0, cond=HIT)
+    B.ride(pb, key, 1, t0=T0, cond=HIT, path=False)
     pb.at(beam, gh(S.fx('qi_beam', [part(DUST['lilac'], 0.4, 1.5, 0.4, 0, 40)],
                         pos=f'at @s positioned ~ ~0.8 ~ facing entity {S.LOCK_M} feet', len=int(ln * 10))), gh(S.snd('g_rise')))
     pb.rng(beam + 1, A('lock2') - 1, S.gate(HIT, f'function rlk:mboss/mv/turn {{max:20}}'))
     pb.at(A('lock2'), gh([P1F.lock_fn(pb, key), FACE_LOCK]))
-    pb.at(dive, gh([f'execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:{hit - dive}}}']), gh(S.snd('g_dive')),
+    pb.at(dive, gh([P1F.near(P1F.LAND_SHORT, hit - dive)]), gh(S.snd('g_dive')),
           gh(S.fx('afterimage', pos=at_body(1.2), len=30)))
     pb.motions.append((dive, hit, 'dive'))
     pb.hit(2, tell_from=beam, t=hit, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    P1F.drop_line(pb, key, 'q_air', hit - B.SHOW_CHAIN, A('lock2'), hit, idx=2, t0=T0, cond=HIT)
+    B.ride(pb, key, 2, t0=T0, cond=HIT, path=False)
     pb.at(hit, gh(S.fx('dive_impact', [part(DUST['lilac'], 1.0, 0.1, 1.0, 0, 30)], pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~', r=26)),
           gh(S.snd('a4_impact', pos=f'at {S.LOCK_M}')))
     pb.rng(hit + 1, leap2 - 1, S.gate(HIT, turn))
@@ -875,6 +956,8 @@ def build_q(W):
           gh(S.fx('sky_mark', [part(DUST['white'], 0.02, 6.0, 0.02, 0, 40), part(DUST['magenta'], 0.9, 0.02, 0.02, 0, 12)],
                   pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')))
     pb.hit(3, tell_from=hit, t=pillar, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    P1F.drop_line(pb, key, 'q_air', pillar - B.SHOW_FIRST, lock3, pillar, idx=3, t0=T0, cond=HIT)
+    B.ride(pb, key, 3, t0=T0, cond=HIT, path=False)
     pb.at(pillar, gh(S.fx('sky_pillar', [part(DUST['white'], 0.5, 6.0, 0.5, 0, 80), part(DUST['magenta'], 0.8, 0.3, 0.8, 0, 20)],
                           pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', r=24)), gh(S.snd('sky_pillar', pos=f'at {S.LOCK_M}')))
     pb.at(drop, gh([f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land2 - drop}}}']))

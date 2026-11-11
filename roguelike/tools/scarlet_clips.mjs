@@ -118,12 +118,14 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // vertical fan 8-10, the blade tipped over to her right 11-12 and the flat backhand crescent across her front (hit 14), the
   // follow-through to her left back, recovery
   const COIL = {pos: [0, -.18, 0], tor: [-12, 42, 0], head: [-6, -30, 0], ...F_WIDE, ...B(70, 0, -55, 1, {gL: .55}), aR: [20, 50, .95], hairS: .3};
-  C('a1', [K(0, ST), K(3, {pos: [0, -.12, 0], tor: [-10, 30, 0], head: [-4, -40, 0], ...F_WIDE, ...B(56, 0, -48, 0, {gL: .53}), aR: [16, 40, .95], hairS: .4}),
-    K(6, COIL, 'o'), K(7, {...COIL, pos: [0, -.2, 0], tor: [-13, 46, 0]}),
-    K(8, {...B(40, 0, -10, 1, {gL: .58}), tor: [-8, 30, 0], pos: [0, -.12, 0]}, 'i'), K(9, {...B(15, 0, 45, 1, {gL: .6}), tor: [-2, 16, 0], pos: [0, -.06, 0]}, 'l'),
-    K(10, {...B(0, 0, 92, .4, {gL: .6}), tor: [4, 6, 0], pos: [0, -.03, 0], head: [-10, -10, 0], aR: [10, 40, .95]}, 'l'),
-    K(11, {...B(0, -44, 106, -.4, {gL: .58}), tor: [0, 22, 0], pos: [0, -.08, 0]}, 'l'),
-    K(12, {...SW(125, 8, -1, 110, -28, .62), tor: [-18, 38, 0], pos: [0, -.28, 0], head: [-6, -20, 0], ...F_WIDE}, 'l'),
+  // Round V (lane VB; v_brief §3 VB 1): the wind-up is one big readable pose, reached at 4 (hit - 10) and held: the blade drawn
+  // back WIDE and high at her right (seen past the avatar from the F5 camera), the body coiled; the old rising fan 8-11 before the
+  // crescent is gone (it carried the blade through three planes in the seven ticks a player has to read it)
+  const WIDE = {pos: [0, -.2, 0], tor: [-12, 44, 0], head: [-6, -30, 0], ...F_WIDE, ...SW(128, -24, -1, 112, -6, .66), aR: [20, 50, .95], hairS: .3};
+  void COIL;
+  C('a1', [K(0, ST), K(2, {pos: [0, -.12, 0], tor: [-10, 30, 0], head: [-4, -40, 0], ...F_WIDE, ...SW(80, -8, -1, 70, -14, .6), aR: [16, 40, .95], hairS: .4}, 'l'),
+    K(4, WIDE, 'o'), K(8, {...WIDE, pos: [0, -.22, 0], tor: [-13, 47, 0]}), K(11, {...WIDE, pos: [0, -.24, 0], tor: [-14, 50, 0]}),
+    K(12, {...SW(125, 8, -1, 110, -28, .62), tor: [-18, 38, 0], pos: [0, -.28, 0], head: [-6, -20, 0], ...F_WIDE}, 'i'),
     K(13, {...SW(70, 8, -1, 58, -30, .64), tor: [-20, 22, 0]}, 'l'), K(14, {...SW(10, 6, -1, 0, -30, .66), tor: [-20, 0, 0], head: [-4, 0, 0]}, 'l'),
     K(15, {...SW(-50, 6, -1, -55, -28, .64), tor: [-20, -22, 0], head: [-4, 14, 0], hairS: -.3}, 'l'),
     K(17, {...SW(-100, 4, -1, -100, -24, .6), tor: [-18, -34, 0], aR: [-10, 30, .95]}, 'o'),
@@ -133,25 +135,28 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // high right, coiled), the diagonal cut upper-right -> lower-left 10-13 (hit 12); recovery: raised diagonally up-right 16-22,
   // lowered to the guard
   const HIGH = {pos: [0, -.06, 0], tor: [-4, 34, 0], head: [-6, -26, 0], ...B(0, -45, 140, -1, {gL: .5}), aR: [24, 30, .95], ...F_ST};
-  C('a2', [K(0, ST), K(2, {...B(10, -45, 40, -1, {gL: .55}), tor: [-6, 16, 0]}), K(4, HIGH, 'o'), K(6, {...HIGH, tor: [-4, 38, 0], ...B(0, -45, 148, -1, {gL: .5})}),
+  // (round V: the high wind-up is reached at 2 = hit - 10 and held; blend 2: the snap up IS the counter's start)
+  C('a2', [K(0, ST), K(1, {...B(14, -30, 44, -1, {gL: .55}), tor: [-5, 20, 0], pos: [0, -.03, 0]}, 'l'), K(2, HIGH, 'l'), K(6, {...HIGH, tor: [-4, 38, 0], ...B(0, -45, 148, -1, {gL: .5})}),
     K(9, {...HIGH, tor: [-6, 40, 0], pos: [0, -.1, 0], ...B(0, -45, 152, -1, {gL: .5})}),
     K(10, {...B(0, -45, 118, -1, {gL: .54}), tor: [-6, 30, 0], pos: [0, -.12, 0]}, 'i'),
     K(11, {...B(0, -45, 62, -1, {gL: .6}), tor: [-8, 14, 0], pos: [0, -.16, -.02], ...F_LUNGE}, 'l'),
     K(12, {...B(0, -45, 2, -1, {gL: .64}), tor: [-12, -4, 0], head: [-4, 6, 0]}, 'l'),
     K(13, {...B(0, -45, -58, -1, {gL: .6}), tor: [-14, -18, 0], pos: [0, -.2, -.02]}, 'l'), K(15, {...B(0, -45, -100, -1, {gL: .56}), tor: [-14, -24, 0]}, 'o'),
     K(19, {...B(0, -45, 55, 1, {gL: .55}), tor: [-4, 10, 0], pos: [0, -.08, 0], ...F_ST}), K(22, {...B(0, -45, 62, 1, {gL: .55}), tor: [-4, 12, 0]}), K(30, ST)],
-    {src: 'v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90'});
+    {blend: 2, src: 'v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90'});
 }
 {
   // A3 five crescents (hits 14 / 30 / 45 / 57 / 69, locks at hit - 7): 1 a vertical downward cut, 2 a short lunge + the downward
   // diagonal (her upper left -> lower right), 3 a rising vertical from low at her right front, 4 an overhead two-handed chop,
   // 5 a rising diagonal wedge (her lower left -> upper right); recovery open after hit 5
-  C('a3', [K(0, ST), K(4, {...B(0, 0, 60, -1, {gL: .5}), tor: [-2, 14, 0], pos: [0, -.06, 0]}),
-    K(9, {...B(0, 0, 118, -1, {gL: .48}), tor: [6, 10, 0], head: [-10, -6, 0], pos: [0, -.02, 0], aR: [30, 40, .95]}, 'o'),
+  // (round V: every wind-up reached >= 10 t before the first cut, >= 6 t before a follow-up, and held: h1's raise at 4, h2's at 23,
+  // h5's at 62)
+  C('a3', [K(0, ST), K(2, {...B(0, 0, 60, -1, {gL: .5}), tor: [-2, 14, 0], pos: [0, -.06, 0]}, 'l'),
+    K(4, {...B(0, 0, 118, -1, {gL: .48}), tor: [6, 10, 0], head: [-10, -6, 0], pos: [0, -.02, 0], aR: [30, 40, .95]}, 'o'),
     K(12, {...B(0, 0, 124, -1, {gL: .48}), tor: [8, 8, 0]}), K(13, {...B(0, 0, 62, -1, {gL: .56}), tor: [-4, 6, 0], pos: [0, -.1, 0]}, 'i'),
     K(14, {...B(0, 0, 0, -1, {gL: .64}), tor: [-16, 4, 0], pos: [0, -.18, -.02], ...F_WIDE}, 'l'), K(15, {...B(0, 0, -38, -1, {gL: .6}), tor: [-20, 4, 0]}, 'o'),
     // 2
-    K(19, {...B(0, 45, -40, -1, {gL: .58}), tor: [-16, 0, 0]}), K(24, {...B(0, 45, 120, -1, {gL: .5}), tor: [0, -24, 0], head: [-8, 14, 0], pos: [0, -.06, 0], ...F_ST}, 'o'),
+    K(18, {...B(0, 45, -40, -1, {gL: .58}), tor: [-16, 0, 0]}), K(23, {...B(0, 45, 124, -1, {gL: .5}), tor: [0, -24, 0], head: [-8, 14, 0], pos: [0, -.06, 0], ...F_ST}, 'o'),
     K(28, {...B(0, 45, 128, -1, {gL: .48}), tor: [2, -28, 0]}), K(29, {...B(0, 45, 68, -1, {gL: .58}), tor: [-6, -8, 0], pos: [0, -.14, -.04], ...F_LUNGE}, 'i'),
     K(30, {...B(0, 45, 8, -1, {gL: .64}), tor: [-14, 12, 0], pos: [0, -.22, -.06]}, 'l'), K(31, {...B(0, 45, -48, -1, {gL: .6}), tor: [-18, 22, 0]}, 'o'),
     // 3
@@ -163,7 +168,7 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
     K(56, {...B(0, 0, 62, -1, {gL: .54}), rh: 1, tor: [-8, 0, 0], pos: [0, -.14, -.04], ...F_LUNGE}, 'i'), K(57, {...B(0, 0, 2, -1, {gL: .6}), rh: 1, tor: [-22, 0, 0], pos: [0, -.26, -.06]}, 'l'),
     K(58, {...B(0, 0, -30, -1, {gL: .56}), rh: .6, tor: [-24, 0, 0]}, 'o'),
     // 5
-    K(63, {...B(0, -45, -130, 1, {gL: .56}), rh: 0, tor: [-16, -26, 0], head: [-6, 18, 0], pos: [0, -.2, 0], ...F_WIDE}), K(67, {...B(0, -45, -136, 1, {gL: .54}), tor: [-18, -30, 0]}),
+    K(62, {...B(0, -45, -132, 1, {gL: .56}), rh: 0, tor: [-16, -26, 0], head: [-6, 18, 0], pos: [0, -.2, 0], ...F_WIDE}, 'o'), K(67, {...B(0, -45, -136, 1, {gL: .54}), tor: [-18, -30, 0]}),
     K(68, {...B(0, -45, -70, 1, {gL: .6}), tor: [-10, -12, 0], pos: [0, -.12, -.04]}, 'i'), K(69, {...B(0, -45, -8, 1, {gL: .64}), tor: [-2, 6, 0], pos: [0, -.04, -.06], ...F_LUNGE}, 'l'),
     K(70, {...B(0, -45, 55, 1, {gL: .62}), tor: [6, 22, 0], head: [-12, -10, 0]}, 'l'), K(72, {...B(0, -45, 100, 1, {gL: .58}), tor: [8, 30, 0], hairS: -.4}, 'o'),
     K(84, {...B(0, -45, 90, 1, {gL: .55}), tor: [4, 26, 0], pos: [0, -.06, -.04], hairS: 0}), K(96, ST)],
@@ -175,13 +180,14 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // 12-18 (the blade carried by the body, swinging forward), feet first onto the spot, the low two-handed blade (hit 20);
   // A5: crouch2 22, the slash up to her right 25, lock2 27, the spin to her left 28-34 (a flat ring at head height, hit2 34),
   // land 38. Pitch and th stay in the -360 range after the flip (the same rotations)
-  const APEX = {...ST, ...AIR, pos: [0, .1, 0], tor: [-4, 10, 0], head: [-4, -10, 0], ...B(-10, 0, 4, -1, {gL: .62}), aR: [30, 60, .9], hairS: -.2, skW: .3};
+  // (round V: at the apex the blade is raised high over her - the plunge's wind-up, held 7-12 -, not pointed at the target)
+  const APEX = {...ST, ...AIR, pos: [0, .1, 0], tor: [-4, 10, 0], head: [-4, -10, 0], ...B(0, 0, 138, -1, {gL: .48}), aR: [70, 40, .9], hairS: -.2, skW: .3};
   const flipK = (t, pt, thRel) => K(t, {rot: [pt, 0, 0], pos: flipPos(pt, .5, .12), tor: [-16, 0, 0], head: [-10, 0, 0], lf: 1, fL: [.12, .72, -.32], fR: [-.12, .68, -.22],
     ...B(0, 0, thRel + pt, -1, {gL: .48}), aR: [100, 30, .9]}, 'l');
   C('a4', [K(0, ST), K(2, {...CROUCH, pos: [0, -.3, 0], tor: [-20, 6, 0], aR: [10, 30, .95]}),
     K(4, {pos: [0, .06, 0], tor: [6, 6, 0], lf: .5, fL: [.12, .2, -.04], fR: [-.12, .18, .08], aR: [60, 30, .95], hairS: -.5, skW: .4, ...B(-10, 0, -20, -1, {gL: .58})}, 'o'),
     K(7, APEX, 'o'), K(9, {...APEX, pos: [0, .12, 0], tor: [-2, 12, 0]}),
-    K(12, {...APEX, ...B(0, 0, 150, -1, {gL: .46}), tor: [-10, 4, 0], head: [-8, -4, 0], aR: [80, 30, .9], fL: [.12, .7, -.3], fR: [-.12, .66, -.2], pos: [0, .12, 0]}),
+    K(12, {...APEX, ...B(0, 0, 146, -1, {gL: .46}), tor: [-10, 4, 0], head: [-8, -4, 0], aR: [80, 30, .9], fL: [.12, .7, -.3], fR: [-.12, .66, -.2], pos: [0, .12, 0]}),
     flipK(13, -60, 140), flipK(14, -120, 130), flipK(15, -180, 120), flipK(16, -240, 110), flipK(17, -300, 100),
     K(18, {rot: [-360, 0, 0], pos: [0, .14, 0], tor: [-12, 0, 0], head: [-4, 0, 0], lf: .9, fL: [.12, .58, -.24], fR: [-.12, .54, -.12], ...B(0, 0, -270, -1, {gL: .5}), rh: .6, aR: [60, 10, .9], hairS: .3, skW: -.3}, 'l'),
     K(19, {pos: [0, .02, 0], lf: .5, fL: [.14, .3, -.2], fR: [-.14, .27, .08], ...B(0, 0, -330, -1, {gL: .56}), rh: .8}, 'l'),
@@ -264,30 +270,34 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   C('g_reform', [K(0, {...ST2, ...CROUCH, vis: .4, pos: [0, -.3, 0]}), K(3, {vis: 1}, 'o'), K(4, {pos: [0, -.26, 0]}), K(10, {...ST2})], {src: 'the ghost reforms (R1 / R3, A8 fail)'});
   // D1 g_dash: a compact ghost far away, hovering / growing 0-6, the straight dash 6-10 (leaning forward, the sword trailing), arrive
   // crouched at the player's right 10
-  const HOV = {...ST, ...AIR, lf: .8, pos: [0, .03, 0], tor: [-10, 6, 0], fL: [.13, .55, -.15], fR: [-.13, .5, -.02], ...B(0, 88, -150, 1, {gL: .6}), aR: [10, 40, .9]};
+  // Round V (lane VB; v_brief §3 VB 1): every approach carries the blade in the wind-up of the cut it leads into from its first
+  // shown tick (g_dash -> g_ring: raised up and back over her left; g_glide -> g_sweep; g_drop / g_run -> g_wrap), and every cut's
+  // tail ends in the next cut's wind-up (g_sweep -> g_x, g_wrap -> g_dome, g_dome -> g_dome / g_vert): a move whose hit is its
+  // tick 3 is blended in from the pose before it, so that pose IS its wind-up.
+  const HOV = {...ST, ...AIR, lf: .8, pos: [0, .03, 0], tor: [-10, -14, 0], fL: [.13, .55, -.15], fR: [-.13, .5, -.02], ...B(0, 30, 150, -1, {gL: .55}), aR: [10, 40, .9]};
   C('g_dash', [K(0, {...HOV, vis: .55}), K(6, {...HOV, vis: 1}, 'o'),
-    K(8, {...HOV, rot: [-40, 0, 0], tor: [-10, 0, 0], ...B(0, 88, -168, 1, {gL: .62}), hairS: -.8, skW: 1, aR: [-40, 30, .95]}, 'i'), K(9, {rot: [-46, 0, 0]}),
-    K(10, {...ST2, ...CROUCH, rot: [0, 0, 0], lf: 0, pos: [0, -.32, 0], ...B(0, 30, 150, 1, {gL: .55}), tor: [-14, -20, 0], hairS: 0, skW: 0}, 'i'), K(12, {pos: [0, -.3, 0]})],
+    K(8, {...HOV, rot: [-30, 0, 0], tor: [-10, -16, 0], hairS: -.8, skW: 1, aR: [-40, 30, .95]}, 'i'), K(9, {rot: [-34, 0, 0]}),
+    K(10, {...ST2, ...CROUCH, rot: [0, 0, 0], lf: 0, pos: [0, -.32, 0], ...B(0, 30, 150, -1, {gL: .55}), tor: [-14, -20, 0], hairS: 0, skW: 0}, 'i'), K(12, {pos: [0, -.3, 0]})],
     {src: 'v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash'});
   // D2 g_glide: appears low 0, glides in legs forward 2-9 (a sliding stop), the sword arm back
-  C('g_glide', [K(0, {...ST, ...LOW, vis: .5, ...B(0, 88, -150, 1, {gL: .6})}), K(2, {vis: 1, pos: [0, -.4, 0], rot: [12, 0, 0], tor: [-24, 10, 0], fL: [.13, .1, -.6], fR: [-.13, .12, .3], hairS: -.7, skW: .8}, 'o'),
-    K(9, {pos: [0, -.42, 0], rot: [6, 0, 0], tor: [-26, 14, 0], fL: [.15, .1, -.5], fR: [-.15, .1, .28], ...B(0, 88, -160, 1, {gL: .6}), hairS: -.2, skW: .2}, 'o'),
-    K(12, {...LOW, rot: [0, 0, 0], pos: [0, -.38, 0], hairS: 0, skW: 0})], {src: 'v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide'});
+  C('g_glide', [K(0, {...ST, ...LOW, vis: .5, ...SW(160, 20, -1, 140, -45, .62), tor: [-24, 30, 0]}), K(2, {vis: 1, pos: [0, -.42, 0], rot: [4, 0, 0], tor: [-24, 28, 0], fL: [.13, .1, -.6], fR: [-.13, .12, .3], hairS: -.7, skW: .8}, 'o'),
+    K(7, {pos: [0, -.42, 0], rot: [0, 0, 0], tor: [-24, 30, 0], fL: [.15, .1, -.5], fR: [-.15, .1, .28], hairS: -.2, skW: .2}, 'o'),
+    K(12, {...LOW, rot: [0, 0, 0], pos: [0, -.42, 0], tor: [-24, 30, 0], hairS: 0, skW: 0})], {src: 'v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide'});
   // D3 g_drop: the white-violet flash 0 (a tense crouch), dissolves 2 (gone 2-6), rematerialises up-right of the player 7 (sword
   // raised), drops diagonally onto them 7-12, lands 12
   C('g_drop', [K(0, {...ST, ...CROUCH, pos: [0, -.2, 0], aR: [30, 40, .95]}), K(2, {vis: 0}), K(6, {vis: 0}),
-    K(7, {...ST, ...AIR, vis: 1, lf: .8, pos: [0, .05, 0], tor: [4, -10, 0], ...B(0, 0, 130, 1, {gF: 0, gB: -20, gE: 40, gD: .6}), rh: .5, fL: [.13, .55, -.1], fR: [-.13, .5, .02]}),
-    K(10, {rot: [-24, 0, 0], ...B(0, 0, 40, 1, {gF: 0, gB: 0, gE: 20, gD: .6}), rh: .5, hairS: .5}, 'i'),
-    K(12, {...LOW, rot: [0, 0, 0], lf: 0, pos: [0, -.42, 0], ...B(0, 0, -70, 1, {gF: 0, gB: 10, gE: -40, gD: .6}), rh: 0, hairS: 0}, 'i'), K(14, {pos: [0, -.4, 0]})],
+    K(7, {...ST, ...AIR, vis: 1, lf: .8, pos: [0, .05, 0], tor: [-6, -24, 0], ...B(0, 70, 140, -1, {gL: .55}), fL: [.13, .55, -.1], fR: [-.13, .5, .02]}),
+    K(10, {rot: [-14, 0, 0], tor: [-10, -28, 0], hairS: .5}, 'i'),
+    K(12, {...ST, ...CROUCH, rot: [0, 0, 0], lf: 0, pos: [0, -.34, 0], ...B(0, 70, 140, -1, {gL: .55}), tor: [-12, -30, 0], hairS: 0}, 'i'), K(14, {pos: [0, -.34, 0]})],
     {src: 'v2 16.067-16.733 (mg_v2_blink): flash, blink, drop', cuts: [2, 7]});
   // D4 g_run: appears 0, runs in on foot 2-10 (the sword trailing at her right back; two strides), lunges with the sword raised
   // overhead in both hands 10
   const RUN = {...ST, rot: [-14, 0, 0], tor: [-10, 4, 0], head: [8, 0, 0], ...B(0, -88, 160, -1, {gL: .6}), aR: [-40, 20, .95], hairS: -.7, skW: .7};
   C('g_run', [K(0, {...RUN, vis: .5, fL: [.12, .1, -.3], fR: [-.12, .3, .4]}), K(2, {...RUN, vis: 1, fL: [.12, .1, .3], fR: [-.12, .26, -.2]}),
-    K(4, {fL: [.12, .3, .3], fR: [-.12, .1, -.45], aR: [40, 20, .95]}), K(6, {fL: [.12, .26, -.4], fR: [-.12, .1, .3], aR: [-40, 20, .95]}),
-    K(8, {fL: [.12, .1, -.2], fR: [-.12, .3, .3], ...B(0, -60, 145, -1, {gL: .56}), rh: .3}),
-    K(10, {rot: [-6, 0, 0], ...F_LUNGE, pos: [0, -.12, -.04], tor: [6, 0, 0], ...B(0, 0, 118, -1, {gL: .48}), rh: .8, hairS: -.2, skW: .3}, 'o'),
-    K(14, {...B(0, 0, 124, -1, {gL: .46}), rh: .9, pos: [0, -.1, -.04]})], {src: 'v3 17.667 (v3r_s7..): the run-in'});
+    K(4, {fL: [.12, .3, .3], fR: [-.12, .1, -.45], aR: [40, 20, .95], ...B(0, 70, 140, -1, {gL: .55}), tor: [-10, -24, 0]}), K(6, {fL: [.12, .26, -.4], fR: [-.12, .1, .3], aR: [-40, 20, .95]}),
+    K(8, {fL: [.12, .1, -.2], fR: [-.12, .3, .3]}),
+    K(10, {...ST, ...CROUCH, rot: [0, 0, 0], pos: [0, -.34, 0], tor: [-12, -30, 0], ...B(0, 70, 140, -1, {gL: .55}), hairS: -.2, skW: .3}, 'o'),
+    K(14, {pos: [0, -.34, 0]})], {src: 'v3 17.667 (v3r_s7..): the run-in'});
   // A8.1 g_ring: the arc wraps down from her upper left into a flat ring round the player at waist / knee height (hit 3, sweeping
   // her left -> right), then a spin in place to her right 4-14 that carries the sweep on
   C('g_ring', [K(0, {...ST2, ...CROUCH, ...B(0, 30, 150, -1, {gL: .55}), tor: [-14, -20, 0]}),
@@ -297,16 +307,17 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
     K(13, {rot: [0, 350, 0], tor: [-12, 20, 0]}, 'l'), K(14, {rot: [0, 360, 0], tor: [-12, 18, 0]}, 'o')], {src: 'v2 11.050, v3 9.583 (v2f_s1_1f): the ring cut'});
   // A8.2 g_rise: spins in place to her left 0-7, the sword held low behind at her right, the rising diagonal from the player's
   // lower left (her lower right) to the upper right (her upper left) 7-10 (hit 9), riding its upper end (rising, legs tucked)
-  C('g_rise', [K(0, {...ST2, ...CROUCH, ...B(0, 45, -150, 1, {gL: .56}), tor: [-10, 24, 0], aR: [40, 40, .9]}), K(2, {rot: [0, -90, 0]}, 'l'), K(4, {rot: [0, -200, 0]}, 'l'),
-    K(6, {rot: [0, -300, 0], tor: [-6, 30, 0], aR: [60, 40, .9]}, 'l'), K(7, {rot: [0, -360, 0], ...B(0, 45, -150, 1, {gL: .55}), pos: [0, -.32, 0]}, 'o'),
+  // (round V: the spin 0-7 is gone - a wind-up is a pose held, not a whirl: coiled low, the blade low and wide behind her right)
+  C('g_rise', [K(0, {...ST2, ...CROUCH, ...B(0, 45, -150, 1, {gL: .56}), tor: [-10, 24, 0], aR: [40, 40, .9]}),
+    K(6, {tor: [-8, 32, 0], aR: [60, 40, .9], pos: [0, -.3, 0]}), K(7, {...B(0, 45, -150, 1, {gL: .55}), pos: [0, -.32, 0]}, 'o'),
     K(8, {...B(0, 45, -80, 1, {gL: .62}), tor: [-4, 14, 0], pos: [0, -.2, 0]}, 'i'), K(9, {...B(0, 45, 0, 1, {gL: .66}), tor: [2, -4, 0], pos: [0, -.06, 0]}, 'l'),
     K(10, {...B(0, 45, 75, 1, {gL: .62}), tor: [8, -20, 0], lf: .6, pos: [0, .04, 0], fL: [.13, .4, -.1], fR: [-.13, .34, .06], hairS: .4}, 'l'),
     K(14, {...B(0, 45, 105, 1, {gL: .58}), tor: [6, -26, 0], pos: [0, .06, 0]}, 'o')], {src: 'v2 11.683, v3 10.200 (cr_a82_windup): spin, arms up, the band'});
   // A8.3 g_leap: coil 0-5 (the sword overhead, blade up-left, the body arched back), raise 5, the leaping diagonal (her upper left
   // -> lower right) 8-10 (hit 9), a forward tumble above the player about her centre 10-16 (the blade carried by the body), gone 17
   const tumK = (t, pt, thRel, x = {}) => K(t, {rot: [pt, 0, 0], pos: flipPos(pt, .5, .6), tor: [-16, 0, 0], lf: 1, fL: [.12, .7, -.3], fR: [-.12, .66, -.2], ...B(0, 0, thRel + pt, -1, {gL: .5}), ...x}, 'l');
-  C('g_leap', [K(0, {...ST2, ...CROUCH, ...B(0, 45, 130, -1, {gL: .5}), tor: [8, -14, 0], rh: .4}), K(5, {...B(0, 45, 150, -1, {gL: .48}), tor: [14, -18, 0], head: [-12, 10, 0], pos: [0, -.24, 0]}, 'o'),
-    K(7, {...AIR, lf: .8, pos: [0, .1, 0], fL: [.13, .5, -.1], fR: [-.13, .44, .04], ...B(0, 45, 115, -1, {gL: .52}), tor: [10, -14, 0]}, 'o'),
+  C('g_leap', [K(0, {...ST2, ...CROUCH, ...B(0, 45, 138, -1, {gL: .5}), tor: [8, -14, 0], rh: .4}), K(5, {...B(0, 45, 142, -1, {gL: .5}), tor: [12, -18, 0], head: [-12, 10, 0], pos: [0, -.24, 0]}, 'o'),
+    K(7, {...AIR, lf: .8, pos: [0, -.06, 0], fL: [.13, .5, -.1], fR: [-.13, .44, .04], ...B(0, 45, 138, -1, {gL: .5}), tor: [10, -14, 0]}, 'o'),
     K(8, {...B(0, 45, 55, -1, {gL: .6}), tor: [-4, -4, 0]}, 'i'), K(9, {...B(0, 45, -5, -1, {gL: .64}), tor: [-14, 10, 0]}, 'l'),
     K(10, {...B(0, 45, -60, -1, {gL: .6}), tor: [-18, 16, 0], rh: 0, pos: [0, .3, 0]}, 'l'),
     tumK(11, -40, -50), tumK(12, -100, -50), tumK(13, -160, -50), tumK(14, -220, -50), tumK(15, -280, -50), tumK(16, -330, -50, {vis: .3}), K(17, {vis: 0}), K(18, {vis: 0})],
@@ -315,12 +326,11 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // turning 4-14
   C('g_sweep', [K(0, {...ST, ...LOW, pos: [0, -.42, 0], ...SW(160, 20, -1, 140, -45, .62), tor: [-24, 30, 0]}),
     K(2, {...SW(85, 20, -1, 80, -48, .66), tor: [-26, 14, 0]}, 'i'), K(3, {...SW(0, 20, -1, 0, -50, .68), tor: [-24, -4, 0]}, 'l'), K(4, {...SW(-70, 18, -1, -65, -45, .64), tor: [-20, -22, 0]}, 'l'),
-    K(6, {...AIR, lf: .7, pos: [0, .06, 0], tor: [0, -10, 0], head: [-6, 0, 0], fL: [.08, .35, -.02], fR: [-.08, .32, .04], ...SW(-100, 15, -1, -95, -20, .6), hairS: .3}, 'o'),
-    K(10, {rot: [0, 60, 0], ...SW(-100, 25, -1, -95, -30, .58)}), K(14, {rot: [0, 110, 0], pos: [0, .05, 0], ...SW(-100, 35, -1, -95, -35, .56)})], {src: 'v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring'});
+    K(7, {...AIR, lf: .7, pos: [0, .06, 0], tor: [6, 30, 0], head: [-10, -20, 0], fL: [.08, .35, -.02], fR: [-.08, .32, .04], ...B(0, -45, 148, -1, {gL: .5}), tw: 0, aR: [40, 40, .9], hairS: .3}, 'o'),
+    K(14, {pos: [0, .05, 0], tor: [8, 34, 0]})], {src: 'v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring'});
   // A8.5 g_x: drops at the player's right 0, the sword swung up behind her right 0-3, the big crescent her upper right -> lower
   // left (hit 6) crossing the sweep into an X, stays close 7-13, gone 14 (th in the -360 range: the backswing runs on)
-  C('g_x', [K(0, {...ST, ...CROUCH, pos: [0, -.3, 0], ...B(0, -45, -50, -1, {gL: .55})}),
-    K(3, {...B(0, -45, -212, -1, {gL: .5}), tor: [6, 30, 0], head: [-10, -20, 0], pos: [0, -.16, 0], aR: [40, 40, .9]}, 'l'),
+  C('g_x', [K(0, {...ST, ...CROUCH, pos: [0, -.16, 0], ...B(0, -45, -212, -1, {gL: .5}), tor: [6, 30, 0], head: [-10, -20, 0], aR: [40, 40, .9]}),
     K(4, {...B(0, -45, -220, -1, {gL: .48}), tor: [8, 34, 0]}), K(5, {...B(0, -45, -290, -1, {gL: .6}), tor: [-4, 14, 0], pos: [0, -.24, 0]}, 'i'),
     K(6, {...B(0, -45, -358, -1, {gL: .66}), tor: [-14, -8, 0]}, 'l'), K(7, {...B(0, -45, -410, -1, {gL: .62}), tor: [-20, -24, 0], pos: [0, -.32, 0]}, 'o'),
     K(13, {...B(0, -45, -412, -1, {gL: .6}), pos: [0, -.3, 0], tor: [-18, -20, 0]}), K(14, {vis: 0}), K(16, {vis: 0})],
@@ -329,20 +339,24 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // to the right (hit 3), twisting / crouching over the player
   C('g_wrap', [K(0, {...ST, ...CROUCH, pos: [0, -.34, 0], ...B(0, 70, 140, -1, {gL: .55}), tor: [-12, -30, 0]}),
     K(2, {...B(0, 70, 60, -1, {gL: .62}), tor: [-16, -10, 0], pos: [0, -.38, 0]}, 'i'), K(3, {...B(0, 70, -20, -1, {gL: .66}), tor: [-16, 10, 0]}, 'l'),
-    K(4, {...B(0, 60, -90, -1, {gL: .62}), tor: [-14, 28, 0], pos: [0, -.32, 0]}, 'l'), K(6, {...B(0, 45, -130, -1, {gL: .58}), tor: [-10, 36, 0]}, 'o'), K(12, {pos: [0, -.3, 0], tor: [-14, 30, 0]})],
+    K(4, {...B(0, 60, -90, -1, {gL: .62}), tor: [-14, 28, 0], pos: [0, -.32, 0]}, 'l'), K(6, {...B(0, 45, -130, -1, {gL: .58}), tor: [-10, 36, 0]}, 'o'),
+    K(9, {...ST, pos: [0, -.18, 0], ...SW(60, -50, -1, 40, 30, .55), tor: [4, 10, 0]}, 'io'), K(12, {pos: [0, -.19, 0], tor: [4, 12, 0]})],
     {src: 'v2 ~16.91, v3 ~18.300 (v2f_s6_*): the wrap-around'});
   // A8.7 g_dome: the swirl over her right 0-2 (the blade lowered into the flat), the spin to her left with the blade out at the
   // waist 1-6 (hit 3), settle
   C('g_dome', [K(0, {...ST, pos: [0, -.18, 0], ...SW(60, -50, -1, 40, 30, .55), tor: [4, 10, 0]}),
     K(1, {rot: [0, -30, 0], ...SW(95, -15, -1, 75, 0, .6), tor: [-2, 14, 0], pos: [0, -.2, 0]}, 'l'), K(2, {rot: [0, -100, 0], ...SW(90, 8, -1, 80, -25, .62), tor: [-6, 18, 0]}, 'l'),
     K(3, {rot: [0, -180, 0]}, 'l'), K(4, {rot: [0, -260, 0]}, 'l'), K(5, {rot: [0, -330, 0], tor: [-8, 10, 0]}, 'l'), K(6, {rot: [0, -360, 0]}, 'l'),
-    K(9, {rot: [0, -380, 0], ...SW(70, 15, -1, 60, -30, .6), pos: [0, -.2, 0]}, 'o'), K(12, {rot: [0, -380, 0], ...SW(60, 25, -1, 50, -35, .58)})],
+    K(9, {rot: [0, -360, 0], ...SW(60, -50, -1, 40, 30, .55), tor: [4, 10, 0], pos: [0, -.18, 0]}, 'o'), K(12, {rot: [0, -360, 0], pos: [0, -.19, 0], tor: [4, 12, 0]})],
     {src: 'v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome'});
   // A8.8 g_vert: crouched low at the player's right, the blade low in front (the pink glow 1-4 is the module's look/blade/pink),
   // springs up cutting vertically (hit 5), rises up and out of view turning head-first 6-17 (the blade carried by the body), gone 18
-  C('g_vert', [K(0, {...ST, ...LOW, pos: [0, -.44, 0], ...B(20, 0, -35, 1, {gL: .58}), tor: [-26, 20, 0]}), K(4, {pos: [0, -.46, 0], tor: [-28, 22, 0], ...B(20, 0, -38, 1, {gL: .58})}),
-    K(5, {...B(10, 0, 30, 1, {gL: .64}), tor: [-10, 10, 0], pos: [0, -.2, 0]}, 'i'),
-    K(6, {...B(0, 0, 95, 1, {gL: .62}), tor: [6, 0, 0], pos: [0, .05, 0], lf: .6, fL: [.12, .3, -.04], fR: [-.12, .26, .06]}, 'l'),
+  // (round V: it follows g_dome, whose tail holds the blade up at her right: g_vert cuts DOWN from there - the falling diagonal
+  // her upper right -> lower left, hit 5 -, then springs up and out of view as before)
+  C('g_vert', [K(0, {...ST, pos: [0, -.18, 0], ...SW(60, -50, -1, 40, 30, .55), tor: [4, 10, 0]}), K(3, {pos: [0, -.2, 0], tor: [6, 14, 0]}),
+    K(4, {...B(0, -45, 96, -1, {gL: .54}), tw: 0, tor: [2, 18, 0], pos: [0, -.2, 0]}, 'i'),
+    K(5, {...B(0, -45, 6, -1, {gL: .64}), tw: 0, tor: [-12, -6, 0], pos: [0, -.26, 0]}, 'l'),
+    K(6, {...B(0, -45, -70, -1, {gL: .6}), tw: 0, tor: [-10, -20, 0], pos: [0, .05, 0], lf: .6, fL: [.12, .3, -.04], fR: [-.12, .26, .06]}, 'l'),
     K(9, {rot: [-55, 0, 0], pos: [0, .3, 0], ...B(0, 0, 75, 1, {gL: .55}), tor: [-10, 0, 0], lf: 1, fL: [.12, .6, -.2], fR: [-.12, .56, -.1]}, 'l'),
     K(12, {rot: [-110, 0, 0], pos: [0, .7, 0], ...B(0, 0, 50, 1)}, 'l'), K(15, {rot: [-165, 0, 0], pos: [0, 1, 0], ...B(0, 0, 10, 1)}, 'l'),
     K(17, {rot: [-200, 0, 0], pos: [0, 1.1, 0], ...B(0, 0, -20, 1), vis: .4}, 'l'), K(18, {vis: 0}), K(20, {vis: 0})],
@@ -350,9 +364,12 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   // A8.9 g_dive: reappears high in her normal colours, the sword overhead in both hands 0, swung down in front as she dives
   // head-first 1-3, the blade leading down along the dive (hit 6)
   const DV = {...ST, ...AIR, lf: .9, rot: [-50, 0, 0], pos: [0, .9, .1], tor: [-10, 0, 0], head: [-20, 0, 0], ...B(0, 0, -50, -1, {gL: .55}), rh: 1, fL: [.12, .6, .25], fR: [-.12, .56, .3], hairS: .6, skW: -.8};
+  // (round V: contract len 22, dive 15, hit 18: she hangs in view with the blade raised in both hands 0-14 - the wind-up nobody
+  // can miss -, swings it down as she tips over 15-17, the blade leading down along the dive at 18)
   C('g_dive', [K(0, {...ST, ...AIR, lf: .8, pos: [0, .5, 0], ...B(0, 0, 120, -1, {gL: .5}), rh: 1, tor: [6, 0, 0]}),
-    K(1, {...B(0, 0, 80, -1, {gL: .5}), rot: [-15, 0, 0], pos: [0, .6, 0]}), K(2, {...B(0, 0, 15, -1, {gL: .52}), rot: [-35, 0, 0], pos: [0, .75, .05]}, 'l'),
-    K(3, DV, 'l'), K(6, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})}), K(10, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})})],
+    K(8, {...B(0, 0, 126, -1, {gL: .5}), pos: [0, .54, 0], tor: [8, 0, 0]}), K(14, {...B(0, 0, 122, -1, {gL: .5}), pos: [0, .5, 0], tor: [6, 0, 0]}),
+    K(15, {...B(0, 0, 80, -1, {gL: .5}), rot: [-15, 0, 0], pos: [0, .6, 0]}, 'i'), K(16, {...B(0, 0, 15, -1, {gL: .52}), rot: [-35, 0, 0], pos: [0, .75, .05]}, 'l'),
+    K(17, DV, 'l'), K(18, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})}, 'l'), K(22, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})})],
     // blend 1 (S2d round 3, C3-1): the module plays g_dive right after hiding the rig (g_vert's 'gone'), so there is no pose to
     // blend from: the whole body shows at t1 (S2c's figure)
     {src: 'v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down', blend: 1});
@@ -447,7 +464,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
   const COIL = {pos: [0, -.16, 0], tor: [-8, 42, 0], head: [-4, -36, 0], ...F_WIDE, ...SW(120, 4, -1, 96, -12, .66), aR: [20, 50, .95]};
   const LOWF = {rot: [0, -360, 0], pos: [0, -.2, 0], tor: [-14, 26, 0], head: [-4, -20, 0], ...F_WIDE, ...Bz(30, 0, -36, 1, {gL: .56}), rh: 0, aR: [16, 40, .95]};
   const LHIP = {rot: [0, -360, 0], pos: [0, -.2, 0], tor: [-10, -38, 0], head: [-4, 32, 0], ...F_WIDE, ...SWr(-125, 6, -100, -28, .6), rh: 0, aR: [30, 40, .95]};
-  C('d4', [K(0, ST), K(3, {pos: [0, -.06, 0], tor: [-4, 18, 0], head: [-4, -14, 0], ...SW(70, 0, -1, 55, -8, .56)}), K(6, COIL, 'o'), K(8, {...COIL, pos: [0, -.2, 0], tor: [-9, 46, 0]}),
+  C('d4', [K(0, ST), K(2, {pos: [0, -.06, 0], tor: [-4, 18, 0], head: [-4, -14, 0], ...SW(70, 0, -1, 55, -8, .56)}, 'l'), K(4, COIL, 'o'), K(8, {...COIL, pos: [0, -.2, 0], tor: [-9, 46, 0]}),
     ...spin(9, 6, 0, -360, 120, 20, -1, -12, .68, u => ({tor: [-6, mix(46, 0, u), 0], head: [-4, mix(-36, 0, u), 0], pos: [0, -.14, 0], ...F_ST, aR: [30, 60, .95]})),
     K(17, {rot: [0, -360, 0], ...SW(-30, 14, -1, -24, -20, .64), tor: [-8, -10, 0], pos: [0, -.16, 0]}, 'l'),
     K(20, LOWF), K(27, {...LOWF, pos: [0, -.24, 0], tor: [-16, 32, 0]}), K(31, {...LOWF, pos: [0, -.26, 0], tor: [-17, 34, 0]}),
@@ -459,8 +476,8 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(43, {...Bz(0, 0, 62, -1, {gL: .54}), rh: 1, tor: [-8, 0, 0], pos: [0, -.14, -.04], ...F_LUNGE}, 'i'),
     K(44, {...Bz(0, 0, 2, -1, {gL: .6}), rh: 1, tor: [-22, 0, 0], pos: [0, -.26, -.06], head: [-2, 0, 0]}, 'l'),
     K(45, {...Bz(0, 0, -30, -1, {gL: .56}), rh: .6, tor: [-24, 0, 0]}, 'o'),
-    K(46, {...SWr(-40, 24, -30, -30, .6), rh: .2, tor: [-20, -14, 0], pos: [0, -.24, -.04]}, 'l'), K(47, {...SWr(-88, 12, -70, -28, .6), rh: 0, tor: [-14, -28, 0], pos: [0, -.21, -.02], ...F_WIDE}, 'l'),
-    K(48, LHIP, 'l'), K(51, {...LHIP, pos: [0, -.24, 0], tor: [-11, -42, 0]}),
+    K(46, {...SWr(-52, 22, -38, -30, .6), rh: .1, tor: [-18, -18, 0], pos: [0, -.23, -.03], ...F_WIDE}, 'l'),
+    K(47, LHIP, 'l'), K(51, {...LHIP, pos: [0, -.24, 0], tor: [-11, -42, 0]}),
     K(52, {...SWr(-95, 6, -78, -28, .62), tor: [-12, -28, 0]}, 'i'), K(53, {...SWr(-45, 6, -36, -26, .64), tor: [-12, -10, 0], head: [-4, 12, 0]}, 'l'),
     K(54, {...SWr(5, 5, 4, -24, .66), tor: [-12, 8, 0], head: [-4, 0, 0], pos: [0, -.22, -.05], ...F_LUNGE}, 'l'),
     K(55, {...SWr(55, 5, 45, -24, .64), tor: [-12, 24, 0], head: [-4, -12, 0]}, 'l'), K(56, {...SWr(100, 4, 82, -24, .62), tor: [-10, 36, 0], head: [-4, -24, 0]}, 'l'),
@@ -479,7 +496,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
   const HR = {pos: [0, -.12, 0], rot: [0, 0, 0], tor: [-2, 38, 0], head: [-8, -30, 0], ...F_WIDE, ...Bz(0, -58, 118, -1, {gL: .52}), rh: 0, aR: [24, 44, .95]};
   const body = (sd, lunge) => u => ({tor: [mix(-4, -20, u), mix(36, -38, u) * sd, 0], head: [-6, mix(-28, 22, u) * sd, 0], pos: [0, mix(-.14, -.32, Math.min(1, u * 2)), mix(0, -.08, u)],
     ...(u >= .25 ? lunge : {})});
-  C('tri', [K(0, ST), K(2, {pos: [0, -.14, .02], tor: [-8, -14, 0], gF: 0, gB: -60, gE: -44, gD: .56, cB: 12, cR: 0, th: -14, ed: -1, tw: 0}, 'l'), K(5, CH, 'o'),
+  C('tri', [K(0, ST), K(2, {pos: [0, -.14, .02], tor: [-8, -14, 0], gF: 0, gB: -60, gE: -44, gD: .56, cB: 12, cR: 0, th: -14, ed: -1, tw: 0}, 'l'), K(4, CH, 'o'),
     K(7, {...CH, pos: [0, -.37, .06], tor: [-17, -40, 0]}), K(11, {...CH, pos: [0, -.4, .08], tor: [-18, -44, 0], gB: -108}),
     K(12, {rot: [-14, 0, 0], pos: [0, -.34, 0], gB: -70, gE: -26, gD: .52, cB: -8, th: 6, tor: [-14, -20, 0], head: [6, 16, 0], lf: .2, fL: [.16, .16, -.2], fR: [-.17, .12, .3], hairS: -.6, skW: .8}, 'i'),
     K(13, {rot: [-22, 0, 0], gB: -30, gE: -14, gD: .6, cB: -2, th: 2, tor: [-14, 4, 0], head: [12, -4, 0], fL: [.16, .12, -.54], fR: [-.17, .2, .46], aR: [20, 60, .95]}, 'l'),
@@ -488,8 +505,8 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(17, {rot: [-16, 0, 0], pos: [0, -.35, -.1], tor: [-13, 30, 0], hairS: 0, skW: 0}), K(25, HR, 'io'), K(31, {...HR, pos: [0, -.16, 0], tor: [-3, 42, 0]}), K(35, {...HR, pos: [0, -.18, 0], tor: [-4, 44, 0]}),
     ...cut(36, 4, 0, -58, 118, -112, -1, [.52, .66], body(1, F_LUNGE)),
     // (the blade swings out round her left side on its way up: at the cue 41 it is side-on to the viewer, not end-on)
-    K(41, {...Bz(-96, 0, -24, -1, {gL: .6}), tor: [-16, -40, 0], pos: [0, -.26, -.05]}, 'l'), K(42, {...Bz(-104, 20, 50, -1, {gL: .54}), tor: [-8, -42, 0], pos: [0, -.18, -.02]}, 'l'),
-    K(43, {...Bz(0, 58, -242, -1, {gL: .52}), tor: [-3, -40, 0], pos: [0, -.12, 0], head: [-8, 30, 0], fL: [.25, .1, .2], fR: [-.25, .1, -.24], aR: [30, 50, .95]}, 'l'),
+    K(41, {...Bz(-96, 0, -24, -1, {gL: .6}), tor: [-16, -40, 0], pos: [0, -.26, -.05]}, 'l'),
+    K(42, {...Bz(0, 58, -242, -1, {gL: .52}), tor: [-3, -40, 0], pos: [0, -.12, 0], head: [-8, 30, 0], fL: [.25, .1, .2], fR: [-.25, .1, -.24], aR: [30, 50, .95]}, 'l'),
     K(45, {...Bz(0, 58, -240, -1, {gL: .52}), tor: [-3, -43, 0], pos: [0, -.14, 0]}),
     ...cut(46, 4, 0, 58, -242, -472, -1, [.52, .66], body(-1, F_LUNGE_R)),
     K(51, {...Bz(0, 20, -512, -1, {gL: .56}), tor: [-16, 40, 0], pos: [0, -.26, -.05]}, 'l'), K(52, {...Bz(0, -20, -566, -1, {gL: .52}), tor: [-8, 44, 0], pos: [0, -.18, -.02]}, 'l'),
@@ -512,7 +529,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(t + 7, {...SW(-45 * sd, 4, -sd, -36 * sd, -10, .68), tw: 54 * sd, tor: [-7, -24 * sd, 0], head: [-4, 20 * sd, 0], pos: [0, -.14, 0]}, 'l'),
     K(t + 8, {...SW(-90 * sd, 4, -sd, -72 * sd, -10, .67), tw: -18 * sd, tor: [-8, -36 * sd, 0], head: [-4, 32 * sd, 0], pos: [0, -.17, 0], ...F_WIDE}, 'l'),
     K(t + 9, {...(sd > 0 ? CL : CR), rot: [0, y0 - 360 * sd, 0]}, 'l')];
-  C('rings', [K(0, ST), K(3, {pos: [0, -.08, 0], tor: [-4, 20, 0], head: [-4, -16, 0], ...SW(75, 0, -1, 60, -8, .56)}), K(6, CR, 'o'), K(8, {...CR, pos: [0, -.2, 0], tor: [-9, 48, 0]}),
+  C('rings', [K(0, ST), K(2, {pos: [0, -.08, 0], tor: [-4, 20, 0], head: [-4, -16, 0], ...SW(75, 0, -1, 60, -8, .56)}, 'l'), K(4, CR, 'o'), K(8, {...CR, pos: [0, -.2, 0], tor: [-9, 48, 0]}),
     ...turn(9, 0, 1), ...turn(19, -360, -1), ...turn(29, 0, 1), ...turn(39, -360, -1), ...turn(49, 0, 1).slice(0, 7),
     K(58, {rot: [0, -360, 0], ...SW(-60, 10, -1, -50, -20, .64), pos: [0, -.16, 0], tor: [-8, -24, 0], head: [-4, 20, 0], ...F_WIDE}, 'o'),
     K(66, {rot: [0, -360, 0], ...SW(-70, 22, -1, -60, -34, .6), pos: [0, -.12, 0], tor: [-6, -18, 0], head: [-4, 12, 0], ...F_ST}), K(78, {...ST, rot: [0, -360, 0]})],
@@ -566,7 +583,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
   const UP = {pos: [0, -.01, 0], tor: [-2, -8, 0], head: [-6, 6, 0], ...F_TOG, ...Bz(-90, 0, 50, -1, {gL: .7}), tw: 90, rh: 0, hR: 'open', aR: [-14, 16, .96]};
   const CHM = {pos: [0, -.2, .08], tor: [-8, -46, 0], head: [-4, 42, 0], fL: [.16, .1, .38], fR: [-.14, .1, -.34], gF: 0, gB: -66, gE: 24, gD: .46, cB: -24, cR: 0, th: 10, ed: -1, tw: 90,
     rh: 0, hR: 'open', aR: [84, -16, .7]};
-  C('blue', [K(0, ST), K(2, {...Bz(-40, 0, -4, -1, {gL: .6}), tw: 45, pos: [0, -.02, 0]}, 'l'), K(4, UP, 'o'), K(10, {...UP, pos: [0, 0, 0], ...Bz(-90, 0, 54, -1, {gL: .7}), tw: 90}), K(15, CHM, 'io'), K(19, {...CHM, pos: [0, -.24, .11], tor: [-9, -50, 0], gB: -72}),
+  C('blue', [K(0, ST), K(2, {...Bz(-40, 0, -4, -1, {gL: .6}), tw: 45, pos: [0, -.02, 0]}, 'l'), K(4, UP, 'o'), K(8, {...UP, pos: [0, 0, 0], ...Bz(-90, 0, 54, -1, {gL: .7}), tw: 90}), K(12, CHM, 'io'), K(19, {...CHM, pos: [0, -.24, .11], tor: [-9, -50, 0], gB: -72}),
     K(20, {rot: [-12, 0, 0], pos: [0, -.26, 0], gB: -40, gE: 16, gD: .56, cB: -12, th: 5, tor: [-9, -20, 0], head: [4, 18, 0], lf: .2, fL: [.16, .14, -.1], fR: [-.15, .12, .2], aR: [40, 30, .8], hairS: -.6,
       skW: .8}, 'i'),
     K(21, {rot: [-18, 0, 0], gB: -16, gE: 8, gD: .7, cB: -4, th: 2, tor: [-10, 8, 0], head: [10, -6, 0], fL: [.16, .12, -.52], fR: [-.16, .18, .44], aR: [0, 60, .9]}, 'l'),
@@ -610,8 +627,8 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(16, {rot: [-10, 0, 0], ...Bz(0, 0, 102, 0, {gL: .5}), tor: [0, 0, 0], head: [-6, 0, 0], pos: [0, -.2, -.1], lf: 0, ...F_LUNGE}, 'l'),
     K(17, {rot: [-8, 0, 0], ...Bz(0, 45, 118, -1, {gL: .52}), tor: [-2, -20, 0], head: [-6, 16, 0], pos: [0, -.22, -.1]}, 'l'),
     K(18, {rot: [-6, 0, 0], ...Bz(0, 45, 24, -1, {gL: .66}), tor: [-14, 4, 0], head: [0, -4, 0], pos: [0, -.32, -.1], hairS: -.2, skW: .2}, 'l'),
-    K(19, {rot: [-3, 0, 0], ...Bz(0, 45, -66, -1, {gL: .62}), tor: [-20, 26, 0], head: [2, -18, 0], pos: [0, -.36, -.1]}, 'l'), K(20, {rot: [-2, 0, 0], ...Bz(0, 45, -102, -1, {gL: .58}), tor: [-20, 32, 0]}, 'o'),
-    K(22, SWIRL, 'io'), K(23, {...SWIRL, pos: [0, -.2, 0], tor: [5, 16, 0]}),
+    K(19, {rot: [-3, 0, 0], ...Bz(0, 45, -80, -1, {gL: .62}), tor: [-20, 28, 0], head: [2, -18, 0], pos: [0, -.36, -.1]}, 'l'),
+    K(21, SWIRL, 'l'), K(23, {...SWIRL, pos: [0, -.2, 0], tor: [5, 16, 0]}),
     K(24, {rot: [0, -30, 0], ...SW(95, -15, -1, 75, 0, .6), tor: [-2, 14, 0], pos: [0, -.2, 0]}, 'l'), K(25, {rot: [0, -95, 0], ...SW(90, 8, -1, 78, -24, .64), tor: [-6, 18, 0]}, 'l'),
     K(26, {rot: [0, -165, 0]}, 'l'), K(27, {rot: [0, -235, 0]}, 'l'), K(28, {rot: [0, -300, 0]}, 'l'), K(29, {rot: [0, -345, 0], tor: [-8, 10, 0]}, 'l'), K(30, {rot: [0, -360, 0]}, 'l'),
     K(33, {rot: [0, -376, 0], ...SW(70, 15, -1, 60, -30, .6), pos: [0, -.2, 0]}, 'o'), K(40, {rot: [0, -372, 0], ...SW(60, 25, -1, 50, -35, .58), pos: [0, -.16, 0]}), K(60, {...ST2, rot: [0, -360, 0]})],
@@ -629,14 +646,14 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
   C('nb', [K(0, ST2), K(2, {...CROUCH, pos: [0, -.32, 0], tor: [-22, 8, 0], ...Bz(30, 0, -30, -1, {gL: .55})}),
     K(4, {pos: [0, .06, 0], tor: [6, 6, 0], head: [-10, -4, 0], lf: .5, fL: [.12, .2, -.04], fR: [-.12, .18, .08], aR: [60, 30, .95], hairS: -.5, skW: .4, ...Bz(-10, 0, -20, -1, {gL: .58})}, 'o'),
     K(8, HANG, 'o'), K(13, {...HANG, pos: [0, .36, 0], tor: [-9, 38, 0]}), K(17, {...HANG, pos: [0, .37, 0], tor: [-8, 40, 0]}),
-    ...airCut(18, -40, 1), K(23, {...Bz(-10, -10, -132, -1, {gL: .56}), tor: [-18, -34, 0]}, 'l'), K(24, {...Bz(15, 20, -196, -1, {gL: .52}), tor: [-12, -38, 0]}, 'l'),
-    K(25, {...Bz(30, 40, -252, -1, {gL: .52}), tor: [-10, -38, 0], head: [-14, 28, 0], fL: [.13, .6, -.04], fR: [-.14, .72, -.28]}, 'l'), K(27, {...Bz(30, 40, -250, -1, {gL: .52}), tor: [-8, -40, 0]}),
+    ...airCut(18, -40, 1), K(23, {...Bz(5, 8, -166, -1, {gL: .54}), tor: [-15, -36, 0]}, 'l'),
+    K(24, {...Bz(30, 40, -252, -1, {gL: .52}), tor: [-10, -38, 0], head: [-14, 28, 0], fL: [.13, .6, -.04], fR: [-.14, .72, -.28]}, 'l'), K(27, {...Bz(30, 40, -250, -1, {gL: .52}), tor: [-8, -40, 0]}),
     ...cut(28, 4, 30, 40, -252, -440, -1, [.52, .66], u => ({tor: [mix(-10, -22, u), mix(-38, 30, u), 0], head: [-14, mix(28, -22, u), 0]})),
     // (the blade back up before her the short way, both hands: the chop's wind-up; flat to the viewer)
-    K(33, {...Bz(16, 20, -404, -1, {gF: .6, gB: 0, gE: 10, gD: .55, gL: .56}), tor: [-18, 16, 0], rh: .3}, 'l'),
-    K(34, {...Bz(0, 0, -338, -1, {gF: .2, gB: 0, gE: 20, gD: .55}), tw: 45, tor: [-12, 6, 0], head: [-16, -4, 0], rh: .7}, 'l'),
-    K(35, {...Bz(0, 0, -268, -1, {gF: 0, gB: 0, gE: 28, gD: .56}), tw: 90, tor: [-6, 0, 0], head: [-18, 0, 0], rh: 1, hR: 'grip', fL: [.13, .7, -.2], fR: [-.13, .66, -.1]}, 'l'),
-    K(38, {...Bz(0, 0, -264, -1, {gF: 0, gB: 0, gE: 30, gD: .56}), tw: 90, tor: [-4, 0, 0], pos: [0, .38, 0]}),
+    K(33, {...Bz(14, 18, -388, -1, {gF: .5, gB: 0, gE: 12, gD: .55, gL: .56}), tw: 15, tor: [-17, 14, 0], rh: .4}, 'l'),
+    K(34, {...Bz(0, 0, -266, -1, {gF: 0, gB: 0, gE: 31, gD: .57}), tw: 90, tor: [-5, 0, 0], head: [-18, 0, 0], rh: .8, hR: 'grip', fL: [.13, .7, -.2], fR: [-.13, .66, -.1]}, 'l'),
+    K(35, {...Bz(0, 0, -266, -1, {gF: 0, gB: 0, gE: 33, gD: .54}), tw: 90, rh: 1}, 'l'),
+    K(38, {...Bz(0, 0, -264, -1, {gF: 0, gB: 0, gE: 33, gD: .54}), tw: 90, tor: [-4, 0, 0], pos: [0, .38, 0]}),
     K(39, {...Bz(0, 0, -312, -1, {gF: .6, gL: .56}), tw: 40, tor: [-14, 0, 0]}, 'i'), K(40, {...Bz(0, 0, -362, -1, {gL: .62}), rh: 1, tor: [-24, 0, 0], head: [-10, 0, 0], pos: [0, .3, 0]}, 'l'),
     K(41, {...Bz(0, 0, -392, -1, {gL: .6}), rh: .8, tor: [-26, 0, 0]}, 'o'),
     K(44, {rot: [-6, 0, 0], pos: [0, .12, 0], lf: .6, fL: [.14, .34, -.16], fR: [-.14, .3, .1], tor: [-18, 0, 0], head: [0, 0, 0], hairS: .5, skW: -.5}, 'l'),

@@ -31,3 +31,4 @@ execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run 
 # The options hold for this draw only.
 scoreboard players set #buHpCol bu 0
 scoreboard players set #buNoNum bu 0
+scoreboard players set #buSubSeg bu 0

@@ -862,12 +862,12 @@
   },
   "g_dive": {
    "id": 44,
-   "len": 10,
+   "len": 22,
    "loop": null,
    "events": {
     "appear": 0,
-    "dive": 3,
-    "hit": 6
+    "dive": 15,
+    "hit": 18
    },
    "owner": "S2a"
   },
@@ -1155,7 +1155,8 @@
    "lilac",
    "pink",
    "violet",
-   "gold"
+   "gold",
+   "edge"
   ],
   "scabbard": [
    "hand",
@@ -1220,6 +1221,7 @@
   "look/blade/pink",
   "look/blade/violet",
   "look/blade/gold",
+  "look/blade/edge",
   "look/scabbard/hand",
   "look/scabbard/hip",
   "look/scabbard/gone",

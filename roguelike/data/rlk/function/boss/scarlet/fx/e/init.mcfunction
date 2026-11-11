@@ -34,7 +34,7 @@ scoreboard players set #c4 hrFx 4
 scoreboard players set #c26 hrFx 26
 scoreboard players set #c90 hrFx 90
 # spin axes (= the card normal) of the flat and cross kinds; face / lance kinds keep z (storage a default)
-data modify storage rlk:hr fx.ax set value {qi_arc_0:"0f,1f,0f",qi_arc_1:"0f,1f,0f",qi_arc_2:"0f,1f,0f",qi_arc_3:"0f,1f,0f",qi_ring_0:"0f,1f,0f",qi_ring_1:"0f,1f,0f",qi_ribbon_0:"0f,1f,0f",qi_ribbon_1:"0f,1f,0f",qi_wedge:"0f,1f,0f",dive_impact:"0f,1f,0f",light_column:"0f,1f,0f",disc_0:"0f,1f,0f",disc_1:"0f,1f,0f"}
+data modify storage rlk:hr fx.ax set value {qi_arc_0:"0f,1f,0f",qi_arc_1:"0f,1f,0f",qi_arc_2:"0f,1f,0f",qi_arc_3:"0f,1f,0f",qi_ring_0:"0f,1f,0f",qi_ring_1:"0f,1f,0f",qi_ribbon_0:"0f,1f,0f",qi_ribbon_1:"0f,1f,0f",qi_wedge:"0f,1f,0f",dive_impact:"0f,1f,0f",light_column:"0f,1f,0f",disc_0:"0f,1f,0f",disc_1:"0f,1f,0f",sw_arc_0:"0f,1f,0f",sw_arc_1:"0f,1f,0f",sw_arc_2:"0f,1f,0f"}
 # the floor (y x 100) the clamps measure from: the arena's (201); test/stage sets the demo floor
 data modify storage rlk:hr fx.fl set value 20100
 # the crescent floor clamp: the lowest point per mille per (pitch cell, roll cell), fx/e/clamp_arc

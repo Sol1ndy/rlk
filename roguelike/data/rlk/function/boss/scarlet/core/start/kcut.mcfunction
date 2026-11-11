@@ -1,6 +1,7 @@
 # Start KCUT 황광 난참 (@s = body; the AI, the triggers, tests): the clock, the no-repeat memory, the
 # cooldown of the fight phase.
 function rlk:boss/scarlet/core/stop_move
+function rlk:boss/scarlet/rig/look/blade/edge
 scoreboard players set #pat hr 15
 scoreboard players set #pt hr 0
 scoreboard players set #done hr 0

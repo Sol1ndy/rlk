@@ -11,6 +11,7 @@ before every hit). Hazards and markers of a pattern carry rlk_hr_p + rlk_hr_p_<k
 from collections import defaultdict
 
 from . import api
+from . import blade
 
 L, K = api.L, api.K
 NS, OBJ, CY = api.NS, api.OBJ, api.CY
@@ -50,7 +51,7 @@ AT_OF = {'a8': 60, 'a13': 5}                   # repel {at} of each gauntlet's c
 # api.EV_FP: the reward hook reads them after cleanup); the generator checks every '#name hr' S3 writes is listed here.
 # I1 (request s3-5): the S3 extras live in the contract now (api.CORE_FP, same order; api.CORE_CONSTS).
 CONSTS = api.CORE_CONSTS
-FP_EXTRA = ('#ai_uc',)                    # HA-09: the gauge close (ai/ult_close) ran once
+FP_EXTRA = ('#ai_uc', '#sw_n')    # round V: #sw_n the target line's measured length (core/sw/march, 0.5 b steps)                    # HA-09: the gauge close (ai/ult_close) ran once
 FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1 + api.P2)   # the patterns' own scores (#<key>_<x>)
 FP = tuple(api.CORE_FP) + tuple(FP_EXTRA)
 assert len(FP) == len(set(FP)), 'duplicate fake player'
@@ -230,6 +231,12 @@ def cue(pos=None):
     subcommands of another point, e.g. a gauntlet's reappear point) + the sound api.CUE_SND; @s = the body."""
     name, a = api.CUE_KIT
     g = fx_lines(name, CUE_FB, **a)
+    if isinstance(pos, tuple):
+        # round V (lane VB): a point of her own frame from the blade track (blade.cue_point: on the blade, or over her hat when
+        # the blade is low / on the hat), the cards following her
+        on, off = K.fixed('follow_on'), K.fixed('follow_off')
+        ln = placed(g, f'{AT_BODY} positioned {blade.car(pos)}')
+        return ([on] + ln + [off] if on else ln) + snd(api.CUE_SND)
     return (placed(g, pos) if pos else anchored('blade_mid', g, follow=True)) + snd(api.CUE_SND)
 
 
@@ -237,7 +244,9 @@ def flash(colour, **over):
     """The module's own unparriable flash on her chest (api.FLASH / FLASH_SND; the cards follow her): yellow / purple / blue.
     over: other preset args (kcut's longer yellow)."""
     name, a = api.FLASH[colour]
-    return anchored('chest', fx_lines(name, FLASH_FB[colour], **{**a, **over}), follow=True) + snd(api.FLASH_SND[colour])
+    # round V (v_brief §3 VB 2: seen past the avatar): at her head, not her chest (the avatar's own head covers her chest from the
+    # F5 camera when the player aims at her)
+    return anchored('head', fx_lines(name, FLASH_FB[colour], **{**a, **over}), follow=True) + snd(api.FLASH_SND[colour])
 
 
 # ------------------------------------------------------------------------------------------------- pattern builder
@@ -305,6 +314,8 @@ class PB:
         rec = dict(t=t, idx=idx, tell=tell_from, grp=grp, kb=h[5], shape=h[2], tier=h[4], dims=h[3], parry=h[6], ph=ph,
                    made=made, cue=None, flash=[])
         if h[6] == 'P':
+            if cue_pos is None and blade.have_track():
+                cue_pos = blade.cue_point(h[0], ev_t - api.CUE_LEAD)
             self.at(t - api.CUE_LEAD, g8(cue(cue_pos)))
             rec['cue'] = t - api.CUE_LEAD
             self.cues.append(t - api.CUE_LEAD)

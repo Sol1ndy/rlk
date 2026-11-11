@@ -159,7 +159,13 @@ def build(W, ctx):
                      api.rig('look/form/normal'),
                      f'execute if score #ph {OBJ} matches ..{PH["p1"]} run {api.rig("look/phase/p1")}',
                      f'execute if score #ph {OBJ} matches {PH["cs1"]}.. run {api.rig("look/phase/p2")}',
-                     api.rig('look/blade/off'), api.rig('state/normal')])
+                     api.rig('look/blade/off'),
+                     # round V (lane VB): while she is fought the blade wears its bright edge (look `edge`: read from every
+                     # side at the fight camera's distance); the cutscenes keep `off`
+                     f'execute if score #ph {OBJ} matches {PH["p1"]} run {api.rig("look/blade/edge")}',
+                     f'execute if score #ph {OBJ} matches {PH["lead60"]}..{PH["a8"]} run {api.rig("look/blade/edge")}',
+                     f'execute if score #ph {OBJ} matches {PH["p2"]}..{PH["a13"]} run {api.rig("look/blade/edge")}',
+                     api.rig('state/normal')])
     w('core/floors', [f'# The HP floors (absolute) from her max HP (@s = body): #fl60 = {api.FLOOR_P1} per mille, #fl5 = {api.FLOOR_ULT}.']
       + S.pm_of('#fl60', '@s', 'mhpM', api.FLOOR_P1) + S.pm_of('#fl5', '@s', 'mhpM', api.FLOOR_ULT))
     deco(W)
@@ -404,7 +410,7 @@ def pattern_files(W, ctx):
     w('core/pat_tick', pt)
     for k in singles:
         start = [f'# Start {k.upper()} {api.PATTERN_NAMES[k]} (@s = body; the AI, the triggers, tests): the clock, the no-repeat memory, the',
-                 '# cooldown of the fight phase.', fn('core/stop_move'), sset('#pat', TID[k]), sset('#pt', 0), sset('#done', 0),
+                 '# cooldown of the fight phase.', fn('core/stop_move'), api.rig('look/blade/edge'), sset('#pat', TID[k]), sset('#pt', 0), sset('#done', 0),
                  sset('#ppf', 0), sset('#ultq', 0),
                  sset('#hits', 0), f'scoreboard players operation #last2 {OBJ} = #last {OBJ}', sset('#last', TID[k])]
         for fp, ph in ((1, PH['p1']), (2, PH['p2'])):
@@ -690,7 +696,10 @@ def seq_runner(W, ctx):
 
     def start(name, args=None, sfx=''):
         return [f'# The sequence {name}{" " + str(args) if args else ""} from tick 0 (@s = body).',
-                sset('#sqn', S.SEQ_ID[name]), sset('#sq', 0), sset('#sqdone', 0), sset('#sq_sig', 0), seq(ctx, name, 'start', args)]
+                sset('#sqn', S.SEQ_ID[name]), sset('#sq', 0), sset('#sqdone', 0), sset('#sq_sig', 0),
+                # round V: the fight's blade edge goes with a locked cutscene, stays through a lead-in (the player moves)
+                api.rig('look/blade/edge' if name in ('lead60', 'lead5', 'lead_re') else 'look/blade/off'),
+                seq(ctx, name, 'start', args)]
     for name in ('cs1', 'lead60', 'lead5', 'ending', 'event'):
         w(f'core/seq/{name}', start(name))
     w('core/seq/repel', [f'# The counter cinematic by the chain: repel {{at:{S.AT_OF["a8"]}}} (CS2) / {{at:{S.AT_OF["a13"]}}} (CS3).',

@@ -28,6 +28,9 @@ Options (the chapter-boss mode, scratchpad az/contract/cm.md 11), both read by o
 a caller that never sets them (Raiden, the mid-bosses) always gets the M0 line:
   #buHpCol bu   0 = the HP colour #E0484B; 1..9 = the under-bar colour codes (SUB_COLORS); 10 = #EDCF63 (gold)
   #buNoNum bu   1 = no "hp/max" numbers (bossui/nums is skipped; the cursor is already at the bar end)
+  #buSubSeg bu  N in SEGMENTS = the under bar is cut into N equal segments by N - 1 dividers (a SEG_W x SEG_H px glyph: a white
+                line between two dark ones, taller than the bar: read on the filled and on the empty part alike). 홍련's
+                5-segment gauge (round V: its segments could not be counted). 0 = none.
 """
 import argparse
 import json
@@ -51,6 +54,9 @@ DIGIT = 6                       # default-font advance of 0-9 and '/'
 
 HP_COLOR, TRAIL_COLOR, EMPTY_COLOR = '#E0484B', '#FFFFFF', '#2A2A2E'
 SUB_EMPTY = '#1E1E22'
+SEGMENTS = (5,)                 # #buSubSeg values with a divider overlay
+SEG_W, SEG_H, SEG_ASC = 3, 7, -1   # the divider glyph: 2 px over and under the 3-px under bar
+SEG_INK = (16, 10, 24, 255)
 HP_GOLD = '#EDCF63'             # #buHpCol 10 (Apep's Heart)
 # Under-bar colour codes: elements (shield) and gauges.
 SUB_COLORS = {1: '#C58BFF',   # electro
@@ -71,6 +77,35 @@ SUB_PIECE = {w: ch(16 + k) for k, w in enumerate(BITS)}
 SP_POS = {w: ch(32 + k) for k, w in enumerate(SPACES)}
 SP_NEG = {w: ch(48 + k) for k, w in enumerate(SPACES)}
 SP_BACK1 = SP_NEG[1]
+SEG_CH = ch(64)
+
+
+def seg_png():
+    row = bytes(SEG_INK) + b'\xff\xff\xff\xff' + bytes(SEG_INK)
+    raw = b''.join(b'\x00' + row for _ in range(SEG_H))
+    chunk = lambda t, d: struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
+    return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', SEG_W, SEG_H, 8, 6, 0, 0, 0))
+            + chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b''))
+
+
+def move(n):
+    """the space glyphs that move the cursor n px (binary digits)"""
+    tab, n, out = (SP_POS if n >= 0 else SP_NEG), abs(n), ''
+    for w in SPACES:
+        while n >= w:
+            out += tab[w]
+            n -= w
+    return out
+
+
+def seg_overlay(n):
+    """From the bar's end: back to its start, the n - 1 dividers centred on k x BAR / n, on to the bar's end again."""
+    out, cur = move(-BAR), 0
+    for k in range(1, n):
+        x = round(k * BAR / n) - SEG_W // 2 - 1
+        out += move(x - cur) + SEG_CH
+        cur = x + SEG_W + 1
+    return out + move(BAR - cur)
 
 
 def png(w, h):
@@ -96,6 +131,8 @@ for w in BITS:
     (tex / f'sub_{w}.png').write_bytes(png(w, SUB_H))
     providers.append({'type': 'bitmap', 'file': f'rlk:font/bossbar/hp_{w}.png', 'ascent': HP_ASC, 'height': HP_H, 'chars': [HP_PIECE[w]]})
     providers.append({'type': 'bitmap', 'file': f'rlk:font/bossbar/sub_{w}.png', 'ascent': SUB_ASC, 'height': SUB_H, 'chars': [SUB_PIECE[w]]})
+(tex / 'seg.png').write_bytes(seg_png())
+providers.append({'type': 'bitmap', 'file': 'rlk:font/bossbar/seg.png', 'ascent': SEG_ASC, 'height': SEG_H, 'chars': [SEG_CH]})
 providers.append({'type': 'space', 'advances': {**{SP_POS[w]: w for w in SPACES}, **{SP_NEG[w]: -w for w in SPACES}}})
 font = RP / 'assets/rlk/font/bossbar.json'
 font.parent.mkdir(parents=True, exist_ok=True)
@@ -234,7 +271,8 @@ draw += ['# Under bar (shield in its element colour, or a gauge).',
          'execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub',
          '# The options hold for this draw only.',
          'scoreboard players set #buHpCol bu 0',
-         'scoreboard players set #buNoNum bu 0']
+         'scoreboard players set #buNoNum bu 0',
+         'scoreboard players set #buSubSeg bu 0']
 write('draw', draw)
 sub = ['# Thin bar under the HP bar: #buSub / #buSubMax in colour #buSubCol.',
        f'scoreboard players set #len bu {BAR}',
@@ -252,6 +290,9 @@ for code, col in SUB_COLORS.items():
     sub.append(f'execute if score #buSubCol bu matches {code} run function rlk:bossui/run_sub {{col:"{col}"}}')
 sub += ['scoreboard players operation #len bu = #se bu',
         f'function rlk:bossui/run_sub {{col:"{SUB_EMPTY}"}}']
+for n in SEGMENTS:
+    sub.append(f'execute if score #buSubSeg bu matches {n} run data modify storage rlk:bu line append value '
+               f'{{text:"{seg_overlay(n)}",font:"rlk:bossbar",color:"white"}}')
 write('sub', sub)
 print(f'Boss bar: {BAR} px HP bar + under bar, {len(providers)} font providers, {len(SUB_COLORS)} under-bar colours; '
       f'functions in {FN.relative_to(ROOT)}.')

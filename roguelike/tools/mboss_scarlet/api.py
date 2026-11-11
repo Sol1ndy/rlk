@@ -235,7 +235,8 @@ TRACK = {'deg': 10, 'step': 0.3, 'min': 2.4}   # chains: re-aim <= 10 deg/t + a 
 DASH_LEN = {'a9': 12.0, 'a6': 12.0, 'cs1_lunge': 20.0,   # max dash / glide lengths (b): A9 iai dash, A6 back-blink
             'hcut': 16.0, 'blue': 9.0, 'kcut': 10.0, 'tri': 6.0, 'q': 14.0}   # hr_design §2.2
 DASH_BEYOND = {'a9': 3.0, 'hcut': 3.0, 'blue': 2.0, 'kcut': 3.0}   # the dash ends this far beyond the locked spot
-LEAP_H = {'a4': 6.0, 'a10': 5.0, 'nb': 5.0, 'q': 5.0, 'q2': 6.0}   # leap heights (b): A4 6 b in 4 t, A10 5 b; nb / q hr_design §2.2
+# round V (v_brief §3 VB 4: she stays in the F5 frame): 6 / 5 / 5 / 5 / 6 b took her out of the top of the screen (review v C4)
+LEAP_H = {'a4': 3.4, 'a10': 3.4, 'nb': 3.4, 'q': 3.4, 'q2': 3.6}   # leap heights (b): A4 6 b in 4 t, A10 5 b; nb / q hr_design §2.2
 NB_TRAVEL, TRI_GLIDE, MX_RETREAT = 6.0, (6.0, 0.3, 12), (6.0, 9.0, 12)   # nb travels <= 6 b; tri glides in 0.3 b/t beyond 6 b
 #                                                          (ticks 0-12); mx: player nearer than 6 b -> a 12-t leap back to ~9 b
 MX_REPEAT = {'hp_pct': 30, 'chance': 60}                  # mx may repeat once at once at <= 30 % HP (the video's second X)
@@ -321,8 +322,10 @@ A8_SCRIPT = (                                     # G1 (60 %): 9 parry cuts in 2
     (147, 'D3', 'g_drop', (147, 156, 163) + _TC),  # c7
     (160, 'A8.6', 'g_wrap', (163, 173, 180) + _TC),  # c8
     (177, 'A8.7', 'g_dome', (180, 189, 196) + _TC),  # c9
-    (191, 'A8.8', 'g_vert', None),                # pink glow 192-195, rises out of view, hidden 209
-    (214, 'A8.9', 'g_dive', None),                # reappears 214 in normal colours 6 b up, dives; judge at 220
+    (191, 'A8.8', 'g_vert', None),                # pink glow 192-195, rises (the dive's reappearance cuts the rise short)
+    # round V (v_brief §3 VB 4: nothing hits from an empty screen): the dive reappears 18 t before the judge (was 6), in the
+    # F5 view, and holds its wind-up 15 t (clip g_dive: appear 0, dive 15, hit 18)
+    (202, 'A8.9', 'g_dive', None),                # reappears 202 in normal colours, in view; dives 217; judge at 220
     (220, 'judge', None, None),                   # gauge 0: seq/repel {at:60} in this tick; fail §2.4: g_reform 220-230,
 )                                                 # P2 decision at 240
 # HA-03, G2: 30 44 58 86 114 128 156 172 186 200 216 gave 10 perfect parries to a 14-t beat and 5 to 3-t / 6-t mashers. With
@@ -347,8 +350,8 @@ A13_SCRIPT = (                                    # G2 (5 %): 11 parry cuts in 2
     (166, 'A8.7', 'g_dome', (169, 183, 190) + _TC),  # c9
     (187, 'A8.7', 'g_dome', (190, 199, 206) + _TC),  # c10
     (203, 'A8.7', 'g_dome', (206, 213, 220) + _TC),  # c11
-    (215, 'A8.8', 'g_vert', None),                # hidden 233
-    (236, 'A8.9', 'g_dive', None),                # dives; judge at 242
+    (215, 'A8.8', 'g_vert', None),                # rises (cut short by the dive's reappearance)
+    (224, 'A8.9', 'g_dive', None),                # reappears 224 (round V: 18 t before the judge), dives 239; judge at 242
     (242, 'judge', None, None),                   # gauge 0: seq/repel {at:5}; fail: the instant death
 )
 SCRIPTS = {'a8': A8_SCRIPT, 'a13': A13_SCRIPT}
@@ -369,11 +372,13 @@ DARK_SLICES = (-17, -14, -11, -8)                 # the `dark` job's four real s
 # shows them (camera 3.5 b behind the player, FOV 70: half-width 51.2 deg at 16:9, 48.2 at 16:10; D2 8 b at 39.0 deg off
 # the camera axis, D4 12 b at 43.4 deg), so the approach is seen from the reappearance on.
 REAPPEAR = {
-    'D1': {'dist': 14.0, 'bearing': -40, 'fallback': (40, 0, 90, -90), 'fallback_dist': 10.0, 'end': (1.5, 90)},
+    # round V (v_brief §3 VB 4: arrivals in front of the avatar): the station of the chain cuts 2.2 b at +35 (the player's front
+    # right; was 1.5 b at +90, beside them: her blade swung through the lens)
+    'D1': {'dist': 14.0, 'bearing': -40, 'fallback': (40, 0, 90, -90), 'fallback_dist': 10.0, 'end': (2.2, 35)},
     'D2': {'dist': 8.0, 'bearing': 55, 'end': (1.6, 45)},
     'D3': {'dist': 2.5, 'up': 3.0, 'bearing': 60},
     'D4': {'dist': 12.0, 'bearing': -55},
-    'A8.9': {'up': 6.0},
+    'A8.9': {'up': 4.0},                             # round V: 4 b over a spot 4.5 b before the player (was 6 b over them: out of view)
 }
 P2_RECOVER, GROGGY_RECOVER = 20, 12   # P2's first decision after the repel {at:60}; the recovery after the balance groggy
 # The counter cinematic's scripted HP steps (true damage, per mille of mhpM via mboss/true_hit, at repel events
@@ -385,7 +390,7 @@ COUNTER_EV = ('strike', 'land', 'kick')           # repel 49 / 101 / 129 (hr_des
 FAIL60_PM = 500           # A8 fail (ULT60_LETHAL false): pl_dot 500 per mille, #mbDotLethal 0 (cannot kill) + a push
 FAIL60_PUSH = (2.5, 3)    # mboss_lib.push_ring(2.5, 3) at the impact point, the same tick
 FAIL60_REFORM_T, FAIL60_P2_T = 220, 240           # g_reform 220-230 (she lands 2 b from the player), P2 decision at 240
-FAIL5_T = {'reappear': 236, 'black': 239, 'slash': 242}   # the instant-death staging (ovl black 239-242, pinkwhite +
+FAIL5_T = {'reappear': 224, 'black': 239, 'slash': 242}   # the instant-death staging (ovl black 239-242, pinkwhite +
 #                                                           scarlet_line + ult/fatal at 242)
 REVIVE = {'dist': 8.0, 'wait': 60}                # after a Ronova revive: she stands 8 b away; 60 t later lead_re {g:a13}
 # Switches (PLAN §0.1 questions 5-7; each one value here, the default the build proceeds with)
@@ -661,7 +666,7 @@ REPARENT = {('hat', 'worn'): 'head', ('hat', 'back'): 'torso', ('hat', 'hand'): 
 # look channels the module / sequences call (rig/look/<channel>/<value>); the module itself calls only form, phase,
 # blade and state (clips key hat / sword / scabbard / face / hands / props at their own events)
 LOOKS = {'form': ('normal', 'ghost'), 'phase': ('p1', 'p2'), 'hat': ('worn', 'back', 'hand', 'world', 'gone'),
-         'sword': ('hand', 'sheathed', 'gone'), 'blade': ('off', 'lilac', 'pink', 'violet', 'gold'),
+         'sword': ('hand', 'sheathed', 'gone'), 'blade': ('off', 'lilac', 'pink', 'violet', 'gold', 'edge'),
          'scabbard': ('hand', 'hip', 'gone'), 'face': ('calm', 'smile', 'closed'), 'props': ('none',)}
 HANDS = ('open', 'grip', 'brim')                 # forearm_r / forearm_l hand models (clip-keyed)
 PROP_STATES = ('none', 'hand', 'rock')           # cup / bottle (keyed by the intro clip; props/none hides both)
@@ -731,7 +736,7 @@ CLIPS_PLAN = {
     'g_wrap': (12, None, {'land': 0, 'hit': 3, 'end': 12}),
     'g_dome': (12, None, {'swirl': 0, 'hit': 3, 'end': 12}),
     'g_vert': (20, None, {'crouch': 0, 'glow': 1, 'hit': 5, 'rise': 6, 'gone': 18, 'end': 20}),
-    'g_dive': (10, None, {'appear': 0, 'dive': 3, 'hit': 6, 'end': 10}),
+    'g_dive': (22, None, {'appear': 0, 'dive': 15, 'hit': 18, 'end': 22}),      # round V: the wind-up held 15 t in view (was dive 3, hit 6)
     'g_deflect': (12, None, {'stop': 0, 'fall': 2, 'lock': 10, 'end': 12}),
     'repel': (140, None, {'lock': 0, 'heave': 22, 'wide': 26, 'grab': 36, 'strike': 49, 'cut1': 56, 'cut2': 62, 'hook': 70,
                           'throw': 78, 'hat_off': 84, 'over': 88, 'land': 101, 'lie': 104, 'kick': 129, 'roll': 133,
@@ -1114,7 +1119,9 @@ KIT_SPRITES = {
 KIT_SPRITE_CAP = 260_000
 # hr_design §5.4: 22 432 px were left; the one planned new sprite group (lane H1c), counted once the kit generator declares it
 KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),),      # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
-                  'cue': ((1, 64, 64),)}             # HA-07 (review H-A): the parry cue's white-gold sparkle (4 096 px)
+                  'cue': ((1, 64, 64),),             # HA-07 (review H-A): the parry cue's white-gold sparkle (4 096 px)
+                  # round V (lane VB, v_brief §3 VB 2-3): the drawn blade path, its head, the slash sector (16 640 px)
+                  'sw_path': ((1, 16, 16),), 'sw_head': ((1, 64, 64),), 'sw_arc': ((3, 64, 64),)}
 KIT_SPRITES.update({k: v for k, v in KIT_SPRITES_HR.items() if kit_declares('sprite', k)})
 KIT_SPRITE_PX = sum(f * w * h for rows in KIT_SPRITES.values() for f, w, h in rows)
 assert KIT_SPRITE_PX == 237_568 + sum(f * w * h for k, rows in KIT_SPRITES_HR.items() if k in KIT_SPRITES for f, w, h in rows) \

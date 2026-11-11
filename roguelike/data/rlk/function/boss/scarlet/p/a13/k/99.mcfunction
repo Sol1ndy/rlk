@@ -1,4 +1,10 @@
 # A13 pattern tick 99.
+kill @e[type=minecraft:marker,tag=rlk_hr_gst]
+function rlk:boss/scarlet/g/spot/d2e
+execute as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 run tp @s ~ ~ ~ ~ 0
+tag @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] add rlk_hr_gst
+tag @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] remove rlk_hr_gsp
+kill @e[type=minecraft:item_display,tag=rlk_hr_sw_c91_93]
 function rlk:boss/scarlet/rig/play/g_glide
 function rlk:boss/scarlet/g/spot/d2
 function rlk:mboss/mv/stop
