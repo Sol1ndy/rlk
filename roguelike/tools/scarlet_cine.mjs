@@ -61,16 +61,19 @@ export const ROOTS = {
     R(1052, 1148, [0, 0, 20.73], [0, 0, 13.5]), R(1234, 1258, [0, 0, 13.5], [0, 0, 6.5], 4.5), R(1258, 1440, [0, 0, 6.5])],
   // CS1 (§3.2): f 9.0; the lunge 6-10 to 1.5; the leap back 34-50 (apex 1.2) to 9.0
   cs1: [R(0, 6, [0, 0, 9]), R(6, 10, [0, 0, 9], [0, 0, 1.5]), R(34, 50, [0, 0, 1.5], [0, 0, 9], 1.2), R(50, 720, [0, 0, 9])],
-  // the repel (§3.4): 1 b above ST(0, 0, 1.0), down to f 1.3 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-62); thrown 78-101 over
+  // the repel (§3.4): 1 b above ST(0, 0, 1.0), down to f 1.3 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-64); thrown 78-101 over
   // the actor (apex 2.2) to 3.0; kicked 129: slides to 8.0 by 135, on to 9.0 by 140 (at 5 % the sequence ends at 129: the ending)
-  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.3]), R(30, 36, [0, 0, 1.3], [0, 0, 1.1]), R(56, 62, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], 2.2),
+  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.3]), R(30, 36, [0, 0, 1.3], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], 2.2),
     R(129, 135, [0, 0, 3], [0, 0, 8]), R(135, 140, [0, 0, 8], [0, 0, 9])],
-  // the ending (§3.5; ST, from E8 = 338 on ST2 with her landing mark 9.0 b ahead): kicked 3.0 -> 4.2 (0-4); stands at 4.6 (the kip-up
-  // 6-22); the lunge to 2.9 (50-52: at the graze tick 52 her brim is at KG, see hr2c_progress.md); shoved to 6.0 (80-86); springs
-  // back to 11 (116-136); runs in to 4.0 (150-188); the aerial duel: up 204-216 to (0, 6.0, 3.6); flies back 314-334 (apex 4.0) to
-  // the mark 9.0; turned away 650-700, back to the actor 1072-1094; walks in 1094-1154 to 4.5
-  ending: [R(0, 4, [0, 0, 3], [0, 0, 4.2]), R(6, 22, [0, 0, 4.2], [0, 0, 4.6]), R(50, 52, [0, 0, 4.6], [0, 0, 2.9]), R(80, 86, [0, 0, 2.9], [0, 0, 6]),
-    R(116, 136, [0, 0, 6], [0, 0, 11], 1.0), R(150, 188, [0, 0, 11], [0, 0, 4]), R(204, 216, [0, 0, 4], [0, 6, 3.6]), R(314, 334, [0, 6, 3.6], [0, 0, 9], 4),
+  // the ending (§3.5; ST, from E8 = 338 on ST2 with her landing mark 9.0 b ahead; = lane H2's seq.py moves): placed on her back at
+  // 4.2 at tick 0 (under the seam's white); up to 4.6 (6-22); the lunge to 2.9 (50-54: at the graze tick 52 she is half way, 3.75);
+  // shoved to 6.0 (80-86); springs back to 11 (116-136, apex 1.2); runs in to 4.0 (150-188); the aerial duel: up 204-216 to
+  // (0, 6.0, 3.6), in to f 3.2 for the passing cut (222-228), up to u 6.4 f 3.4 for the overhead (250-262), to (0, 6.0, 3.3) for
+  // the big one (276-286); flies back 314-334 (apex 4.0) to the mark 9.0; turned away 650-700, back to the actor 1072-1094;
+  // walks in 1094-1154 to 4.5
+  ending: [R(0, 6, [0, 0, 4.2]), R(6, 22, [0, 0, 4.2], [0, 0, 4.6]), R(50, 54, [0, 0, 4.6], [0, 0, 2.9]), R(80, 86, [0, 0, 2.9], [0, 0, 6]),
+    R(116, 136, [0, 0, 6], [0, 0, 11], 1.2), R(150, 188, [0, 0, 11], [0, 0, 4]), R(204, 216, [0, 0, 4], [0, 6, 3.6]), R(222, 228, [0, 6, 3.6], [0, 6, 3.2]),
+    R(250, 262, [0, 6, 3.2], [0, 6.4, 3.4]), R(276, 286, [0, 6.4, 3.4], [0, 6, 3.3]), R(314, 334, [0, 6, 3.3], [0, 0, 9], 4),
     R(650, 700, [0, 0, 9], undefined, 0, 180, 360), R(700, 1072, [0, 0, 9], undefined, 0, 0), R(1072, 1094, [0, 0, 9], undefined, 0, 0, 180),
     R(1094, 1154, [0, 0, 9], [0, 0, 4.5]), R(1154, 1372, [0, 0, 4.5])],
 };
@@ -488,7 +491,7 @@ const cs1Lock = (t, G = K1_G[t]) => xLock('cs1', t, 'K1', G, K1_POS[t], {tor: [t
     tor: [-22, +lerp(-24, -40, u).toFixed(1), 0], pos: [0, +lerp(-.32, -.4, u).toFixed(3), 0], hsR: +lerp(1, 0, u).toFixed(2)})));
   k.k(650, {...SLASHED, hat: 'worn', shW: 0, sh: 0, gN: 0}, 'o').k(656, {tor: [-24, -48, 0]}).k(670, {pos: [0, -.41, 0], tor: [-23, -46, 0], head: [-2, 32, 0]})
     .k(700, {pos: [0, -.42, 0], tor: [-24, -44, 0], head: [-4, 30, 0]}).k(720, FULL(SLASH_UP), 'io');
-  C('cs1', k, {cuts: [200], src: 'v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬'});
+  C('cs1', k, {cuts: [200, 566, 567], src: 'v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬'});
 }
 
 // =================================================================================================================================
@@ -514,8 +517,10 @@ const cs1Lock = (t, G = K1_G[t]) => xLock('cs1', t, 'K1', G, K1_POS[t], {tor: [t
 const DIVE0 = {...ST, ...AIR, lf: .9, rot: [-60, 0, 0], pos: [0, .9, .2], tor: [-10, 0, 0], head: [-20, 0, 0], ...B(0, 0, -70, -1, {gL: .55}), rh: 1, fL: [.12, .6, .25], fR: [-.12, .56, .3],
   hairS: .6, skW: -.8, hat: 'worn', hR: 'grip'};
 // lying after the throw (repel 104-129 = ending 0): DOWN with the hat at the hold spot beside her head and the right hand on its brim
-const HAT_HOLD = HAT_REST.hold.t, HOLD_HAND = nH(HAT_HOLD[0] + .64, .10, HAT_HOLD[2] - .02);
-const LIE = {...DOWN, hat: 'world', hwP: [...HAT_HOLD], hwE: [0, 20, 0], head: [-10, -18, 0], tor: [2, 0, 0], hR: 'grip', plR: HOLD_HAND, plwR: 1, aR: [20, 60, .9], gN: 0};
+// HOLD_HAND: her right fist on the hat's rim (0.64 in from its centre), as low as a fist lying on the floor goes from any history
+// (0.17: repel 129 = ending 0); the elbow out to her side toward her feet (pR), never into the floor
+const HAT_HOLD = HAT_REST.hold.t, HOLD_HAND = nH(HAT_HOLD[0] + .64, .17, HAT_HOLD[2] - .02);
+const LIE = {...DOWN, hat: 'world', hwP: [...HAT_HOLD], hwE: [0, 20, 0], head: [-10, -18, 0], tor: [2, 0, 0], hR: 'grip', plR: HOLD_HAND, plwR: 1, aR: [20, 60, .9], pR: [-.8, .1, -.4], gN: 0};
 // R0-R1 (the rig frame; the root drops to the floor at 6). Tick 0: the dive's body (g_dive's last pose), the sword in the left hand
 // alone on the dive's line through KR, its grip clear of her body (g_dive's own two-hand grip sits in her chest: the solver's clear
 // guards carry it up to 0.7 b off the line). 1-2 (never shown: the rig blends from g_dive's pose to the key at 3 under the gold
@@ -610,7 +615,9 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
     // far as it can), let go, flung wide past her head, down beside her as she lands
     const w = sm((t - 85) / 7), w2 = sm((t - 92) / 8), wb = sm((t - 78) / 6);
     const pullG = toRig(rootAt('repel', t), t <= 82 ? lerp3([.26, 1.6, 1.74], [.28, 1.33, 2.07], (t - 78) / 4) : lerp3([.28, 1.33, 2.07], [.31, .87, 2.49], (t - 82) / 4));
-    const pull = t <= 85 ? blade([pullG[0], Math.max(.45, pullG[1]), pullG[2]], [.8, .15, .58], {pos, yaw: 0}) : null;
+    // the blade keeps the hook's line over the actor's shoulder while the arm is drawn down (a line nearer her left would bend the
+    // wrist back past the suite's 130 degrees at 82); 86 = the hand let go, the blade thrown up before the arm flings wide
+    const pull = t <= 85 ? blade([pullG[0], Math.max(.45, pullG[1]), pullG[2]], HOOK.d, {pos, yaw: 0}) : t === 86 ? blade([.35, .62, .42], [.2, .97, .1], {pos, yaw: 0}) : null;
     k.k(t, {rot: [+pt.toFixed(1), 0, 0], pos: pos.map(x => +x.toFixed(4)), lf, tor: [+lerp(17, lerp(-4, 2, w2), wb).toFixed(1), +lerp(-4, 0, wb).toFixed(1), +lerp(30, 0, wb).toFixed(1)],
       head: [+lerp(12, lerp(-14, -10, w2), wb).toFixed(1), +lerp(8, lerp(0, -18, w2), wb).toFixed(1), +lerp(12, 0, wb).toFixed(1)],
       fL: [.15, +lerp(.1, .62, fly).toFixed(3), +lerp(-.06, -.34, fly).toFixed(3)], fR: [-.15, +lerp(.1, .4, fly).toFixed(3), +lerp(-.02, -.12, fly).toFixed(3)],
@@ -640,14 +647,14 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
   const KIP_BLADE = {gF: 0, gN: 1, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
   const LIE_BLADE = {gF: 0, gN: 0, gB: -90, gE: -58, gD: .62, cB: 0, cR: 90, th: 6, ed: -1, tw: 0}, UP_BLADE = {gF: 0, gN: 0, gB: -40, gE: -42, gD: .7, cB: 52, cR: 0, th: -30, ed: -1, tw: 0};
   const mixB = (a, b, u) => Object.fromEntries(Object.keys(a).map(n => [n, +(a[n] + (b[n] - a[n]) * u).toFixed(3)]));
-  k.k(129, {...FULL(LIE)}).k(130, {tor: [-8, 4, 0], head: [-22, -8, 0], fL: [.15, .4, -.14], fR: [-.15, .3, -.08], pos: [0, -1.0, 0], ...mixB(LIE_BLADE, KIP_BLADE, .25)}, 'l')
+  k.k(129, {...FULL(LIE)}).k(130, {tor: [-8, 4, -14], head: [-22, -8, 0], fL: [.15, .4, -.14], fR: [-.15, .3, -.08], pos: [0, -1.0, 0], ...mixB(LIE_BLADE, KIP_BLADE, .25)}, 'l')
     .k(131, {hat: 'hand', hhB: 90, hhE: 0, hhN: [0, 90], tor: [-14, 2, 0], head: [-20, -4, 0], fL: [.14, .7, -.3], fR: [-.14, .6, -.22], pos: [0, -1.06, 0], ...mixB(LIE_BLADE, KIP_BLADE, .5)}, 'l')
-    .k(132, {tor: [-20, 0, 0], head: [-20, 0, 0], fL: [.13, .9, -.4], fR: [-.13, .86, -.3], pos: [0, -1.12, 0], plwR: .5, ...mixB(LIE_BLADE, KIP_BLADE, .75)}, 'l')
+    .k(132, {tor: [-20, 0, 0], head: [-20, 0, 0], fL: [.13, .9, -.4], fR: [-.13, .86, -.3], pos: [0, -1.12, 0], plwR: .5, pR: [.2, -.5, .6], ...mixB(LIE_BLADE, KIP_BLADE, .75)}, 'l')
     // R9: the kip-up with it 133-137 (roll 133; every tick), crouched 137, up 139 with the hat set back on (worn 139), the P2
     // stance at 140 (= idle2)
     .k(133, {rot: [70, 0, 0], pos: [0, -1.0, 0], lf: 1, tor: [-28, 0, 0], head: [-10, 0, 0], fL: [.13, .8, -.5], fR: [-.13, .76, -.42], plwR: 0, aR: [60, 50, .9], hhB: 80, hhE: 0, hhN: [0, 90],
       ...KIP_BLADE, skG: .3}, 'l')
-    .k(134, {rot: [48, 0, 0], pos: [0, -.84, 0], lf: .8, tor: [-30, 0, 0], fL: [.13, .56, -.52], fR: [-.13, .5, -.42], aR: [80, 44, .9], hhB: 70, hhE: 6, hhN: [20, 80]}, 'l')
+    .k(134, {rot: [48, 0, 0], pos: [0, -.84, 0], lf: .8, tor: [-30, 0, 0], fL: [.13, .56, -.52], fR: [-.13, .5, -.42], aR: [80, 44, .9], pR: [.55, -.35, .75], hhB: 70, hhE: 6, hhN: [20, 80]}, 'l')
     .k(135, {rot: [24, 0, 0], pos: [0, -.62, 0], lf: .5, tor: [-30, -4, 0], head: [-2, 4, 0], fL: [.14, .3, -.46], fR: [-.14, .26, -.36], aR: [100, 38, .9], hhB: 60, hhE: 10, hhN: [40, 70], skG: 0,
       skIB: 0, scHip: [-30, 0]}, 'l')
     .k(136, {...ST2, ...LOW, rot: [6, 0, 0], lf: .2, pos: [0, -.5, 0], tor: [-30, -6, 0], head: [4, 6, 0], fL: [.2, .14, -.3], fR: [-.2, .12, -.1], aR: [120, 30, .9], hat: 'hand', hR: 'grip',
@@ -665,7 +672,7 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
 // ending (1372 t = H; §3.5 E1-E17; v 296.5-373.1: ref/cs_ending.jpg, hr_duel_2_5fps.jpg). Her root: ROOTS.ending.
 // E1 0-50: on her back with her hand on the hat (= repel 129; the root skids 0-4); the kip-up 6-16 taking the hat (up 6; every
 //    tick), rising 16-22 with the hat set back on (hat_on 20), stands; raises the sword high 28-42 (raise 28), holds;
-// E2 the lunge 50-52 (lunge 50; the root to f 2.9): at 52 the actor's point grazes her brim (graze 52: the near edge of the brim at
+// E2 the lunge 50-54 (lunge 50; the sequence glides the root to f 2.9): at 52 the actor's point grazes her brim (graze 52: the near edge of the brim at
 //    KG, the head knocked back); the X lock at KE2 56-80 (lock 56), a jolt at the burst (burst 70); shoved back 80-86 (shove 80);
 // E3 86-116 a turned guard (off screen); springs back 116-136 (back 116: airborne, legs tucked), lands low;
 // E4 the run in 150-188 (run 150: a 8-t cycle at the sequence's 0.18 b/t), the sword trailing;
@@ -697,7 +704,7 @@ const AIRP = {pos: [0, -.16, 0], rot: [-6, 20, 0], lf: 1, tor: [-8, 8, 0], head:
 const AIR_N = [0, -.16, 0];                      // (lf 1: the offset is native)
 const airBlade = (G, d, x = {}) => ({...blade(G, d, {pos: AIR_N, yaw: 20}), ...x});
 const airCut = (t, Kn, G) => airBlade(G, vsub(rigOf('ending', t, KP[Kn]), G));
-const KA_G = {228: [.3, .95, -.45], 262: [.24, 1.54, -.62], 286: [.28, .67, -.54], 298: [-.1, .86, -.6], 304: [-.1, .88, -.58]};
+const KA_G = {228: [.4, .82, -.25], 262: [.24, 1.14, -.42], 286: [.3, .62, -.38], 298: [-.1, .86, -.4], 304: [-.1, .88, -.38]};
 const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA2', 286: 'KA3', 298: 'KA4', 304: 'KA4'}[t], G)});
 {
   const k = Keys().k(0, FULL(LIE)).k(4, {tor: [3, 0, 0]}).k(5, {});
@@ -709,9 +716,11 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
     [9, 86, -1.12, 1, [.13, .9, -.4], [-.13, .86, -.3], -22], [10, 76, -1.04, 1, [.13, .84, -.48], [-.13, .8, -.4], -26], [11, 62, -.94, 1, [.13, .7, -.52], [-.13, .64, -.44], -30],
     [12, 46, -.82, .8, [.13, .54, -.52], [-.13, .48, -.42], -30], [13, 30, -.68, .6, [.14, .36, -.48], [-.14, .3, -.38], -30], [14, 16, -.56, .35, [.18, .2, -.38], [-.18, .16, -.2], -30],
     [15, 6, -.5, .15, [.22, .12, -.3], [-.22, .1, 0], -28]];
-  for (const [t, pt, y, lf, fL, fR, tp] of KIPR) k.k(t, {rot: [pt, 0, 0], pos: [0, y, 0], lf, fL, fR, tor: [tp, 0, 0], head: [-16, 0, 0], ...mixB(LIE_BLADE, KIP_BLADE, Math.min(1, (t - 5) / 4)),
+  // (6-11: she rolls a little toward the hat as she takes it at 9: the fist reaches its rim from above)
+  const KROLL = {6: -6, 7: -10, 8: -14, 9: -12, 10: -6, 11: -2};
+  for (const [t, pt, y, lf, fL, fR, tp] of KIPR) k.k(t, {rot: [pt, 0, 0], pos: [0, y, 0], lf, fL, fR, tor: [tp, 0, KROLL[t] || 0], head: [-16, 0, 0], ...mixB(LIE_BLADE, KIP_BLADE, Math.min(1, (t - 5) / 4)),
     skG: +(.5 * (1 - (t - 6) / 9)).toFixed(2), skIB: 0, scHip: [+(-70 * (1 - (t - 6) / 9)).toFixed(1), 0]}, 'l');
-  k.k(9, {hat: 'hand', hhB: 90, hhE: 0, hhN: [0, 90]}, 'l').k(11, {plwR: 0, aR: [60, 50, .9], hhB: 80, hhE: 4, hhN: [10, 86]}, 'l')
+  k.k(9, {hat: 'hand', hhB: 90, hhE: 0, hhN: [0, 90]}, 'l').k(11, {plwR: 0, aR: [60, 50, .9], pR: [.55, -.35, .75], hhB: 80, hhE: 4, hhN: [10, 86]}, 'l')
     .k(13, {aR: [90, 40, .9], hhB: 64, hhE: 10, hhN: [30, 74]}, 'l').k(15, {aR: [120, 30, .9], hhB: 40, hhE: 16, hhN: [20, 78]}, 'l');
   k.k(16, {...ST2, ...LOW, rot: [0, 0, 0], lf: 0, pos: [0, -.44, 0], tor: [-26, -4, 0], head: [6, 4, 0], fL: [.25, .1, -.22], fR: [-.25, .1, .2], aR: [150, 20, .9], hat: 'hand', hR: 'grip',
     hhB: 10, hhE: 26, hhN: [0, 74], ...KIP_BLADE, scHip: [0, 0], skG: 0, skIB: 0, plwR: 0}, 'l')
@@ -721,12 +730,15 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
   // the sword raised high 28-42 (the module's violet glow), held
   k.k(42, {...ST, pos: [0, -.06, 0], ...F_WIDE, tor: [-4, 0, 0], head: [-4, 0, 0], aR: [40, 70, .95], gF: 0, gB: -60, gE: 40, gD: .7, cB: -40, cR: 0, th: 130, ed: -1, rh: 0}, 'io')
     .k(48, {gE: 44, th: 136});
-  // E2: the lunge 50-52: forward on the left foot; 52 = the graze (upright again, the head knocked back: the brim's near edge at KG)
+  // E2: the lunge 50-54 (the sequence glides her 4.6 -> 2.9): forward on the left foot; 52 = the graze half way (root 3.75): the
+  // body thrown 0.45 b ahead of the root, the head knocked back (the brim's near edge at KG); 54 over her feet at 2.9
   k.k(50, {pos: [0, -.2, -.06], tor: [-14, 6, 0], head: [0, -6, 0], ...F_LUNGE, gB: -20, gE: 10, gD: .62, cB: -10, th: 60, aR: [10, 30, .9]}, 'i')
-    .k(51, {pos: [0, -.16, -.02], tor: [-8, 8, 0], gB: -24, gE: 4, cB: 0, th: 30}, 'l')
-    .k(52, {pos: nP(0, -.03, .02), rot: [0, 20, 0], tor: [3, 4, 0], head: [8, -18, 0], fL: nF('L', .2, 0, -.2), fR: nF('R', -.2, 0, .2), ...blade([.12, 1.0, -.45], [-.08, .78, -.62], {pos: [0, -.03, .02], yaw: 20}),
-      aR: [30, 40, .85]}, 'l')
-    .k(54, {pos: nP(0, -.08, .04), rot: [0, 36, 0], tor: [-6, 10, 0], head: [0, -30, 0], ...blade([.1, 1.02, -.55], [-.1, .72, -.68], {pos: [0, -.08, .04], yaw: 36})}, 'l');
+    // 51-53 a fleche: off the ground for three ticks, the body thrown ahead of the gliding root (52: 0.55 b), the right leg trailing
+    .k(51, {...AIR, lf: .9, pos: [0, .05, -.3], rot: [0, 10, 0], tor: [-10, 8, 0], fL: [.15, .22, -.32], fR: [-.15, .3, .3], gB: -24, gE: 4, cB: 0, th: 30}, 'l')
+    .k(52, {...AIR, lf: .9, pos: [0, .1, -.55], rot: [0, 20, 0], tor: [-19, 4, 0], head: [16, -18, 0], fL: [.15, .32, -.3], fR: [-.15, .42, .42],
+      ...blade([.12, 1.05, -.95], [-.08, .78, -.62], {pos: [0, .1, -.55], yaw: 20}), aR: [30, 40, .85]}, 'l')
+    .k(53, {...AIR, lf: .9, pos: [0, .04, -.3], rot: [0, 28, 0], tor: [-4, 6, 0], head: [6, -24, 0], fL: [.15, .12, -.28], fR: [-.15, .28, .3]}, 'l')
+    .k(54, {lf: 0, kL: ST.kL, kR: ST.kR, fL: nF('L', .2, 0, -.2), fR: nF('R', -.2, 0, .2), pos: nP(0, -.08, .04), rot: [0, 36, 0], tor: [-6, 10, 0], head: [0, -30, 0], ...blade([.1, 1.02, -.55], [-.1, .72, -.68], {pos: [0, -.08, .04], yaw: 36})}, 'l');
   for (const t of [56, 68, 72, 80]) k.k(t, {...ke2Lock(t), ...(t === 72 ? {tor: [-6, 12, 0], head: [4, -40, 0]} : {})}, t === 56 ? 'l' : 'io');
   k.k(70, {...ke2Lock(68), tor: [-14, 14, 0]}, 'l');
   // shoved back 80-86 (the root to 6.0): heels dug in, the blade knocked up; 86-116 a turned guard

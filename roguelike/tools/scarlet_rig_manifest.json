@@ -2037,8 +2037,8 @@
    },
    "owner": "H2",
    "key_files": 126,
-   "keys": 1678,
-   "keys_per_tick": 11.9,
+   "keys": 1662,
+   "keys_per_tick": 11.8,
    "source": "v 215.6-222.6 (ref/hr_repel_5fps.jpg, gauntlet_repel.jpg; hr_design §3.4): the deflected dive, the lock, the seized wrist, the hilt on the hat, two cuts, back to back, the shoulder throw, the kick, up again",
    "note": "",
    "authored": true
@@ -2222,9 +2222,9 @@
     "music": 676
    },
    "owner": "H2",
-   "key_files": 378,
-   "keys": 2109,
-   "keys_per_tick": 2.9,
+   "key_files": 379,
+   "keys": 2133,
+   "keys_per_tick": 3,
    "source": "v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬",
    "note": "",
    "authored": true
@@ -2280,8 +2280,8 @@
     "open": 1360
    },
    "owner": "H2",
-   "key_files": 702,
-   "keys": 4439,
+   "key_files": 700,
+   "keys": 4456,
    "keys_per_tick": 3.2,
    "source": "v 296.5-373.1 (ref/cs_ending.jpg, hr_duel_2_5fps.jpg; hr_design §3.5): the kip-up, the lock, the run and the clash, the aerial duel, the sheathing, the turn away, the moon, the greeting and the hat tip",
    "note": "",
@@ -2545,7 +2545,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 206055712
+  "version": 116811814
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -3954,9 +3954,9 @@
     -0.4
    ],
    "face": [
-    0.1027,
-    0.7247,
-    0.8198
+    0.1051,
+    0.7027,
+    0.8162
    ],
    "hold": [
     -1.25,
@@ -3965,8 +3965,8 @@
    ]
   },
   "hat_face": {
-   "tilt": 6,
-   "lift": 0.012
+   "tilt": 7,
+   "lift": 0.02
   },
   "shadow_r": 0.6,
   "contacts": {
@@ -9985,7 +9985,7 @@
     0.028,
     0.026,
     0.036,
-    0.226,
+    0.223,
     0.176,
     0.119,
     0.222,
@@ -10212,19 +10212,7 @@
    "cuts": [],
    "lift": {
     "82": 0.066,
-    "83": 0.152,
-    "121": 0.005,
-    "122": 0.015,
-    "123": 0.014,
-    "124": 0.029,
-    "125": 0.03,
-    "126": 0.026,
-    "127": 0.029,
-    "128": 0.032,
-    "129": 0.034,
-    "130": 0.036,
-    "131": 0.02,
-    "132": 0.016
+    "83": 0.152
    },
    "hat_push": {
     "135": 12.5,
@@ -18377,7 +18365,9 @@
     ]
    ],
    "cuts": [
-    200
+    200,
+    566,
+    567
    ],
    "lift": {},
    "hat_push": {
@@ -18787,7 +18777,7 @@
     0.028,
     0.026,
     0.026,
-    0.153,
+    0.152,
     0.179,
     0.139,
     0.117,
@@ -18832,9 +18822,9 @@
     0.003,
     0.004,
     0.008,
-    0.006,
-    0.004,
-    0.005,
+    0.145,
+    0.271,
+    0.038,
     0.005,
     0.005,
     0.004,
@@ -20166,6 +20156,10 @@
    "feet_l": [
     [
      16,
+     50
+    ],
+    [
+     54,
      115
     ],
     [
@@ -20232,6 +20226,10 @@
    "feet_r": [
     [
      15,
+     50
+    ],
+    [
+     54,
      115
     ],
     [
@@ -20294,6 +20292,10 @@
    "touch": [
     [
      13,
+     50
+    ],
+    [
+     54,
      116
     ],
     [
@@ -20309,6 +20311,10 @@
     [
      11,
      12
+    ],
+    [
+     51,
+     52
     ],
     [
      117,
@@ -21712,19 +21718,7 @@
     ]
    ],
    "cuts": [],
-   "lift": {
-    "0": 0.029,
-    "1": 0.03,
-    "2": 0.026,
-    "3": 0.028,
-    "4": 0.029,
-    "5": 0.03,
-    "6": 0.037,
-    "7": 0.026,
-    "8": 0.025,
-    "9": 0.039,
-    "10": 0.024
-   },
+   "lift": {},
    "hat_push": {
     "15": 5,
     "16": 20,
@@ -24560,11 +24554,9 @@
     "passes": 3,
     "corrections": {
      "armUp": 100,
-     "bPush": 1.62,
-     "bTurn": 36,
      "drop": 1.42,
-     "gripClear": 33.25,
-     "handClearR": 5.43,
+     "gripClear": 29.44,
+     "handClearR": 9.31,
      "hatClear": 20.93,
      "hatPush": 43.55,
      "incl": 19,
@@ -24572,12 +24564,12 @@
      "rock-": 0.88,
      "sash": 100.66,
      "scab": 55.56,
-     "scabArm": 21,
+     "scabArm": 19,
      "strings": 64.22
     },
     "contacts": {
-     "floor": 0.292,
-     "hatfloor": 0.284,
+     "floor": 0.046,
+     "hatfloor": 0.035,
      "hat": 0
     },
     "stretch": 1,
@@ -24585,11 +24577,11 @@
     "support_dy": 0.286,
     "lift": 0.152,
     "clear": {
-     "guard.head": -0.059,
-     "guard.torso": -0.06,
-     "hand_l.head": -0.107,
+     "guard.head": -0.029,
+     "guard.torso": -0.037,
+     "hand_l.head": -0.085,
      "hand_l.torso": -0.064,
-     "hand_r.head": -0.045,
+     "hand_r.head": -0.018,
      "hand_r.torso": -0.09,
      "hilt.head": -0.041,
      "hilt.torso": -0.02
@@ -24845,20 +24837,20 @@
      "bPush": 22.02,
      "close": 23.58,
      "drop": 3.1,
-     "gripClear": 23.25,
+     "gripClear": 24.37,
      "handClearL": 8.19,
      "handClearR": 33.88,
      "hatClear": 19.99,
      "incl": 19,
      "rock+": 11,
-     "sash": 65.56,
-     "scab": 68.16,
+     "sash": 65.09,
+     "scab": 67.94,
      "scabArm": 10,
      "strings": 64.22
     },
     "contacts": {
-     "floor": 0.335,
-     "hatfloor": 0.3,
+     "floor": 0.046,
+     "hatfloor": 0.029,
      "hat": 0,
      "brim": 0.005,
      "throat": 0,
@@ -24867,16 +24859,16 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.247,
-    "lift": 0.039,
+    "lift": 0,
     "clear": {
      "guard.head": -0.019,
-     "guard.torso": -0.061,
+     "guard.torso": -0.056,
      "hand_l.head": -0.033,
      "hand_l.torso": -0.022,
-     "hand_r.head": 0.002,
+     "hand_r.head": -0.009,
      "hand_r.torso": -0.072,
-     "hilt.head": -0.022,
-     "hilt.torso": -0.008
+     "hilt.head": -0.036,
+     "hilt.torso": -0.018
     }
    },
    "ev_give": {
@@ -24953,10 +24945,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 63,
-  "key_files": 2872,
-  "keys": 21989,
-  "rig_functions": 3549,
-  "rig_bytes": 6985167,
+  "key_files": 2871,
+  "keys": 22014,
+  "rig_functions": 3548,
+  "rig_bytes": 6991864,
   "cull_overhang_ticks": 0
  },
  "sprites": {

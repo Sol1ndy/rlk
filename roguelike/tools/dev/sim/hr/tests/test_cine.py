@@ -7,13 +7,13 @@ boss/scarlet/rig/an/load.mcfunction, the clips' key files and tools/dev/sim/hr/c
              event and its tick ('end' = the length); sq1 / lead_down / lead_stand are gone; a runner, play/ and start/ exist per clip
   handover   the §4.1 hand-over poses on the shipped anchor table (the 8 anchors of the last tick of A against tick 0 of B, b):
              intro 1290 = intro_end 0, intro_end 150 = idle 0, cs1 720 = lead60 0, lead60 / lead5 / lead_re end = g_brim's hold,
-             repel 129 = ending 0, repel 140 = idle2 0, ending 1372 = ev_give 0 (H_POSE) within 0.03 b; repel 0 against g_dive's
+             repel 140 = idle2 0, ending 1372 = ev_give 0 (H_POSE) within 0.03 b; repel 129 = ending 0 (the right hand 0.06 b); repel 0 against g_dive's
              last pose: the head and the chest within 0.25 b (the dive's body; the sword is re-gripped on the dive's line: reported)
   states     the hat / sword / scabbard / props states the clips key at the contract's ticks (the key files' stored looks): cs1
              sheathed at 200 and drawn at 642, the bottle 216-500, the hat off 240-258; repel hat off at 84 and on at 139; intro
              bottle 326-424, cup to 712; ending hat on at 20, sheathed at 452, the scabbard in hand from 388
   tracks     her_tracks.json: the 5 staged clips carry every column for len + 1 ticks, the lead-ins are not staged; her root at
-             the table's marks (cs1 lock f 1.5, repel 88 over the actor, ending aerial hang (0, 6, 3.6), ...); no root motion in a
+             the table's marks = lane H2's sequence moves (cs1 lock f 1.5, repel 88 over the actor, ending 52 half way, the aerial cuts, ...); no root motion in a
              clip on the ground: the pelvis stays within 0.75 b of the root's axis; the feet never under the floor of the stage
   contacts   every §4.3 row of her_tracks.contacts within its tolerance (the builder's gate; test_contact.py judges both sides)
 """
@@ -79,9 +79,16 @@ def gap(a, ta, b, tb, names=None):
 
 
 for a, ta, b, tb in [('intro', 1290, 'intro_end', 0), ('intro_end', 150, 'idle', 0), ('cs1', 720, 'lead60', 0), ('lead60', 56, 'g_brim', 14), ('lead5', 116, 'g_brim', 14),
-                     ('lead_re', 60, 'g_brim', 14), ('repel', 129, 'ending', 0), ('ending', 1372, 'ev_give', 0)]:
+                     ('lead_re', 60, 'g_brim', 14), ('ending', 1372, 'ev_give', 0)]:
     d = gap(a, ta, b, tb)
     ok(d <= .03, f'handover: {a} {ta} = {b} {tb} (the 8 anchors within {d:.3f} b)')
+# repel 129 = ending 0 (the lethal kick; lane H2 cuts it under the seam's white, where her place also jumps 3.0 -> 4.2): the
+# body within 0.03 b; the right hand is already reaching for the hat in the repel (the pick-up's 4-tick pre-roll from 127), the
+# ending starts with it resting on the brim: within 0.06 b (reported)
+d = gap('repel', 129, 'ending', 0, [a for a in MAN['anchors'] if a != 'hand_r'])
+ok(d <= .03, f'handover: repel 129 = ending 0 (the anchors but the right hand within {d:.3f} b)')
+d = gap('repel', 129, 'ending', 0, ['hand_r'])
+ok(d <= .06, f'handover: repel 129 = ending 0 the right hand {d:.3f} b (the hat pick-up\'s pre-roll; under the seam\'s white)')
 # repel 140 = idle2: hat_on is at 139, so the right hand that set the hat on is still coming down at 140 (the arm turns <= 85
 # degrees a tick): every other anchor is on idle2, the hand within its 3-tick blend (reported)
 d = gap('repel', 140, 'idle2', 0, [a for a in MAN['anchors'] if a != 'hand_r'])
@@ -139,8 +146,10 @@ R = lambda c, t: TR['clips'][c]['root'][t]
 for c, t, want in [('intro', 0, [0, 0, 20.73, 0]), ('intro', 880, [0, 0, 20.73, 180]), ('intro', 1148, [0, 0, 13.5, 180]), ('intro', 1258, [0, 0, 6.5, 180]), ('intro_end', 150, [0, 0, 6.5, 180]),
                    ('cs1', 0, [0, 0, 9, 180]), ('cs1', 10, [0, 0, 1.5, 180]), ('cs1', 30, [0, 0, 1.5, 180]), ('cs1', 50, [0, 0, 9, 180]), ('cs1', 720, [0, 0, 9, 180]),
                    ('repel', 0, [0, 1, 1, 180]), ('repel', 6, [0, 0, 1.3, 180]), ('repel', 36, [0, 0, 1.1, 180]), ('repel', 68, [0, 0, 1.2, 180]), ('repel', 101, [0, 0, 3, 180]),
-                   ('repel', 129, [0, 0, 3, 180]), ('repel', 140, [0, 0, 9, 180]), ('ending', 0, [0, 0, 3, 180]), ('ending', 4, [0, 0, 4.2, 180]), ('ending', 22, [0, 0, 4.6, 180]),
-                   ('ending', 56, [0, 0, 2.9, 180]), ('ending', 86, [0, 0, 6, 180]), ('ending', 190, [0, 0, 4, 180]), ('ending', 216, [0, 6, 3.6, 180]), ('ending', 304, [0, 6, 3.6, 180]),
+                   ('repel', 64, [0, 0, 1.2, 180]), ('repel', 129, [0, 0, 3, 180]), ('repel', 140, [0, 0, 9, 180]), ('ending', 0, [0, 0, 4.2, 180]), ('ending', 22, [0, 0, 4.6, 180]),
+                   ('ending', 52, [0, 0, 3.75, 180]), ('ending', 54, [0, 0, 2.9, 180]),
+                   ('ending', 56, [0, 0, 2.9, 180]), ('ending', 86, [0, 0, 6, 180]), ('ending', 190, [0, 0, 4, 180]), ('ending', 216, [0, 6, 3.6, 180]), ('ending', 228, [0, 6, 3.2, 180]),
+                   ('ending', 262, [0, 6.4, 3.4, 180]), ('ending', 286, [0, 6, 3.3, 180]), ('ending', 304, [0, 6, 3.3, 180]),
                    ('ending', 334, [0, 0, 9, 180]), ('ending', 1154, [0, 0, 4.5, 180]), ('ending', 1372, [0, 0, 4.5, 180])]:
     ok(all(abs(a - b) < 1e-6 for a, b in zip(R(c, t)[:3], want[:3])) and abs((R(c, t)[3] - want[3]) % 360) < 1e-6, f'tracks: her root at {c} {t} = ST{tuple(want[:3])} yaw {want[3]} ({R(c, t)})')
 d88 = R('repel', 88); ok(abs(d88[1] - 2.163) < .01 and abs(d88[2] - 1.983) < .01, f'tracks: repel 88 the root over the actor ({d88})')

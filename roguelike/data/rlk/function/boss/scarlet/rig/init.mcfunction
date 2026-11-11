@@ -23,4 +23,4 @@ scoreboard objectives add hrRigQx dummy
 scoreboard objectives add hrRigQy dummy
 scoreboard objectives add hrRigQz dummy
 scoreboard objectives add hrRigQw dummy
-execute unless data storage rlk:hr rig{anv:206055712} run function rlk:boss/scarlet/rig/an/load
+execute unless data storage rlk:hr rig{anv:116811814} run function rlk:boss/scarlet/rig/an/load
