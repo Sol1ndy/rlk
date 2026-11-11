@@ -403,6 +403,8 @@ class ScSim(HrSim):
         while i < len(t) and t[i] not in ('run', 'as'):
             if t[i] in ('if', 'unless') and i + 2 < len(t) and t[i + 1] == 'predicate':
                 ok = t[i + 2] == 'rlk:in_sneak' and self._sneak(ctx.ex)
+                if t[i + 2] == 'rlk:in_jump':      # round V (lane VC): the cutscene skip is the jump key (seq/<name>/skipin)
+                    ok = bool(ctx.ex is not None and (ctx.ex.data.get('jump') or 'jump' in ctx.ex.data.get('keys', ())))
                 if ok == (t[i] == 'unless'):
                     return 0
                 return self.execute(t[:i] + t[i + 3:], ctx)

@@ -314,7 +314,7 @@ s = at_cs1(250)
 pl = s.player()
 s.ents.remove(pl)
 run_until(s, lambda s: False, 4)
-s.st(pl)['cam'] = None
+s.st(pl)['cam'] = s.st(pl)['ccam'] = None
 s.ents.append(pl)
 s.setsc('#vFresh', 'view', 1)
 world(s)

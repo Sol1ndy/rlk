@@ -155,10 +155,15 @@ ck(f'test 35: the intro replay skipped at its tick 100 -> {api.SKIP_T}', H.hr(s,
 s = fresh(intro=True)
 pl = s.player()
 H.run_h1(s, 30)
+# (round V, lane VC: the skip is the jump key held SKIP_HOLD ticks - seq/intro/skipin; Shift ends a spectate and is no input)
 pl.data['sneak'] = 1
 H.run_h1(s, api.SKIP_HOLD + 2)
-ck('CS0: sneak held 20 t inside the window skips to its last shots', (H.hr(s, '#sq') or 0) >= api.SKIP_T, H.hr(s, '#sq'))
+ck('CS0: sneak held 20 t skips nothing (round V)', (H.hr(s, '#sq') or 0) < api.SKIP_T, H.hr(s, '#sq'))
 pl.data['sneak'] = 0
+pl.data['jump'] = 1
+H.run_h1(s, api.SKIP_HOLD + 2)
+ck('CS0: the jump key held 20 t inside the window skips to its last shots', (H.hr(s, '#sq') or 0) >= api.SKIP_T, H.hr(s, '#sq'))
+pl.data['jump'] = 0
 ok = H.until_h1(s, lambda s: ph(s) == PH['p1'] and (H.mb(s, '#mbSt') or 0) == 1, L['intro'] - api.SKIP_T + 20)
 ck('... and control comes at its end', ok)
 

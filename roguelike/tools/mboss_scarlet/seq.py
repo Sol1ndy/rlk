@@ -271,7 +271,7 @@ def say(s, t, lid, cond=''):
         cl = L.cam_line(comp)
         s.at(t + dt, f'execute {cond} {cl[8:]}' if cond else cl)
         if text is not None:
-            s.at(t + dt, f'execute {pre}if {held} run {TYPE_SND[8:]}')
+            s.at(t + dt, f'execute {pre}if {held} {TYPE_SND[8:]}')
     return s
 
 
@@ -738,8 +738,9 @@ def build_intro(W):
     tr.cut(170, B, HR(0.9, 0.75, 0.9), HR(0.25, 0.62, 0.35), 'I4 petal on her hand', ('her',))
     tr.move(220, 236, look=HR(0.3, 0.8, 0.1))
     tr.move(236, 249, look=HR(0, 1.55, 0))
-    tr.cut(250, A, HR(1.1, 1.45, 0.25), HR(0, 1.6, 0.05), 'I5 profile', ('her',))
-    tr.move(250, 319, eye=HR(1.1, 1.45, 0.35))
+    # (round V, VC 10: line 1 sits in the lower third; the lens looks at her shoulder so her face is in the upper half)
+    tr.cut(250, A, HR(1.1, 1.42, 0.25), HR(0, 1.2, 0.05), 'I5 profile', ('her',))
+    tr.move(250, 319, eye=HR(1.1, 1.42, 0.35))
     tr.cut(320, B, HR(-0.55, 0.5, -0.7), HR(-0.35, 1.05, 0.5), 'I6 bottle', ('her',))
     # (round V: level with the cup. The client looks from 4 b behind the camera entity, so the entity of a lens that looks
     # down at something low would be under the floor: the design's eye 0.6 b up looking 25 degrees down)
@@ -888,6 +889,8 @@ def build_intro(W):
 # CS1 — the 60 % cutscene (hr_design §3.2; clip cs1 720) and its skip (-> #sq 566)
 HER_F = 9.0                                                          # her mark: 9 b ahead of the actor
 S13_T = 654                                                          # (HF-B) the wide of 홍련일섬 after line 16 (618 + 36)
+S11_T = 608                                                          # the cut to S11: two ticks before she sinks into the iai
+#                                                                      stance (609: in S10's close frame her face would dip under line 15)
 S11_EYE = HR(-0.5, 1.2, 2.05)                                        # the S11 lens: 2.15 b from her head
 S11_PETAL = HR(-0.1, 1.0, 0.62)                                      # the S11 petal: 1.5 b before the lens, under her face
 K1 = ST(*api.CONTACT['K1'][2])                                       # the blade lock
@@ -923,7 +926,7 @@ def build_cs1(W):
     # (HF-B, HB-06) line 16 (618-653): S11 is a close shot of her in the iai stance with the petal held in the foreground
     # (the video's ECU of the petal had her out of focus behind it); it holds through the draw and the slash to the line's end
     # (round V: the petal 1.5 b before the lens, at her waist: petal-sized and under her face)
-    tr.cut(610, B, S11_EYE, HR(0, 1.3, 0), 'S11 the petal, her iai', ('her',))
+    tr.cut(S11_T, B, S11_EYE, HR(0, 1.3, 0), 'S11 the petal, her iai', ('her',))
     # (the design's eye r 0.4 hides her behind the actor: 1.2 b to the right shows both, the actor near, her beyond)
     tr.cut(S13_T, A, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor?'))
     TRACKS['cs1'] = tr

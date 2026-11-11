@@ -6,5 +6,5 @@ execute if score #sq hr matches 82..110 run return run function rlk:boss/scarlet
 execute if score #sq hr matches 177..218 run return run function rlk:boss/scarlet/seq/cs1/cb/177_218
 execute if score #sq hr matches 220..337 run return run function rlk:boss/scarlet/seq/cs1/cb/220_337
 execute if score #sq hr matches 338..380 run return run function rlk:boss/scarlet/seq/cs1/cb/338_380
-execute if score #sq hr matches 497..608 run return run function rlk:boss/scarlet/seq/cs1/cb/497_608
-execute if score #sq hr matches 610..654 run return run function rlk:boss/scarlet/seq/cs1/cb/610_654
+execute if score #sq hr matches 497..606 run return run function rlk:boss/scarlet/seq/cs1/cb/497_606
+execute if score #sq hr matches 608..654 run return run function rlk:boss/scarlet/seq/cs1/cb/608_654

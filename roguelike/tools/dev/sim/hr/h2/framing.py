@@ -163,6 +163,34 @@ def far_lines(rows):
     return [r for r in rows if r['line'] and not r['gone'] and not (inside(r['her'], INNER) and r['d'] is not None and r['d'] <= CLOSE)]
 
 
+HEAD_R = 0.27            # b: her face around her head point (a 0.5-b head box)
+
+
+def text_box(L, width_px=192, fov=70.0, aspect=16 / 9):
+    """(x half-width, y bottom, y top) of the dialogue line's box in the picture (-1 .. 1 both ways; mboss_lib.CAM_LINE: a
+    block of one 9-px line plus the 1-px backdrop margin, `width_px` font px wide, 0.3 b before the eye)."""
+    ty, tz, k = L.cam_text_geom(L.CAM_LINE)
+    d = L.CAM_BACK - tz
+    half = d * math.tan(math.radians(fov / 2))
+    px = 0.025 * k
+    return ((width_px / 2 + 1) * px / (half * aspect), (ty - px) / half, (ty + 10 * px) / half)
+
+
+def face_under_text(rows, L, fov=70.0, aspect=16 / 9):
+    """Ticks of a line whose text box lies over her face (round V, VC 10): her head point +- HEAD_R projected into the
+    picture overlaps the line's box (the widest page). The projection and the box scale alike with the field of view."""
+    bx, by0, by1 = text_box(L, fov=fov, aspect=aspect)
+    bad = []
+    for r in rows:
+        h = r['her']
+        if not r['line'] or r['gone'] or h is None or h[2] is None or h[2] <= 0.05:
+            continue
+        rr = HEAD_R / (h[2] * math.tan(math.radians(fov / 2)))
+        if abs(h[0]) - rr / aspect < bx and h[1] - rr < by1 and h[1] + rr > by0:
+            bad.append(r)
+    return bad
+
+
 def spans(rows):
     """[(seq, shot, t0, t1)] runs of consecutive ticks."""
     out = []

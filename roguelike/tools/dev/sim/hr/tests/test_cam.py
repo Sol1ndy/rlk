@@ -813,9 +813,12 @@ def ident():
         if not n.endswith('.mcfunction') or n not in VC_FILES:
             continue
         d = git('diff', '-U0', base, '--', n).stdout.split('\n')
-        code = [l[1:] for l in d if l[:1] in '+-' and not l.startswith(('---', '+++')) and l[1:].strip() and not l[1:].startswith('#')]
-        ck(f'D2 {n.rsplit("/", 2)[-2]}/{n.rsplit("/", 1)[-1]}: every changed command is a lock line (rlk_mb_camh / #mbCamSap / the blank skin)',
-           all(any(w in l for w in ('rlk_mb_camh', 'mbCamSap', 'rlk:skin/blank')) for l in code), str(code))
+        add = [l[1:] for l in d if l[:1] == '+' and not l.startswith('+++') and l[1:].strip() and not l[1:].startswith('#')]
+        rem = [l[1:] for l in d if l[:1] == '-' and not l.startswith('---') and l[1:].strip() and not l[1:].startswith('#')]
+        ck(f'D2 {n.rsplit("/", 2)[-2]}/{n.rsplit("/", 1)[-1]}: every added command is a lock line (rlk_mb_camh / #mbCamSap / the blank skin); '
+           'a removed command comes back inside an added one',
+           all(any(w in l for w in ('rlk_mb_camh', 'mbCamSap', 'rlk:skin/blank')) for l in add)
+           and all(any(r[:36] in a_ or r[-60:] in a_ for a_ in add) for r in rem), f'{add} {rem}')
 
 
 SECTIONS = [('static', static), ('hold', hold), ('lock', lock), ('grid', grid), ('client', client), ('post', post), ('text', text),

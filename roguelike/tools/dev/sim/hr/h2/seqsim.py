@@ -15,7 +15,9 @@ avatar pos, held, gm, sig, kit [(sub, args)], cmds; and, filled in when the worl
   view / srv                the picture's viewpoint through the camera the CLIENT is on / the same from the server pose;
   con                       the camera the client looks through (1 / 2, None: its own player);
   text / hint               the line and the hint on the live camera's texts;
-  rig                       where her model stands (the rig's follow: see SeqSim.rig_follow).
+  rig                       where her model stands (the rig's follow: see SeqSim.rig_follow);
+  living                    the living entities in the world (type, their framework tags): a spectator sees every
+                            invisible one of them as a ghost unless its texture is blank.
 """
 import math
 import sys
@@ -34,6 +36,10 @@ CX, CY, CZ = 880.0, 201.0, 8.0
 PARK_PH = 2                 # the core's cs1 phase: with #sqn 0 its state function does nothing
 HUSK_EYE = 1.74             # her body: a husk at scale 1 (api.BOSS)
 TRACE = []                  # the function path at a crash (see SeqSim.call)
+# entity types a spectator never sees a ghost of (displays draw only their content, the others have no renderer; the local
+# player is drawn only when it is the camera entity)
+NOT_LIVING = ('marker', 'item_display', 'block_display', 'text_display', 'interaction', 'item', 'player', 'experience_orb')
+LIVING_KEYS = ('rlk_av', 'rlk_vseat', 'rlk_mb_body', 'rlk_lure', 'rlk_mb_cam', 'rlk_mb_px')
 
 
 class SeqSim(CS.CamSim):
@@ -90,6 +96,8 @@ class SeqSim(CS.CamSim):
                            and x.data.get('riding') == live.id), None) for t in (CS.LINE_TAG, CS.HINT_TAG)}
             r['text'], r['hint'] = tx[CS.LINE_TAG], tx[CS.HINT_TAG]
             r['rig'] = self.rig_pos
+            r['living'] = sorted({(e.etype, tuple(sorted(t for t in e.tags if t in LIVING_KEYS))) for e in self.ents
+                                  if e.alive and e.etype not in NOT_LIVING})
             b = H.body_of(self)
             r['body1'] = (tuple(b.pos), b.rot[0]) if b else None      # her body when the tick is over
         self._fresh = []

@@ -84,6 +84,7 @@ class CamSim(H.ScSim):
         self.cam_packets = []         # (tick, entity id | None, applied by the client)
         self.sidebar = 'stacks'
         self.abar = []
+        self.all_sent, self.all_segs = [], []   # every rotation sent for a camera (tick, rot); every interpolation the client ran (tick, length)
 
     # ------------------------------------------------------------------ player state
     @staticmethod
@@ -197,6 +198,7 @@ class CamSim(H.ScSim):
         e.data['og'] = False
         e.data['spawn'] = (list(e.pos), list(e.rot))
         e.data['sent'], e.data['segs'] = [tuple(e.rot)], []
+        self.all_sent.append((self.t, tuple(e.rot)))
         e.data['known'] = not self.pair_later
 
     def client_tick(self):
@@ -215,6 +217,7 @@ class CamSim(H.ScSim):
             if srv != d['last'] or flt:
                 rot = srv[1] if flt else tuple(math.floor(v * 256.0 / 360.0) * 360.0 / 256.0 for v in srv[1])
                 d['sent'].append(rot)
+                self.all_sent.append((self.t, rot))
                 d['og_sent'], d['last'] = d.get('og', False), srv
                 tgt = (srv[0], rot)
                 if d['cdur'] == 0:
@@ -222,6 +225,7 @@ class CamSim(H.ScSim):
                 elif not (d['steps'] > 0 and tgt == d['tgt']):
                     d['tgt'], d['steps'] = tgt, d['cdur']
                     d['segs'].append((self.t, d['cdur']))
+                    self.all_segs.append((self.t, d['cdur']))
             d['cdur'] = d.get('dur', 0)
             if d['steps'] > 0:
                 k = d['steps']

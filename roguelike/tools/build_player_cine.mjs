@@ -60,6 +60,7 @@ export function cineAtlas(atlas) {
 const PARTS = ['head', 'body', 'right_arm', 'right_forearm', 'left_arm', 'left_forearm', 'right_leg', 'right_shin', 'left_leg', 'left_shin', 'weapon'];
 const NS = 'rlk:char/cine', OBJ = 'cine';
 const TAG = {root: 'rlk_cine_root', part: 'rlk_cine_part', hidden: 'rlk_cine_hid'};
+const BLANK_SKIN = 'rlk:skin/blank';      // a fully transparent skin (tools/build_blank_tex.py): the hidden avatar's ghost draws nothing
 const UUID = i => `524c4b4d-4349-4e45-8000-0000000000${i.toString(16).padStart(2, '0')}`;
 const UUID_INTS = i => `[I;1380731725,1128877637,-2147483648,${i}]`;
 const GRID = 20;                                 // a sync tick every GRID ticks
@@ -350,6 +351,9 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
   fn('clear', ['# Internal: the actor\'s entities.', `kill ${PARTSEL}`, `kill @e[type=minecraft:marker,tag=${TAG.root}]`]);
   fn('hide', ['# Internal, every tick while the actor stands: the avatar invisible with empty hands (1 s at a time: it shows again by',
     '# itself if the ticks stop), a rig character\'s displays and a floating catalyst out of view range until stop.',
+    '# Round V (lane VC): the player watches a locked sequence as a spectator, and a spectator sees an invisible living',
+    '# entity as a 15 % ghost drawn with its own texture: the avatar\'s skin is the blank one until stop (blank / show).',
+    `execute as @e[tag=rlk_av,tag=!${TAG.hidden},limit=1] run function ${NS}/blank`,
     `effect give ${AV} minecraft:invisibility 1 0 true`,
     `item replace entity ${AV} weapon.mainhand with minecraft:air`, `item replace entity ${AV} weapon.offhand with minecraft:air`,
     `tag ${AV} add ${TAG.hidden}`,
@@ -357,6 +361,12 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     `execute as @e[type=minecraft:block_display,tag=rlk_rncat,tag=!${TAG.hidden}] run function ${NS}/hide_one`,
     `execute as @e[type=minecraft:block_display,tag=rlk_nfcat,tag=!${TAG.hidden}] run function ${NS}/hide_one`]);
   fn('hide_one', [`data merge entity @s {view_range:0f}`, `tag @s add ${TAG.hidden}`]);
+  fn('blank', ['# Internal (@s = the avatar, once per hide): its profile kept in storage rlk:cine av (none: it wears the default skin),',
+    `# the skin texture replaced by the fully transparent ${BLANK_SKIN} (tools/build_blank_tex.py writes it into the pack): the`,
+    '# ghost a spectator would see of the invisible avatar has nothing to draw.',
+    'data remove storage rlk:cine av',
+    'data modify storage rlk:cine av set from entity @s profile',
+    `data modify entity @s profile.texture set value "${BLANK_SKIN}"`]);
   fn('play', ['# function rlk:char/cine/play {clip:"cs0"|"cs1"|"repel"|"ending"|"coda"}: selects the clip; #cavT is the module\'s.',
     `scoreboard objectives add ${OBJ} dummy`, `$function ${NS}/c/$(clip)/sel`]);
   fn('tick', ['# @s = the player, once per tick of a locked sequence, after the module wrote the clip tick into #cavT cine: shows that',
@@ -391,6 +401,9 @@ export function buildCine({dpRoot, rpRoot, here, transform, bodyModels, argv = p
     `scoreboard objectives remove ${OBJ}`]);
   fn('show', ['# Internal (@s = the player): the avatar the actor hid shows again. A rig character\'s avatar stays hidden under its rig.',
     `execute unless entity @e[tag=rlk_av,tag=${TAG.hidden},limit=1] run return 0`,
+    `execute if data storage rlk:cine av run data modify entity ${AV} profile set from storage rlk:cine av`,
+    `execute unless data storage rlk:cine av run data remove entity ${AV} profile`,
+    'data remove storage rlk:cine av',
     'execute if score @s pmVisible matches 1 run return 0', 'execute if score @s pmActive matches 1 run return 0',
     `effect clear ${AV} minecraft:invisibility`,
     `item replace entity ${AV} weapon.mainhand from entity @s hotbar.0`, 'function rlk:view/av_unwrap',

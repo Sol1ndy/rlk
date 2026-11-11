@@ -85,7 +85,7 @@ def want(n):
 CUTS = {
     'intro': [(0, 1), (76, 2), (110, 1), (170, 2), (250, 1), (320, 2), (410, 1), (460, 2), (536, 1), (666, 2), (690, 1), (750, 2),
               (790, 1), (820, 2), (838, 1), (960, 2), (980, 1), (1040, 2), (1230, 1), (1260, 2), (1290, 1), (1350, 2), (1406, 1)],
-    'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (110, 1), (180, 2), (220, 1), (276, 2), (340, 1), (380, 2), (500, 1), (610, 2), (654, 1)],
+    'cs1': [(0, 1), (6, 2), (34, 1), (84, 2), (110, 1), (180, 2), (220, 1), (276, 2), (340, 1), (380, 2), (500, 1), (608, 2), (654, 1)],
     'repel': [(0, 1), (26, 2), (52, 1), (68, 2), (78, 1), (102, 2), (128, 1), (132, 2)],
     'ending': [(0, 1), (50, 2), (94, 1), (118, 2), (150, 1), (190, 2), (204, 1), (240, 2), (276, 1), (314, 2), (338, 1), (378, 2),
                (420, 1), (470, 2), (556, 1), (616, 2), (700, 1), (846, 2), (882, 1), (910, 2), (1038, 1), (1072, 2), (1212, 1)],
@@ -184,7 +184,7 @@ def static():
     snd_ids = set((HERE.parent.parent / 'rd/tests/sound_ids.txt').read_text(encoding='utf-8').split()) \
         if (HERE.parent.parent / 'rd/tests/sound_ids.txt').exists() else None
     bad = {k: [] for k in ('negative literal', 'request outside lock', 'core call', 'gamemode / spectate', 'chat', 'sound',
-                           'missing function', 'macro', 'upper case id')}
+                           'missing function', 'macro', 'upper case id', 'execute subcommand after run')}
     for p in files:
         rel = p.relative_to(SQ).as_posix()[:-11]
         for ln in fn_lines(p):
@@ -209,6 +209,9 @@ def static():
                     bad['upper case id'].append((rel, ref))
             if ln.startswith('$') != ('$(' in ln):
                 bad['macro'].append((rel, ln))
+            # (round V: the real server refused `... run as @a ... run playsound`; the simulators ignore an unknown command)
+            if re.search(r' run (as|at|if|unless|positioned|rotated|facing|store|in|anchored|align|on) ', body):
+                bad['execute subcommand after run'].append((rel, ln))
     for k, v in bad.items():
         ck((f'S3 seq/**: no {k}' if k != 'request outside lock' else 'S3 seq/**: the lock request is set only in lock files (a cancel takes it back)') if k not in ('sound', 'macro') else f'S3 seq/**: {"vanilla sound ids only" if k == "sound" else "a macro line has $(...) and only a macro line"}',
            not v, str(v[:4]))
@@ -548,6 +551,19 @@ def run():
                    f'the first frame is that place (settle margins {sorted(set(margins))} t)', not glide, str(glide[:4]))
                 free = [t for t in sorted(by) if 1 <= t <= last and by[t]['held'] and by[t]['con'] != by[t]['live']]
                 ck(f'R11 {tag} (VC 6): the client looks through the live camera on every held tick', not free, str(free[:8]))
+                # round V (VC 7): a spectator sees every invisible LIVING entity as a ghost. In a locked tick the only living
+                # entities are her body (a husk: its texture is blank in the pack, tools/build_blank_tex.py) and the avatar (a
+                # mannequin: its skin is blank while the actor stands in for it, char/cine/blank); never an armour stand
+                import importlib
+                BT = importlib.import_module('build_blank_tex')
+                blank = {'husk': any(f.endswith('zombie/husk.png') for f in BT.FILES),
+                         'mannequin': any(f.endswith('skin/blank.png') for f in BT.FILES)
+                         and any('profile.texture set value "rlk:skin/blank"' in x for x in fn_lines(F / 'char/cine/blank.mcfunction'))
+                         and any('rlk:char/cine/blank' in x for x in fn_lines(F / 'char/cine/hide.mcfunction'))}
+                ghosts = sorted({x for t in by if 1 <= t <= last and by[t]['held'] for x in by[t].get('living', []) if not blank.get(x[0])})
+                kinds = sorted({x[0] for t in by if 1 <= t <= last and by[t]['held'] for x in by[t].get('living', [])})
+                ck(f'R14 {tag} (VC 7): no living entity a spectator could see a ghost of on any held tick (living types present: '
+                   f'{kinds}, each with a blank texture)', not ghosts, str(ghosts))
                 rg = [t for t in sorted(by) if t <= last and by[t].get('rig') and by[t].get('body1') and math.dist(by[t]['rig'], by[t]['body1'][0]) > 1e-6]
                 ck(f'R13 {tag} (VC 8): her model stands where her body stands when every tick is over', not rg, str(rg[:8]))
             if sn == 'event':
@@ -558,18 +574,18 @@ def run():
                    str(ev_black))
             cm = [r['cmds'] for r in by.values()]
             print(f'   {tag}: {len(by)} ticks, commands per tick avg {sum(cm) / len(cm):.0f} / max {max(cm)} (the sequence\'s own files)')
-            ck(f'R6 {tag}: at most 400 commands of its own in a tick', max(cm) <= 400, str(max(cm)))
+            # (round V: a start that places her instantly also runs the rig's follow, 36 commands, inside the sequence's own
+            # call now - before it ran later in the same tick from rig/tick, in the wrong place)
+            ck(f'R6 {tag}: at most 440 commands of its own in a tick', max(cm) <= 440, str(max(cm)))
         if key in ('intro', 'cs1', 'repel60', 'ending'):
             # round V (VC 1): what reached the client. Every rotation ever sent for a camera is on the 360 / 256 grid (the
             # byte packet is then exact and agrees with the entity's place); every interpolation it ran lasted <= 59 ticks
-            off, long_ = [], []
-            n_seg = 0
-            for e in s.stands():
-                off += [(sorted(e.tags)[-1], r_) for r_ in e.data.get('sent', []) if not CS.on_grid(r_)]
-                long_ += [x for x in e.data.get('segs', []) if x[1] > CAM.SEG_MAX]
-                n_seg += len(e.data.get('segs', []))
+            off = [x for x in s.all_sent if not CS.on_grid(x[1])]
+            long_ = [x for x in s.all_segs if x[1] > CAM.SEG_MAX]
+            n_seg = len(s.all_segs)
             ck(f'R12 {key} (VC 1): every rotation sent for a camera lies on the 1.40625-degree grid; no interpolation longer than '
-               f'{CAM.SEG_MAX} t ({n_seg} moves interpolated by the client on the last cameras)', not off and not long_, f'{off[:3]} {long_[:3]}')
+               f'{CAM.SEG_MAX} t ({len(s.all_sent)} rotations sent, {n_seg} moves interpolated by the client)', not off and not long_ and n_seg > 0 and len(s.all_sent) > 10,
+               f'{off[:3]} {long_[:3]}')
         if key in ('intro', 'cs1', 'repel60', 'repel5', 'ending'):
             # (HF-B, HB-04 / HB-06) the framing of every held tick through the built cameras (hr/h2/framing.py: her rig's
             # points from her_tracks.json on her body, the actor's head from lane H3's manifest)
@@ -580,6 +596,8 @@ def run():
             far = FR.spans(FR.far_lines(rows))
             ck(f'F2 {key} (HB-06): every tick of every line on a shot close on her (her head in the frame\'s middle, the lens <= '
                f'{FR.CLOSE} b from it)', not far, str(far[:4]))
+            over = FR.spans(FR.face_under_text(rows, L))
+            ck(f'F4 {key} (VC 10): on no tick of a line does the text box lie over her face', not over, str(over[:6]))
             if key == 'ending':
                 n_line = sum(1 for r in rows if r['line'] and not r['gone'])
                 ck('F2 ... the ending\'s lines 17-23 and the coda\'s 24 / 25 (while she is there) were measured', n_line >= 600, str(n_line))
@@ -655,20 +673,34 @@ def stages():
 
 # ============================================================================================================ skip
 def state(s):
-    """What a skip must reproduce: her place and yaw, the live camera's stand, the props, the lock. (The idle stand stays
-    where the skipped shot left it: it is placed again 4 t before the next cut.)"""
+    """What a skip must reproduce (v_brief VC 8): her place and yaw, where her MODEL stands (the rig's follow), the live camera
+    and the picture the client has through it, the texts, the props and the seat rock, the stage, the actor's clock, the lock.
+    (The idle camera is prepared again before the next cut.)"""
     b = H.body_of(s)
     live = s.sc('#mbCamId', 'mb')
-    e = s.snap('x', 0, [], 0)['cam'][live]
-    return dict(body=[round(v, 2) for v in b.pos], yaw=round(b.rot[0] % 360, 1), live=live,
-                cam=None if e is None else ([round(v, 2) for v in e[0]], [round(v, 1) for v in e[1]]),
+    v = CS.client_view(s)
+    cam = next((e for e in s.ents if e.alive and f'rlk_mb_cam{live}' in e.tags), None)
+    tx = [next((x.data.get('text') for x in s.ents if x.alive and t in x.tags and cam is not None and x.data.get('riding') == cam.id), None)
+          for t in (CS.LINE_TAG, CS.HINT_TAG)]
+    return dict(body=[round(v_, 2) for v_ in b.pos], yaw=round(b.rot[0] % 360, 1), live=live,
+                rig=None if s.rig_pos is None else [round(v_, 2) for v_ in s.rig_pos],
+                view=None if v is None else ([round(x, 2) for x in v[0]], [round(x, 2) for x in v[1]]),
+                on=CS.client_on(s) is not None and f'rlk_mb_cam{live}' in CS.client_on(s),
+                text=tx[0], hint=tx[1], cav=s.sc('#cavT', 'cine'), sq=s.sc('#sq', 'hr'),
+                stage=[(sorted(e.tags)[0], [round(x, 2) for x in e.pos], round(e.rot[0], 1)) for e in s.ents
+                       if e.alive and e.etype == 'marker' and ('rlk_hr_stage' in e.tags or 'rlk_hr_stage2' in e.tags)],
                 props=sorted(sorted(e.tags) for e in s.ents if e.alive and ('rlk_hr_sqp' in e.tags or 'rlk_hr_deco_seat_rock' in e.tags)),
                 held=CS.held(s))
 
 
 def lines_from(rec, name, t0):
-    return [(r['sq'], [int(a['id']) for c, a in r['kit'] if c == 'hud/line']) for r in rec
-            if r['seq'] == name and r['sq'] >= t0 and any(c == 'hud/line' for c, _a in r['kit'])]
+    """[(tick, text)] of the camera text from t0 on (each change once)."""
+    out, last = [], None
+    for r in rec:
+        if r['seq'] == name and r['sq'] >= t0 and r.get('text') != last:
+            last = r.get('text')
+            out.append((r['sq'], last))
+    return out
 
 
 def skip():
@@ -681,34 +713,78 @@ def skip():
         k0 = len(s.rec)
         Q.play(s, name, until=lambda s: (s.sc('#sq', 'hr') or 0) >= to + 4)
         ref = state(s)
+        ck(f'K0 {name}: in the full run at {to + 4} her model stands at her body and the client is on the live camera',
+           ref['rig'] == ref['body'] and ref['on'] and ref['view'] is not None, str(ref))
         while s.drive is not None:                      # the reference run goes on to its end
             CS.world(s)
         ref_end = state(s)
         ref_tail = lines_from(s.rec[k0:], name, to)
-        ck(f'K0 {name}: the full run has lines after {to} (the check below is not empty)', len(ref_tail) >= 1, str(ref_tail))
-        for at in sorted({lo, lo + 37, (lo + hi) // 2, hi - 51, hi}):
+        ck(f'K0 {name}: the full run has lines after {to} (the check below is not empty)', len([x for x in ref_tail if x[1]]) >= 1, str(ref_tail))
+        hint0 = [r['hint'] for r in s.rec[k0:] if r['seq'] == name]
+        ck(f'K5 {name}: the prompt 「⊙ 건너뛰기 · Space 길게」 on the live camera\'s hint text through the window {lo}..{hi}, nothing before '
+           'or after it; never the word Shift',
+           all((('건너뛰기' in (h or '') and 'Space 길게' in (h or '')) == (lo <= t <= hi)) and 'Shift' not in (h or '') for t, h in enumerate(hint0)),
+           str([(t, h) for t, h in enumerate(hint0) if (('건너뛰기' in (h or '')) != (lo <= t <= hi))][:4]))
+        for at in sorted({lo, lo + 37, (lo + hi) // 2, hi - 51, hi - api.SKIP_HOLD}):
             s, pl = world(name)
             Q.play(s, name, until=lambda s: (s.sc('#sq', 'hr') or 0) >= at)
-            b = H.body_of(s)
             n0 = len(s.rec)
-            s.call(f'{H.ROOT_SC}seq/{name}/skip', Ctx(b, tuple(b.pos), tuple(b.rot)))      # the core, after the hold
-            s.setsc('#sq', 'hr', to - 1)
-            ov = [(a['g'], int(a['in']), int(a['hold']), int(a['out'])) for _t, c, a in s.kitl if c == 'hud/ovl'][-1:]
+            if at + 80 < hi:
+                # Shift is not the skip any more (it only makes the game drop the camera, which post gives back): nothing happens
+                pl.data['sneak'] = True
+                Q.go(s, 30)
+                pl.data['sneak'] = False
+                ck(f'K6 {name} at {at}: Shift held 30 ticks skips nothing; the client stays on the live camera',
+                   s.sc('#sq', 'hr') == at + 30 and all(r['con'] == r['live'] for r in s.rec[n0:]) and not any(c == 'hud/ovl' and a.get('g') == 'black' for r in s.rec[n0:] for c, a in r['kit']),
+                   f"{s.sc('#sq', 'hr')}")
+                pl.data['keys'] = {'jump'}
+                Q.go(s, api.SKIP_HOLD - 6)
+                pl.data['keys'] = set()
+                Q.go(s, 2)
+                ck(f'K6 {name} at {at}: the jump key released before {api.SKIP_HOLD} ticks: no skip, the count starts again',
+                   s.sc('#sq', 'hr') == at + 30 + api.SKIP_HOLD - 4 and (s.sc('#sq_sk', 'hr') or 0) == 0)
+            t_press = s.sc('#sq', 'hr')
+            pl.data['keys'] = {'jump'}
+            m0 = len(s.rec)
+            for _ in range(api.SKIP_HOLD + 3):
+                CS.world(s)
+                if (s.sc('#sq', 'hr') or 0) == to - 1:
+                    break
+            pl.data['keys'] = set()
+            held_t = len(s.rec) - m0
+            ov = [(a['g'], int(a['in']), int(a['hold']), int(a['out'])) for r in s.rec[m0:] for c, a in r['kit'] if c == 'hud/ovl'][-1:]
+            ck(f'K1 {name} at {t_press}: the jump key held {api.SKIP_HOLD} ticks skips (#sq = {to - 1}), under the black 0 / 20 / 6',
+               s.sc('#sq', 'hr') == to - 1 and held_t == api.SKIP_HOLD and ov == [('black', 0, 20, 6)], f"{s.sc('#sq', 'hr')} {held_t} {ov}")
+            sk = state(s)
+            ck(f'K1 {name} at {t_press}: in the tick of the skip her model stands at her body (no empty mark), the prompt and the line are gone, '
+               'the client is on the new live camera', sk['rig'] == sk['body'] and sk['hint'] in ('', None) and sk['text'] in ('', None) and sk['on'],
+               str(sk))
             while s.drive is not None and (s.sc('#sq', 'hr') or 0) < to + 4:
                 CS.world(s)
             got = state(s)
-            ck(f'K1 {name} skipped at {at}: the black 0 / 20 / 6; the state at {to + 4} = the uninterrupted run\'s (her place and yaw, '
-               f'the live camera and its stand, the props, still locked)', ov == [('black', 0, 20, 6)] and got == ref,
-               f'{ov} {[(k, got[k], ref[k]) for k in got if got[k] != ref[k]]}')
+            ck(f'K1 {name} skipped at {t_press}: the state at {to + 4} = the uninterrupted run\'s (her place, yaw and model, the live camera '
+               f'and the client\'s picture, the texts, the props, the stage, the actor\'s clock, still locked)', got == ref,
+               f'{[(k, got[k], ref[k]) for k in got if got[k] != ref[k]]}')
+            kit_lines = [(r['sq'], a) for r in s.rec[m0:] for c, a in r['kit'] if c == 'hud/line']
+            ck(f'K1 {name} skipped at {t_press}: no subtitle line is ever drawn over the black (the kit\'s title line is not called in a '
+               'held run; the camera text is in the world, under the overlay)', not kit_lines, str(kit_lines[:2]))
             while s.drive is not None:
                 CS.world(s)
-            ck(f'K2 {name} skipped at {at}: it ends as the uninterrupted run (#sqdone at {LEN[name]}, the same end state)',
+            ck(f'K2 {name} skipped at {t_press}: it ends as the uninterrupted run (#sqdone at {LEN[name]}, the same end state)',
                (name, LEN[name]) in s.done and state(s) == ref_end, str([(k, state(s)[k], ref_end[k]) for k in ref_end if state(s)[k] != ref_end[k]]))
-            tail = lines_from(s.rec[n0:], name, to)
-            ck(f'K2 {name} skipped at {at}: the lines from {to} on come as in the full run', tail == ref_tail, f'{tail} {ref_tail}')
+            tail = lines_from(s.rec[m0:], name, to)
+            ck(f'K2 {name} skipped at {t_press}: the lines from {to} on come as in the full run', tail == ref_tail, f'{tail[:3]} {ref_tail[:3]}')
+            rg = [r['sq'] for r in s.rec[n0:] if r['seq'] == name and r.get('rig') and r.get('body1') and math.dist(r['rig'], r['body1'][0]) > 1e-6]
+            ck(f'K2 {name} skipped at {t_press}: her model is at her body on every tick from the skip to the end (no pop)', not rg, str(rg[:6]))
             Q.go(s, 2)
             bad = [k for k, v in CS.clean(s).items() if not v]
-            ck(f'K3 {name} skipped at {at}: released, nothing left', not bad and not Q.leftovers(s), f'{bad} {Q.leftovers(s)}')
+            ck(f'K3 {name} skipped at {t_press}: released, nothing left', not bad and not Q.leftovers(s), f'{bad} {Q.leftovers(s)}')
+        # the core's test hook (#skp hr = the tick to skip at) is honoured by the sequence's own input
+        s, pl = world(name)
+        s.setsc('#skp', 'hr', lo + 60)
+        Q.play(s, name, until=lambda s: (s.sc('#sq', 'hr') or 0) >= to + 4, limit=lo + 80)
+        ck(f'K7 {name}: #skp hr {lo + 60} (the test commands) skips at that tick', s.sc('#sq', 'hr') == to + 4 and len(s.rec) < lo + 80,
+           f"{s.sc('#sq', 'hr')} {len(s.rec)}")
     if api.rig_real():
         ln = fn_lines(SQ / 'cs1/skip.mcfunction')
         ck('K4 the CS1 skip moves her clip to tick 565 (the rig shows 566 next) and sets the discrete looks of 566',
@@ -815,7 +891,7 @@ def life():
         s, pl = start()
         s.ents.remove(pl)
         CS.run(s, 4)
-        s.st(pl)['cam'] = None
+        s.st(pl)['cam'] = s.st(pl)['ccam'] = None
         s.ents.append(pl)
         s.setsc('#vFresh', 'view', 1)
         CS.world(s)
