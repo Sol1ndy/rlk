@@ -781,12 +781,13 @@ def snap(s):
 # #hzNoParry option of every hazard made, and lane B's balance clock on her body (mob/tick's balance line; mob/setup runs
 # the REAL bal/init).
 #   F: the REAL player/f_key at the head of the tick (rlk:tick's input pre-pass, #now cb = this tick): player/def/press
-#      (the lock #parGap x (1 + the whiff streak #parWs: +1 when the press before blocked nothing and came <= #parWsT t
-#      earlier, at most #parWsMax; 0 after a longer pause) / player/def/press_re (a refused press: no F for #parRe t,
-#      #parMl), and in the judge player/def/par_use (#parChain; a parry of tier >= #parWsClr clears the streak). A press is
+#      (the lock #parGap; round W: the whiff ladder is gone) / player/def/press_re (a refused press: no F for #parRe t,
+#      #parMl), and in the judge player/def/par_use (#parChain, any tier). A press is
 #      accepted when it stamped parAt = now.
 #   dodge: the REAL cooldown score dashCool: refused while >= 1 (player/dash), set to #dashCoolT when accepted, the judge's
 #      player/def/dg_refund gives #dashCoolT - #dashCoolHitT back on a dodge that avoided a hit, player/tick's - 1 per tick.
+#      Round W (the dash is gone, the reference game's dodge set): a press inside the cooldown 1..#dgChW t after the set's
+#      first dodge is the double dodge's second move (player/dodge/again): a new stamp, dashCool + #dashCoolT, one per set.
 #      The dodge itself is stamped by world_sc (dgAt; the move and the start-spot box are not modelled: the player stands).
 # HB (11-11, review H-A): until then the F lock was a Python model with its own numbers (whiff window 40 not 80, the long
 # lock a press late and capped at 36 not 48, a refused press pushing the lock a full #parGap, any parry clearing the
@@ -802,6 +803,7 @@ class H1Sim(ScSim):
         self.f_log = []              # (tick, accepted)
         self.d_at = set()            # world ticks with a dodge asked
         self.d_log = []
+        self.d_set = None            # round W: the world tick of this dodge set's first dodge (None after its second move)
 
     def call(self, fid, ctx, macro=None):
         if fid == 'rlk:mboss/hz/make':
@@ -842,10 +844,17 @@ def world_h1(s):
         if t in s.d_at:
             s.d_at.discard(t)
             if (s.sc(pid, 'dashCool') or 0) >= 1:
-                s.d_log.append((t, False))
+                if s.d_set is not None and 1 <= t - s.d_set <= s.sc('#dgChW', 'tmp'):
+                    s.dash(at=t)                                  # the double dodge's second move
+                    s.setsc(pid, 'dashCool', s.sc(pid, 'dashCool') + s.sc('#dashCoolT', 'tmp'))
+                    s.d_set = None
+                    s.d_log.append((t, True))
+                else:
+                    s.d_log.append((t, False))
             else:
                 s.dash(at=t)
                 s.setsc(pid, 'dashCool', s.sc('#dashCoolT', 'tmp'))
+                s.d_set = t
                 s.d_log.append((t, True))
     b = body_of(s)
     if b is not None and b.alive and (s.sc(('e', b.id), 'balT') or 0) >= 1 and 'rlk_mb_dying' not in b.tags:

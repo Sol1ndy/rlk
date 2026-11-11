@@ -10,7 +10,7 @@ execute unless entity @e[tag=rlk_pl,limit=1] run return 0
 scoreboard players set @s plActive 1
 scoreboard players set @s plTick -1
 scoreboard players set @s plClip 2
-scoreboard players set @s plLen 21
+scoreboard players set @s plLen 13
 # heading: toward the attacker (the beat's tag), else as the avatar faces; fixed for the clip
 kill @e[tag=rlk_pl_basis]
 execute at @e[tag=rlk_av,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_pet","rlk_pl_basis"]}

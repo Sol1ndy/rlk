@@ -15,6 +15,7 @@ and `data modify storage ... set` that leaves the value as it was returns 0 (the
 import collections
 import copy
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -161,6 +162,11 @@ def snbt_dump(v, top=False):
     if isinstance(v, int):
         return str(v)
     if isinstance(v, float):
+        if top:
+            # a macro argument (MacroFunction.stringify, 26.3 bytecode): floats and doubles go through a DecimalFormat - no 'd'
+            # suffix, no exponent (round W: player/dash_sub's ~$(dx) took '0.125d' here and the move was never simulated)
+            t = ('%.15f' % v).rstrip('0').rstrip('.')
+            return '0' if t in ('', '-0') else t
         return f'{v}d'
     if isinstance(v, dict):
         return '{' + ','.join((k if re.fullmatch(r'[A-Za-z0-9._+\-]+', k) else _q(k)) + ':' + snbt_dump(x)
@@ -729,13 +735,29 @@ class PSim(mcsim.Sim):
                 if not ents:
                     return None, 0
                 return ctx.copy(rot=tuple(ents[0].rot)), 3
-            return ctx, 3
+            # round W: the yaw / pitch are applied (~ relative, else absolute) as mcsim does - before, `rotated ~180 0` kept the old
+            # rotation, so a local ^ ^ ^1 after it pointed the wrong way (player/dodge/away)
+            try:
+                r = [ctx.rot[j] + float(v[1:] or 0) if v.startswith('~') else float(v) for j, v in enumerate(t[i + 1:i + 3])]
+            except ValueError:
+                return ctx, 3
+            return ctx.copy(rot=tuple(r)), 3
         if k == 'facing':
             if t[i + 1] == 'entity':
                 ents = self.select(t[i + 2], ctx)
                 if not ents:
                     return None, 0
-                return ctx, 4
+                # round W: the rotation toward the entity (feet / eyes), as mcsim does
+                e = ents[0]
+                tgt = list(e.pos)
+                if t[i + 3] == 'eyes':
+                    tgt[1] += e.data.get('eye', 0.0)
+                dx, dy, dz = (tgt[j] - ctx.pos[j] for j in range(3))
+                if abs(dx) + abs(dy) + abs(dz) < 1e-9:
+                    return ctx, 4
+                yaw = math.degrees(math.atan2(-dx, dz))
+                pitch = math.degrees(-math.atan2(dy, math.hypot(dx, dz)))
+                return ctx.copy(rot=(yaw, pitch)), 4
             return ctx, 4
         if k == 'in':
             return ctx, 2

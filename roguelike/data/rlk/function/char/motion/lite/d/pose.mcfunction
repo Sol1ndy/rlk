@@ -12,11 +12,3 @@ execute if score @s plTick matches 10 run return run function rlk:char/motion/li
 execute if score @s plTick matches 11 run return run function rlk:char/motion/lite/d/11
 execute if score @s plTick matches 12 run return run function rlk:char/motion/lite/d/12
 execute if score @s plTick matches 13 run return run function rlk:char/motion/lite/d/13
-execute if score @s plTick matches 14 run return run function rlk:char/motion/lite/d/14
-execute if score @s plTick matches 15 run return run function rlk:char/motion/lite/d/15
-execute if score @s plTick matches 16 run return run function rlk:char/motion/lite/d/16
-execute if score @s plTick matches 17 run return run function rlk:char/motion/lite/d/17
-execute if score @s plTick matches 18 run return run function rlk:char/motion/lite/d/18
-execute if score @s plTick matches 19 run return run function rlk:char/motion/lite/d/19
-execute if score @s plTick matches 20 run return run function rlk:char/motion/lite/d/20
-execute if score @s plTick matches 21 run return run function rlk:char/motion/lite/d/21

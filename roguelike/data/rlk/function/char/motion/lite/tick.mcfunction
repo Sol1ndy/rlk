@@ -8,4 +8,5 @@ execute if score @s plTick > @s plLen run return run function rlk:char/motion/li
 function rlk:char/motion/lite/hide
 execute at @e[tag=rlk_av,limit=1] rotated as @e[tag=rlk_pl_basis,limit=1] rotated ~ 0 run tp @e[tag=rlk_pl] ~ ~ ~ ~ 0
 execute if score @s plClip matches 1 run return run function rlk:char/motion/lite/p/pose
+execute if score @s plClip matches 3 run return run function rlk:char/motion/lite/f/pose
 function rlk:char/motion/lite/d/pose
