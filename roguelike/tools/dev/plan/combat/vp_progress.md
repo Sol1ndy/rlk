@@ -12,7 +12,7 @@ javap output). Pack copy `<S>/rp_vp` (from `<S>/rp_fin`, the 11-11b release pack
 - [x] 4 the avatar: clips `pparry` / `pdodge` for the three rig characters, the stand-in rig for the four mannequin characters,
       the weapon glow variants, the red-pink body tint; sheets
 - [x] 5 README 3 / 0-4 / 0-6 / 0-8 / 11, hr_design addendum, ident_hr allow group, gates (below)
-- [ ] 6 final report
+- [x] 6 gates on the final tree, pushed; final report sent
 
 ## What the user asked (v_brief §1.2, §1.5) -> what is built
 | item | built |
@@ -101,7 +101,7 @@ lying body would swing its far end; they still freeze and get the lightning). Co
 (registry flag `"beat"`, like `"bal"`): a module's own pose replaces the generic tilt when `beat_parried` returns 1.
 
 ## Proof (a)-(e) (`tools/dev/sim/cb/tests`: `test_cb.py` sections `beat` and `beatloop` = `test_beat.py`)
-- (a) nothing changes without a perfect answer: the older sections of `test_cb` (251 checks: input, lock, judge, tiers, dodge,
+- (a) nothing changes without a perfect answer: the older sections of `test_cb` (271 checks: input, lock, judge, tiers, dodge,
   cool, context ...) run with `#btOn 0` and pass unchanged; every 홍련 / 아를레키노 / balance suite passes unchanged; with
   `#btOn 1` and no perfect answer `rlk:tick` pays 3 commands for the beat and `mboss/main` 1.
 - (b) every later event exactly N ticks later: `beat` drives six scripted fights with the beat on and off (chains 10 / 3 / 2 t
@@ -173,6 +173,40 @@ lying body would swing its far end; they still freeze and get the lightning). Co
   lanes will add theirs next to it. The resource pack's own README (font table: `rlk:cb` is now U+EE00-EE0D + two spaces
   U+EE1E / EE1F) is the lead's at the release.
 
+## Gates on the final tree (11-11)
+- Generators twice (`build_combat_fx.py --resourcepack`, `build_player_rig.mjs`, `build_player_audio.py`, `regen_all.sh --mobs`,
+  `build_mboss_bf_fx.py` / `build_mboss_fg_fx.py --skip-rp`): no change after either round; pack hash the same both rounds
+  (f628f145fd88...). `check_mboss_pack` 0 problems. `rplint` 0 problems (the 11-11b pack: 3 = streak 512 x 288, streak_s
+  512 x 288, glint 320 x 64). Items atlas 13.089 M px (<= 13.2 M). `loadcheck` 0 function load failures (26.3, Done, 1870
+  advancements).
+- Suites (from a copy outside the datapack): `test_cb` 383 (fx 21, beat 49, beatloop 25 for the three mid-bosses + 9 for 홍련, bossloop 8,
+  the older sections 271), `test_np` 125, `test_rm`, `test_bal` 117, `test_bal_boss` 117, `test_input_hr` 17, `test_metro` 30, `pat_p1` 559,
+  `pat_p2` 70, `pat_ghost` 65, `test_flow` 40, `test_bal_hr` 79, `test_scarlet` 47, `ident_hr`, 아를레키노 `test_arlecchino` /
+  `pat_p1` / `pat_p2`: all pass. `az/tests_cm/run_all.sh`: the same step statuses as on the base tree (the known failures of
+  README 0-9: `test_m0diff`, `test_px` 4e, `ident`, the suites that were never moved, the validators' missing baselines);
+  `test_m0diff`'s tick-cost line with this lane's share in the budget.
+
+## Only a person in the game can check
+1. The feel of the beats: the 5-tick freeze of a perfect parry and the 9 ticks at one third after a perfect dodge (rigs finish
+   the interpolation they were in for 1-3 ticks, then stand; the client was not run).
+2. The retimed interpolation in the slow motion: the boss rig should glide at one third speed without popping when the slow
+   motion starts and ends (the shadow_strength trick: every piece read in the bytecode, the whole not run).
+3. The rocked-back tilt (pitch -16 of the rig parts) on 홍련, 아를레키노, 타키, 파수꾼, 나루카미 and the chapter 1-3 mobs: the
+   body should lean away from the player, nothing through the floor, and snap back on the release.
+4. The weapon glow: the scythe / spear / sword / halberd turn yellow-white for 12 ticks (half-transparent emissive shell on
+   the weapon's own sprites: the sprite-transparency render type and light emission are read from the bytecode, not seen);
+   the vanilla sword of 루미네 / 클로린드 in the stand-in rig: its place in the hand and its glow card (the vanilla model could
+   not be drawn offline: a stand-in bar on the same diagonal was); the catalysts' yellow outline for 로노바 / 네페르.
+5. The title overlays at the user's GUI scale: the streak's four strips in one unbroken line just under the screen centre,
+   the warm tint and the dark vignette covering the whole screen, no box.
+6. The stand-in rig of the mannequin characters: one-tick swaps mannequin <-> rig at the start and the end, the mannequin
+   hidden meanwhile; the red-pink tint and the pink outline of the body.
+7. The view pull-in (movement-speed modifier, 5 % / 3 %) with the player's "FOV effects" setting; the sounds' mix.
+8. Walking mobs under the NoAI hold: they should stop and go on without sliding or snapping.
+
 ## Log
 - 11-11 start; baseline suites on the untouched tree all pass (test_cb 296, test_np 125, test_rm, test_bal 117, test_bal_boss
   117, test_input_hr 17, test_metro 30, pat_p1 559, pat_p2 70, pat_ghost 65 ...).
+- 11-11 commits: be11b8b2b (the box, tiers, the beat, the avatar, tests, README), 9abdedf5f (beatloop_hr, ident_hr group),
+  39e7213fb (the boss hold tried as a condition on rlk:tick's line), 698fe0129 (back to the core hook: the camera suites find
+  that line by its text), then the test / notes commit after this one.

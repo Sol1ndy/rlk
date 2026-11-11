@@ -160,8 +160,8 @@ def main():
         ck(f'beathr: ... beat on = beat off, world tick by world tick ({len(r1)} world ticks: every `# hr` and `# mb` score, her '
            f'body and yaw, both health pools)', d is None and len(r1) == len(r0) and len(r1) >= 100, d)
         ck(f'beathr: ... held {s1["held"]} real ticks = 5 x {par} perfect parries = #btLag (+{s1["lag"]}); {s1["real"]} real ticks = '
-           f'{len(r1)} world ticks + the held ones; on a held tick rlk:tick\'s mboss/main line costs {s1.get("hook", 0)} commands (the call and the hook)',
-           s1['held'] == 5 * par == s1['lag'] and s1['real'] == len(r1) + s1['held'] and s0['held'] == 0 and s1.get('hook', 2) <= 2,
+           f'{len(r1)} world ticks + the held ones; on a held tick rlk:tick\'s mboss/main line costs {s1.get("hook", 0)} simulator commands (the line, the call, the hook, its return)',
+           s1['held'] == 5 * par == s1['lag'] and s1['real'] == len(r1) + s1['held'] and s0['held'] == 0 and s1.get('hook', 4) <= 4,
            (s1['held'], par, s1['lag'], s1['real'], len(r1), s1.get('hook')))
     print(f'beatloop_hr: {"FAILED " + str(len(FAILS)) if FAILS else "all passed"}')
     return 1 if FAILS else 0
