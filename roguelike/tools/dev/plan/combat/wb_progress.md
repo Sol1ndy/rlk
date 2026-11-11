@@ -16,8 +16,23 @@ Branch `wip/w-boss` (from `origin/wip/w` 2613c47f0, + the brief's §4 / §5 merg
 - [x] kit sprites / models: sw_rib_0..2, sw_quad_0..2 new; sw_arc_0..2 repainted (a wedge with a chord rim: ribbon + ink + faint fill,
       T3-11); sw_path gone; sw_head kept (the flashes' star); models sw_band, sw_rib_k, sw_fan_k (wedge + rim wall), sw_quad_k
 - [x] test_blade rewritten (347 checks), test_vi beatpat on the trail, test_kit's sprite pin; all hr suites pass (test_vi rerun)
-- [ ] fightcam: trail measure at 4 / 7 / 10 b both fields (FOV 90); before / after strips
-- [ ] full gates (regen twice, loadcheck, gen_check_hr, hrfair quick), docs (README 홍련, hr_design), final push
+- [x] fightcam: `trail` measure at 4 / 7 / 10 b on three fields (FOV 90); before / after strips
+- [x] full gates (below), docs (README 홍련 + 0-4 / 0-8 lines, hr_design §11), pushed
+
+## Gates (the final tree)
+| gate | result |
+|---|---|
+| regeneration twice (rig -> kit -> bossbar -> `regen_all.sh --mobs`) | round 1 and 2: `git status` of data/ + tools/ empty; pack hash `376a5321ea53` both rounds (the first round on the working pack re-sorted it) |
+| other bosses' outputs | byte-identical (`git diff origin/wip/w` outside `boss/scarlet/**`, `tools/`, README: empty; `ident_hr` passes) |
+| `check_mboss_pack.py` | 0 problems |
+| loadcheck (26.3 server, tag `wbfin`) | 0 function load failures, `Done (` in the log |
+| `rplint` / `atlas_px` (`<S>/rp_wb`) | 0 problems / 13 109 184 px (13.109 M) |
+| test_blade | 347 / 347 |
+| pat_p1 / pat_p2 / pat_ghost | 559 / 70 / 65 |
+| test_scarlet / test_metro / test_flow / test_gauge | 48 (P1 505, P2 524 commands per tick) / 30 / 40 / 33 |
+| test_clips_h1c / test_kit / test_rig / test_bal_hr | 297 / 15 313 / 162 / 79 |
+| test_vi (beatpat on the trail) / ident_hr / gen_check_hr (`--rp`) | 208 / passes / 28 of 28 |
+| hrfair 2.0 `--quick --only p1,p2,kill` (seed 11; `<S>/wb/hrfair/run.log`) | P1 / P2 walker intake 237.7 / 239.9 %/min (= round V's quick run: / 타키 232.3 = 1.02 / 1.03), T1b 0.49, T1c 0, T3 1.43, T4 19.0 %, T8 1, T9 walker Lv15 167 s (150-185), T9b 164 s, T10 1.50 / 0, T12 100 %, T13 ok, W35 35 35 34 35 / 35 35 35 32 |
 
 ## Design (as built; `blade.py` header and hr_design.md §11)
 Nothing is drawn where the blade is going. The trail is generated from the sword the rig SHOWS on the pattern clock (`blade.Shown`:
