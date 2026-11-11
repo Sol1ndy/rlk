@@ -7,6 +7,7 @@ execute unless score #akInit mb matches 1 run function rlk:boss/azhdaha/fx/e/ini
 scoreboard players add #akN mb 1
 $function rlk:boss/azhdaha/fx/e/spawn {kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:"$(s0)",s1:"$(s1)",z:"$(z)",off:"$(off)",move:"$(move)",col:$(col),col2:$(col2),ax:"$(ax)",rr:"$(rr)",sr:"$(sr)",d:$(d),f:$(f),tg:"rlk_ak_c",t2:"rlk_ak_c",tpd:0}
 execute store result score #akNow mb run time query gametime
+scoreboard players operation #akNow mb -= #btLag cb
 scoreboard players add #akNow mb 1
 $execute as @e[type=minecraft:item_display,tag=rlk_ak_new,limit=1] run function rlk:boss/azhdaha/fx/e/bornf {dly:$(dly),life:$(life),fade:$(f),h1:$(h1),tsh:"$(tsh)",tfd:"$(tfd)",thit:"$(thit)"}
 tag @e[type=minecraft:item_display,tag=rlk_ak_new] remove rlk_ak_new

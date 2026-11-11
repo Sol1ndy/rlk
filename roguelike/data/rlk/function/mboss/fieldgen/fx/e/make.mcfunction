@@ -31,6 +31,7 @@ execute if score #fkDly mb matches 1.. run data modify storage rlk:fgkit a.z set
 function rlk:mboss/fieldgen/fx/e/spawn with storage rlk:fgkit a
 execute if score #fkTel mb matches 1 run tag @e[type=minecraft:item_display,tag=rlk_fk_new] add rlk_fk_t
 execute store result score #fkNow mb run time query gametime
+scoreboard players operation #fkNow mb -= #btLag cb
 scoreboard players add #fkNow mb 1
 execute as @e[type=minecraft:item_display,tag=rlk_fk_new,limit=1] run function rlk:mboss/fieldgen/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_fk_new] remove rlk_fk_new

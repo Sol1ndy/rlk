@@ -29,6 +29,7 @@ data modify storage rlk:kn fx.a.z set from storage rlk:kn fx.a.s0
 execute if score #dly knFx matches 1.. run data modify storage rlk:kn fx.a.z set value "0f,0f,0f"
 function rlk:boss/arlecchino/fx/e/spawn with storage rlk:kn fx.a
 execute store result score #now knFx run time query gametime
+scoreboard players operation #now knFx -= #btLag cb
 scoreboard players add #now knFx 1
 execute as @e[type=minecraft:item_display,tag=rlk_kn_fx_new,limit=1] run function rlk:boss/arlecchino/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_kn_fx_new] remove rlk_kn_fx_new

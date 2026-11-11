@@ -11,6 +11,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {buildLocomotion} from './build_player_locomotion.mjs';
 import {buildCine,cineAtlas} from './build_player_cine.mjs';
+import {beatFragments,buildBeat,beatAtlas,glowShell,hotTextures,GLOW_MODELS} from './build_player_beat.mjs';
 import {buildScytheGeometry} from './scythe_geometry.mjs';
 import {buildSkirkWeaponGeometry} from './skirk_weapon_geometry.mjs';
 import {buildNaviaWeaponGeometry} from './navia_weapon_geometry.mjs';
@@ -79,6 +80,12 @@ for(const[char,info]of Object.entries(characters)){
  for(const weapon of variants)if(JSON.stringify(sheathOf(char,weapon))!==JSON.stringify(sheathOf(char,info.weapon)))
   throw new Error(`${char}.json sheath.weapons: ${variants.join(', ')} are loco/weapon variants shown on the back with one shared mount; give ${weapon} no separate mount (edit the base sheath block instead).`);
  info.hasSheathe=!!data.clips?.sheathe;
+ // Round V (lane VP): the perfect-parry / perfect-dodge clips (pparry, pdodge and their _i variants for the second loco
+ // weapon), generated from player_motion/beat/clips.json by build_player_beat.mjs and compiled like authored clips.
+ for(const[name,clip]of Object.entries(beatFragments(here,char,info))){
+  if(data.clips[name])throw new Error(`Duplicate clip "${name}" for ${char}: the beat clips are generated (build_player_beat.mjs).`);
+  data.clips[name]=clip;
+ }
 }
 const glowing=new Set(Object.values(characters).flatMap(info=>info.glow));
 // Back mount of one weapon model: the character's sheath block with that model's overrides.
@@ -150,7 +157,9 @@ function transform(pose){
 }
 const nbt=v=>`{translation:${arr(v.t)},left_rotation:${arr(v.q)},scale:${arr(v.s||[1,1,1])},right_rotation:[0f,0f,0f,1f]}`;
 function skinFaces(u,v,w,h,d,start=0,end=h){
- const face=(a,b,c,e)=>({uv:[a/4,b/4,c/4,e/4],texture:'#skin'});
+ // tintindex 0: the perfect dodge's red-pink body glow (char/motion/beat/tint_on) tints the skin through the item's
+ // custom_model_data colour; white (the default) leaves it as painted.
+ const face=(a,b,c,e)=>({uv:[a/4,b/4,c/4,e/4],texture:'#skin',tintindex:0});
  return{east:face(u,v+d+start,u+d,v+d+end),north:face(u+d,v+d+start,u+d+w,v+d+end),west:face(u+d+w,v+d+start,u+2*d+w,v+d+end),south:face(u+2*d+w,v+d+start,u+2*d+2*w,v+d+end),up:face(u+d,v,u+d+w,v+d),down:face(u+d+w,v+d,u+d+2*w,v)};
 }
 const skinBox=(from,to,uv,start,end,inflate=0)=>({from:from.map(x=>x-inflate),to:to.map(x=>x+inflate),faces:skinFaces(...uv,start,end)});
@@ -169,7 +178,7 @@ function bodyModels(char,skin){
  };
  for(const[name,s]of Object.entries(specs)){
   json(path.join(assets,'models/item/player_motion',char,name+'.json'),{ambientocclusion:false,textures:{skin:'rlk:skin/'+skin,particle:'rlk:skin/'+skin},elements:[skinBox(s.from,s.to,s.uv,s.start,s.end),skinBox(s.from,s.to,s.over,s.start,s.end,s.inflate)]});
-  json(path.join(assets,'items/player_motion',char,name+'.json'),{model:{type:'minecraft:model',model:`rlk:item/player_motion/${char}/${name}`}});
+  json(path.join(assets,'items/player_motion',char,name+'.json'),{model:{type:'minecraft:model',model:`rlk:item/player_motion/${char}/${name}`,tints:[{type:'minecraft:custom_model_data',index:0,default:16777215}]}});
  }
 }
 const blocks=['black_concrete','red_concrete','orange_concrete','white_concrete','light_blue_concrete','purple_concrete','cyan_concrete','gray_concrete','blue_concrete','light_gray_concrete'];
@@ -186,6 +195,7 @@ function weaponModels(){
  paintWeaponTextures(rpRoot);
  const {spear,scythe}=buildScytheGeometry();
  const {sword,cryo_sword:cryo}=buildSkirkWeaponGeometry();
+ const hotSprites=new Set();
  for(const[name,elements]of Object.entries({spear,scythe,sword,cryo_sword:cryo,...buildNaviaWeaponGeometry()})){
   for(const el of elements)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside -16..32');
   modelIds[name]??=Object.keys(modelIds).length+1;
@@ -194,7 +204,16 @@ function weaponModels(){
   const textures=Object.fromEntries(used.map(n=>[n,spriteId(n)]));textures.particle=textures[used[0]];
   json(path.join(assets,'models/item/player_motion/weapons',name+'.json'),{ambientocclusion:false,textures,elements});
   json(path.join(assets,'items/player_motion/weapons',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/player_motion/weapons/'+name}});
+  // <name>_glow (round V): the weapon while it glows yellow-white (perfect parry): its own elements + an emissive shell of
+  // the same elements on the "hot" copies of its sprites (build_player_beat.mjs).
+  if(GLOW_MODELS.includes(name)){
+   used.forEach(n=>hotSprites.add(n));
+   json(path.join(assets,'models/item/player_motion/weapons',name+'_glow.json'),{ambientocclusion:false,textures:{...textures,...hotTextures(textures)},elements:[...elements,...glowShell(elements)]});
+   json(path.join(assets,'items/player_motion/weapons',name+'_glow.json'),{model:{type:'minecraft:model',model:'rlk:item/player_motion/weapons/'+name+'_glow'}});
+  }
  }
+ // Round V: the hot sprites of the glow models and the two glow cards, appended to the atlas once (after the weapon sprites).
+ beatAtlas(rpRoot,[...hotSprites].sort());
 }
 // snap: parts whose line uses interpolation_duration 0 (the weapon on an attach change).
 function poseLines(p,duration='$(step)',hidden=false,snap=[]){
@@ -465,4 +484,6 @@ fn('dash_face',['# Turn the dash clip basis (and the rig) toward the dash direct
 json(atlasPath,atlas);json(path.join(here,'player_motion/compiled_clips.json'),manifest);
 // The cutscene actor (hr_design.md §5.3): char/cine/**, its part models and tools/player_motion/cine/{<clip>,manifest}.json.
 buildCine({dpRoot,rpRoot,here,transform,bodyModels});
-console.log(`Built articulated combat avatars and ${manifest.length} clips.`);
+// Round V (lane VP): char/motion/beat/**, the stand-in rig of the mannequin characters (char/motion/lite/**), the glow models.
+const beatReport=buildBeat({fn,json,assets,rpRoot,here,transform,nbt,characters,modelIds,glowing,weaponSpan,arg});
+console.log(`Built articulated combat avatars and ${manifest.length} clips (beat: ${beatReport.length} frames floor-checked).`);

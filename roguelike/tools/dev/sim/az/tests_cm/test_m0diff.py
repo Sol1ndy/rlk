@@ -57,6 +57,9 @@ CMD_BUDGET = 6.5        # extra commands per mid-boss fight tick (sim count; +15
 # proto +0.74, Guardian +0.49, butterfly +0.78, fieldgen +1.08 per tick (totals +7.14 / +6.24 / +7.29 / +7.88; fieldgen's
 # older overrun of +0.30 keeps its check failing, as on the base).
 LANE_C_CMD = 1.2
+# round V, lane VP (11-11): the perfect parry / dodge beat's hold test, the first line of mboss/main (one command per boss tick;
+# tools/dev/plan/combat/vp_progress.md "Cost"). The effect kits' two clock lines (나비, 역장) come on top and are not budgeted.
+LANE_VP_CMD = 1.0
 DRAW_BUDGET = 6         # extra commands per bossui/draw with the options unset (sim count: the colour test, the nums
                         # call, the two resets; measured +6, was +15 before the fix round)
 # chapter-mode names a mid-boss fight may hold on the tree only (cm.md 4.1 / 4.2 / 11 / 13, and their internal temporaries)
@@ -285,7 +288,7 @@ def main():
             check(f'A force {f}: dmg / dodge / hz / pj / rig / line logs identical', not dl, dl)
             per = (r1['cmds'] - r0['cmds']) / r0['ticks']
             check(f'A force {f}: commands per tick {r0["cmds"] / r0["ticks"]:.1f} -> {r1["cmds"] / r1["ticks"]:.1f} '
-                  f'(+{per:.2f}/t, budget {CMD_BUDGET} + lane C {LANE_C_CMD})', per <= CMD_BUDGET + LANE_C_CMD, per)
+                  f'(+{per:.2f}/t, budget {CMD_BUDGET} + lane C {LANE_C_CMD} + lane VP {LANE_VP_CMD})', per <= CMD_BUDGET + LANE_C_CMD + LANE_VP_CMD, per)
         print('== B. kill / cancel / pause / reload: traces and end states')
         for mode in [m for m in args.modes.split(',') if m]:
             for f in forces:

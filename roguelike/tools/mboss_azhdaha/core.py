@@ -360,7 +360,7 @@ class Core:
         self.w('tick', tick)
         on_hit = ['# Hook on_hit (@s = body inside combat/apply; #elem #dmg known). Scores only: the hit flash group of the hit',
                   '# proxy (#mbPart, cm.md 9.5; 0 / unset = a direct body hit -> front), the flank-proxy record of the AI.']
-        on_hit += ['execute store result score #azPxGT mb run time query gametime', sc('#azPxHit', 0),
+        on_hit += ['execute store result score #azPxGT mb run time query gametime', 'scoreboard players operation #azPxGT mb -= #btAdj cb', sc('#azPxHit', 0),
                    'execute if score #mbPart mb matches 1.. run scoreboard players operation #azPxHit mb = #mbPart mb',
                    sc('#azFlash', FLASH_GROUP['front'])]
         for k, lay in enumerate(SR.PROXY_LAYOUT, 1):

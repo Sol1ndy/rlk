@@ -2,9 +2,11 @@
 # Ages the kit's cards once per tick while any is alive (scheduled from e/make and itself, so it runs at the
 # end of the server tick; no hook in rlk:tick). A dead or reviving player clears every card (fx/clear).
 execute unless entity @e[type=minecraft:item_display,tag=rlk_tk_fx,limit=1] run return run function rlk:boss/tachy/fx/e/zero
+execute if score #btHold cb matches 1 run return run schedule function rlk:boss/tachy/fx/e/world 1t replace
 execute if entity @a[tag=player,scores={dead=1}] run function rlk:boss/tachy/fx/clear
 execute if entity @a[tag=player,scores={rnDie=1..}] run function rlk:boss/tachy/fx/clear
 execute store result score #now tkFx run time query gametime
+scoreboard players operation #now tkFx -= #btLag cb
 execute as @e[type=minecraft:item_display,tag=rlk_tk_fx] run function rlk:boss/tachy/fx/e/age
 execute store result score #n tkFx if entity @e[type=minecraft:item_display,tag=rlk_tk_fx,tag=!rlk_tk_fx_coc]
 execute store result score #cn tkFx if entity @e[type=minecraft:item_display,tag=rlk_tk_fx,tag=rlk_tk_fx_coc]

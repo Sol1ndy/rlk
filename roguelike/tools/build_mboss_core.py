@@ -66,6 +66,47 @@ def w(name, text):
     out.write('mboss/' + name, text)
 
 
+# =============================================================================================
+# Beat (round V, lane VP; tools/dev/plan/combat/vp_progress.md, README 3 "박자"). The perfect parry's freeze and the perfect
+# dodge's slow motion are built in the game (`tick rate` cannot be used from functions in single player): while the beat
+# holds the world (#btHold cb 1 on a real tick; player/def/beat/clock, first thing in rlk:tick) nothing of a boss fight runs -
+# module AI and pattern clocks, the rig, mv / hz / pj / pull, bars, typed lines - and it resumes where it stopped, later.
+# Everything the core contributes is here plus three one-line hooks marked "VP beat":
+#   mboss/main      first line: a held tick returns before the per-tick requests (#mbLowG / #mbCam) are cleared, so low
+#                   gravity and a cutscene lock survive the hold exactly as they were. (One command per boss tick. A condition
+#                   on rlk:tick's own mboss/main line would cost none, but the camera suites find that line by its exact text
+#                   and lane VC edits the lines next to it: the hook lives here.)
+#   mboss/np_gate   the warning glint's spacing is counted on the beat's clock (game time minus the held ticks)
+#   mboss/pl_dot2   the boss DoT does not tick damage while the player is untouchable (#btInv cb 1)
+# and two optional module hooks, dispatched over the registry entries with the flag "beat" (like "bal"):
+#   <fn root>/beat_parried   as the body, at it, on the tick the parried attacker is thrown open (2 t after the contact, held
+#                            for 4 t). Return 1 = the module posed its own rocked-back reaction; anything else (or no flag)
+#                            = the generic one: the rig parts (rlk_mb_part) tilt back about the feet and step back a little,
+#                            for the bosses of mboss/d/beat_rock (upright, man-sized bodies)
+#   <fn root>/beat_release   as the body, at it, on the release tick (before the fight's tick): undo it
+BEAT_HOLD = ('# VP beat: a held tick of the perfect parry / dodge beat (player/def/beat/clock) - nothing below runs, the requests stay\n'
+             'execute if score #btHold cb matches 1 run return 0')
+BEAT_NOW_NP = '# VP beat: on the beat\'s clock\nscoreboard players operation #npNow mb -= #btAdj cb'
+BEAT_INV = '\n# VP beat: untouchable for the beat\nexecute if score #btInv cb matches 1 run return 0'
+TOK.update({'@BEAT_HOLD@': BEAT_HOLD, '@BEAT_NOW_NP@': BEAT_NOW_NP, '@BEAT_INV@': BEAT_INV})
+BEAT_BOSSES = [b for b in BOSSES if b.get('beat')]
+# The generic rocked-back tilt pivots the whole rig about the anchor: right for an upright, man-sized body only (a long or
+# lying body would swing its far end metres). Default by id; a registry entry may say "rock": 0 / 1.
+BEAT_ROCK_DEFAULT = {'guardian', 'arlecchino', 'tachy', 'scarlet', 'proto', 'cproto', 'spproto'}
+BEAT_ROCK = [b for b in BOSSES if b.get('rock', 1 if b['id'] in BEAT_ROCK_DEFAULT else 0)]
+out.write('mboss/d/beat_rock', '\n'.join(
+    ['# GENERATED (VP beat): return 1 when the running boss\'s rig may take the generic rocked-back tilt of a perfect parry',
+     '# (player/def/beat/rock_on: an upright, man-sized body; registry "rock" overrides the default list).']
+    + [f'execute if score #mbId mb matches {b["n"]} run return 1' for b in BEAT_ROCK] + ['return fail']))
+for hook, doc in (('beat_parried', 'return 1 = the module posed its own reaction (no generic tilt)'),
+                  ('beat_release', 'undo beat_parried')):
+    out.write('mboss/d/' + hook, '\n'.join(
+        [f'# GENERATED dispatcher (VP beat): rlk:<fn root>/{hook} of the running boss with the registry flag "beat"; {doc}.',
+         '# @s = the body husk, at it (player/def/beat/rock_on / rock_off).']
+        + [f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}' for b in BEAT_BOSSES]
+        + ['return fail']))
+
+
 T = '[{text:"[중간보스] ",color:"#E0703A",bold:true},'
 TT = '[{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},'
 CT = '[{text:"[챕터 보스] ",color:"#E0703A",bold:true},'
@@ -1089,6 +1130,7 @@ execute if score #mbPushOn mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_bod
 execute if score #mbMusPh mb matches 1.. run function rlk:mboss/music/tick
 ''')
 w('main', '''
+@BEAT_HOLD@
 # From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
 # here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
 # lost): the fight's leftovers and the bars go, and the scans stop until the next mboss/start.
@@ -2137,6 +2179,7 @@ scoreboard players set #npOk mb 0
 execute if score #mbNpOwn mb matches 1 run return 0
 execute if score #mbCine mb matches 1 run return 0
 execute store result score #npNow mb run time query gametime
+@BEAT_NOW_NP@
 scoreboard players operation #t mb = #npNow mb
 scoreboard players operation #t mb -= #mbNpAt mb
 execute if score #t mb < #npGap tmp run return 0
@@ -3676,6 +3719,7 @@ scoreboard players set #mbNoRx mb 0
 ''')
 w('pl_dot2', '''
 # @s = player (modelled on F:player/hurt_elem).
+@BEAT_INV@
 scoreboard players operation #mbDI mb = @s dashInvT
 scoreboard players set @s dashInvT 0
 scoreboard players operation #dmgIn tmp = @s maxHealth

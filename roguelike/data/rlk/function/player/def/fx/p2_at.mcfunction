@@ -1,7 +1,6 @@
-# 2단계 패링의 접점(p2)
-function rlk:player/def/fx/g/star {s:0.7}
-particle minecraft:flash{color:[1f,0.88f,0.55f,1f]} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-particle minecraft:crit ~ ~ ~ 0.2 0.2 0.2 0.45 8 force @a[tag=player]
-particle minecraft:dust{color:[1f,0.8f,0.3f],scale:0.8f} ~ ~ ~ 0.2 0.2 0.2 0 6 force @a[tag=player]
-playsound minecraft:item.shield.block player @a[tag=player] ~ ~ ~ 0.8 1.3
-playsound minecraft:entity.player.attack.crit player @a[tag=player] ~ ~ ~ 0.6 1.5
+# 2단계 패링의 접점(p2): 작은 불꽃 0.45칸 + 불티
+function rlk:player/def/fx/g/spark {s:1.1}
+particle minecraft:dust{color:[1f,0.95f,0.6f],scale:0.6f} ~ ~ ~ 0.12 0.12 0.12 0 4 force @a[tag=player]
+particle minecraft:wax_off ~ ~ ~ 0.08 0.08 0.08 1.5 3 force @a[tag=player]
+playsound minecraft:block.chain.hit player @a[tag=player] ~ ~ ~ 0.9 1.7
+playsound minecraft:block.amethyst_block.hit player @a[tag=player] ~ ~ ~ 0.5 1.9

@@ -10,6 +10,8 @@ execute if score @s parHit = #now cb run scoreboard players set #jpv tmp 1
 execute if score #hcNP tmp matches 1 run scoreboard players set #jpv tmp 0
 execute if score #jp tmp matches ..-1 run scoreboard players set #jpv tmp 0
 execute if score #jpv tmp matches 1 if score #jp tmp < #parW3 tmp run return run function rlk:player/def/par3
+# 3-1. 박자(퍼펙트 패링의 멈춤 · 퍼펙트 닷지의 느린 화면) 동안은 맞지 않는다(닷지 불가 공격도; 퍼펙트로 받아낸 것은 위에서 이미 답함)
+execute if score #btInv cb matches 1 run return run function rlk:player/def/beat/inv
 # 4. 넓은 닷지: 일반 몹(#dgLooseC 1 이면 정예까지)
 execute if score #hcND tmp matches 0 if score #hcC tmp <= #dgLooseC tmp if score #jd tmp matches 0.. if score #jd tmp < #dgLW tmp run return run function rlk:player/def/loose
 # 5. 2단계 · 1단계 패링

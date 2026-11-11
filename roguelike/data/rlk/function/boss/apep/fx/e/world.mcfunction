@@ -4,9 +4,11 @@
 # telegraph and flood cards (fx/clear; the phase-2 dressing pool stays). The dressing pool is never aged: its
 # ley strips pulse (their width breathes over 20 t).
 execute unless entity @e[type=minecraft:item_display,tag=rlk_wk,limit=1] run return run function rlk:boss/apep/fx/e/zero
+execute if score #btHold cb matches 1 run return run schedule function rlk:boss/apep/fx/e/world 1t replace
 execute if entity @a[tag=player,scores={dead=1}] if entity @e[type=minecraft:item_display,tag=rlk_wk,tag=!rlk_wk_d,limit=1] run function rlk:boss/apep/fx/clear
 execute if entity @a[tag=player,scores={rnDie=1..}] if entity @e[type=minecraft:item_display,tag=rlk_wk,tag=!rlk_wk_d,limit=1] run function rlk:boss/apep/fx/clear
 execute store result score #wkNow mb run time query gametime
+scoreboard players operation #wkNow mb -= #btLag cb
 execute as @e[type=minecraft:item_display,tag=rlk_wk,tag=!rlk_wk_d] run function rlk:boss/apep/fx/e/age
 execute if score #wkDN mb matches 1.. run function rlk:boss/apep/fx/dress/e/pulse
 execute store result score #wkN mb if entity @e[type=minecraft:item_display,tag=rlk_wk,tag=!rlk_wk_t,tag=!rlk_wk_d,tag=!rlk_wk_fl]

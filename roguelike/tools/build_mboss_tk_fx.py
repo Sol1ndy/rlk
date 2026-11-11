@@ -42,6 +42,9 @@ fx/clear, uninstall -> fx/uninstall (contract §3.3).
 Run: python3 tools/build_mboss_tk_fx.py --resourcepack <unpacked RP>   (or --skip-rp: the datapack + manifest only)
 """
 from pathlib import Path
+# VP beat (round V, lane VP): the kit clock is the game time minus the ticks the perfect parry / dodge beat held the world
+# (#btLag cb, player/def/beat/clock): while the fight is frozen the effects stand still, and a timed effect stays in step
+# with the hit it announces.
 import argparse
 import json
 import math
@@ -1283,7 +1286,7 @@ def engine(W):
         f'data modify storage {STO} fx.a.z set from storage {STO} fx.a.s0',
         f'execute if score #dly {OBJ} matches 1.. run data modify storage {STO} fx.a.z set value "0f,0f,0f"',
         f'function {E}spawn with storage {STO} fx.a',
-        'execute store result score #now ' + OBJ + ' run time query gametime',
+        'execute store result score #now ' + OBJ + ' run time query gametime', 'scoreboard players operation #now ' + OBJ + ' -= #btLag cb',
         f'scoreboard players add #now {OBJ} 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove {TAG}_new',
@@ -1326,9 +1329,11 @@ def engine(W):
         '# Ages the kit\'s cards once per tick while any is alive (scheduled from e/make and itself, so it runs at the',
         '# end of the server tick; no hook in rlk:tick). A dead or reviving player clears every card (fx/clear).',
         f'execute unless entity {SEL},limit=1] run return run function {E}zero',
+        # VP beat: a tick the beat holds - nothing ages (per-run counters too), the loop stays scheduled
+        f'execute if score #btHold cb matches 1 run return run schedule function {E}world 1t replace',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run function {FN}clear',
-        f'execute store result score #now {OBJ} run time query gametime',
+        f'execute store result score #now {OBJ} run time query gametime', f'scoreboard players operation #now {OBJ} -= #btLag cb',
         f'execute as {SEL}] run function {E}age',
         f'execute store result score #n {OBJ} if entity {SEL},tag=!{COC}]',
         f'execute store result score #cn {OBJ} if entity {SEL},tag={COC}]',

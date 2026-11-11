@@ -33,6 +33,7 @@ function rlk:boss/azhdaha/fx/e/spawn with storage rlk:azkit a
 execute if score #akTel mb matches 1 run tag @e[type=minecraft:item_display,tag=rlk_ak_new] add rlk_ak_t
 execute if score #akTel mb matches 2 run tag @e[type=minecraft:item_display,tag=rlk_ak_new] add rlk_ak_fp
 execute store result score #akNow mb run time query gametime
+scoreboard players operation #akNow mb -= #btLag cb
 scoreboard players add #akNow mb 1
 execute as @e[type=minecraft:item_display,tag=rlk_ak_new,limit=1] run function rlk:boss/azhdaha/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_ak_new] remove rlk_ak_new

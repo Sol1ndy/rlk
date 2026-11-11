@@ -3,9 +3,11 @@
 # the end of the server tick; no hook in rlk:tick). A dead or reviving player clears them (fields too: the
 # module redraws its field table on resume). Safe-circle beams (tele/safe_beam) emit every 2 t.
 execute unless entity @e[type=minecraft:item_display,tag=rlk_ak,limit=1] run return run function rlk:boss/azhdaha/fx/e/zero
+execute if score #btHold cb matches 1 run return run schedule function rlk:boss/azhdaha/fx/e/world 1t replace
 execute if entity @a[tag=player,scores={dead=1}] run return run function rlk:boss/azhdaha/fx/clear
 execute if entity @a[tag=player,scores={rnDie=1..}] run return run function rlk:boss/azhdaha/fx/clear
 execute store result score #akNow mb run time query gametime
+scoreboard players operation #akNow mb -= #btLag cb
 execute as @e[type=minecraft:item_display,tag=rlk_ak] run function rlk:boss/azhdaha/fx/e/age
 execute store result score #akN mb if entity @e[type=minecraft:item_display,tag=rlk_ak,tag=!rlk_ak_t,tag=!rlk_ak_fp]
 execute store result score #akTN mb if entity @e[type=minecraft:item_display,tag=rlk_ak_t]

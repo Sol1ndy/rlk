@@ -161,7 +161,7 @@ def emit(core):
     ring += [sc('#azDwell', 0)] + [f'scoreboard players operation #azDwell mb += #azFs{i} mb' for i in range(DWELL_N)]
     ring += ['# a flank proxy hit in the last 40 t from |s| >= 3 (#azPxHit = mbPart of the last hit, #azPxGT its gametime)',
              sc('#azPxF', 0),
-             'execute store result score #azX mb run time query gametime', 'scoreboard players operation #azX mb -= #azPxGT mb']
+             'execute store result score #azX mb run time query gametime', 'scoreboard players operation #azX mb -= #btAdj cb', 'scoreboard players operation #azX mb -= #azPxGT mb']
     ring += [f'execute if score #azPxHit mb matches {k} if score #azX mb matches ..{PROXY_GT} if score #azAs mb matches {s0}.. '
              'run scoreboard players set #azPxF mb 1' for k in FLANK_PX]
     w('ai/sample4', ring)

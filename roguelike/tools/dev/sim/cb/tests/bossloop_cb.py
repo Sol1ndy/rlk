@@ -114,7 +114,8 @@ def main():
     # (HI, 11-11: lane H2's FN-cam hold / release lines may stand between mboss/main and the near pass)
     ck('bossloop: rlk:tick has the pre-pass before and the near pass right after mboss/main', I1 < MAIN and TICK.index(NEAR) > MAIN
        and all('rlk:mboss/cam/' in l for l in TICK[MAIN + 1:TICK.index(NEAR)])
-       and len(PRE) == 4, (I0, I1, MAIN, TICK.index(NEAR)))
+       and len(PRE) == 6 and 'player/def/beat/clock' in PRE[1] and PRE[2] == 'scoreboard players operation #now cb -= #btAdj cb',
+       (I0, I1, MAIN, TICK.index(NEAR), len(PRE)))
     ck(f'bossloop: the fight of boss n {BOSS} starts (azsim: the real gate, intro, #mbSt 1)', azsim.to_fight(s, zone))
     s.log = []
     home = list(pl.pos)

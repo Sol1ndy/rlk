@@ -821,6 +821,19 @@ scoreboard players set #parChain tmp 1
 scoreboard players set #parKeep2 tmp 20
 scoreboard players set #parKeep1 tmp 50
 scoreboard players set #parCut tmp 20
+# round V: 퍼펙트 패링 · 퍼펙트 닷지의 박자(1 = 세계를 멈추고 / 늦춘다, 0 = 효과만; player/def/beat/*). 지금까지 멈춘 틱 수 #btLag cb 는
+# 전투 시계의 일부라 지우지 않는다. /reload 가 박자 중이었어도 아무것도 멈춘 채 남지 않는다(beat/reset)
+scoreboard players set #btOn tmp 1
+scoreboard objectives add btD dummy
+scoreboard objectives add btD0 dummy
+scoreboard objectives add btTp dummy
+scoreboard objectives add plActive dummy
+scoreboard objectives add plTick dummy
+scoreboard objectives add plClip dummy
+scoreboard objectives add plLen dummy
+scoreboard objectives add pbGlow dummy
+scoreboard objectives add pbTint dummy
+function rlk:player/def/beat/reset
 # 패링 불가 공격의 섬광: 같은 공격자에게 다시 띄우지 않는 간격(틱)
 scoreboard players set #npGap tmp 10
 # 기본공격 콤보 딜레이(공격속도 100% 기준 틱×100): 1타→2타, 2타→1타
@@ -1304,9 +1317,9 @@ forceload add 1000000 1000000
 team add rlk_nfshade
 team modify rlk_nfshade color dark_green
 team modify rlk_nfshade collisionRule never
-# 퍼펙트 닷지의 붉은 잔상(빛나는 테두리 색, player/def/fx/pd_ghost)
+# 퍼펙트 닷지의 잔상(빛나는 테두리 색, player/def/fx/pd_ghost; round V: 붉은 2페이즈 꽃밭에서도 보이게 흰색)
 team add rlk_cbred
-team modify rlk_cbred color red
+team modify rlk_cbred color white
 team modify rlk_cbred collisionRule never
 team modify rlk_cbred seeFriendlyInvisibles false
 # ===== 1챕터 커스텀 몹(cm) =====

@@ -17,6 +17,7 @@ execute store result storage rlk:azkit w.d int 1 run scoreboard players get #akT
 $data modify storage rlk:azkit w.id set value $(id)
 # the new end of life: now + dur + hold + 1
 execute store result score #akWl mb run time query gametime
+scoreboard players operation #akWl mb -= #btLag cb
 scoreboard players add #akWl mb 2
 scoreboard players operation #akWl mb += #akTd mb
 $scoreboard players operation #akWl mb += #akWh$(id) mb

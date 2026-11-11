@@ -790,3 +790,11 @@ What §3.0 "Camera", §3.1-§3.5 (shot tables) and §5.2 say about camera STANDS
 - **Shot table changes**: CS0 opening mask black 0 / 34 / 8 (the arrival); I1 0-75 (push 24-74), I2 76-109; I5 aimed at her
   shoulder (her face above the line); I7 level; I15 tracked; I16 from the side at r -4.6 (chase); CS1 S10's petal passes
   behind her, S11 cut at 608 with the petal at her waist 1.5 b from the lens; the ending's E7 chased, E9b's petal behind her.
+
+## Round V addendum (lane VP, 11-11): the perfect parry / dodge beat
+What this document says about the player's parry / dodge effects (the streak, the 1.5-degree jolt, "does not stop or slow the
+server", tier 2's star) is replaced by `v_brief.md` §3 "VP" + §5 as built: README 3 「효과」 · 「박자」 and `vp_progress.md`. For her
+fight this means: a perfect parry or perfect dodge of any cut freezes / slows her whole module (pattern clock, rig, gauntlet,
+shield and ULT clocks, hazards) through `mboss/main`'s first line and resumes it 5 / 7 ticks later with nothing else changed;
+the pips (`q_pf0` / `q_pf1`, `#mbDodgeOk`) read the beat's clock; her effect kit must subtract `#btLag cb` from its game-time
+reads (request to lane VB in `vp_progress.md`).

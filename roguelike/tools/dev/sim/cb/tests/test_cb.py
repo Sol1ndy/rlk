@@ -3,7 +3,7 @@
 datapack root (read only).
 
     python3 test_cb.py <datapack root> [section ...]
-      sections: static input lock judge tiers dodge cool context energy cd bal boss near raiden readers fx bossloop cost
+      sections: static input lock judge tiers dodge cool context energy cd bal boss near raiden readers fx beat bossloop beatloop cost
                 (default: all)
 
   static   the dash charges / HUD gauge / dash_iframe / hurt_nd are gone; dashInvT is written only by the non-dodge
@@ -51,6 +51,15 @@ datapack root (read only).
            (A-05: the jolt's two turns are one tick apart, the star grows after its first tick); the ghost is never
            killed where it stood (A-03: glow off and moved to the far chunk first), it faces as the body did (A-06);
            the crosshair is sent in the tick an overlay ends (A-09)
+  beat     round V, lane VP (the perfect parry / dodge beat, #btOn tmp 1): the hold schedule and the untouchable ticks of both
+           beats, the clock (#now cb counts world ticks, #btLag grows by N = 5 / 7), (a)(b) the same scripted fights with the
+           beat on and off give identical events on the beat's clock and take exactly N real ticks more per beat (chains 10 /
+           3 / 2 t apart, mistimed presses, dodge cooldowns), (c) nothing hurts during a beat, (d) back-to-back beats, (e)
+           death / revival wait / selection space / map / cutscene / camera lock / reload / lost tag leave nothing held,
+           a freeze started during the hold survives the release, the gates and clock users are in place, the idle cost
+  beatloop beatloop_hr.py (홍련's two gauntlets and her free fight in the suites' H1 world, same proof) and
+           beatloop_cb.py for the three mid-bosses: a real fight with the beat on = the same fight with it off, world tick by
+           world tick (every `# mb` score, the body, the hazard clocks, health, the dodge cooldown), held = 5 / 7 per beat
   bossloop review A-11: a real mid-boss fight (the vendored azsim world of tools/dev/sim/hr/tests/lib, read only) with
            rlk:tick's pre-pass lines and its mboss/near_all line in the world loop: the pre-pass runs every tick, the
            near pass only in the window, a dodge whose body has left finds its perfect dodge through near_all
@@ -109,7 +118,11 @@ class CSim(PSim):
                       'rlk:char/cd_cut', 'rlk:items/hook/on_parry', 'rlk:items/hook/on_pdodge', 'rlk:player/dash_go',
                       'rlk:player/def/fx/glint', 'rlk:char/motion/guard', 'rlk:mboss/hurt_dodge', 'rlk:combat/rclick_do',
                       'rlk:player/dash_fail', 'rlk:snd/f228', 'rlk:char/cast_skill_r', 'rlk:bal/take', 'rlk:bal/grog/start',
-                      'rlk:view/xhair', 'rlk:player/def/box_end', 'rlk:player/def/fx/t_arc'}
+                      'rlk:view/xhair', 'rlk:player/def/box_end', 'rlk:player/def/beat/start_p', 'rlk:player/def/beat/start_d',
+                      'rlk:player/def/beat/end', 'rlk:player/def/beat/rock_on', 'rlk:player/def/beat/rock_off',
+                      'rlk:char/motion/beat/parry', 'rlk:char/motion/beat/dodge', 'rlk:char/motion/beat/wglow_off',
+                      'rlk:char/motion/beat/tint_off', 'rlk:player/def/fx/p3_star', 'rlk:player/def/fx/p3_shatter',
+                      'rlk:player/def/fx/p3_bolt', 'rlk:player/def/beat/hold_on', 'rlk:player/def/beat/hold_off'}
         self.titles = []
         self.cmdlog = []                 # (gametime, text) of the rotate / data merge entity commands
         self.killed = []                 # (type, tags, position, data) of every entity a kill removed
@@ -130,9 +143,12 @@ class CSim(PSim):
             self.n += 1
             self.cmdlog.append((self.gt, ' '.join(t)))
             m = re.search(r'Glowing:(\d)b', t[4])
-            for e in self.select(t[3], ctx):
+            m2 = re.search(r'NoAI:(\d)b', t[4])
+            for e in (self.select(t[3], ctx) if t[3] != '@s' else [ctx.ex]):
                 if m:
                     e.data['Glowing'] = int(m.group(1))
+                if m2:
+                    e.data['NoAI'] = int(m2.group(1))
             return 1
         if t[0] == 'kill' and len(t) == 2 and t[1].startswith('@'):   # the game's result: how many it removed (0 = it fails)
             self.n += 1
@@ -153,6 +169,11 @@ class CSim(PSim):
         # `if|unless data entity <sel> interaction|attack` at the head of an execute (after `as <sel>` too: psim recurses
         # here): a click the entity really holds. psim answers every entity data test with true, so every eye shield in
         # the world would be "clicked" on every tick
+        if len(t) > 4 and t[0] in ('if', 'unless') and t[1:3] == ['data', 'entity'] and t[4] == '{NoAI:1b}':
+            es = self.select(t[3], ctx) if t[3] != '@s' else [ctx.ex]
+            if (bool(es) and es[0].data.get('NoAI') == 1) == (t[0] == 'unless'):
+                return 0
+            return self.execute(t[5:], ctx) if len(t) > 5 else 1
         if len(t) > 4 and t[0] in ('if', 'unless') and t[1:3] == ['data', 'entity'] and t[4] in ('interaction', 'attack'):
             es = self.select(t[3], ctx)
             if (bool(es) and t[4] in es[0].data) == (t[0] == 'unless'):
@@ -178,12 +199,17 @@ class CSim(PSim):
         return [c for c in self.log if c[0] == fid]
 
 
-def world():
+def world(beat=0):
+    """beat: #btOn tmp. The sections written before round V test the combat logic in un-slowed terms, so they run with
+    the perfect parry / dodge beat's world hold off (0: effects only, exactly the 11-11b clock); the `beat` section (and
+    test_beat.py) runs with it on (1, the pack's default) and proves the two agree."""
     s = CSim(FN)
     pl = Ent('player', (0.5, 64.0, 0.5), (0.0, 0.0), ['player', 'rlk_body'])
     s.ents.append(pl)
     s.player = pl
     s.call('rlk:load', Ctx(None, (0, 0, 0), (0, 0)))
+    s.btOnLoad = s.sc('#btOn', 'tmp')
+    s.setsc('#btOn', 'tmp', beat)
     for _ in range(5):
         s.t += 1
         s.gt += 1
@@ -323,7 +349,7 @@ def no_errors(s, name):
     # (fx/t_star stores an entity's transformation: psim has no entity NBT store)
     bad = {k: v for k, v in s.errors.items() if k[0].startswith(('rlk:player/def', 'rlk:player/f_key', 'rlk:player/dash',
                                                                   'rlk:combat/rc', 'rlk:engravings/'))
-           and k[0] != 'rlk:player/def/fx/t_star'}
+           and k[0] not in ('rlk:player/def/fx/t_star', 'rlk:player/def/fx/t_burst')}
     ck(f'{name}: the simulator ran every command of the parry / dodge functions (no swallowed error)', not bad, list(bad)[:4])
 
 
@@ -1442,6 +1468,30 @@ def t_readers():
 
 
 # ================================================================================================== fx
+CLOCK = next(l for l in _TICK if 'player/def/beat/clock' in l)
+ADJ = next(l for l in _TICK if l == 'scoreboard players operation #now cb -= #btAdj cb')
+FXW = next(l for l in _TICK if 'player/def/fx/world' in l)
+POST = next(l for l in _TICK if 'player/def/beat/post' in l)
+
+
+def eot(s):
+    """the rest of a game tick after its hits: rlk:tick's effect line and the beat's post line"""
+    s.cmd(split(FXW), C0)
+    s.cmd(split(POST), C0)
+
+
+def sot(s):
+    """the head of the next game tick: the game time and rlk:tick's beat-clock lines"""
+    s.gt += 1
+    s.setsc('#now', 'cb', s.gt)
+    s.cmd(split(CLOCK), C0)
+    s.cmd(split(ADJ), C0)
+
+
+def fxn(s, tag):
+    return len(s.select(f'@e[tag={tag}]', pctx(s)))
+
+
 def t_fx():
     s, pl = world()
     e = brain(s)
@@ -1450,20 +1500,59 @@ def t_fx():
     press(s, 1)
     P(s, 'vBig', 0)
     P(s, 'ttlT', 0)
+    pl.rot = [40.0, 20.0]
+    s.cmdlog.clear()
+    t0 = s.gt
     cm_hit(s, e, 20)
-    ck('fx: a perfect parry: the starburst text_display (rlk_cb_star) and the arc / jolt markers', bool(s.select('@e[tag=rlk_cb_star]', pctx(s)))
-       and bool(s.select('@e[tag=rlk_cb_arc]', pctx(s))) and bool(s.select('@e[tag=rlk_cb_jolt]', pctx(s))))
-    ck('fx: ... and the streak overlay on the title (vBig = 6)', any('' in t for t in s.titles) and P(s, 'vBig') == 6, s.titles[-2:])
-    s.titles.clear()
-    s.gt += 30
-    nopress(s)
-    press(s, 4)
-    P(s, 'ttlT', 30)
-    P(s, 'vBig', 0)
-    cm_hit(s, e, 20)
-    ck('fx: tier 2 under a bottom line (ttlT): no overlay (the line keeps its times), the small star still shows',
-       not s.titles and len(s.select('@e[tag=rlk_cb_star]', pctx(s))) == 2)
-    P(s, 'ttlT', 0)
+    ck('fx: a perfect parry starts the beat on the contact tick: kind 1, the contact marker, a small spark, the attacker tagged, '
+       'the avatar motion; no starburst and no overlay yet', G(s, '#btK', 'cb') == 1 and G(s, '#btA', 'cb') == 0 and fxn(s, 'rlk_bt_pt') == 1
+       and fxn(s, 'rlk_cb_spark') == 1 and fxn(s, 'rlk_cb_star') == 0 and not s.titles and 'rlk_bt_atk' in e.tags
+       and len(s.calls('rlk:char/motion/beat/parry')) == 1, (G(s, '#btK', 'cb'), fxn(s, 'rlk_cb_spark'), s.titles))
+    seen = []
+    for k in range(1, 21):
+        eot(s)
+        sot(s)
+        seen.append((fxn(s, 'rlk_cb_star'), fxn(s, 'rlk_cb_bolt'), G(s, '#btK', 'cb'), P(s, 'vBig')))
+    star = [x[0] for x in seen]
+    ck('fx: the starburst appears 2 ticks after the contact at full size, stands through the freeze (ticks 2-5), starts to go on '
+       'the release tick 6 and is removed 2 ticks later', star[:8] == [0, 1, 1, 1, 1, 1, 1, 0], star)
+    mg = [(t - t0, c) for t, c in s.cmdlog if c.startswith('data merge') and 'scale:[0f,0f,0f]' in c]
+    ck('fx: ... the contact spark shrinks from tick 1, the starburst from the end of the last freeze tick (5: seen from the release)',
+       [m[0] for m in mg] == [1, 5], mg[:3])
+    ck('fx: the warm tint + streak overlay (title, vBig 7) comes with the starburst on tick 2', any('title' in t for t in s.titles)
+       and seen[1][3] == 7 and seen[0][3] == 0, (s.titles[-2:], [x[3] for x in seen[:3]]))
+    ck('fx: lightning cards crawl over the attacker on ticks 7-15 only', [k + 1 for k, x in enumerate(seen) if x[1]][:1] == [7]
+       and max(k + 1 for k, x in enumerate(seen) if x[1]) <= 17 and len(s.calls('rlk:player/def/fx/p3_bolt')) == 9,
+       ([k + 1 for k, x in enumerate(seen) if x[1]], len(s.calls('rlk:player/def/fx/p3_bolt'))))
+    ck('fx: the shatter on tick 6, the weapon glow off on tick 12, the beat over on tick 17; nothing is left afterwards',
+       len(s.calls('rlk:player/def/fx/p3_shatter')) == 1 and len(s.calls('rlk:char/motion/beat/wglow_off')) >= 1
+       and [x[2] for x in seen][15:18] == [1, 0, 0] and not s.select('@e[tag=rlk_cb_fx]', pctx(s)) and fxn(s, 'rlk_bt_pt') == 0
+       and 'rlk_bt_atk' not in e.tags, ([x[2] for x in seen], fxn(s, 'rlk_bt_pt')))
+    ck('fx: the perfect parry never turns the view (the 11-11b jolt is gone: the freeze is the impact)',
+       not [c for _, c in s.cmdlog if c.startswith('rotate @s')] and [round(v, 3) for v in pl.rot] == [40.0, 20.0],
+       ([c for _, c in s.cmdlog if c.startswith('rotate')], pl.rot))
+    pl.rot = [0.0, 0.0]
+    for tier, ago in ((2, 4), (1, 7)):
+        s.titles.clear()
+        s.log.clear()
+        s.gt += 30
+        nopress(s)
+        press(s, ago)
+        P(s, 'vBig', 0)
+        n0 = fxn(s, 'rlk_cb_spark')
+        cm_hit(s, e, 20)
+        ck(f'fx: tier {tier} looks like a normal guard: one small spark, no starburst, no overlay, no beat, no view turn',
+           G(s, '#parT') == tier and fxn(s, 'rlk_cb_spark') == n0 + 1 and fxn(s, 'rlk_cb_star') == 0 and not s.titles
+           and G(s, '#btK', 'cb') == 0 and P(s, 'vBig') == 0, (G(s, '#parT'), fxn(s, 'rlk_cb_spark'), s.titles))
+        for _ in range(6):
+            eot(s)
+            sot(s)
+    src = {n: rd(f'player/def/fx/{n}') for n in ('p1_at', 'p2_at', 'p3_at', 'p3_star', 'p2', 'p1')}
+    ck('fx: tiers 2 / 1 draw no flash particle, no star glyph and no title; their sound is the thin chain tick, not the perfect '
+       'parry\'s anvil / trident clang or the amethyst ring', all('flash' not in src[n] and 'g/star' not in src[n] and 'ovl' not in src[n]
+       and 'anvil' not in src[n] and 'resonate' not in src[n] for n in ('p1_at', 'p2_at', 'p1', 'p2'))
+       and 'block.chain.hit' in src['p1_at'] and 'block.chain.hit' in src['p2_at'] and 'anvil' in src['p3_at'] and 'resonate' in src['p3_star'])
+    ck('fx: every effect entity is gone', not s.select('@e[tag=rlk_cb_fx]', pctx(s)))
     s.titles.clear()
     s.gt += 30
     nopress(s)
@@ -1471,61 +1560,24 @@ def t_fx():
     s.ents.append(Ent('interaction', (0.5, 64.0, 0.5), (0.0, 0.0), ['rlk_dgo', 'rlk_pet']))
     P(s, 'vBig', 0)
     cm_hit(s, e, 20)
-    ck('fx: a perfect dodge: the wash overlay and the red ghost mannequin (team rlk_cbred, 8 t)', any('' in t for t in s.titles)
-       and bool(s.select('@e[tag=rlk_cb_ghost]', pctx(s))))
-    for _ in range(12):
-        s.call('rlk:player/def/fx/world', Ctx(None, (0, 0, 0), (0, 0)))
-    ck('fx: every effect entity is gone after 12 ticks of fx/world', not s.select('@e[tag=rlk_cb_fx]', pctx(s)))
+    ck('fx: a perfect dodge: beat kind 2, the dark vignette overlay (vBig 17), the ghost mannequin (team rlk_cbred), the burst card',
+       any('title' in t for t in s.titles) and bool(s.select('@e[tag=rlk_cb_ghost]', pctx(s))) and G(s, '#btK', 'cb') == 2
+       and P(s, 'vBig') == 17 and fxn(s, 'rlk_cb_burst') == 1, (s.titles[-1:], G(s, '#btK', 'cb'), P(s, 'vBig')))
+    for _ in range(30):
+        eot(s)
+        sot(s)
+    ck('fx: ... the avatar\'s flip starts on tick 5, the tint goes on the landing tick 21, the beat is over on tick 27 and '
+       'every effect entity is gone', len(s.calls('rlk:char/motion/beat/dodge')) == 1 and len(s.calls('rlk:char/motion/beat/tint_off')) >= 1
+       and G(s, '#btK', 'cb') == 0 and not s.select('@e[tag=rlk_cb_fx]', pctx(s)),
+       (len(s.calls('rlk:char/motion/beat/dodge')), G(s, '#btK', 'cb')))
 
     def age():
-        """rlk:tick's effect line (once per tick, after that tick's hits), then the next tick"""
-        if s.select('@e[tag=rlk_cb_fx,limit=1]', pctx(s)):
-            s.call('rlk:player/def/fx/world', C0)
-        s.gt += 1
-    # review A-05: nothing is aged away in the tick it is made
+        """the rest of this tick, then the next tick's head"""
+        eot(s)
+        sot(s)
     for g in list(s.select('@e[tag=rlk_dgo]', pctx(s))):
         g.alive = False
     s.ents = [x for x in s.ents if x.alive]
-    nopress(s)
-    s.gt += 30
-    press(s, 1)
-    P(s, 'vBig', 0)
-    pl.rot = [40.0, 20.0]
-    s.cmdlog.clear()
-    t0 = s.gt
-    cm_hit(s, e, 20)
-    s.log.clear()
-    seen = []
-    for k in range(8):
-        seen.append((len(s.select('@e[tag=rlk_cb_star]', pctx(s))), len(s.select('@e[tag=rlk_cb_jolt]', pctx(s))),
-                     len(s.select('@e[tag=rlk_cb_arc]', pctx(s)))))
-        age()
-    rot = [(t - t0, c) for t, c in s.cmdlog if c.startswith('rotate')]
-    ck('fx: the perfect parry turns the view in its tick and back one tick later, to where it was (review A-05)',
-       rot == [(0, 'rotate @s ~1.5 ~-1'), (1, 'rotate @s ~-1.5 ~1')] and [round(v, 3) for v in pl.rot] == [40.0, 20.0], (rot, pl.rot))
-    mg = [(t - t0, 'grow' if 'scale' not in c else 'shrink') for t, c in s.cmdlog if c.startswith('data merge') and 'interpolation' in c]
-    ck('fx: the star is shown for its first tick as made, grows from the next tick (2 t), shrinks away (2 t) and is removed '
-       'on the 5th tick after', mg == [(1, 'grow'), (3, 'shrink')] and [x[0] for x in seen] == [1, 1, 1, 1, 1, 1, 0, 0], (mg, [x[0] for x in seen]))
-    for _ in range(6):
-        age()
-    ck('fx: the jolt marker is removed 2 ticks after, the ground arc crawls for 10 ticks; then nothing is left',
-       [x[1] for x in seen] == [1, 1, 1, 0, 0, 0, 0, 0] and len(s.calls('rlk:player/def/fx/t_arc')) == 10
-       and not s.select('@e[tag=rlk_cb_fx]', pctx(s)), ([x[1] for x in seen], len(s.calls('rlk:player/def/fx/t_arc'))))
-    pl.rot = [10.0, -89.5]                                   # looking almost straight up: the pitch would clamp
-    nopress(s)
-    s.gt += 30
-    press(s, 1)
-    P(s, 'vBig', 0)
-    s.cmdlog.clear()
-    cm_hit(s, e, 20)
-    age()
-    age()
-    ck('fx: looking straight up the jolt is yaw only (no 1-degree drift from the pitch clamp)',
-       [c for _, c in s.cmdlog if c.startswith('rotate')] == ['rotate @s ~1.5 ~', 'rotate @s ~-1.5 ~'] and [round(v, 3) for v in pl.rot] == [10.0, -89.5],
-       ([c for _, c in s.cmdlog if c.startswith('rotate')], pl.rot))
-    pl.rot = [0.0, 0.0]
-    for _ in range(12):
-        age()
     # reviews A-03 / A-06: the red ghost through the real path (right-click -> the dodge-start box -> a strike in the window)
     fresh(s)
     pl.rot = [135.0, 0.0]
@@ -1580,22 +1632,313 @@ def t_fx():
     vb = [l for l in code(rd('view/tick')) if 'score @s vBig matches' in l]
     xh = [l for l in code(rd('view/ride_tick')) if '#xh view' in l]
     nopress(s)
-    s.gt += 30
+    s.gt += 40
     press(s, 1)
     P(s, 'vBig', 0)
     cm_hit(s, e, 20)
+    age()
+    age()                                                    # the overlay goes up on tick 2 of the beat (vBig 7)
     s.setsc('#xh', 'view', 1)                                # the 10-tick resend has just fired
     s.log.clear()
     sent = []
-    for k in range(1, 9):                                    # the view ticks after the parry tick
+    for k in range(1, 11):                                   # the view ticks from the overlay's tick on
         for l in vb + xh:
             s.cmd(split(l), pctx(s))
         if s.calls('rlk:view/xhair'):
             sent.append(k)
             s.log.clear()
-    ck('fx: after the 6-tick streak overlay the crosshair is sent on the 6th tick, not up to 9 ticks later (review A-09)',
-       len(xh) == 3 and sent[:1] == [6], (len(xh), sent))
+    ck('fx: after the 7-tick parry overlay the crosshair is sent on its 7th tick, not up to 9 ticks later (review A-09)',
+       len(xh) == 3 and sent[:1] == [7], (len(xh), sent))
+    for _ in range(20):
+        age()
     no_errors(s, 'fx')
+
+
+# ================================================================================================== the beat (round V, lane VP)
+def drive(on, hits, f_at=(), rc_at=(), total=120, cls=0, rc_every=False, log_cool=False):
+    """One scripted fight on the beat's clock. hits / f_at / rc_at are COMBAT ticks (0 = the first tick): a strike of the
+    swordsman lands on the world tick `c`, F / a right-click arrive on the first real tick whose pre-pass carries combat
+    tick `c` (during a hold that is the tick the world resumes on). World things (the strike, the dodge cooldown line) run
+    only on ticks the beat does not hold, as the gated dispatchers do. -> (events in combat ticks, real ticks used, sim)"""
+    s, pl = world(beat=on)
+    e = brain(s)
+    fresh(s)
+    P(s, 'energy', 0)
+    ev, real, base = [], 0, None
+    sent_f, sent_rc = set(), set()
+    while True:
+        c = s.gt + 1 - (G(s, '#btLag', 'cb') or 0)           # the combat tick the next pre-pass carries
+        if base is None:
+            base = c
+        k = c - base
+        if k >= total:
+            break
+        f = k in f_at and k not in sent_f
+        rc = (k in rc_at or rc_every) and k not in sent_rc
+        sent_f.add(k)
+        sent_rc.add(k)
+        acc, dg = prepass2(s, f=f, rc=rc)
+        real += 1
+        hold = G(s, '#btHold', 'cb') == 1
+        if f:
+            ev.append((k, 'F', acc))
+        if dg:
+            ev.append((k, 'dodge'))
+        if not hold:
+            if k in hits:
+                full(s)
+                hp0 = P(s, 'curHealth')
+                if cls == 2:
+                    for o, v in (('#cmDmg', 60), ('#cmLv', 1), ('#cmEl', 0), ('#cmKB', 0), ('#hcC', 2), ('#hcK', 1)):
+                        s.setsc(o, 'tmp', v)
+                    s.call('rlk:cm/hit_pl2', pctx(s))
+                else:
+                    s.setsc('#cmDmg', 'tmp', 60)
+                    s.call('rlk:cm/hit_me', Ctx(e, tuple(e.pos), tuple(e.rot)))
+                ev.append((k, 'hit', hp0 - P(s, 'curHealth'), G(s, '#parT'), G(s, '#pdg'), G(s, '#dodged')))
+            if log_cool:
+                ev.append((k, 'cool', P(s, 'dashCool')))
+        cooldown(s)
+        eot(s)
+    return ev, real, s
+
+
+def prepass2(s, f=False, rc=False):
+    """prepass() for a beat-on world: the accepted F / started dodge are read on the beat's clock (#now cb), not s.gt"""
+    a0, d0 = P(s, 'parAt'), P(s, 'dgAt')
+    prepass(s, f=f, rc=rc)
+    now = G(s, '#now', 'cb')
+    return P(s, 'parAt') == now and a0 != now, P(s, 'dgAt') == now and d0 != now
+
+
+def t_beat():
+    # ---- the schedule: which real ticks hold the world, which are untouchable, the clock's lag (N = 5 / 7)
+    for kind, name, holds, inv, endA in ((1, 'perfect parry', [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], 17),
+                                         (2, 'perfect dodge', [1, 6, 7, 9, 10, 12, 13], list(range(1, 15)), 27)):
+        s, pl = world(beat=1)
+        e = brain(s)
+        fresh(s)
+        prepass2(s)
+        lag0 = G(s, '#btLag', 'cb') or 0
+        now0 = G(s, '#now', 'cb')
+        if kind == 1:
+            press(s, 1)
+            P(s, 'parAt', now0 - 1)
+        else:
+            dodge(s, 0)
+            P(s, 'dgAt', now0)
+        lost = cm_hit(s, e, 60)
+        cooldown(s)
+        eot(s)
+        got_h, got_i, nows, K = [], [], [], []
+        for a in range(1, endA + 3):
+            prepass2(s)
+            if G(s, '#btHold', 'cb') == 1:
+                got_h.append(a)
+            if G(s, '#btInv', 'cb') == 1:
+                got_i.append(a)
+            nows.append(G(s, '#now', 'cb') - now0)
+            K.append(G(s, '#btK', 'cb'))
+            cooldown(s)
+            eot(s)
+        n = len(holds)
+        want_now, c = [], 0
+        for a in range(1, endA + 3):
+            if a not in holds:
+                c += 1
+            want_now.append(c if a not in holds else c + 1)
+        ck(f'beat: a {name} (no damage) holds the world on real ticks {holds} after the hit and nowhere else',
+           lost == 0 and got_h == holds, (lost, got_h))
+        ck(f'beat: ... the player is untouchable on ticks {inv[0]}-{inv[-1]}', got_i == inv, got_i)
+        ck(f'beat: ... the clock: #now cb counts only world ticks (a held tick carries the tick the world resumes on), '
+           f'#btLag grew by exactly {n}', nows == want_now and G(s, '#btLag', 'cb') - lag0 == n and G(s, '#btAdj', 'cb') == G(s, '#btLag', 'cb'),
+           (nows, G(s, '#btLag', 'cb') - lag0))
+        ck(f'beat: ... it is over on tick {endA} (#btK 0, nothing held, no tags, the fov modifier call made)', K[endA - 2] == kind
+           and K[endA - 1] == 0 and G(s, '#btHold', 'cb') == 0 and G(s, '#btInv', 'cb') == 0 and 'rlk_bt_atk' not in e.tags
+           and e.data.get('NoAI') in (0, None) and 'rlk_bt_noai' not in e.tags, (K[endA - 3:endA + 1], e.data, sorted(e.tags)))
+    # ---- (a) / (b): the same fight with the beat on and off gives the same events on the beat's clock, N real ticks later
+    cases = [
+        ('a 7-hit chain 10 t apart, F one tick before each', dict(hits=[10 + 10 * i for i in range(7)], f_at=[9 + 10 * i for i in range(7)], total=100), 7, 0),
+        ('a 9-hit string 3 t apart, F in rhythm', dict(hits=[12 + 3 * i for i in range(9)], f_at=[12 + 3 * i for i in range(9)], total=70), 9, 0),
+        ('a 9-hit string 2 t apart, F in rhythm', dict(hits=[12 + 2 * i for i in range(9)], f_at=[12 + 2 * i for i in range(9)], total=60), 9, 0),
+        ('late and early presses (tiers 1-3 and misses) on a 12-t chain', dict(hits=[20 + 12 * i for i in range(6)],
+                                                                          f_at=[19, 28, 37, 55, 68, 80, 81], total=110), None, 0),
+        ('boss-class strikes 20 t apart, a right-click every tick (dodge cooldown 18 / 12)', dict(hits=[15 + 20 * i for i in range(5)],
+                                                                                            rc_every=True, total=120, cls=2, log_cool=True), None, None),
+        ('normal-mob strikes 25 t apart, a dodge one tick before each', dict(hits=[20 + 25 * i for i in range(4)],
+                                                                         rc_at=[19 + 25 * i for i in range(4)], total=120), 0, 4),
+    ]
+    for name, kw, n_par, n_dg in cases:
+        ev0, real0, s0 = drive(0, **kw)
+        ev1, real1, s1 = drive(1, **kw)
+        par = len([x for x in ev1 if x[1] == 'hit' and x[3] == 3])
+        pdg = len([x for x in ev1 if x[1] == 'hit' and x[4] == 1])
+        # a strike on a world tick inside a dodge beat is voided by design (untouchable): keep it out of the comparison
+        lag = (G(s1, '#btLag', 'cb') or 0) - (s1.lag0 if hasattr(s1, 'lag0') else 0)
+        ck(f'beat: {name}: the beat on and off give the same events on the beat\'s clock ({len(ev1)} events, {par} perfect parries, '
+           f'{pdg} perfect dodges)', ev0 == ev1 and len(ev1) >= 4 and (n_par is None or par == n_par) and (n_dg is None or pdg == n_dg),
+           [(a, b) for a, b in zip(ev0, ev1) if a != b][:3] or (len(ev0), len(ev1), par, pdg))
+        ck(f'beat: ... and takes exactly 5 real ticks more per perfect parry and 7 per perfect dodge ({real1} = {real0} + 5 x {par} '
+           f'+ 7 x {pdg})', real1 == real0 + 5 * par + 7 * pdg, (real0, real1, par, pdg))
+    # ---- (c): untouchable for the beat
+    s, pl = world(beat=1)
+    e = brain(s)
+    fresh(s)
+    prepass2(s)
+    press(s, 1)
+    P(s, 'parAt', G(s, '#now', 'cb') - 1)
+    cm_hit(s, e, 60)
+    cooldown(s)
+    eot(s)
+    lost, extra = [], 0
+    for a in range(1, 8):
+        prepass2(s)
+        n_p3 = len(s.calls('rlk:player/def/fx/p3'))
+        full(s)
+        hp0 = P(s, 'curHealth')
+        s.setsc('#cmDmg', 'tmp', 60)
+        s.call('rlk:cm/hit_me', Ctx(e, tuple(e.pos), tuple(e.rot)))            # a vanilla / stray hit in the freeze
+        d1 = hp0 - P(s, 'curHealth')
+        full(s)
+        hp0 = P(s, 'curHealth')
+        for o, v in (('#cmDmg', 60), ('#cmLv', 1), ('#cmEl', 0), ('#cmKB', 0), ('#hcC', 2), ('#hcK', 3), ('#hcND', 1), ('#hcNP', 1)):
+            s.setsc(o, 'tmp', v)
+        s.call('rlk:cm/hit_pl2', pctx(s))                                       # an undodgeable, unparriable boss hit
+        d2 = hp0 - P(s, 'curHealth')
+        full(s)
+        hp0 = P(s, 'curHealth')
+        s.setsc('#dmg', 'tmp', 30)
+        s.setsc('#elem', 'tmp', 1)
+        s.call('rlk:player/hurt_elem', pctx(s))                                 # a reaction DoT tick
+        d3 = hp0 - P(s, 'curHealth')
+        lost.append((d1, d2, d3))
+        extra += len(s.calls('rlk:player/def/fx/p3')) - n_p3
+        cooldown(s)
+        eot(s)
+    ck('beat: (c) during the freeze (ticks 1-5) a melee hit, an undodgeable unparriable boss hit and a DoT tick take nothing, '
+       'start nothing; from the release tick they hurt again', all(x == (0, 0, 0) for x in lost[:5]) and all(v > 0 for v in lost[5])
+       and extra == 0, (lost, extra))
+    # a hit on a world tick inside the dodge beat: voided unless it is answered perfectly (then it counts as that answer)
+    ev, real, s = drive(1, hits=[20, 24, 26], rc_at=[19], total=60, cls=2)
+    hv = [x for x in ev if x[1] == 'hit']
+    ck('beat: (c) boss strikes 4 and 6 world ticks after a perfectly dodged one (inside its beat) take nothing and are no dodge '
+       'event', len(hv) == 3 and hv[0][2:] == (0, 0, 1, 1) and hv[1][2:] == (0, 0, 0, 1) and hv[2][2:] == (0, 0, 0, 1), hv)
+    ev, real, s = drive(1, hits=[20, 25], rc_at=[19], f_at=[24], total=60, cls=2)
+    hv = [x for x in ev if x[1] == 'hit']
+    ck('beat: (d) a perfect parry inside a dodge beat is a perfect parry and starts its own beat (the dodge beat is closed first)', len(hv) == 2 and hv[1][3] == 3 and len(s.calls('rlk:player/def/beat/start_p')) == 1
+       and G(s, '#btK', 'cb') == 0 and G(s, '#btHold', 'cb') == 0, (hv, real))
+    # ---- (d): back-to-back beats leave nothing behind
+    ev, real, s = drive(1, hits=[10 + 10 * i for i in range(7)], f_at=[9 + 10 * i for i in range(7)], total=100)
+    e = [x for x in s.ents if 'rlk_cmb' in x.tags][0]
+    ck('beat: (d) seven perfect parries 10 t apart: seven beats, each closed before the next hit (the mob is free between them, '
+       'no tag or marker is left)', len(s.calls('rlk:player/def/beat/start_p')) == 7 and len(s.calls('rlk:player/def/beat/hold_on')) == 7
+       and len(s.calls('rlk:player/def/beat/hold_off')) == 7 and e.data.get('NoAI') == 0 and 'rlk_bt_noai' not in e.tags
+       and not s.select('@e[tag=rlk_bt_pt]', pctx(s)) and not s.select('@e[tag=rlk_bt_rk]', pctx(s)),
+       (len(s.calls('rlk:player/def/beat/start_p')), len(s.calls('rlk:player/def/beat/hold_on')), e.data))
+    # ---- (e): every exit leaves nothing frozen
+    def frozen_then(what, kind=1, at=3):
+        s, pl = world(beat=1)
+        e = brain(s)
+        e2 = brain(s, pos=(4.5, 64.0, 2.5), cid=8)
+        P2 = ('e', e2.id)
+        s.setsc(P2, 'frzT', 40)
+        e2.data['NoAI'] = 1                                   # a mob that was frozen before the beat
+        fresh(s)
+        prepass2(s)
+        if kind == 1:
+            P(s, 'parAt', G(s, '#now', 'cb') - 1)
+            P(s, 'parHit', -1000000)
+        else:
+            P(s, 'dgAt', G(s, '#now', 'cb'))
+            P(s, 'dgRw', -1000000)
+        cm_hit(s, e, 60)
+        eot(s)
+        for _ in range(at):
+            prepass2(s)
+            eot(s)
+        held = (G(s, '#btHold', 'cb'), e.data.get('NoAI'), 'rlk_bt_noai' in e.tags, 'rlk_bt_noai' in e2.tags)
+        what(s, pl)
+        prepass2(s)
+        eot(s)
+        full(s)
+        after = (G(s, '#btK', 'cb'), G(s, '#btHold', 'cb'), G(s, '#btInv', 'cb'), e.data.get('NoAI'), 'rlk_bt_noai' in e.tags,
+                 e2.data.get('NoAI'), 'rlk_bt_atk' in e.tags, len(s.select('@e[tag=rlk_bt_pt]', pctx(s))),
+                 G(s, '#btAdj', 'cb') == G(s, '#btLag', 'cb'))
+        return held, after
+    FREE = (0, 0, 0, 0, False, 1, False, 0, True)
+    exits = [('the player dies', lambda s, pl: P(s, 'dead', 1)), ('Ronova falls (revival wait)', lambda s, pl: P(s, 'rnDie', 1)),
+             ('the selection space opens', lambda s, pl: P(s, 'pkMode', 1)), ('the map opens', lambda s, pl: P(s, 'vMap', 1)),
+             ('a cutscene starts (#mbCine)', lambda s, pl: s.setsc('#mbCine', 'mb', 1)),
+             ('a cutscene camera lock is requested (#mbCam)', lambda s, pl: s.setsc('#mbCam', 'mb', 1)),
+             ('/reload (rlk:load)', lambda s, pl: s.call('rlk:load', C0)),
+             ('the player tag is gone', lambda s, pl: pl.tags.discard('player'))]
+    for name, what in exits:
+        for kind, at in ((1, 3), (2, 6)):
+            held, after = frozen_then(what, kind, at)
+            ck(f'beat: (e) {name} during a {"parry freeze" if kind == 1 else "dodge slow motion"}: the next tick nothing is held (the '
+               f'mob has its AI back, a mob frozen before keeps its own NoAI, no tag, the clock keeps its lag)',
+               held == (1, 1, True, False) and after == FREE, (held, after))
+    # a freeze that starts during the hold is not undone by the release, and its "was NoAI before" note is corrected
+    s, pl = world(beat=1)
+    e = brain(s)
+    fresh(s)
+    prepass2(s)
+    P(s, 'parAt', G(s, '#now', 'cb') - 1)
+    P(s, 'parHit', -1000000)
+    cm_hit(s, e, 60)
+    eot(s)
+    prepass2(s)
+    eot(s)
+    s.setsc(('e', e.id), 'frzT', 40)                          # element/frz_on during the hold: it sees NoAI 1 and notes rlk_noai
+    e.tags.add('rlk_noai')
+    for _ in range(8):
+        prepass2(s)
+        eot(s)
+    ck('beat: (e) a mob the player froze during the hold stays frozen after the release (NoAI 1) and loses the wrong rlk_noai '
+       'note, so the freeze\'s own end gives its AI back', e.data.get('NoAI') == 1 and 'rlk_noai' not in e.tags and 'rlk_bt_noai' not in e.tags,
+       (e.data, sorted(e.tags)))
+    # ---- the gates are where the worlds start
+    fns = {n: rd(n) for n in ('mboss/main', 'cm/world', 'cm/pj/world', 'mob/tick', 'player/tick', 'tick', 'player/hurt_elem', 'mboss/pl_dot2',
+                              'mboss/np_gate', 'player/def/judge2', 'player/def/q_pf0', 'player/def/q_pf1', 'player/def/dodge_stamp')}
+    ck('beat: mboss/main returns first thing on a held tick (before the per-tick requests are cleared; rlk:tick\'s own '
+       'mboss/main line keeps its text: the camera suites find it by it)', code(fns['mboss/main'])[0] == 'execute if score #btHold cb matches 1 run return 0'
+       and 'execute if score #mbLive mb matches 1 run function rlk:mboss/main' in code(fns['tick']))
+    ck('beat: rlk:tick gates cm/world, cm/pj/world, Raiden\'s world and the near pass (one condition on each line: no command '
+       'more); mob/tick the stun, balance and element timers; player/tick the dodge cooldown',
+       all(any(k in l and 'unless score #btHold cb matches 1' in l for l in code(fns[n])) for n, k in (
+           ('tick', 'function rlk:cm/world'), ('tick', 'function rlk:cm/pj/world'),
+           ('tick', 'boss/raiden/world'), ('tick', 'mboss/near_all'), ('mob/tick', 'remove @s stunT 1'), ('mob/tick', 'rlk:bal/tick'),
+           ('mob/tick', 'rlk:element/tick'), ('player/tick', 'remove @s dashCool 1')))
+       and all('#btHold' not in fns[n] for n in ('cm/world', 'cm/pj/world')))
+    ck('beat: the untouchable test sits in judge2 after the perfect dodge and the perfect parry, in player/hurt_elem and in '
+       'mboss/pl_dot2; the clock users (judge, dodge_stamp, q_pf0 / q_pf1, np_gate) subtract #btAdj',
+       code(fns['player/def/judge2']).index('execute if score #btInv cb matches 1 run return run function rlk:player/def/beat/inv')
+       > max(i for i, l in enumerate(code(fns['player/def/judge2'])) if 'player/def/par3' in l or 'player/def/pd' in l)
+       and all('#btInv cb matches 1' in fns[n] for n in ('player/hurt_elem', 'mboss/pl_dot2'))
+       and all('-= #btAdj cb' in fns[n] for n in ('player/def/q_pf0', 'player/def/q_pf1', 'player/def/dodge_stamp', 'mboss/np_gate')))
+    kits = [p for p in FN.rglob('fx/e/world.mcfunction')] + [p for p in FN.rglob('fx/e/make.mcfunction')]
+    own = [p for p in kits if 'scarlet' not in p.as_posix()]
+    ck(f'beat: the effect kits\' clocks ({len(own)} world / make functions of 6 kits; 홍련\'s is lane VB\'s) subtract the held '
+       'ticks (#btLag), and every kit world skips a held tick (it only re-schedules itself)', len(own) >= 12
+       and all('-= #btLag cb' in p.read_text(encoding='utf-8') for p in own)
+       and all('execute if score #btHold cb matches 1 run return run schedule function' in p.read_text(encoding='utf-8')
+               for p in own if p.name == 'world.mcfunction'),
+       [p.as_posix()[-40:] for p in own if '-= #btLag cb' not in p.read_text(encoding='utf-8')])
+    # ---- the default and the cost
+    s, pl = world(beat=1)
+    ck('beat: rlk:load sets #btOn tmp 1 (the beat is on by default) and keeps #btLag', s.btOnLoad == 1 and G(s, '#btLag', 'cb') == 0)
+    s.setsc('#btLag', 'cb', 77)
+    s.call('rlk:load', C0)
+    ck('beat: ... a second load keeps the lag (the stamps are on that clock) and #btAdj follows it', G(s, '#btLag', 'cb') == 77 and G(s, '#btAdj', 'cb') == 77)
+    s, pl = world(beat=1)
+    fresh(s)
+    prepass2(s)
+    n0 = s.n
+    s.cmd(split(CLOCK), C0)
+    s.cmd(split(ADJ), C0)
+    s.cmd(split(POST), C0)
+    ck(f'beat: with no beat running rlk:tick pays {s.n - n0} commands for it (<= 3)', s.n - n0 <= 3, s.n - n0)
+    no_errors(s1, 'beat')
 
 
 # ================================================================================================== boss world loop (A-11)
@@ -1611,6 +1954,28 @@ def t_bossloop():
     ck('bossloop: bossloop_cb.py ran to the end (5+ checks, exit 0)', n >= 5 and r.returncode == 0, (n, r.returncode, r.stderr[-400:]))
 
 
+def t_beatloop():
+    import subprocess
+    for boss in ('1', '2', '3'):
+        r = subprocess.run([sys.executable, str(HERE / 'beatloop_cb.py'), str(DP), boss], capture_output=True, text=True, timeout=2400)
+        n = 0
+        for line in r.stdout.split('\n'):
+            if line.startswith(('ok   ', 'FAIL ')):
+                n += 1
+                name, _, info = line[5:].partition('  -- ')
+                ck(name if boss == '1' or 'boss n' in name else f'{name} [boss n {boss}]', line.startswith('ok'), info)
+        ck(f'beatloop: beatloop_cb.py boss n {boss} ran to the end (7+ checks, exit 0)', n >= 7 and r.returncode == 0, (n, r.returncode, r.stderr[-400:]))
+    r = subprocess.run([sys.executable, str(HERE / 'beatloop_hr.py'), str(DP)], capture_output=True, text=True, timeout=2400)
+    n = 0
+    for line in r.stdout.split('\n'):
+        if line.startswith(('ok   ', 'FAIL ')):
+            n += 1
+            name, _, info = line[5:].partition('  -- ')
+            ck(name, line.startswith('ok'), info)
+    ck('beatloop: beatloop_hr.py (홍련: both gauntlets and the free fight) ran to the end (9 checks, exit 0)', n >= 9 and r.returncode == 0,
+       (n, r.returncode, r.stderr[-400:]))
+
+
 # ================================================================================================== cost
 def t_cost():
     s, pl = world()
@@ -1623,7 +1988,7 @@ def t_cost():
 
 SECTIONS = [('static', t_static), ('input', t_input), ('lock', t_lock), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge), ('cool', t_cool),
             ('context', t_context), ('energy', t_energy), ('cd', t_cd), ('bal', t_bal), ('boss', t_boss), ('near', t_near), ('raiden', t_raiden),
-            ('readers', t_readers), ('fx', t_fx), ('bossloop', t_bossloop), ('cost', t_cost)]
+            ('readers', t_readers), ('fx', t_fx), ('beat', t_beat), ('bossloop', t_bossloop), ('beatloop', t_beatloop), ('cost', t_cost)]
 for name, fn in SECTIONS:
     if run(name):
         fn()
