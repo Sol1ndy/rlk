@@ -44,3 +44,7 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
   test_hwamu 283 · test_moon 55 · ev_dry 78 · gen_check_hr 28; test_rig 160/161 = 사용자 스킨 원본이 없는 환경 탓 하나; ident_hr 은 작업 트리에서 통과),
   ar 다섯 · bal 둘 · test_cb 217 · test_rm 72 통과. az run_all 을 기준(origin/wip/combat 58c6c13f1)에도 돌려 단계별로 비교: 같은 상태, 다른 것은
   m0diff 37 → 38(역장 예산 하나)과 refs 새 7 → 8(매크로로 만든 이름 `player/def/fx/g/t_$(g)`)뿐. fw_az · fw_ap 는 레인 C 의미로 고친 시험이라 기준에서는 실패, 병합에서 통과.
+
+## 11-12 round W (lane WP)
+닷지는 옛 대쉬(3칸 / 3틱)가 아니라 원작의 닷지 한 벌(제자리 비틀기 · 걸음 · 피하면 백스텝 · 더블 닷지 옆돌기; `wp_progress.md`), 패링의 헛누름 사다리는
+없앰(w_brief §6). 창 · 재사용 대기 · 판정 순서는 그대로.

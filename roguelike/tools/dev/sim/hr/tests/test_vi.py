@@ -295,9 +295,9 @@ def beatpat():
                f'{len(s1["kitl"])} kit calls, {len(s1["rigl"])} rig calls)',
                all(s0[k] == s1[k] for k in ('judged', 'hz', 'kitl', 'rigl')),
                [k for k in ('judged', 'hz', 'kitl', 'rigl') if s0[k] != s1[k]])
-            ck(f'{lab}: held {s1["held"]} real ticks = 5 x {par} + 7 x {pd} = #btLag (+{s1["lag"]}); on a held tick no sweep card, '
+            ck(f'{lab}: held {s1["held"]} real ticks = 5 x {par} + 4 x {pd} = #btLag (+{s1["lag"]}); on a held tick no sweep card, '
                f'no kit card, no rig call, no kit call, not her body, not #pt changes; nothing held at the end',
-               s1['held'] == 5 * par + 7 * pd == s1['lag'] and s0['held'] == 0 and not s1['froze'] and not s1['left']
+               s1['held'] == 5 * par + 4 * pd == s1['lag'] and s0['held'] == 0 and not s1['froze'] and not s1['left']
                and s1['real'] == len(r1) + s1['held'], (s1['held'], par, pd, s1['lag'], s1['froze'][:3], s1['left']))
             if api.HITS.get(key):
                 ck(f'{lab}: the blade\'s trail is there ({s1["nsw"]} cards at most) and moves with her pattern clock (above: the same on '
@@ -602,7 +602,7 @@ def swap():
     tot = 0
     for ch, name in sorted((MAN_CH | RIG_CH).items()):
         own = 'rig' if ch in RIG_CH else 'avatar'
-        for kind, last in (('parry', 17), ('dodge', 27)):
+        for kind, last in (('parry', 17), ('dodge', 14)):     # round W: the dodge beat is 14 ticks (27 before)
             bad, after, glows = [], [], []
             # no lock: the beat alone
             for age in [None] + list(range(0, last + 1)):
@@ -640,7 +640,7 @@ def swap():
                f'invisible and blank), nothing of the beat left one tick into the lock', not bad, bad[:6])
             ck(f'swap {name}, a perfect {kind}: after the hand-back (and without a lock) the {own} is back as it was (skin, hand), no stand-in part, no '
                f'actor part, no glow, no tint, no beat left', not after and not glows, (after[:3], glows[:3]))
-    ck(f'swap: {tot} ticks looked at (7 characters x 2 beats x every lock age)', tot > 30000, tot)
+    ck(f'swap: {tot} ticks looked at (7 characters x 2 beats x every lock age; round W: the dodge beat is 14 ticks, 27 before)', tot > 25000, tot)
 
 
 # ============================================================================================================ beatseq
@@ -763,11 +763,11 @@ def seq_variants(snap, name, started, ended, cases):
         st = vstate(s)
         clean = [x for x, v in CS.clean(s).items() if not v] if held0 else []
         what = {'p': 'a perfect parry', 'd': 'a perfect dodge'}[kind]
-        slow = ' (inside the slow motion)' if kind == 'd' and age in (8, 11) else ''
+        slow = ' (inside the slow motion)' if kind == 'd' and age in (2, 4, 6) else ''      # round W: x1/2 on 1-8 (x1/3 on 6-14 before)
         if not held0:
             # a lead-in of the fight (no camera lock, no #mbCine): the beat is not cut: it runs its own length, and the
             # lead-in still ends on the same world tick in the same state
-            n = 5 if kind == 'p' else 7
+            n = 5 if kind == 'p' else 4                  # round W: the dodge beat holds 4 real ticks (7 before)
             ck(f'beatseq {name} (not a locked sequence): {what} judged {k} world tick(s) before it: the beat runs its course (the world '
                f'held {s.held - snap.held} real ticks), the lead-in starts and ends on the same world ticks and the fight goes on from '
                f'the same state; nothing held at the end', same and done and w1b == w1 and st == st_ref and s.held - snap.held == n

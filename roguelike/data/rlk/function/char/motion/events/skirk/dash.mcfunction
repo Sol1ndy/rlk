@@ -1,2 +1,1 @@
-# Dash clip (char/motion/dash, from player/dash_go): gameplay moves the body and plays the dash
-# sound and the few cloud particles; the clip itself has no events.
+# Dodge clip dash (build_player_beat.mjs): no hit, step or lock events - gameplay moves the body (player/dash_move_tick).

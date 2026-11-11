@@ -5,3 +5,5 @@ scoreboard players operation #t cb = #dashCoolT tmp
 scoreboard players operation #t cb -= #dashCoolHitT tmp
 scoreboard players operation @s dashCool -= #t cb
 execute if score @s dashCool matches ..-1 run scoreboard players set @s dashCool 0
+# round W: 피한 닷지는 공격한 적에게서 물러서는 백스텝이 된다(원작의 닷지; player/dodge/away)
+function rlk:player/dodge/away

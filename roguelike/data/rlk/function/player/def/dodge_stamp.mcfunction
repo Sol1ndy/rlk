@@ -1,4 +1,4 @@
-# @s = 플레이어, at 몸(player/dash_go). 닷지 시각 도장: dgAt = 지금, 퍼펙트 창의 끝 #dgEnd = 지금 + #dgPW - 1, 그 다음 틱에
+# @s = 플레이어, at 몸(player/dash_go: 일반 닷지의 스텝과 더블 닷지의 두 번째 동작 모두 — 동작마다 새 도장). 닷지 시각 도장: dgAt = 지금, 퍼펙트 창의 끝 #dgEnd = 지금 + #dgPW - 1, 그 다음 틱에
 # 표식을 지움(#dgKill; rlk:tick → player/def/box_end, #dgBox cb 1 = 지울 표식이 있음). 표식 rlk_dgo = 시작한 자리의 몸 크기 상자
 # (interaction 0.6 × 1.8, 클릭을 받지 않는 자리 표시, 몸이 보던 쪽을 봄: 붉은 잔상의 방향): 창이 열린 동안 커스텀 몹 · 보스 위험 지대 ·
 # 투사체 · 나루카미는 몸 대신 이 자리로도 판정한다(player/def/ghost_on)

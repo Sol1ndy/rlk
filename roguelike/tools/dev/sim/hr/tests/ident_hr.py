@@ -220,11 +220,23 @@ ALLOW[LANE_VP] = (
      F + r'(?:boss/(?:apep|azhdaha|tachy|arlecchino)|mboss/(?:butterfly|fieldgen))/fx/.+',
      F + r'boss/azhdaha/(?:ai/sample4|on_hit)\.mcfunction', F + r'mboss/fieldgen/(?:on_hit|field/banner|hud/banner_cut)\.mcfunction',
      r'data/rlk/tags/entity_type/beat_disp\.json'])
+# Round W, lane WP (11-12, wip/w-player; tools/dev/plan/combat/wp_progress.md): the dash is gone - the reference game's dodge
+# set (player/dash*, player/dodge/**, combat/rc_hold's held-repeat flag), the dodge clips dash / dash_l / dash_b / dash2 of every
+# character (char/motion/{dash*,clips/*/dash*,*_fx/dash*,events/*/dash*}; 나비아's old dash fx / audio gone), the parry sounds
+# and the faster perfect dodge (player/def/**, char/motion/beat|lite: group VP), the audio manifest
+LANE_WP = 'round W lane WP (11-12): the dodge set replaces the dash, parry sounds, the faster perfect dodge'
+ALLOW[LANE_WP] = (
+    [F + r'player/(?:dash[a-z_]*|dodge/.+)\.mcfunction', F + r'combat/rc_hold\.mcfunction',
+     F + r'char/motion/dash(?:2|_l|_b|_face)?\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/dash(?:2|_l|_b)?/.+',
+     F + r'char/motion/(?:(?:arle|skirk|navia)_fx|events/(?:arle|skirk|navia))/dash(?:2|_l|_b)?\.mcfunction',
+     F + r'char/motion/navia_fx/dash/.+', F + r'char/motion/audio/navia/dash\.mcfunction',
+     r'tools/player_motion/compiled_audio\.json'])
 # Round V, the integration (11-12, wip/v-int; tools/dev/plan/combat/vi_progress.md): the developer fallback mob of room/mob_summon
 # (`#mobTmp room 1`) is a zombie (lane VC's blank husk texture hides a husk)
 ALLOW['round V integration (11-12): the developer fallback mob is a zombie'] = [F + r'room/mob_summon\.mcfunction']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
+              LANE_WP,                              # lane WP: the dash clips / 나비아's dash fx + audio, beat/d/a14, a21
               LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash
               'combat P late-game lag (11-10)'}     # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4
