@@ -33,14 +33,15 @@ const r6 = x => Math.round(x * 1e6) / 1e6;
 export const SUPPORTS = {stone: SUP};
 // the world hat at rest: beside her (look/hat/world, DEFAULT_POSE), beside her lying right leg (DOWN / the kip-ups), over her
 // face (LY, the ending's start; HAT_REST.face is set by the builder from a probe solve of LY: setHatFace)
-export const HAT_REST = {side: {t: [1.00, .02, -.35]}, leg: {t: [-1.00, .02, -.40]}, face: null};
+// H2c (11-11): `hold` = beside her head at her right while she lies on her back after the repel's throw (rig frame: 1.25 b to her
+// right, 0.55 b toward her head): its near edge lies under her right hand (repel 104-131, ending 0-9), which takes it up as she rises
+export const HAT_REST = {side: {t: [1.00, .02, -.35]}, leg: {t: [-1.00, .02, -.40]}, face: null, hold: {t: [-1.25, .02, .55]}};
 // the source spots (S2a's hwP values) that map onto them; any other world-hat value outside a flight is a build error
-const HAT_SOURCE = [[[.95, .02, -.35], 'side'], [[-1.05, .02, -.5], 'leg'], [[0, .52, .96], 'face']];
-// the thrown paths: repel 60-75 (from the hat on her back at 59 to the leg spot), ending 26-39 (from her face to her right
-// hand at 40); P'(t) = A' + (B' - A') u + K_ARC (P(t) - (A + (B - A) u)), u = (t - t0) / (t1 - t0)
+const HAT_SOURCE = [[[.95, .02, -.35], 'side'], [[-1.05, .02, -.5], 'leg'], [[0, .52, .96], 'face'], [[-1.25, .02, .55], 'hold']];
+// the thrown path: repel 84-101 (H2c 11-11: from the hat on her head at 83, as she goes over the actor's shoulder, to the hold spot
+// as she lands); P'(t) = A' + (B' - A') u + K_ARC (P(t) - (A + (B - A) u)), u = (t - t0) / (t1 - t0)
 export const HAT_FLIGHTS = {
-  repel: {t0: 60, t1: 75, from: {state: 'back', t: 59}, to: {spot: 'leg'}},
-  ending: {t0: 26, t1: 39, from: {spot: 'face'}, to: {state: 'hand', t: 40}},
+  repel: {t0: 84, t1: 101, from: {state: 'worn', t: 83}, to: {spot: 'hold'}},
 };
 export function setHatFace(spot) { HAT_REST.face = spot; }
 // lane H1c (11-11): grog_in, the balance break (hr_design.md §1.4): the hat leaves her head as she topples backward (6) and lands on
@@ -89,7 +90,7 @@ const same = (a, b) => a && b && Math.abs(a[0] - b[0]) < 1e-6 && Math.abs(a[1] -
 export const hatSpotOf = hwP => (HAT_SOURCE.find(([v]) => same(v, hwP)) || [])[1] || null;
 
 // ---- the channel retarget ------------------------------------------------------------------------------------------------------
-const SEAT_CLIP = 'intro', SEAT_END = [214, 226];
+const SEAT_CLIP = 'intro', SEAT_END = [792, 806];      // H2c 11-11: the 1290-t intro (she stands up on the rock 792-820)
 export function retarget(p, clip, t) {
   const o = {...p};
   const lf = clamp01(p.lf || 0);
@@ -111,6 +112,8 @@ export function retarget(p, clip, t) {
   o.gD = gripDistance(p, o.pos); o.gL = (p.gL ?? .55) * S_ARM;
   const wl = ramp(p.rh || 0, .6, .9) * ramp(p.gE, -10, 0) * ramp(p.gE, 40, 20) * ramp(Math.abs(p.th - 95), 20, 10) * (1 - (p.gF || 0));
   o.gD += (Math.max(o.gD, .46) - o.gD) * wl;
+  // H2c (11-11): a cinematic key written in blocks (scarlet_cine.mjs blade(): gN 1) keeps its grip distance as authored
+  if (p.gN) o.gD += (p.gD - o.gD) * clamp01(p.gN);
   o.plL = p.plL.map(v => v * S_LEG); o.plR = p.plR.map(v => v * S_LEG);
   o.scOff = Math.max(SK.throat, (p.scOff || 0) * S_SCAB);
   // derived weights (from the source sample)
@@ -164,6 +167,9 @@ const KNEEL = {pos: [0, -.29, -.02], rot: [-25, 0, 0], tor: [-55, -10, 0], head:
 // torso, and the grip comes forward with the kip (a grip left in the yaw frame would let the shoulder swing past it)
 const KNEEL_BLADE = {gF: 0, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
 export const IAI_DELTA = 14;
+// H2c (11-11): the ending's sheathe (hr_design §3.5 E9): the scabbard swung down 398-418 while the left hand brings the blade onto its
+// axis (t1 = the builder's probe tick: SH0'), held on it to 426, slid in 426-450, seated 452; the patch ramps the free blade to SH0'
+export const SHEATHE = {clip: 'ending', t0: 398, t1: 418, t2: 426, out: 460};
 // V1 (HR-47): a10's airborne crouch (9-19, both hands on the grip, the torso bowed 24 deg) raised S2a's blade laid back over the
 // head (th 120): the player-size arms put the fists behind and in the head, and the dive strike at 20-21 had to bring them through
 // it. Held instead as a high guard before her face: the grip on the swing sphere ahead of her chin, the blade upright (S2a units)
@@ -237,24 +243,20 @@ const strafeFeet = sd => (o, t) => {
 export const PATCHES = [
   {id: 'KNEEL-K', clip: 'kipup', in: [6, 8], out: [10, 12], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
   {id: 'KNEEL-K-B', clip: 'kipup', in: [3, 8], out: [10, 16], set: KNEEL_BLADE, why: 'the sword out at her left through the kneel (5- / 6-tick ramps: no whip)'},
-  {id: 'KNEEL-L', clip: 'lead_down', in: [5, 7], out: [9, 11], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
-  {id: 'KNEEL-L-B', clip: 'lead_down', in: [1, 6], out: [11, 17], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (a 5-tick ramp in; out over 6 ticks after the kneel: no whip, the elbow never crosses the shoulder)'},
-  {id: 'IAI', clip: 'cs1', in: [104, 106], out: [161, 164], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]},
-    why: 'the cross-draw reach to the hip hilt (V1: held through the draw at 162, so the turning torso does not sweep over the hilt)'},
-  {id: 'SIP', clip: 'intro', in: [66, 70], out: [86, 94], set: {wLip: 1}, why: 'the cup at her lips'},
-  {id: 'SH0', clip: 'ending', in: [297, 297], out: [326, 326], sh0: true, why: 'the sheathe entry on the new scabbard axis (SH0\')'},
+  {id: 'SIP', clip: 'intro', in: [596, 602], out: [644, 660], set: {wLip: 1}, why: 'the cup at her lips (H2c 11-11: the 1290-t intro)'},
+  {id: 'IAI-E', clip: 'intro_end', in: [58, 62], out: [66, 69], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]},
+    why: 'the cross-draw reach to the hip hilt (H2c 11-11: intro_end draws from the hip)'},
+  {id: 'IAI', clip: 'cs1', in: [606, 610], out: [641, 644], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]},
+    why: 'the cross-draw reach to the hip hilt (held through the draw at 642, so the turning torso does not sweep over the hilt; H2c 11-11: the 720-t cs1)'},
+  {id: 'SH0', clip: SHEATHE.clip, in: [SHEATHE.t0 + 1, SHEATHE.t0 + 1], out: [SHEATHE.out, SHEATHE.out], sh0: true, why: 'the sheathe entry on the new scabbard axis (SH0\')'},
   {id: 'A10-HIGH', clip: 'a10', in: [4, 8], out: [19, 20], set: A10_HIGH,
     why: 'V1 (HR-47): the airborne two-hand guard held as a high guard before her face (the player-size arms cannot hold the blade laid back over her head)'},
-  {id: 'DRAW-E', clip: 'intro_end', in: [47, 51], out: [57, 60], set: DRAW_E,
-    why: 'V1 (HR-47): the scabbard held further out before her chest for the cross-draw (the fist off her torso and head)'},
   {id: 'WALK', clip: 'walk', in: [0, 0], out: [24, 24], fn: walkFeet,
     why: 'V1 (HR-49): a longer stride (each sole planted 0.38 b ahead, swept steadily 0.76 b back over its 12-t stance, swung forward lifted), the hips bobbing with it'},
   {id: 'STRAFE-L', clip: 'strafe_l', in: [0, 0], out: [20, 20], fn: strafeFeet(1),
     why: 'V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)'},
   {id: 'STRAFE-R', clip: 'strafe_r', in: [0, 0], out: [20, 20], fn: strafeFeet(-1),
     why: 'V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)'},
-  {id: 'ASIDE', clip: 'intro', in: [ASIDE.t0, ASIDE.t0], out: [ASIDE.t0 + ASIDE.len, ASIDE.t0 + ASIDE.len], fn: asideFeet,
-    why: 'the feet step with seq.py\'s 1.1-b glide aside off the seat stone (4 side steps of 0.55 b, the stance sole kept on its world spot)'},
 ];
 const patchW = (P, t) => (t < P.in[0] || t > P.out[1] ? 0 : t < P.in[1] ? ramp(t, P.in[0], P.in[1]) : t <= P.out[0] ? 1 : 1 - ramp(t, P.out[0], P.out[1]));
 export const patchSpans = clip => PATCHES.filter(P => P.clip === clip).map(P => [P.id, P.in[0], P.out[1]]);
@@ -276,12 +278,12 @@ export function overlay(q0, clip, t, ctx = {}) {
     if (P.id.startsWith('KNEEL') && w > 0) o.kneelHat = true;
     if (P.sh0 && ctx.sh0) {
       const S = ctx.sh0;
-      if (t <= 304) {
-        const s = smooth((t - 297) / 7);
+      if (t <= SHEATHE.t1) {
+        const s = smooth((t - SHEATHE.t0) / (SHEATHE.t1 - SHEATHE.t0));
         Object.assign(o, {gF: 0, gB: L1(-32, S.gB, s), gE: L1(-50, S.gE, s), gD: L1(.6 * S_ARM, S.gD, s), cB: L1(38, S.cB, s), cR: 0, th: L1(-40, S.th, s), ed: -1,
           tw: L1(0, S.tw, s)});
       } else Object.assign(o, {gF: 0, gB: S.gB, gE: S.gE, gD: S.gD, cB: S.cB, cR: 0, th: S.th, ed: -1, tw: S.tw});
-      if (S.sh && t >= 304 && t <= 306) o.sh = Math.max(o.sh || 0, S.sh);
+      if (S.sh && t >= SHEATHE.t1 && t <= SHEATHE.t2) o.sh = Math.max(o.sh || 0, S.sh);
     }
   }
   // the hat hand-overs (from the source key ticks of `hat`; ctx.hatSwitches, cut ticks snap)
