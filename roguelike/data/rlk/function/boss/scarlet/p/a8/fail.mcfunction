@@ -4,6 +4,6 @@
 execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run function rlk:boss/scarlet/ult/fail60
 function rlk:boss/scarlet/rig/play/g_reform
 function rlk:mboss/mv/face
-function rlk:boss/scarlet/g/spot/over
+function rlk:boss/scarlet/g/spot/land
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run function rlk:mboss/mv/glide {t:2}
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]

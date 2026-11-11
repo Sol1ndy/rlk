@@ -361,6 +361,60 @@ def paint_cue(a, b):
     return mix(WHITE, CUE_GOLD, gold) + (min(1.0, al * 1.15),)
 
 
+# ---- round V (lane VB; v_brief.md §3 VB 2-3): the drawn blade path, its head and the slash sector --------------------------
+# All three are neutral (white, tinted per hit) with a DARK rim: a tell must read on the pale straw grass and her white hat of
+# the P1 field as well as on the crimson P2 field (review v C2: a white-gold star on a white hat over pale grass was lost).
+SW_INK = hexc('#1C0B2E')               # the dark rim (the tint multiplies it: it stays dark)
+SW_CORE = 0.56                         # the path's bright core: this share of the card's width (blade.PATH_CORE)
+SW_ARC_TAN = 0.5                       # the sector's edges: a = +-SW_ARC_TAN b (blade.ARC_TAN)
+SW_ARC_INNER = 0.30                    # it fades out below this radius (blade.ARC_INNER)
+SW_ARC_ALPHA = (1.0, 0.62, 0.3)        # the fading frames
+
+
+def paint_sw_path(a, b):
+    """sw_path (a lance card, a across its width -0.5 .. 0.5, b along its length): a solid bright core SW_CORE of the width,
+    a dark rim, nothing outside. Even along its length (a card is stretched to its piece of the path)."""
+    x = abs(a) * 2
+    if x <= SW_CORE:
+        return WHITE + (1.0,)
+    if x <= 0.86:
+        return SW_INK + (0.9,)
+    return SW_INK + (0.9 * (1 - smooth(0.86, 1.0, x)),)
+
+
+def paint_sw_head(a, b):
+    """sw_head (the head that runs along the path; billboard): a round white core, four short rays, a dark rim round all."""
+    r = math.hypot(a, b)
+    ang = math.atan2(b, a)
+    reach = 0.42 + 0.44 * abs(math.cos(2 * ang)) ** 8
+    if r <= reach:
+        return WHITE + (1.0,)
+    if r <= reach + 0.13:
+        return SW_INK + (0.92,)
+    return SW_INK + (0.92 * (1 - smooth(reach + 0.13, reach + 0.2, r)),)
+
+
+def make_sw_arc(k):
+    """sw_arc frame k (the slash: one sector of the blade's sweep; flat card, the apex at a 0 b 0, the axis along b): a white
+    rim at the radius 1 (the tip's way), the body fading inward to nothing at SW_ARC_INNER (the blade's base), cut hard on the
+    two edges a = +-SW_ARC_TAN b so that neighbouring pieces close up; frames 1, 2 = the same at SW_ARC_ALPHA (the fade)."""
+    A = SW_ARC_ALPHA[k]
+
+    def paint(a, b):
+        if b <= 0 or abs(a) > SW_ARC_TAN * b:
+            return CLEAR
+        r = math.hypot(a, b)
+        if r > 1.0 or r < SW_ARC_INNER:
+            return CLEAR
+        if r >= 0.93:
+            return WHITE + (A,)
+        if r >= 0.90:
+            return mix(SW_INK, WHITE, 0.35) + (0.75 * A,)
+        t = (r - SW_ARC_INNER) / (0.90 - SW_ARC_INNER)
+        return mix(hexc('#C9C9C9'), WHITE, t) + (A * 0.82 * t ** 1.3,)
+    return paint
+
+
 def paint_star4(a, b):
     """glint frame 1 (star4): a slim four-point star inside a thin circle (A9's chest star; neutral)."""
     r = math.hypot(a, b)

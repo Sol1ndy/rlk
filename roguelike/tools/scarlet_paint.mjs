@@ -189,10 +189,11 @@ function blade(u, v) {
   return c;
 }
 // the glow overlays (16 x 128, translucent): the edge side bright, fading to the spine
-function glowSpr(col, core = '#FFFFFF') {
+// (round V, lane VB: `hot` = the fight's edge sheath: a wide opaque white core, so the blade is a bright line from every side)
+function glowSpr(col, core = '#FFFFFF', hot = false) {
   return (u, v) => {
-    const a = Math.pow(clamp(1 - u * 1.25), 1.5) * smooth(0, .06, v) * smooth(0, .03, 1 - v);
-    return withA(mix(C(core), C(col), clamp(u * 2.2)), a * .92);
+    const a = (hot ? clamp(1.35 - u * 1.3) : Math.pow(clamp(1 - u * 1.25), 1.5)) * smooth(0, .06, v) * smooth(0, .03, 1 - v);
+    return withA(mix(C(core), C(col), clamp(hot ? (u - .3) * 1.6 : u * 2.2)), a * (hot ? 1 : .92));
   };
 }
 // scabbard flats (16 x 128): u 0 = the edge side .. 1 = the spine; v 0 = the tip .. 1 = the mouth. Black lacquer, the violet
@@ -245,6 +246,7 @@ export function scarletSprites() {
     guard: [32, 32, guardSpr, false], blade: [16, 128, blade, false], scab: [16, 128, scabSpr, false],
     glow_lilac: [16, 128, glowSpr('#C97EDD', '#FFE6FA'), true], glow_pink: [16, 128, glowSpr('#FF5AB4', '#FFE0F0'), true],
     glow_violet: [16, 128, glowSpr('#8A4CFF', '#E8DCFF'), true], glow_gold: [16, 128, glowSpr('#FFC83A', '#FFF6D0'), true],
+    glow_edge: [16, 128, glowSpr('#D9C8FF', '#FFFFFF', true), true],
     cup_in: [16, 16, cupIn, false], cup_rim: [16, 16, cupRim, false], bottle: [32, 32, bottleSpr, false], ghost: [96, 32, ghost, true],
   });
   return S;

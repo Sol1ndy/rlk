@@ -3,10 +3,25 @@ execute if score #pt hr matches 1..5 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 13..14 if score #pp hr matches 1 run function rlk:boss/scarlet/core/pp
 execute if score #pt hr matches 13..21 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 17..21 run function rlk:boss/scarlet/ai/tail_step
-execute if score #pt hr matches 4 at @s run function rlk:boss/scarlet/fx/snd/a2_draw
+execute if score #pt hr matches 1 run function rlk:boss/scarlet/p/a2/k/1
+execute if score #pt hr matches 2 run function rlk:boss/scarlet/p/a2/k/2
+execute if score #pt hr matches 3 run function rlk:boss/scarlet/p/a2/k/3
+execute if score #pt hr matches 4 run function rlk:boss/scarlet/p/a2/k/4
 execute if score #pt hr matches 5 run function rlk:boss/scarlet/p/a2/k/5
-execute if score #pt hr matches 6 run function rlk:boss/scarlet/rig/look/blade/lilac
+execute if score #pt hr matches 6 run function rlk:boss/scarlet/p/a2/k/6
+execute if score #pt hr matches 7 run function rlk:boss/scarlet/p/a2/k/7
+execute if score #pt hr matches 8 run function rlk:boss/scarlet/p/a2/k/8
+execute if score #pt hr matches 9 run function rlk:boss/scarlet/p/a2/k/9
+execute if score #pt hr matches 10 run function rlk:boss/scarlet/p/a2/k/10
 execute if score #pt hr matches 11 run function rlk:boss/scarlet/p/a2/k/11
 execute if score #pt hr matches 12 run function rlk:boss/scarlet/p/a2/k/12
-execute if score #pt hr matches 16 run function rlk:boss/scarlet/ai/tail
+execute if score #pt hr matches 13 run function rlk:boss/scarlet/p/a2/k/13
+execute if score #pt hr matches 14 run function rlk:boss/scarlet/p/a2/k/14
+execute if score #pt hr matches 15 run function rlk:boss/scarlet/p/a2/k/15
+execute if score #pt hr matches 16 run function rlk:boss/scarlet/p/a2/k/16
+execute if score #pt hr matches 17 run function rlk:boss/scarlet/p/a2/k/17
+execute if score #pt hr matches 18 run function rlk:boss/scarlet/p/a2/k/18
+execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/a2/k/19
+execute if score #pt hr matches 20 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a212_14]
+execute if score #pt hr matches 21 run kill @e[type=minecraft:item_display,tag=rlk_hr_sw_a212_15]
 execute if score #pt hr matches 22 run scoreboard players set #done hr 1

@@ -1264,9 +1264,9 @@
     "hit": 14
    },
    "owner": "S2a",
-   "key_files": 31,
-   "keys": 387,
-   "keys_per_tick": 11.1,
+   "key_files": 33,
+   "keys": 293,
+   "keys_per_tick": 8.4,
    "source": "v1 9.667-10.400 (cr_v1_a1, v1s_a2_*): pivot, magenta glint, rising fan, flat crescent; footage glint -> hit 6 t, stretched to 14",
    "note": "",
    "authored": true
@@ -1284,8 +1284,8 @@
    },
    "owner": "S2a",
    "key_files": 30,
-   "keys": 358,
-   "keys_per_tick": 11.5,
+   "keys": 349,
+   "keys_per_tick": 11.3,
    "source": "v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90",
    "note": "",
    "authored": true
@@ -1308,9 +1308,9 @@
     "h5": 69
    },
    "owner": "S2a",
-   "key_files": 92,
-   "keys": 974,
-   "keys_per_tick": 10,
+   "key_files": 88,
+   "keys": 939,
+   "keys_per_tick": 9.7,
    "source": "v1 23.150-26.300 (cr_v1_a3_leads, v1s_a12*, v1s_combo5): gaps 16 / 15 / 12 / 12; open after hit 5",
    "note": "",
    "authored": true
@@ -1337,7 +1337,7 @@
    },
    "owner": "S2a",
    "key_files": 60,
-   "keys": 785,
+   "keys": 786,
    "keys_per_tick": 12.9,
    "source": "v1 10.800-12.550 (cr_v1_a4, v1s_a3_*, v1s_a4_*): leap, apex glint, flip, the S-ribbon dive; the ring spin; apex 7 t",
    "note": "",
@@ -1440,8 +1440,8 @@
    },
    "owner": "H1",
    "key_files": 73,
-   "keys": 925,
-   "keys_per_tick": 11.4,
+   "keys": 893,
+   "keys_per_tick": 11,
    "source": "v 112.40-114.80 (P-d; vid d4): the chest glint, the flat ring, the rising fan, the vertical, the small slash; video gaps 20 / 8 / 8 -> 20 / 10 / 10",
    "note": "",
    "authored": true
@@ -1463,9 +1463,9 @@
     "h3": 60
    },
    "owner": "H1",
-   "key_files": 83,
-   "keys": 979,
-   "keys_per_tick": 11.5,
+   "key_files": 80,
+   "keys": 940,
+   "keys_per_tick": 11.1,
    "source": "v 146.9-149.4 (P-i; vid tri): the lunge, then three big crescents descending across the frame; video gaps 24 / 10 / 12",
    "note": "",
    "authored": true
@@ -1488,9 +1488,9 @@
     "r5": 54
    },
    "owner": "H1",
-   "key_files": 76,
-   "keys": 1229,
-   "keys_per_tick": 15.6,
+   "key_files": 78,
+   "keys": 1216,
+   "keys_per_tick": 15.4,
    "source": "v 150.0-151.9 (P-j; vid rings): flat rings at her chest height while she turns, one every 8-12 t -> 10 t",
    "note": "",
    "authored": true
@@ -1589,9 +1589,9 @@
     "dome": 28
    },
    "owner": "H1",
-   "key_files": 55,
-   "keys": 640,
-   "keys_per_tick": 10.5,
+   "key_files": 54,
+   "keys": 616,
+   "keys_per_tick": 10.1,
    "source": "v 236.25-236.9, 244.40-246.2 (P-m; ref tells_p2): the purple star, two crossing crescents with a star burst, the dome",
    "note": "",
    "authored": true
@@ -1613,9 +1613,9 @@
     "land": 46
    },
    "owner": "H1",
-   "key_files": 64,
-   "keys": 728,
-   "keys_per_tick": 10.9,
+   "key_files": 63,
+   "keys": 709,
+   "keys_per_tick": 10.6,
    "source": "v 261.00-262.05 (P-n; ref tells_p2 261.20 / 262.05): two huge diagonal bands from above, then a third; video gaps 6-12 t / 8 t -> 10 / 10",
    "note": "",
    "authored": true
@@ -1770,8 +1770,8 @@
    },
    "owner": "S2a",
    "key_files": 10,
-   "keys": 162,
-   "keys_per_tick": 12.5,
+   "keys": 161,
+   "keys_per_tick": 12.4,
    "source": "v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash",
    "note": "",
    "authored": true
@@ -1786,9 +1786,9 @@
     "stop": 9
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 110,
-   "keys_per_tick": 8.5,
+   "key_files": 11,
+   "keys": 119,
+   "keys_per_tick": 9.2,
    "source": "v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide",
    "note": "",
    "authored": true
@@ -1805,8 +1805,8 @@
    },
    "owner": "S2a",
    "key_files": 9,
-   "keys": 167,
-   "keys_per_tick": 11.1,
+   "keys": 163,
+   "keys_per_tick": 10.9,
    "source": "v2 16.067-16.733 (mg_v2_blink): flash, blink, drop",
    "note": "",
    "authored": true
@@ -1821,9 +1821,9 @@
     "lunge": 10
    },
    "owner": "S2a",
-   "key_files": 13,
-   "keys": 173,
-   "keys_per_tick": 11.5,
+   "key_files": 12,
+   "keys": 160,
+   "keys_per_tick": 10.7,
    "source": "v3 17.667 (v3r_s7..): the run-in",
    "note": "",
    "authored": true
@@ -1855,9 +1855,9 @@
     "hit": 9
    },
    "owner": "S2a",
-   "key_files": 14,
-   "keys": 245,
-   "keys_per_tick": 16.3,
+   "key_files": 12,
+   "keys": 180,
+   "keys_per_tick": 12,
    "source": "v2 11.683, v3 10.200 (cr_a82_windup): spin, arms up, the band",
    "note": "",
    "authored": true
@@ -1891,9 +1891,9 @@
     "spring": 4
    },
    "owner": "S2a",
-   "key_files": 14,
-   "keys": 208,
-   "keys_per_tick": 13.9,
+   "key_files": 12,
+   "keys": 141,
+   "keys_per_tick": 9.4,
    "source": "v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring",
    "note": "",
    "authored": true
@@ -1909,9 +1909,9 @@
     "gone": 14
    },
    "owner": "S2a",
-   "key_files": 15,
-   "keys": 208,
-   "keys_per_tick": 12.2,
+   "key_files": 12,
+   "keys": 182,
+   "keys_per_tick": 10.7,
    "source": "v2 14.317, v3 14.183 (v2f_s5_*): the X",
    "note": "",
    "authored": true
@@ -1925,9 +1925,9 @@
     "hit": 3
    },
    "owner": "S2a",
-   "key_files": 11,
-   "keys": 110,
-   "keys_per_tick": 8.5,
+   "key_files": 12,
+   "keys": 159,
+   "keys_per_tick": 12.2,
    "source": "v2 ~16.91, v3 ~18.300 (v2f_s6_*): the wrap-around",
    "note": "",
    "authored": true
@@ -1942,8 +1942,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 210,
-   "keys_per_tick": 16.2,
+   "keys": 197,
+   "keys_per_tick": 15.2,
    "source": "v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome",
    "note": "",
    "authored": true
@@ -1961,25 +1961,25 @@
    },
    "owner": "S2a",
    "key_files": 18,
-   "keys": 297,
-   "keys_per_tick": 14.1,
+   "keys": 310,
+   "keys_per_tick": 14.8,
    "source": "v2 ~18.11, v3 ~19.500 (mg_pink_glint): the pink glow, the rising vertical cut, rising out of view",
    "note": "",
    "authored": true
   },
   "g_dive": {
    "id": 44,
-   "len": 10,
+   "len": 22,
    "loop": null,
    "events": {
     "appear": 0,
-    "dive": 3,
-    "hit": 6
+    "dive": 15,
+    "hit": 18
    },
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 145,
-   "keys_per_tick": 13.2,
+   "key_files": 21,
+   "keys": 238,
+   "keys_per_tick": 10.3,
    "source": "v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down",
    "note": "",
    "authored": true
@@ -2353,7 +2353,8 @@
    "lilac",
    "pink",
    "violet",
-   "gold"
+   "gold",
+   "edge"
   ],
   "scabbard": [
    "hand",
@@ -2418,6 +2419,7 @@
   "look/blade/pink",
   "look/blade/violet",
   "look/blade/gold",
+  "look/blade/edge",
   "look/scabbard/hand",
   "look/scabbard/hip",
   "look/scabbard/gone",
@@ -2472,7 +2474,8 @@
    "lilac": "glow_lilac",
    "pink": "glow_pink",
    "violet": "glow_violet",
-   "gold": "glow_gold"
+   "gold": "glow_gold",
+   "edge": "glow_edge"
   },
   "ghost": "every model <m> has the twin <m>_g (texture rlk:mboss/scarlet/ghost)"
  },
@@ -2533,7 +2536,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 19175266
+  "version": 160085367
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -4796,17 +4799,17 @@
   "a1": {
    "low_ref": [
     0.004,
+    0.005,
+    0.005,
     0.004,
     0.005,
     0.005,
     0.005,
-    0.004,
-    0.004,
-    0.005,
-    0.005,
-    0.003,
-    0.003,
-    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
     0.006,
     0.006,
     0.006,
@@ -4911,9 +4914,9 @@
   "a2": {
    "low_ref": [
     0.004,
-    0.004,
-    0.004,
-    0.004,
+    0.003,
+    0.005,
+    0.005,
     0.005,
     0.005,
     0.005,
@@ -5019,24 +5022,24 @@
    "low_ref": [
     0.004,
     0.004,
+    0.005,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
     0.004,
     0.005,
-    0.005,
-    0.004,
-    0.004,
-    0.003,
-    0.003,
-    0.003,
-    0.003,
-    0.003,
-    0.003,
-    0.005,
-    0.004,
-    0.004,
-    0.004,
-    0.004,
-    0.004,
-    0.004,
     0.005,
     0.005,
     0.005,
@@ -5076,8 +5079,8 @@
     0.004,
     0.011,
     0.011,
-    0.01,
-    0.006,
+    0.005,
+    0.005,
     0.005,
     0.005,
     0.005,
@@ -5249,7 +5252,7 @@
      47
     ],
     [
-     60,
+     59,
      96
     ]
    ],
@@ -6107,12 +6110,12 @@
    "low_ref": [
     0.004,
     0.004,
-    0.004,
     0.005,
     0.005,
     0.005,
     0.005,
     0.004,
+    0.005,
     0.005,
     0.006,
     0.006,
@@ -6151,10 +6154,10 @@
     0.004,
     0.011,
     0.011,
-    0.01,
+    0.006,
     0.005,
     0.005,
-    0.005,
+    0.006,
     0.006,
     0.006,
     0.006,
@@ -6379,7 +6382,7 @@
     0.009,
     0.009,
     0.011,
-    0.007,
+    0.005,
     0.005,
     0.005,
     0.005,
@@ -6561,12 +6564,12 @@
   "rings": {
    "low_ref": [
     0.004,
-    0.004,
-    0.005,
     0.005,
     0.005,
     0.005,
     0.004,
+    0.004,
+    0.005,
     0.005,
     0.005,
     0.004,
@@ -7478,15 +7481,15 @@
     0.003,
     0.002,
     0.002,
-    0.002,
-    0.001,
     0.001,
     0.001,
     0.004,
     0.005,
     0.005,
     0.005,
-    0.005,
+    0.006,
+    0.006,
+    0.006,
     0.006,
     0.006,
     0.006,
@@ -7793,9 +7796,9 @@
     0.009,
     0.009,
     0.008,
-    0.008,
     0.006,
     0.006,
+    0.004,
     0.004,
     0.004,
     0.006,
@@ -7982,10 +7985,10 @@
     0.83,
     0.83,
     0.83,
-    0.83,
     0.87,
-    0.872,
-    0.877,
+    0.871,
+    0.875,
+    0.878,
     0.88,
     0.88,
     0.8,
@@ -8134,7 +8137,7 @@
    "free_r": [
     [
      0,
-     33
+     32
     ],
     [
      48,
@@ -8145,6 +8148,11 @@
    "lift": {},
    "hat_push": {},
    "contacts": [
+    [
+     34,
+     "twohand",
+     -1
+    ],
     [
      35,
      "twohand",
@@ -9183,9 +9191,9 @@
     0.357,
     0.357,
     0.357,
-    0.365,
-    0.494,
-    0.538,
+    0.361,
+    0.439,
+    0.458,
     0.006,
     0.006,
     0.006
@@ -9342,9 +9350,9 @@
     0.005,
     0.373,
     0.374,
-    0.389,
-    0.448,
-    0.225,
+    0.379,
+    0.4,
+    0.218,
     0.006,
     0.006,
     0.006
@@ -9420,10 +9428,6 @@
    "free_r": [
     [
      0,
-     6
-    ],
-    [
-     11,
      14
     ]
    ],
@@ -9446,12 +9450,12 @@
     0.005,
     0.032,
     0.004,
-    0.005,
     0.006,
-    0.004,
-    0,
-    0,
-    0
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006
    ],
    "seat": [],
    "lie": [],
@@ -9523,7 +9527,7 @@
    "free_r": [
     [
      0,
-     8
+     14
     ]
    ],
    "cuts": [],
@@ -9611,7 +9615,7 @@
     0.006,
     0.006,
     0.006,
-    0.005,
+    0.006,
     0.006,
     0.006,
     0.006,
@@ -9694,10 +9698,10 @@
     0.006,
     0.006,
     0.006,
-    0.193,
-    0.353,
-    0.353,
-    0.353,
+    0.12,
+    0.225,
+    0.225,
+    0.225,
     0.513,
     1.223,
     1.83,
@@ -9788,15 +9792,15 @@
     0.006,
     0.006,
     0.006,
-    0.068,
-    0.198,
-    0.198,
-    0.198,
+    0.006,
+    0.138,
     0.198,
     0.198,
     0.197,
     0.195,
+    0.194,
     0.192,
+    0.191,
     0.191
    ],
    "seat": [],
@@ -9817,12 +9821,12 @@
    "touch": [
     [
      0,
-     4
+     5
     ]
    ],
    "air": [
     [
-     5,
+     6,
      14
     ]
    ],
@@ -9863,8 +9867,8 @@
   },
   "g_x": {
    "low_ref": [
-    0.006,
-    0.006,
+    0.005,
+    0.005,
     0.005,
     0.005,
     0.005,
@@ -9957,11 +9961,11 @@
     0.006,
     0.006,
     0.006,
+    0.005,
     0.006,
     0.006,
-    0.006,
-    0.006,
-    0.006
+    0.004,
+    0.004
    ],
    "seat": [],
    "lie": [],
@@ -10030,7 +10034,7 @@
     0.006,
     0.006,
     0.006,
-    0.004,
+    0.006,
     0.004,
     0.004
    ],
@@ -10093,25 +10097,25 @@
    "low_ref": [
     0.006,
     0.006,
+    0.004,
+    0.004,
+    0.004,
     0.006,
-    0.006,
-    0.006,
-    0.005,
     0.129,
     0.329,
     0.601,
     0.891,
     1.054,
     1.278,
-    1.377,
-    1.231,
-    1.178,
-    1.236,
-    1.325,
-    1.397,
-    1.397,
-    1.397,
-    1.397
+    1.317,
+    1.202,
+    1.185,
+    1.277,
+    1.287,
+    1.391,
+    1.391,
+    1.391,
+    1.391
    ],
    "seat": [],
    "lie": [],
@@ -10184,20 +10188,30 @@
    "cuts": [
     18
    ],
-   "lift": {
-    "13": 0.019
-   },
+   "lift": {},
    "hat_push": {},
    "contacts": []
   },
   "g_dive": {
    "low_ref": [
     0.732,
+    0.733,
+    0.737,
+    0.742,
+    0.748,
+    0.754,
+    0.759,
+    0.763,
+    0.764,
+    0.762,
+    0.756,
+    0.748,
+    0.74,
+    0.734,
+    0.732,
     0.853,
     1.041,
     1.496,
-    1.505,
-    1.522,
     1.533,
     1.533,
     1.533,
@@ -10213,10 +10227,22 @@
    "air": [
     [
      0,
-     10
+     22
     ]
    ],
    "w_root": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     0,
     0,
     0,
@@ -10233,7 +10259,7 @@
    "held": [
     [
      0,
-     10
+     22
     ]
    ],
    "free_r": [],
@@ -10293,6 +10319,66 @@
     ],
     [
      10,
+     "twohand",
+     -1
+    ],
+    [
+     11,
+     "twohand",
+     -1
+    ],
+    [
+     12,
+     "twohand",
+     -1
+    ],
+    [
+     13,
+     "twohand",
+     -1
+    ],
+    [
+     14,
+     "twohand",
+     -1
+    ],
+    [
+     15,
+     "twohand",
+     -1
+    ],
+    [
+     16,
+     "twohand",
+     -1
+    ],
+    [
+     17,
+     "twohand",
+     -1
+    ],
+    [
+     18,
+     "twohand",
+     -1
+    ],
+    [
+     19,
+     "twohand",
+     -1
+    ],
+    [
+     20,
+     "twohand",
+     -1
+    ],
+    [
+     21,
+     "twohand",
+     -1
+    ],
+    [
+     22,
      "twohand",
      -1
     ]
@@ -24264,10 +24350,8 @@
    "a1": {
     "passes": 3,
     "corrections": {
-     "bPush": 14.04,
-     "bTurn": 6,
-     "drop": 0.64,
-     "gripClear": 62.07,
+     "bPush": 9.88,
+     "gripClear": 35.13,
      "scabArm": 9
     },
     "contacts": {},
@@ -24276,23 +24360,23 @@
     "support_dy": 0.001,
     "lift": 0,
     "clear": {
-     "guard.head": -0.041,
-     "guard.torso": -0.135,
+     "guard.head": -0.02,
+     "guard.torso": -0.044,
      "hand_l.head": -0.113,
-     "hand_l.torso": -0.027,
-     "hand_r.head": -0.404,
+     "hand_l.torso": -0.023,
+     "hand_r.head": -0.362,
      "hand_r.torso": -0.186,
-     "hilt.head": -0.097,
+     "hilt.head": -0.064,
      "hilt.torso": -0.017
     }
    },
    "a2": {
     "passes": 3,
     "corrections": {
-     "bPush": 22.65,
+     "bPush": 15.26,
      "bTurn": 12,
-     "gripClear": 33.25,
-     "scabArm": 14
+     "gripClear": 33.44,
+     "scabArm": 16
     },
     "contacts": {},
     "stretch": 1,
@@ -24301,7 +24385,7 @@
     "lift": 0,
     "clear": {
      "guard.head": -0.019,
-     "guard.torso": -0.055,
+     "guard.torso": -0.054,
      "hand_l.head": -0.077,
      "hand_l.torso": -0.026,
      "hand_r.head": -0.445,
@@ -24314,7 +24398,7 @@
     "passes": 3,
     "corrections": {
      "bPush": 11.13,
-     "bTurn": 18,
+     "bTurn": 15,
      "drop": 7.83,
      "gripClear": 64.66,
      "handClearR": 10.58,
@@ -24353,10 +24437,10 @@
     "clear": {
      "guard.head": -0.02,
      "guard.torso": -0.048,
-     "hand_l.head": -0.082,
+     "hand_l.head": -0.077,
      "hand_l.torso": -0.022,
      "hand_r.head": -0.126,
-     "hand_r.torso": -0.112,
+     "hand_r.torso": -0.111,
      "hilt.head": -0.058,
      "hilt.torso": -0.02
     }
@@ -24504,9 +24588,9 @@
      "guard.head": -0.022,
      "guard.torso": -0.02,
      "hand_l.head": -0.094,
-     "hand_l.torso": -0.02,
-     "hand_r.head": -0.283,
-     "hand_r.torso": -0.169,
+     "hand_l.torso": -0.021,
+     "hand_r.head": -0.288,
+     "hand_r.torso": -0.17,
      "hilt.head": -0.056,
      "hilt.torso": -0.019
     }
@@ -24524,10 +24608,10 @@
     "support_dy": 0.001,
     "lift": 0,
     "clear": {
-     "guard.head": -0.102,
+     "guard.head": -0.13,
      "guard.torso": -0.082,
      "hand_l.head": -0.149,
-     "hand_l.torso": -0.023,
+     "hand_l.torso": -0.02,
      "hand_r.head": -0.266,
      "hand_r.torso": -0.186,
      "hilt.head": -0.167,
@@ -24586,7 +24670,7 @@
     "corrections": {
      "drop": 0.43,
      "gripClear": 23.44,
-     "scabArm": 40
+     "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
@@ -24598,8 +24682,8 @@
      "guard.torso": -0.177,
      "hand_l.head": -0.108,
      "hand_l.torso": -0.02,
-     "hand_r.head": -0.238,
-     "hand_r.torso": -0.12,
+     "hand_r.head": -0.249,
+     "hand_r.torso": -0.11,
      "hilt.head": -0.059,
      "hilt.torso": -0.015
     }
@@ -24644,8 +24728,8 @@
     "clear": {
      "guard.head": -0.041,
      "guard.torso": -0.034,
-     "hand_l.head": -0.124,
-     "hand_l.torso": -0.032,
+     "hand_l.head": -0.125,
+     "hand_l.torso": -0.044,
      "hand_r.head": -0.326,
      "hand_r.torso": -0.186,
      "hilt.head": -0.1,
@@ -24657,26 +24741,26 @@
     "corrections": {
      "bPush": 11.18,
      "bTurn": 24,
-     "gripClear": 71.67,
-     "handClearR": 8.26,
+     "gripClear": 72.02,
+     "handClearR": 8.38,
      "scab": 2.13,
      "scabArm": 40
     },
     "contacts": {
-     "twohand": 0.098
+     "twohand": 0.087
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.047,
     "lift": 0,
     "clear": {
-     "guard.head": -0.021,
-     "guard.torso": -0.149,
-     "hand_l.head": -0.106,
+     "guard.head": -0.012,
+     "guard.torso": -0.157,
+     "hand_l.head": -0.094,
      "hand_l.torso": -0.065,
-     "hand_r.head": -0.099,
+     "hand_r.head": -0.105,
      "hand_r.torso": -0.025,
-     "hilt.head": -0.057,
+     "hilt.head": -0.069,
      "hilt.torso": -0.019
     }
    },
@@ -24841,7 +24925,6 @@
    "g_dash": {
     "passes": 2,
     "corrections": {
-     "gripClear": 3.06,
      "scabArm": 39
     },
     "contacts": {},
@@ -24850,22 +24933,23 @@
     "support_dy": 0,
     "lift": 0,
     "clear": {
-     "guard.head": -0.159,
-     "guard.torso": -0.119,
-     "hand_l.head": -0.191,
-     "hand_l.torso": -0.099,
+     "guard.head": -0.26,
+     "guard.torso": -0.293,
+     "hand_l.head": -0.236,
+     "hand_l.torso": -0.222,
      "hand_r.head": -0.372,
-     "hand_r.torso": -0.169,
-     "hilt.head": -0.127,
-     "hilt.torso": -0.018
+     "hand_r.torso": -0.18,
+     "hilt.head": -0.109,
+     "hilt.torso": -0.107
     }
    },
    "g_glide": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "gripClear": 4,
-     "scab": 11.28,
-     "scabArm": 15
+     "bPush": 15.13,
+     "bTurn": 36,
+     "gripClear": 37.25,
+     "scab": 11.28
     },
     "contacts": {},
     "stretch": 1,
@@ -24873,49 +24957,43 @@
     "support_dy": 0.001,
     "lift": 0,
     "clear": {
-     "guard.head": -0.164,
-     "guard.torso": -0.256,
-     "hand_l.head": -0.131,
-     "hand_l.torso": -0.148,
-     "hand_r.head": -0.516,
+     "guard.head": -0.298,
+     "guard.torso": -0.019,
+     "hand_l.head": -0.314,
+     "hand_l.torso": -0.048,
+     "hand_r.head": -0.52,
      "hand_r.torso": -0.185,
-     "hilt.head": -0.129,
-     "hilt.torso": -0.02
+     "hilt.head": -0.298,
+     "hilt.torso": -0.03
     }
    },
    "g_drop": {
     "passes": 3,
     "corrections": {
-     "bTurn": 18,
-     "gripClear": 45.95,
-     "handClearR": 3.81,
-     "scab": 1.5,
-     "scabArm": 21
+     "gripClear": 5.44,
+     "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
-    "support_dy": 0.068,
+    "support_dy": 0.064,
     "lift": 0,
     "clear": {
-     "guard.head": -0.082,
-     "guard.torso": -0.206,
-     "hand_l.head": -0.109,
-     "hand_l.torso": -0.122,
-     "hand_r.head": -0.388,
-     "hand_r.torso": -0.02,
-     "hilt.head": -0.097,
-     "hilt.torso": -0.02
+     "guard.head": -0.525,
+     "guard.torso": -0.506,
+     "hand_l.head": -0.307,
+     "hand_l.torso": -0.293,
+     "hand_r.head": -0.535,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.147,
+     "hilt.torso": -0.113
     }
    },
    "g_run": {
-    "passes": 3,
+    "passes": 2,
     "corrections": {
-     "bPush": 1.29,
-     "bTurn": 12,
-     "drop": 3.93,
-     "gripClear": 71.14,
-     "handClearR": 2.62
+     "drop": 3.61,
+     "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
@@ -24923,13 +25001,13 @@
     "support_dy": 0.01,
     "lift": 0,
     "clear": {
-     "guard.head": -0.03,
-     "guard.torso": -0.166,
-     "hand_l.head": -0.059,
-     "hand_l.torso": -0.149,
-     "hand_r.head": -0.13,
-     "hand_r.torso": -0.019,
-     "hilt.head": -0.098,
+     "guard.head": -0.256,
+     "guard.torso": -0.314,
+     "hand_l.head": -0.147,
+     "hand_l.torso": -0.164,
+     "hand_r.head": -0.353,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.101,
      "hilt.torso": -0.023
     }
    },
@@ -24959,7 +25037,7 @@
    "g_rise": {
     "passes": 2,
     "corrections": {
-     "gripClear": 31.13
+     "gripClear": 32
     },
     "contacts": {},
     "stretch": 1,
@@ -24967,27 +25045,27 @@
     "support_dy": 0.034,
     "lift": 0,
     "clear": {
-     "guard.head": -0.274,
-     "guard.torso": -0.051,
-     "hand_l.head": -0.209,
-     "hand_l.torso": -0.074,
-     "hand_r.head": -0.293,
-     "hand_r.torso": -0.203,
+     "guard.head": -0.282,
+     "guard.torso": -0.055,
+     "hand_l.head": -0.215,
+     "hand_l.torso": -0.064,
+     "hand_r.head": -0.294,
+     "hand_r.torso": -0.259,
      "hilt.head": -0.15,
-     "hilt.torso": -0.02
+     "hilt.torso": -0.014
     }
    },
    "g_leap": {
     "passes": 3,
     "corrections": {
-     "gripClear": 5.94,
-     "handClearR": 17.19,
+     "gripClear": 5,
+     "handClearR": 16.88,
      "scabArm": 19
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
-    "support_dy": 0.049,
+    "support_dy": 0.075,
     "lift": 0,
     "clear": {
      "guard.head": -0.071,
@@ -25005,9 +25083,8 @@
     "corrections": {
      "bPush": 22.47,
      "bTurn": 30,
-     "gripClear": 26.75,
-     "scab": 1.5,
-     "scabArm": 14
+     "gripClear": 35.13,
+     "scab": 1.5
     },
     "contacts": {},
     "stretch": 1,
@@ -25015,22 +25092,22 @@
     "support_dy": 0.042,
     "lift": 0,
     "clear": {
-     "guard.head": -0.353,
-     "guard.torso": -0.17,
-     "hand_l.head": -0.314,
-     "hand_l.torso": -0.089,
-     "hand_r.head": -0.523,
-     "hand_r.torso": -0.181,
-     "hilt.head": -0.234,
+     "guard.head": -0.019,
+     "guard.torso": -0.076,
+     "hand_l.head": -0.164,
+     "hand_l.torso": -0.134,
+     "hand_r.head": -0.368,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.1,
      "hilt.torso": -0.02
     }
    },
    "g_x": {
     "passes": 3,
     "corrections": {
-     "bPush": 10.22,
-     "gripClear": 34.38,
-     "scabArm": 13
+     "bPush": 9.66,
+     "bTurn": 6,
+     "gripClear": 34.38
     },
     "contacts": {},
     "stretch": 1,
@@ -25038,36 +25115,36 @@
     "support_dy": 0,
     "lift": 0,
     "clear": {
-     "guard.head": -0.039,
-     "guard.torso": -0.089,
-     "hand_l.head": -0.067,
-     "hand_l.torso": -0.046,
+     "guard.head": -0.02,
+     "guard.torso": -0.081,
+     "hand_l.head": -0.188,
+     "hand_l.torso": -0.151,
      "hand_r.head": -0.368,
-     "hand_r.torso": -0.294,
-     "hilt.head": -0.111,
-     "hilt.torso": -0.118
+     "hand_r.torso": -0.317,
+     "hilt.head": -0.1,
+     "hilt.torso": -0.095
     }
    },
    "g_wrap": {
     "passes": 3,
     "corrections": {
      "bPush": 5.73,
-     "gripClear": 30.5,
+     "gripClear": 27.31,
      "scab": 0.25,
      "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0.009,
+    "blade_residue": 0,
     "support_dy": 0.001,
     "lift": 0,
     "clear": {
-     "guard.head": -0.255,
+     "guard.head": -0.161,
      "guard.torso": -0.021,
-     "hand_l.head": -0.122,
-     "hand_l.torso": -0.032,
+     "hand_l.head": -0.102,
+     "hand_l.torso": -0.055,
      "hand_r.head": -0.535,
-     "hand_r.torso": -0.185,
+     "hand_r.torso": -0.186,
      "hilt.head": -0.068,
      "hilt.torso": -0.021
     }
@@ -25075,7 +25152,7 @@
    "g_dome": {
     "passes": 3,
     "corrections": {
-     "gripClear": 20.94,
+     "gripClear": 18.38,
      "scabArm": 25
     },
     "contacts": {},
@@ -25084,63 +25161,62 @@
     "support_dy": 0,
     "lift": 0,
     "clear": {
-     "guard.head": -0.212,
+     "guard.head": -0.035,
      "guard.torso": -0.02,
-     "hand_l.head": -0.247,
+     "hand_l.head": -0.092,
      "hand_l.torso": -0.064,
      "hand_r.head": -0.524,
      "hand_r.torso": -0.129,
-     "hilt.head": -0.243,
-     "hilt.torso": -0.016
+     "hilt.head": -0.094,
+     "hilt.torso": -0.02
     }
    },
    "g_vert": {
     "passes": 3,
     "corrections": {
-     "gripClear": 11.81,
-     "scab": 2.75,
-     "scabArm": 15
+     "gripClear": 41.62,
+     "scabArm": 38
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.027,
-    "lift": 0.019,
+    "lift": 0,
     "clear": {
-     "guard.head": -0.045,
+     "guard.head": -0.02,
      "guard.torso": -0.161,
-     "hand_l.head": -0.055,
+     "hand_l.head": -0.08,
      "hand_l.torso": -0.066,
-     "hand_r.head": -0.209,
+     "hand_r.head": -0.214,
      "hand_r.torso": -0.074,
-     "hilt.head": -0.051,
+     "hilt.head": -0.055,
      "hilt.torso": -0.038
     }
    },
    "g_dive": {
     "passes": 3,
     "corrections": {
-     "bPush": 8.92,
+     "bPush": 11.56,
      "bTurn": 27,
-     "gripClear": 73.41,
-     "handClearR": 6.38
+     "gripClear": 71.69,
+     "handClearR": 3.75
     },
     "contacts": {
-     "twohand": 0.096
+     "twohand": 0.104
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
     "lift": 0,
     "clear": {
-     "guard.head": -0.132,
-     "guard.torso": -0.27,
-     "hand_l.head": -0.112,
-     "hand_l.torso": -0.19,
-     "hand_r.head": -0.114,
-     "hand_r.torso": -0.025,
-     "hilt.head": -0.123,
-     "hilt.torso": 0
+     "guard.head": -0.055,
+     "guard.torso": -0.191,
+     "hand_l.head": -0.088,
+     "hand_l.torso": -0.187,
+     "hand_r.head": -0.102,
+     "hand_r.torso": -0.021,
+     "hilt.head": -0.108,
+     "hilt.torso": -0.02
     }
    },
    "g_deflect": {
@@ -25554,20 +25630,20 @@
   "hair": "skin"
  },
  "budgets": {
-  "atlas_px": 47872,
+  "atlas_px": 49920,
   "atlas_budget": 150000,
-  "sprites": 27,
+  "sprites": 28,
   "elements_at_rest": {
    "normal": 224,
    "ghost": 224
   },
   "elements_budget": 6500,
   "parts": 29,
-  "models": 63,
-  "key_files": 3455,
-  "keys": 29164,
-  "rig_functions": 4214,
-  "rig_bytes": 8910825,
+  "models": 64,
+  "key_files": 3456,
+  "keys": 28875,
+  "rig_functions": 4216,
+  "rig_bytes": 8838566,
   "cull_overhang_ticks": 0
  },
  "sprites": {
@@ -25595,6 +25671,7 @@
   "glow_pink": 2048,
   "glow_violet": 2048,
   "glow_gold": 2048,
+  "glow_edge": 2048,
   "cup_in": 256,
   "cup_rim": 256,
   "bottle": 1024,

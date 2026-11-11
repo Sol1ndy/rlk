@@ -297,7 +297,28 @@
     64
    ]
   ],
-  "seat_rock": []
+  "seat_rock": [],
+  "sw_path": [
+   [
+    1,
+    16,
+    16
+   ]
+  ],
+  "sw_head": [
+   [
+    1,
+    64,
+    64
+   ]
+  ],
+  "sw_arc": [
+   [
+    3,
+    64,
+    64
+   ]
+  ]
  },
  "textures": {
   "qi_arc_0": [
@@ -509,6 +530,26 @@
    64
   ],
   "disc_1": [
+   64,
+   64
+  ],
+  "sw_path": [
+   16,
+   16
+  ],
+  "sw_head": [
+   64,
+   64
+  ],
+  "sw_arc_0": [
+   64,
+   64
+  ],
+  "sw_arc_1": [
+   64,
+   64
+  ],
+  "sw_arc_2": [
    64,
    64
   ],
@@ -1555,6 +1596,91 @@
    "source": "own",
    "desc": "sword-qi wedge standing across the aim, the point at b 1"
   },
+  "sw_path": {
+   "plane": "lance",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/sw_path",
+   "source": "own",
+   "desc": "the drawn blade path: one straight piece along +z (tinted)"
+  },
+  "sw_head": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/sw_head",
+   "source": "own",
+   "desc": "the head running along the blade path (tinted)"
+  },
+  "sw_arc_0": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/sw_arc_0",
+   "source": "own",
+   "desc": "the slash: one sector of the blade's sweep, apex at b 0, fading frame 0 (tinted)"
+  },
+  "sw_arc_1": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/sw_arc_1",
+   "source": "own",
+   "desc": "the slash: one sector of the blade's sweep, apex at b 0, fading frame 1 (tinted)"
+  },
+  "sw_arc_2": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/sw_arc_2",
+   "source": "own",
+   "desc": "the slash: one sector of the blade's sweep, apex at b 0, fading frame 2 (tinted)"
+  },
   "rift_void": {
    "plane": "face",
    "px": [
@@ -1666,8 +1792,8 @@
   "rift_arc2": "rlk:item/rift/arc_2",
   "rift_arc3": "rlk:item/rift/arc_3"
  },
- "atlas_px_new": 245760,
- "sprite_px": 241664,
+ "atlas_px_new": 262400,
+ "sprite_px": 258304,
  "sprite_cap": 260000,
  "gate_icon_px": 4096,
  "presets": {

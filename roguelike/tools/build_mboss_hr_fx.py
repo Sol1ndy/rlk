@@ -155,6 +155,11 @@ SPRITES = {
     'moon_halo': [(f'moon_halo_{k}', (96, 96), UNIT, P.make_halo(k), 2) for k in range(2)],
     'disc': [(f'disc_{k}', (64, 64), UNIT, P.make_disc(k), 2) for k in range(2)],
     'seat_rock': [],                    # vanilla items (tuff, a potion bottle, a flower-pot cup): 0 px
+    # round V (lane VB; v_brief.md §3 VB 2-3; api.KIT_SPRITES_HR): the drawn blade path, its head, the slash sector's three
+    # fading frames. tools/mboss_scarlet/blade.py summons their cards from the rig's blade track (not through fx/card).
+    'sw_path': [('sw_path', (16, 16), (-0.5, 0.5, 0, 1), P.paint_sw_path, 4)],
+    'sw_head': [('sw_head', (64, 64), UNIT, P.paint_sw_head, 3)],
+    'sw_arc': [(f'sw_arc_{k}', (64, 64), (-0.5, 0.5, 0, 1), P.make_sw_arc(k), 3) for k in range(3)],
 }
 GATE_ICON = ('gate_icon', (64, 64), UNIT, P.paint_gate_icon, 2)      # rlk:mboss/hr_kit/gate_icon (api.GATE_ICON_MODEL)
 TEXTURES = {stem: (wh, box, fn, ss) for rows in SPRITES.values() for stem, wh, box, fn, ss in rows}
@@ -237,6 +242,11 @@ KINDS = {
     **{f'qi_arcf_{k}': ('face', f'qi_arc_{k}', ARC_BOX, False, f'sword-qi crescent frame {k} standing across the aim '
                         '(a slanted slash, rolled in the screen plane)') for k in range(4)},
     'qi_wedgef': ('face', 'qi_wedge', (-0.25, 0.25, 0, 1), False, 'sword-qi wedge standing across the aim, the point at b 1'),
+    # round V (lane VB): the cards of tools/mboss_scarlet/blade.py (literal summons on pattern ticks; never through fx/card)
+    'sw_path': ('lance', 'sw_path', (-0.5, 0.5, 0, 1), True, 'the drawn blade path: one straight piece along +z (tinted)'),
+    'sw_head': ('face', 'sw_head', SQ, True, 'the head running along the blade path (tinted)'),
+    **{f'sw_arc_{k}': ('flat', f'sw_arc_{k}', (-0.5, 0.5, 0, 1), True, f'the slash: one sector of the blade\'s sweep, apex at b 0, '
+                       f'fading frame {k} (tinted)') for k in range(3)},
 }
 # The arrival tear: the dungeon rift's item models (tools/build_rift.py), referenced (no px of ours); without them in the
 # pack the item definitions fall back to the ghost flash card.

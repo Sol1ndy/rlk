@@ -50,7 +50,7 @@ AT_OF = {'a8': 60, 'a13': 5}                   # repel {at} of each gauntlet's c
 # api.EV_FP: the reward hook reads them after cleanup); the generator checks every '#name hr' S3 writes is listed here.
 # I1 (request s3-5): the S3 extras live in the contract now (api.CORE_FP, same order; api.CORE_CONSTS).
 CONSTS = api.CORE_CONSTS
-FP_EXTRA = ('#ai_uc',)                    # HA-09: the gauge close (ai/ult_close) ran once
+FP_EXTRA = ('#ai_uc', '#sw_n')    # round V: #sw_n the target line's measured length (core/sw/march, 0.5 b steps)                    # HA-09: the gauge close (ai/ult_close) ran once
 FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1 + api.P2)   # the patterns' own scores (#<key>_<x>)
 FP = tuple(api.CORE_FP) + tuple(FP_EXTRA)
 assert len(FP) == len(set(FP)), 'duplicate fake player'

@@ -1,0 +1,8 @@
+# A4 pattern tick 15
+execute store result storage rlk:hr core.sw.d double 0.3333 run scoreboard players get #sw_n hr
+function rlk:boss/scarlet/core/sw/head with storage rlk:hr core.sw
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_a420_13] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a4","rlk_hr_swn","rlk_hr_sw_a420_15"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.417f,1.1834f,-0.1138f],left_rotation:[0.0023f,0.0032f,-0.7046f,0.7096f],scale:[0.8055f,1f,2.1836f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a4","rlk_hr_swn","rlk_hr_sw_a420_15"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.4115f,1.234f,-0.3766f],left_rotation:[0.1301f,0.1319f,-0.6925f,0.6972f],scale:[0.8597f,1f,2.3307f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn

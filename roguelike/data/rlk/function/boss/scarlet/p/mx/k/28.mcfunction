@@ -1,3 +1,11 @@
 # MX pattern tick 28
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~0 ~ run function rlk:boss/scarlet/fx/p/qi_dome {r:35}
+tp @e[type=minecraft:item_display,tag=rlk_hr_swr] ~ ~ ~ ~ 0
+kill @e[type=minecraft:item_display,tag=rlk_hr_swh,tag=rlk_hr_sw_mx28,limit=1]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_mx28_24] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_sw_mx28_26] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_arc_1"
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_mx","rlk_hr_swn","rlk_hr_sw_mx28_28"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.1715f,1.064f,-0.1698f],left_rotation:[-0.0135f,0.9749f,-0.0814f,0.2066f],scale:[0.6941f,1f,1.834f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_mx","rlk_hr_swn","rlk_hr_sw_mx28_28"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.2203f,1.0908f,0.0367f],left_rotation:[0.0018f,0.9964f,-0.0825f,0.0218f],scale:[0.7385f,1f,1.9514f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_sw","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_mx","rlk_hr_swn","rlk_hr_sw_mx28_28"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.2032f,1.1024f,0.1544f],left_rotation:[-0.0171f,-0.983f,0.0807f,0.1639f],scale:[0.7634f,1f,2.0169f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_arc_0","minecraft:custom_model_data":{colors:[14857471]}}}}
+tp @e[type=minecraft:item_display,tag=rlk_hr_swn] ~ ~ ~ ~ 0
+tag @e[type=minecraft:item_display,tag=rlk_hr_swn] remove rlk_hr_swn
 execute at @s run function rlk:boss/scarlet/fx/snd/g_dome
