@@ -66,7 +66,7 @@ node $WT/tools/dev/sim/hr/cine/probe.mjs repel 49 88              # her points a
 | kit + `regen_all.sh` twice | identical; `check_mboss_pack` 0 problems |
 | `test_cine.py` | 159 / 159 |
 | `test_contact.py` | 47 / 47 her side; 86 / 86 with H3's manifest (both sides + where they meet) |
-| loadcheck | `hr2c_b` 0, `hr2c_c` 0 (the final tree) |
+| loadcheck | `hr2c_b` 0, `hr2c_c` 0, `hr2c_d` 0 (the final tree) |
 | rplint / atlas | 0 / 12.919 M px |
 | `test_kit.py` | 3 rows fail, none of them the overlay: 104 sounds pinned (H1 added 5), the module's preset calls (H2's sequences) |
 | `test_rig.py` | still pins the 11-06 set (47 clips, the old cine events: crashes at `scab_hand`; lanes H1c / H2 own the update). A scratch copy past those rows: see Decisions |
@@ -94,17 +94,22 @@ within 0.015 b; no blade deeper than 0.04 b into the other's head box (KA2 / KA4
   grips were drawn in to keep the same blade lines through KA1-KA4.
 - **cs1 566 / 567** are declared `cuts` of the clip: every shown part keys at 566 with a 1-tick move to 567 (a normal run
   is unchanged; after the skip's seek the parts reach the clip's pose by 567, under the skip's black).
-- `test_rig.py` (S2a's 11-06 suite) in a scratch copy past its old-contract rows: the generic checks that touch these clips
-  and are still open — the hat's switch jumps 0.19-0.20 b at repel 84 (off in the throw) and 139 (put on); the brim
-  1.7 mm into the base head's top corner at cs1 236; the sheathed hilt 1-2 cm off the scabbard pivot at intro 787-788 (the
-  compiler's 1-tick reappearance key); `float` at repel 0-2 is the replay's artifact of the 3-tick blend (the clip starts
-  in the air, the suite replays without the previous clip); the floor hat grip 0.05-0.07 b above the hold point one tick
-  before the pick-ups (repel 130, ending 8: a lying fist does not reach 0.10 b over the floor). Fixed in this lane: the
-  blade-forearm rule at repel 82 (the pull keeps the hook's line), the lying arm (elbow out to her side, no lift, the fist
-  at 0.14 b; the elbow pole reset when she rises).
+- `test_rig.py` (S2a's 11-06 suite) in a scratch copy past its old-contract rows (the states / hand-overs / big-swing spans
+  of the 11-06 events, `seq.SEAT_RISE`, the 47-clip counts): the generic rows that touch these clips and stay open —
+  the hat's switch jumps 0.19-0.20 b at repel 84 (off in the throw) and 139 (put on); the brim 1.7 mm into the base head's
+  top corner at cs1 236; the sheathed hilt 1-2 cm off the scabbard pivot at intro 787-788 (the compiler's 1-tick
+  reappearance key); `float` at repel 0-2 is the replay's artifact of the 3-tick blend (the clip starts in the air, the
+  suite replays it without the previous clip); the lying right fist 0.046 b off its floor target while the hat pick-up's
+  pre-roll pulls it to the hat (repel 127-130, ending 5-8: two contacts on one hand). Fixed in this lane after that run:
+  the blade-forearm rule at repel 82 (the pull keeps the hook's line), the lying arm (elbow out to her side: no lift, the
+  core on the floor, the fist on the brim at 0.17 b, the floor hat reached within 0.035 b, the pole reset as she rises),
+  the intro's landing (a deeper crouch 1258-1276: the left palm on the ground instead of 0.29 b above it).
+- **I18 (lane H2's camera)** at intro 1290-1296: with the hat low after the landing her brim passes 0.13 b in front of the
+  lens (HR(0.15, 1.35, 1.0)); from about 1297 the lens is under the brim as the shot intends. A box stand-in did not show it.
 
 ## Requests to other lanes
-- **H2 / HI** (`seq.py`): nothing blocking; her root tracks equal your moves. The lethal kick's seam: the ending places her
+- **H2 / HI** (`seq.py`): nothing blocking; her root tracks equal your moves. I18's first frames: see Decisions (lower
+  the eye or start the shot a few ticks later if the brim fills the lens in game). The lethal kick's seam: the ending places her
   at f 4.2 at tick 0 (she lay at 3.0 at repel 129): the 1.2 b jump is under the seam's white, as you built it.
 - **HI** (`test_rig.py`, owner H2 per §6.2): the cinematic rows (states, hand-overs, big-swing spans, the intro stone
   check with `seq.SEAT_RISE`) still name the 11-06 events; `test_cine.py` holds the §4.1 versions of those checks.

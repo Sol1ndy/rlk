@@ -362,8 +362,8 @@ const INTRO_END0 = {...LANDED, pos: [0, -.4, 0], tor: [-24, 6, 0], head: [-20, -
       aR: [120, 30, .9], pR: [.8, -.2, .3], skW: .6}, 'o')
     .k(1246, {rot: [0, 0, 0], fL: [.13, .56, -.26], fR: [-.13, .5, -.1], aL: [120, 60, .9], tor: [-6, 0, 0], skW: -.2}, 'io')
     .k(1254, {rot: [8, 0, 0], fL: [.14, .36, -.3], fR: [-.14, .3, .1], aL: [60, 50, .9], tor: [-12, 0, 0], head: [-16, 0, 0], skW: -.6}, 'io')
-    .k(1258, {...FULL(LANDED), plL: [.42, .06, -.5], plwL: 1, tor: [-34, 8, 0], pos: [0, -.56, 0]}, 'i')
-    .k(1262, {pos: [0, -.6, 0]}, 'o').k(1276, {pos: [0, -.58, 0]}).k(1290, {...FULL(INTRO_END0)}, 'io');
+    .k(1258, {...FULL(LANDED), plL: [.3, .16, -.36], plwL: 1, tor: [-50, 10, 0], pos: [0, -.8, 0]}, 'i')
+    .k(1262, {pos: [0, -.84, 0]}, 'o')   /* the deep landing crouch: the left palm on the ground 1258-1276 */.k(1276, {pos: [0, -.82, 0], plwL: 1}).k(1290, {...FULL(INTRO_END0)}, 'io');
   C('intro', k, {src: 'v 0-94.8 (ref/cs_intro.jpg; hr_design §3.1 I1-I17): seated with the cup, the bottle poured, the cup to the moon, the drink, the thumb on the guard, up on the rock, the walk with a hand on the brim, the hat tipped, the leap and the landing'});
 }
 
