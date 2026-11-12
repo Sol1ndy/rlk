@@ -1,0 +1,26 @@
+# @s = body: the test #tst (api.TEST_IDS).
+execute if score #tst tk matches 1 run return run function rlk:boss/tachy/test/go/a1
+execute if score #tst tk matches 2 run return run function rlk:boss/tachy/test/go/b1
+execute if score #tst tk matches 3 run return run function rlk:boss/tachy/test/go/b2
+execute if score #tst tk matches 4 run return run function rlk:boss/tachy/test/go/b3
+execute if score #tst tk matches 5 run return run function rlk:boss/tachy/test/go/c1
+execute if score #tst tk matches 6 run return run function rlk:boss/tachy/test/go/c2
+execute if score #tst tk matches 7 run return run function rlk:boss/tachy/test/go/c3
+execute if score #tst tk matches 8 run return run function rlk:boss/tachy/test/go/k
+execute if score #tst tk matches 9 run return run function rlk:boss/tachy/test/go/w1
+execute if score #tst tk matches 10 run return run function rlk:boss/tachy/test/go/w2
+execute if score #tst tk matches 11 run return run function rlk:boss/tachy/test/go/l
+execute if score #tst tk matches 20 run return run function rlk:boss/tachy/test/mantle_b
+execute if score #tst tk matches 21 run return run function rlk:boss/tachy/test/mantle_f
+execute if score #tst tk matches 22 run return run function rlk:boss/tachy/test/tr1
+execute if score #tst tk matches 23 run return run function rlk:boss/tachy/test/tr2
+execute if score #tst tk matches 24 run return run function rlk:boss/tachy/test/swap
+execute if score #tst tk matches 25 run return run function rlk:boss/tachy/test/g3
+execute if score #tst tk matches 26 run return run function rlk:boss/tachy/test/intro
+execute if score #tst tk matches 27 run return run function rlk:boss/tachy/test/death
+execute if score #tst tk matches 30 run return run function rlk:boss/tachy/test/ph2
+execute if score #tst tk matches 31 run return run function rlk:boss/tachy/test/ph3
+execute if score #tst tk matches 40 run return run function rlk:boss/tachy/test/el1
+execute if score #tst tk matches 41 run return run function rlk:boss/tachy/test/el3
+execute if score #tst tk matches 80 run return run function rlk:boss/tachy/test/floor
+execute if score #tst tk matches 99 run return run function rlk:boss/tachy/test/freeze

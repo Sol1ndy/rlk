@@ -20,15 +20,11 @@ fill 11 203 19 15 203 19 minecraft:spruce_planks
 fill 16 206 19 19 207 19 minecraft:iron_ore
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
-fill 7 201 1 7 201 3 minecraft:tuff
-fill 8 201 3 18 201 3 minecraft:tuff
 fill 1 201 11 5 201 11 minecraft:tuff
 fill 1 201 12 1 201 12 minecraft:tuff
 fill 5 201 12 5 201 13 minecraft:tuff
 fill 4 201 13 4 201 13 minecraft:tuff
 fill 3 201 14 3 201 18 minecraft:tuff
-fill 8 201 1 18 201 2 minecraft:cobbled_deepslate
-fill 8 202 1 18 202 2 minecraft:tuff
 fill 2 201 12 4 201 12 minecraft:cobbled_deepslate
 fill 2 202 12 4 202 12 minecraft:tuff
 fill 1 201 13 3 201 13 minecraft:cobbled_deepslate

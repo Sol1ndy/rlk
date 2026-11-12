@@ -23,8 +23,6 @@ fill -5 210 19 -5 210 19 minecraft:oak_leaves[persistent=true]
 fill -17 204 19 -12 205 19 minecraft:andesite
 fill -20 210 0 -1 210 19 minecraft:polished_deepslate
 fill -19 210 1 -2 210 18 minecraft:air
-fill -13 201 1 -13 201 3 minecraft:podzol
-fill -12 201 3 -2 201 4 minecraft:podzol
 fill -5 201 7 -2 201 7 minecraft:podzol
 fill -5 201 8 -5 201 15 minecraft:podzol
 fill -18 201 9 -18 201 10 minecraft:podzol
@@ -38,8 +36,6 @@ fill -7 201 15 -6 201 15 minecraft:podzol
 fill -15 201 16 -15 201 18 minecraft:podzol
 fill -16 201 17 -16 201 18 minecraft:podzol
 fill -19 201 18 -17 201 18 minecraft:podzol
-fill -12 201 1 -2 201 2 minecraft:dirt
-fill -12 202 1 -2 202 2 minecraft:podzol
 fill -4 201 8 -2 201 13 minecraft:dirt
 fill -4 202 8 -2 202 13 minecraft:podzol
 fill -19 201 11 -17 201 17 minecraft:dirt
@@ -54,7 +50,7 @@ execute positioned -17 203 12 run function rlk:room/prop/p_grass
 execute positioned -2 202 7 run function rlk:room/prop/p_dandelion
 execute positioned -6 201 12 run function rlk:room/prop/p_grass
 execute positioned -14 201 2 run function rlk:room/prop/p_grass
-execute positioned -9 203 2 run function rlk:room/prop/p_wildflower
+execute positioned -9 201 2 run function rlk:room/prop/p_wildflower
 execute positioned -16 201 1 run function rlk:room/prop/p_grass
 execute positioned -10 201 11 run function rlk:room/prop/p_grass
-execute positioned -7 202 3 run function rlk:room/prop/p_wildflower
+execute positioned -7 201 3 run function rlk:room/prop/p_wildflower

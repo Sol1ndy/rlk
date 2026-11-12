@@ -75,7 +75,7 @@ execute if score #src4 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src5 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src6 itv matches 1.. run scoreboard players add #srcN itv 1
 execute if score #src7 itv matches 1.. run scoreboard players add #srcN itv 1
-# 생명줄: 대쉬가 끝났으면 실이 감긴 적에게 피해
+# 생명줄: 닷지가 끝났으면 실이 감긴 적에게 피해
 execute if entity @e[tag=rlk_llm,limit=1] unless score @s dashMoveT matches 1.. at @e[tag=rlk_body,limit=1] run function rlk:items/proc/lifeline_fire
 execute if score #srcN itv matches 1.. run scoreboard players operation 음원 stacks = #srcN itv
 execute if score #srcN itv matches 1.. run scoreboard players display name 음원 stacks {text:"켜진 음원",color:"#A5D94A"}
@@ -87,7 +87,7 @@ execute unless score #oath itv matches 1.. run scoreboard players reset 전의 s
 execute if score #fanT itv matches 1.. run function rlk:items/proc/fan_tick
 execute unless score #fanT itv matches 1.. run scoreboard players set #fan itv 0
 scoreboard players operation #t1 itv = #seamT itv
-scoreboard players operation #t1 itv %= #st50 tmp
+scoreboard players operation #t1 itv %= #seamGap tmp
 execute if score #seamT itv matches 1.. if score #t1 itv matches 1 run function rlk:items/proc/seam_pulse
 scoreboard players operation #t1 itv = #genieT itv
 scoreboard players operation #t1 itv %= #st40 tmp
@@ -161,3 +161,6 @@ execute if score #cgMoonT itv matches 1.. at @e[tag=rlk_body,limit=1] run partic
 # 각인 만월 2개: 달 반응 피해
 execute if score fullmoon engN matches 2.. run scoreboard players operation #lnBuff itv += #fmDmg tmp
 execute unless score #salonT itv matches 1.. if entity @e[tag=rlk_salon,limit=1] run function rlk:items/proc/salon_end
+# 화무십일홍: 중첩 시간 · 반격 · 홍련일섬 지연 · 재사용 대기 / 팔거나 버리면 상태와 사이드바를 지운다
+execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_tick
+execute unless score @s it_sword_hwamu matches 1.. if score #hwOn itv matches 1 run function rlk:items/proc/hw_clear

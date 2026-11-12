@@ -1,0 +1,8 @@
+# event: the timeline, the ticks 16..30.
+execute if score #sq hr matches 16 run return run function rlk:boss/scarlet/seq/event/k/16
+execute if score #sq hr matches 17 run return run function rlk:boss/scarlet/seq/event/k/17
+execute if score #sq hr matches 18 run return run function rlk:boss/scarlet/seq/event/k/18
+execute if score #sq hr matches 19 run return run function rlk:boss/scarlet/seq/event/k/19
+execute if score #sq hr matches 20 run return run function rlk:boss/scarlet/seq/event/k/20
+execute if score #sq hr matches 21..29 run return run function rlk:boss/scarlet/seq/event/k/21_29
+execute if score #sq hr matches 30 run return run function rlk:boss/scarlet/seq/event/k/30

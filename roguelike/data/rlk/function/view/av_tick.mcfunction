@@ -18,4 +18,8 @@ scoreboard players set #e tmp 0
 scoreboard players set #alv tmp 0
 execute on attacker run function rlk:element/read_tag
 execute on attacker run scoreboard players operation #alv tmp = @s mlv
+# 피해 문맥(전투 개편 C): 때린 것(투사체면 쏜 것) · 보스 등급
+tag @e[tag=rlk_hc_atk] remove rlk_hc_atk
+scoreboard players set #hcC tmp 0
+execute on attacker run function rlk:player/def/ctx_va
 execute as @a[tag=player,limit=1] run function rlk:view/av_hurt

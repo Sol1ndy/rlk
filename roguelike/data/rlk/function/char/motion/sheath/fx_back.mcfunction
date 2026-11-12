@@ -1,0 +1,25 @@
+# Gold line along the weapon hanging on the back (idle sheathed pose; ^ from the feet, rig yaw).
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.414 ^0.057 ^-0.433 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.216 ^0.461 ^-0.372 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.018 ^0.865 ^-0.31 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.18 ^1.269 ^-0.249 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.378 ^1.673 ^-0.188 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.576 ^2.078 ^-0.127 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.774 ^2.482 ^-0.065 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 5 run particle minecraft:end_rod ^-0.18 ^1.269 ^-0.249 0.06 0.25 0.06 0.01 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.71 ^1.338 ^-0.14 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.442 ^1.226 ^-0.186 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.174 ^1.114 ^-0.232 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.094 ^1.002 ^-0.278 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.362 ^0.89 ^-0.324 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.629 ^0.779 ^-0.37 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.897 ^0.667 ^-0.416 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 3 run particle minecraft:end_rod ^0.094 ^1.002 ^-0.278 0.06 0.25 0.06 0.01 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.43 ^1.99 ^-0.304 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.266 ^1.682 ^-0.298 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^-0.103 ^1.374 ^-0.291 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.061 ^1.067 ^-0.284 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.224 ^0.759 ^-0.277 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.388 ^0.451 ^-0.271 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:dust{color:[1.0,0.84,0.38],scale:0.55} ^0.552 ^0.143 ^-0.264 0.04 0.05 0.04 0 2
+execute if score #charN tmp matches 6 run particle minecraft:end_rod ^0.061 ^1.067 ^-0.284 0.06 0.25 0.06 0.01 2

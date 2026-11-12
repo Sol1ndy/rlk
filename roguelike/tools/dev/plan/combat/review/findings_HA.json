@@ -1,0 +1,134 @@
+{
+ "head": "d7da75e79 (origin/wip/combat-hi)",
+ "findings": [
+  {
+   "id": "HA-01",
+   "severity": "major",
+   "title": "A floor reached during the forced rings (full gauge) still lets her play the whole ultimate before CS1 / lead5",
+   "where": "roguelike/tools/mboss_scarlet/core.py:432 (core/pat_end; generated data/rlk/function/boss/scarlet/core/pat_end.mcfunction:11)",
+   "what": "core/pat_end chains rings -> ult (`if #dec = rings if #ultq 1 -> core/start/ult`) without looking at #fl. hr_design §1.1 / §1.5: a floor reserves the step for the next decision and only the running pattern finishes; ult is a new pattern started outside the decision. mx's repeat in the same function is guarded by #fl (core.py:442), the ult chain is not. The video cuts to CS1 at once (video_notes §2.1, 160.5).",
+   "evidence": "Sim probe (H1 world, test 80 / 34 = HP floor + 1, test 12 = gauge 50 + rings, hit to the floor at rings pt 3, #fl = 1 at once). P1: rings runs to 50, then ult 50-108 (two unparriable whole-arena hits on the player at +74 / +96), recovery, CS1 at +122. P2 (5 %): rings to 60, ult 60-118 (hits at +84 / +106), lead5 at +138. Second confirmation: code path above (pat_end line 11 has no #fl gate; ai/decide is the only place the step starts).",
+   "repro": "python3 <copy>/probe/p_floor_ult.py <roguelike> from a sim copy (HA probe: setup_h1, hold, test_id 80|34, test_id 12, hold(False), A.strike 5000 at rings pt 3, log (#pat, #ph) per tick).",
+   "fix": "In core/pat_end start ult only `unless score #fl hr matches 1..` (as core/mx_rep does); with a floor reserved fall through to ai/rec_start (the decision then starts CS1 / lead5). Add the case to test_gauge / test_scarlet."
+  },
+  {
+   "id": "HA-02",
+   "severity": "major",
+   "title": "Hits on her during the balance groggy arm the counter / skill triggers: she counters (A2/A1) or A6-blinks in the very tick the groggy ends, skipping its 12-t recovery",
+   "where": "roguelike/tools/mboss_scarlet/core.py:791-796 (on_hit -> core/hit_rec gated only on #pat 0 and #ph p1|p2; #a6q set on any skill hit) and core.py:510-527 (bal_on / bal_off leave #ctr #a6q #flq #hits); generated boss/scarlet/core/fp.mcfunction:9-10",
+   "what": "During the groggy #pat is 0 (bal_on -> cancel_pat0) and #ph is p1/p2, so every punishing hit is counted as a hit \"while she recovers\" (#ctr after 4 in 40 t, #flq every 4th) and a skill hit sets #a6q. Nothing clears them at bal_on / bal_off; core/fp checks #a6q and #ctr before the recovery, so the first fight tick after the groggy starts A6 (60 %) or the counter (70 %) instead of bal_off's 12-t recovery (hr_design §1.4: \"bal_off: 12 t recovery (ai/rec_start), then the AI\"; §1.5 counter = hits while she recovers). The groggy is the player's punish window; punishing it now triggers an instant counter on get-up.",
+   "evidence": "Probe p_grog_ctr: test 19 groggy, player 2.5 b away lands a basic hit every 8 t in its last 60 t; groggy ends at t 100 and A2 starts at t 100 (0 t later) on seeds 6-10, seed 11 (the 30 % miss) goes through the 12-t recovery to a3s at t 111. Probe p_grog_a6: one skill hit (on_hit with #skillDmg 1) at grgT 30 -> A6 starts at t 100 on 3 of 4 seeds, the other through the recovery at 111. Second confirmation: the code path above (no grgT gate in on_hit, nothing resets the flags in bal_on/bal_off).",
+   "repro": "Sim copy: setup_h1, fight_sc, facing_setup 2.5, run 260 t held, test_id 19, hold(False); hit while 0 < grgT <= 60 every 8 t; print the first #pat after grgT reaches 0.",
+   "fix": "Ignore on_hit's trigger lines while groggy (`execute unless score @s grgT matches 1.. ...`) and clear #ctr #a6q #flq #hits in bal_on and bal_off. Add a test_bal_hr row: hits during the groggy -> the first pattern starts >= GROGGY_RECOVER t after it."
+  },
+  {
+   "id": "HA-03",
+   "severity": "major",
+   "title": "Both gauntlets can be cleared by a blind F metronome: G2's cuts sit on a 14-t lattice (7 of 11), G1 yields to a 15-t beat",
+   "where": "roguelike/tools/mboss_scarlet/api.py:297-334 (A8_SCRIPT, A13_SCRIPT); roguelike/tools/dev/sim/hr/review/bal/hrfair2.py:127 (the masher probe presses every 4 t only)",
+   "what": "The brief asks that the gauntlets cannot be cleared by mashing, only by perfect parries read off the cuts. G2 strikes 30 44 58 86 114 128 156 are all = 2 (mod 14) (gaps 14 / 28), so pressing F on the first cue and then every 14 t (0.7 s) without watching anything perfect-parries 7 cuts (5 needed) and avoids the instant death. G1 (30 46 64 94 110 138 164 180 196) gives 5 perfect parries to a 15-t beat started one tick before cut 1. The shipped F rules do not stop it: every metronome press either parries (par_use: next F 1 t later, tier >= 2 clears the whiff streak) or comes > 12 t after the last.",
+   "evidence": "(1) The real player/f_key -> press / press_re / par_use / judge in the H1 world (probe p_metronome, F pressed via f_key with #now cb = next gametime): a13 every 14 t from cut1 - 1: 16/16 presses accepted, 7 perfect parries, gauge 0, repel {at:5}; a8 every 15 t: 5 perfect, repel {at:60}. Controls fail: a13 every 13 t 3 perfect, a8 every 14 t 1 perfect. (2) A Python model of the shipped rules (load.mcfunction 806-818), 4000 random-phase runs: G2 metronome 14 t clears 22.2 %, G1 16 t 5.8 %; mashers every 2-13 t 0 %. hrfair's T7 \"masher 0 %\" only probes a 4-t cadence.",
+   "repro": "python3 <copy>/probe/p_metronome.py <roguelike> (sim copy); python3 probe/fmodel.py for the random-phase table.",
+   "fix": "Break the common period: jitter the strikes by 2-5 t off any 13-16 t lattice while keeping every gap >= 14 (e.g. the video's irregular G2 rhythm 9 / 27 / 10 / 15 / 27 scaled up), check that no k in 10..40 at any phase reaches 5 perfect parries; add a metronome agent (all k 10-40, all phases) to hrfair T7."
+  },
+  {
+   "id": "HA-04",
+   "severity": "minor",
+   "title": "/reload during the balance groggy: she stands idle until the kip-up, then kips up from a pose she is not in",
+   "where": "roguelike/tools/mboss_scarlet/core.py:978-995 (reload hook) + generated boss/scarlet/rig/spawn.mcfunction (\"queues idle\"); bal_tick plays `down` only at grgT 88",
+   "what": "The reload hook re-spawns the rig (idle) and cancels nothing for a groggy (#pat is 0); bal_tick plays `down` only on grgT = 88 and `kipup` on 20, so after a reload mid-groggy she stands in her idle pose, hittable at x 1.30, and at grgT 20 snaps to the lying kip-up clip.",
+   "evidence": "Probe p_reload_grog: test 19, 30 t later (grgT 70) mboss/init: rig calls init/spawn/look_apply, no play; the next play is kipup at grgT 20, then strafe_l.",
+   "repro": "Sim copy: setup_h1, fight_sc, test_id 19, run 30, s.call(\"rlk:mboss/init\"), log s.rigl plays until grgT 0.",
+   "fix": "In the reload hook (or bal_tick when the rig was respawned): grgT 21..88 -> play down; > 88 -> grog_in from its tick."
+  },
+  {
+   "id": "HA-05",
+   "severity": "minor",
+   "title": "bal_ok misses a4's second airborne span (29-37): a break there teleports her 1 b down to the floor",
+   "where": "roguelike/tools/mboss_scarlet/core.py:486 (a4 refused leap..hit = 2-20; hr_design §1.3 \"a4 (2-20)\")",
+   "what": "A4's aerial ring hops again after the landing hit: she is 0.5-1.0 b up from pt 29 to 37 (hit 2 at 34). bal_ok refuses only 2-20, so a break in 29-37 (a perfect parry on hit 2 is a common source of the last pip) starts at once and bal_on's core/ground drops her to the floor in one tick instead of waiting (pending) for the landing, which is what the refusal list exists for.",
+   "evidence": "Measured body height (pat_lib.run_key a4 P1 at 9 b): airborne 3-19 and 29-37, 1.0 b at 30-34. bal/hit {n:12} at a4 pt 31: groggy 100 at once, not pending, body 1.0 b -> 0.0 b in the same tick.",
+   "repro": "Sim copy: start_pattern a4 (9 b), run to pt 31, bal/hit {n:12} on the body, compare Pos[1] before / after.",
+   "fix": "Refuse a4 2..38 (or add 28..38); fix the §1.3 row; test_bal_hr's WIN table covers only (leap, hit)."
+  },
+  {
+   "id": "HA-06",
+   "severity": "minor",
+   "title": "The parry cue and the purple \"cannot parry\" flash play the same sound",
+   "where": "roguelike/tools/mboss_scarlet/api.py:980 (a9_star) and :1020 (parry_cue); hr_design §2.1",
+   "what": "The cue that means \"press F now\" is block.amethyst_block.chime 0.6 pitch 1.9; the purple flash that means \"F does nothing, dodge\" is block.amethyst_block.chime 0.8 pitch 2.0. A 5 % pitch step on a sound event with random variants is not audible as a different signal, and both are used in the same patterns (mx: purple at 4 for the X, cue at 21 for the dome; q: purple 8, cues 36 / 52, purple 83).",
+   "evidence": "Generated fx/snd/parry_cue.mcfunction and fx/snd/a9_star.mcfunction; per-pattern kit log (probe p_hz): mx P2 cues [21] flashes [(4, a9_star)]; q cues [36, 52] flashes [(8, a9_star), (83, a9_star)].",
+   "repro": "cat data/rlk/function/boss/scarlet/fx/snd/{parry_cue,a9_star}.mcfunction",
+   "fix": "Give the cue its own vanilla sound event (one not used by any flash), keep the purple chime for the flash."
+  },
+  {
+   "id": "HA-07",
+   "severity": "minor",
+   "title": "The parry cue shows as a ~0.5 b pink dot, not the 1.8 b sparkle the kit describes",
+   "where": "roguelike/tools/build_mboss_hr_fx.py:1075-1082 (glint {c:2}) with the glint_0 sprite (32 x 32)",
+   "what": "The cue cards are scaled to 1.8 / 1.3 / 0.8 b, but glint_0 draws its star only in the central 12 x 12 px (alpha > 20; alpha > 128 only 4 x 4 px), so the visible sparkle is about 0.68 b with a 0.2 b core. It is the one signal that tells a parryable hit, it sits at blade_mid against her body, and in P2 it is pink on crimson grass (README 0-6: nothing too small to see).",
+   "evidence": "rp_hi assets/rlk/textures/mboss/hr_kit/glint_0.png alpha bbox rows/cols 10-21 of 32. render_hr.py strip \"cue\" (F5 camera): the pink glint measures 9 x 13 px (t+1..t+4) against her 2.0-b stand-in of 47 px = 0.4-0.55 b; the purple star4 and the yellow tell render 2-3 x larger.",
+   "repro": "python3 -I tools/dev/sim/hr/s1k/render/render_hr.py <roguelike> <rp> <out> cue (from a sim copy); measure the pink bbox.",
+   "fix": "A cue sprite whose rays reach the card edge (or a larger scale), checked on the crimson P2 floor."
+  },
+  {
+   "id": "HA-08",
+   "severity": "minor",
+   "title": "q's grab knocks the player back (kb 5) in the middle of its chain",
+   "where": "roguelike/tools/mboss_scarlet/api.py:169 (KB_THROW) and :200 (HITS[\"q\"])",
+   "what": "README 0-6 (타키 lesson): knockback only on the last hit of a chain. When the grab lands q goes on with the beam (P) at +23 t, the dive (P) at +39 t and the pillar (N) at +75 t, but the grab, the first hit, throws the player with kb 5 (the design kept the video's throw as a ground knockback, open question 7).",
+   "evidence": "Probe p_hz: q P2 hits [20, 43, 59, 95]; pat_p2 checks kb against the table (grab 5, beam 0, dive 0, pillar 3), so the suite accepts it.",
+   "repro": "pat_p2.py q row; api.HITS[\"q\"].",
+   "fix": "Play the throw as her motion with kb 0 on the grab (the player stays where the aimed beam then finds them), or ask the user to sanction the exception."
+  },
+  {
+   "id": "HA-09",
+   "severity": "minor",
+   "title": "The forced full-gauge rings starts anywhere in the mid band (11 b) but reaches nothing beyond ~7 b, while every ring still plays its parry cue",
+   "where": "roguelike/tools/mboss_scarlet/ai.py:224 (full gauge -> core/ult_go when #ai_d2 <= MID2 = 11 b); rings = disc(2.6) round her, step 0.3 b/t",
+   "what": "From 8-11 b the 54-64 t spin walk cannot land a single ring (a long whiff before the ultimate, 타키: no long waits / real gap closers), and the cue glint + chime announce four (P2 five) parryable hits that cannot reach; a player who answers them whiffs F each time.",
+   "evidence": "Probe p_rings_mid (rings P1, standing player): 4 b -> hits at 14 24 34 44; 6 b -> 34 44; 8 b -> none (ends 3.2 b away); 10 b -> none (ends 5.2 b away).",
+   "repro": "pat_lib.run_key(dp, api, S, \"rings\", 1, d) for d in 4, 6, 8, 10; count judged hits.",
+   "fix": "From beyond ~5 b let the full-gauge rule close first (glide / far rule) and start rings in the near band, or let her glide in during rings' windup."
+  },
+  {
+   "id": "HA-10",
+   "severity": "minor",
+   "title": "Tests: the H1 world models the F lock with rules that are not the shipped ones; hrfair probes only a 4-t masher; test_flow's parry check skips unparried hits",
+   "where": "roguelike/tools/dev/sim/hr/tests/lib/hrsim.py:781-875 (INPUT_RULES, world_h1); roguelike/tools/dev/sim/hr/review/bal/hrfair2.py:127; roguelike/tools/dev/sim/hr/tests/test_flow.py:171",
+   "what": "Shipped (player/f_key, press, press_re, par_use; load.mcfunction 809-818): the whiff streak grows from the first whiff within #parWsT 80 t, lock 12 x (1 + streak) up to 48, an ignored press only sets #parMl = now + 3, only tier >= 2 clears the streak. hrsim: the streak grows only from the second whiff within 40 t (#parStreakW does not exist, so the default stays), cap 36, an ignored press pushes parLk to t + 12, any parry clears it. pat_ghost / T6 / T7 / T13 are measured under the model. test_flow's P1 check filters `and j[\"parT\"]`, so a P hit that landed full (a refused F) is never looked at.",
+   "evidence": "Same agents, 4000 random-phase runs on the gauntlet strikes: 4-t masher G1 0.25 PP/run shipped vs 0.00 model; 14-t beat G1 cleared 0 % shipped vs 7.0 % model; 16-t beat G2 0 % vs 6.0 %. The rhythm exploit of HA-03 is invisible to T7 (4-t masher only). A replica of test_flow's P1 parrier found 0 unparried P hits, so nothing is hidden today, but the check could not see it.",
+   "repro": "probe/fmodel.py (shipped vs model); grep INPUT_RULES hrsim.py; test_flow.py:171.",
+   "fix": "Drive the real player/f_key in world_h1 (stamp #now cb, call it in the input pre-pass) instead of the model; add metronome agents to hrfair T7; drop the parT filter in test_flow (count P hits judged parT 0, np 0, not dodged)."
+  },
+  {
+   "id": "HA-11",
+   "severity": "minor",
+   "title": "README still describes her unparriable set as `api.NOPARRY` (A9 · A10 · R2 moon discs), 3 of 15",
+   "where": "roguelike/README.md:920 (§3 unparriable table) and :573 (0-9)",
+   "what": "api.NOPARRY no longer exists and R2 / the moon discs were removed; the rebuilt kit's unparriable hits are ult x2, a9, a10, hcut, blue, kcut, mx's X, q's grab and pillar (8 of 17 patterns), drawn by her own flashes.",
+   "evidence": "grep NOPARRY tools/mboss_scarlet -> none; probe p_hz flash list per pattern.",
+   "repro": "grep -n \"api.NOPARRY\" README.md",
+   "fix": "Update both rows from api.HITS (P / N column)."
+  }
+ ],
+ "checked": [
+  "test_flow 40/40, pat_p1 531/531, pat_p2 67/67, pat_ghost 65/65, test_gauge 22/22, test_bal_hr 49/49 re-run on d7da75e79 from a sim copy",
+  "Every P1 / P2 pattern run in the H1 world and logged (probe p_hz): hit ticks = clip events, the cue exactly at h - 7 of every P hit and never before an N hit, yellow >= 12 t / purple exactly 12 t / blue sphere 4-19 before their hits, chain gaps >= 10, first hit >= 12 (new clips >= 14, big hits >= 20)",
+  "Multi-hazard strikes (a9, hcut, kcut dash + discs / lines) share one volley group: one strike = one answer",
+  "q's grab is unparriable (np 1, purple at 8, no cue) per §8.2; beam / dive parryable with cues at 36 / 52",
+  "No two unparriable hits closer than 22 t in any pattern (ult 24 / 46; mx repeat >= 40 t): the 12-t post-success dodge cooldown never blocks a needed perfect dodge",
+  "Gauntlet pip: shield/tick reads #parT tmp right after the judge reset it, a perfect dodge (#parT 0) takes no segment, one cut = one consumed hazard; mashing every 2-13 t never clears (shipped-rule model)",
+  "rings at a full gauge with a perfect-parry flinch on its last ring still chains ult (no endless forced rings)",
+  "Floor reached while groggy cuts it to the kip-up; a pending break at CS1 / lead5 is dropped to 3 pips; balance refused in lead-ins, gauntlets, repel, cutscenes; +3 after repel {at:60}",
+  "bal_ok windows of a10 (3-21), nb (3-45), q (24-58, 68-104 + the ghost refusal), hcut / a9 / kcut / blue / ult / mx cover their measured airborne / dash ticks",
+  "Pause / reload / revive paths in gauntlets and lead-ins (pause hook, core/g/pause, re/g, re/lead) and the G2 fail -> Ronova -> revive stance -> lead_re chain (test_flow branch)",
+  "The selection screen cannot be opened during her fight (lvup/toggle denies in combat), so a gauntlet cannot be paused at will to dodge a judged fail",
+  "cleanup / uninstall: #mbNpOwn, #mbBalOff, objective hr (event scores kept on cleanup), storage rlk:hr, the rlk:hr_warn bossbar, every rlk_hr_* entity; fight_vars also zero both flags",
+  "All playsound / particle ids under boss/scarlet exist in the 26.3 registries report (generated from the server jar); check_macro on boss/scarlet: only storage-fed macro calls",
+  "The instant-death banner: every component carries font minecraft:default, white with 「즉사」 #FF3A55, only G2 (ULT5_LETHAL), off on pause / cleanup / death_start",
+  "Per-tick hot paths (tick, core/fight, fp, look, inv, pat_tick, ai/recover, rig/tick, bal_tick, g/tick) have no unbounded @e scan; test_flow mean cost <= 429 per phase (budget 830)",
+  "Kit strips rendered from the F5 camera (render_hr.py: flash_blue, yellow / big yellow, cue, rings, ult_web, sky_mark + pillar, qi_beam aimed and ground band) and the 12 fight clips at their cue / hit ticks (rig debug build in scratch + rigtech_render): q_air's beam swing comes down through tick 22, kcut / d4 / ult hit poses match their hazards",
+  "Video fidelity: P-a..P-q and U mapped (a3s covers P-b / P-f / P-l / P-o, mx's retreat = P-y without the flash), G1 9 / G2 11 cuts with the three-hit dome, no darkness, crimson field"
+ ]
+}

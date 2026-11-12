@@ -3,7 +3,7 @@ scoreboard players remove @s life 1
 execute if score @s life matches ..0 run particle minecraft:poof ~ ~0.4 ~ 0.3 0.3 0.3 0.02 12
 execute if score @s life matches ..0 run return run kill @s
 scoreboard players operation #t1 itv = @s life
-scoreboard players operation #t1 itv %= #st20 tmp
+scoreboard players operation #t1 itv %= #houndGap tmp
 execute unless score #t1 itv matches 0 run return 0
 execute at @e[tag=rlk_body,limit=1] unless entity @e[tag=rlk_mob,distance=..12,limit=1] run return run tp @s ~1 ~ ~
 execute at @e[tag=rlk_body,limit=1] as @e[tag=rlk_mob,distance=..12,sort=nearest,limit=1] run tag @s add rlk_ht

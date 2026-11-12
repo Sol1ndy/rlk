@@ -6,34 +6,36 @@ scoreboard players set @s pkHI 0
 execute if score @s pkMode matches 4 run return run function rlk:invd/draw
 # 아이템 도감(모드 6)도 화면이 따로 있다
 execute if score @s pkMode matches 6 run return run function rlk:codex/draw
+# 노드 화면: 7 나무뿌리(세계수의 기적), 8 인챈트
+execute if score @s pkMode matches 7 run return run function rlk:root/draw
+execute if score @s pkMode matches 8 run return run function rlk:ench/draw
 execute if score @s pkMode matches 1 unless data storage rlk:lvpick choices[0] at @s run function rlk:lvup/roll
 scoreboard players operation #pkPend tmp = @s pkPending
 summon minecraft:text_display 108.100 199.400 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"아이템 선택",color:"#FFE08A",bold:true},{text:"  남은 횟수 ",color:"gray",bold:false},{score:{name:"#pkPend",objective:"tmp"},color:"white",bold:false}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
-summon minecraft:text_display 103.600 199.400 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:{text:"보유 아이템",color:"white",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
+summon minecraft:text_display 103.900 199.400 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:{text:"보유 아이템",color:"white",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
 summon minecraft:text_display 99.800 199.400 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:{text:"각인",color:"white",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
-summon minecraft:text_display 103.600 193.900 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"Shift + F",color:"#FFE08A"},{text:"  돌아가기 (선택지는 그대로 남습니다)",color:"gray"}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.7f,0.7f,0.7f]}}
-summon minecraft:block_display 104.750 198.450 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 104.750 198.450 9.920 run function rlk:lvup/ui/inv_cell {i:0}
-summon minecraft:block_display 103.600 198.450 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 103.600 198.450 9.920 run function rlk:lvup/ui/inv_cell {i:1}
-summon minecraft:block_display 102.450 198.450 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 102.450 198.450 9.920 run function rlk:lvup/ui/inv_cell {i:2}
-summon minecraft:block_display 104.750 197.300 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 104.750 197.300 9.920 run function rlk:lvup/ui/inv_cell {i:3}
-summon minecraft:block_display 103.600 197.300 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 103.600 197.300 9.920 run function rlk:lvup/ui/inv_cell {i:4}
-summon minecraft:block_display 102.450 197.300 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 102.450 197.300 9.920 run function rlk:lvup/ui/inv_cell {i:5}
-summon minecraft:block_display 104.750 196.150 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 104.750 196.150 9.920 run function rlk:lvup/ui/inv_cell {i:6}
-summon minecraft:block_display 103.600 196.150 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 103.600 196.150 9.920 run function rlk:lvup/ui/inv_cell {i:7}
-summon minecraft:block_display 102.450 196.150 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 102.450 196.150 9.920 run function rlk:lvup/ui/inv_cell {i:8}
+summon minecraft:text_display 103.900 193.050 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"Shift + F",color:"#FFE08A"},{text:"  돌아가기 (선택지는 그대로 남습니다)",color:"gray"}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.7f,0.7f,0.7f]}}
+execute positioned 104.850 198.750 9.920 run function rlk:lvup/ui/inv_cell {i:0}
+execute positioned 103.900 198.750 9.920 run function rlk:lvup/ui/inv_cell {i:1}
+execute positioned 102.950 198.750 9.920 run function rlk:lvup/ui/inv_cell {i:2}
+execute positioned 104.850 197.800 9.920 run function rlk:lvup/ui/inv_cell {i:3}
+execute positioned 103.900 197.800 9.920 run function rlk:lvup/ui/inv_cell {i:4}
+execute positioned 102.950 197.800 9.920 run function rlk:lvup/ui/inv_cell {i:5}
+execute positioned 104.850 196.850 9.920 run function rlk:lvup/ui/inv_cell {i:6}
+execute positioned 103.900 196.850 9.920 run function rlk:lvup/ui/inv_cell {i:7}
+execute positioned 102.950 196.850 9.920 run function rlk:lvup/ui/inv_cell {i:8}
+execute positioned 104.850 195.900 9.920 run function rlk:lvup/ui/inv_cell {i:9}
+execute positioned 103.900 195.900 9.920 run function rlk:lvup/ui/inv_cell {i:10}
+execute positioned 102.950 195.900 9.920 run function rlk:lvup/ui/inv_cell {i:11}
+execute positioned 104.850 194.950 9.920 run function rlk:lvup/ui/inv_cell {i:12}
+execute positioned 103.900 194.950 9.920 run function rlk:lvup/ui/inv_cell {i:13}
+execute positioned 102.950 194.950 9.920 run function rlk:lvup/ui/inv_cell {i:14}
+execute positioned 104.850 194.000 9.920 run function rlk:lvup/ui/inv_cell {i:15}
+execute positioned 103.900 194.000 9.920 run function rlk:lvup/ui/inv_cell {i:16}
+execute positioned 102.950 194.000 9.920 run function rlk:lvup/ui/inv_cell {i:17}
 # 현재 캐릭터(조준하면 설명)
-summon minecraft:block_display 104.750 194.900 9.970 {Tags:["rlk_pk"],brightness:{sky:15,block:15},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.500f,-0.500f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.000f,1.000f,0.02f]}}
-execute positioned 104.750 194.900 9.920 run function rlk:lvup/ui/char_cell
-summon minecraft:text_display 103.050 194.650 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"현재 캐릭터\n",color:"gray"},{nbt:"cur.info.name",storage:"rlk:chars",interpret:true,color:"#FFE08A",bold:true}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.8f,0.8f,0.8f]}}
+execute positioned 101.750 198.750 9.920 run function rlk:lvup/ui/char_cell
+summon minecraft:text_display 101.750 197.550 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"현재 캐릭터\n",color:"gray"},{nbt:"cur.info.name",storage:"rlk:chars",interpret:true,color:"#FFE08A",bold:true}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.7f,0.7f,0.7f]}}
 summon minecraft:text_display 99.800 198.750 9.920 {Tags:["rlk_pk","rlk_pk_er","rlk_pk_new"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:{text:""},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.0f,1.0f,1.0f]}}
 scoreboard players set @e[tag=rlk_pk_new] pkIdx 0
 tag @e[tag=rlk_pk_new] remove rlk_pk_new

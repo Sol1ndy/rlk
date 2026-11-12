@@ -1,4 +1,5 @@
-# @s = 플레이어, at @s. 이동 방향(없으면 시선)으로 tp 이동 시작
+# @s = 플레이어, at @s. 이동 방향(없으면 시선)으로 닷지 이동 시작. 첫 동작(#dgMv cb 1)은 방향키를 누르고 있으면(이동 중 · 숄더뷰의 입력)
+# 그 방향으로 내딛는 걸음(#dgMv 3), 아니면 제자리의 비틀기(1). 2 = 더블 닷지의 두 번째 동작
 execute store result score #cx tmp run data get entity @e[tag=rlk_body,limit=1] Pos[0] 100
 execute store result score #cz tmp run data get entity @e[tag=rlk_body,limit=1] Pos[2] 100
 scoreboard players operation #dvx tmp = #cx tmp
@@ -17,12 +18,14 @@ execute unless score #amove tmp matches 5..250 run function rlk:player/dash_look
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vx tmp = #dvx tmp
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vz tmp = #dvz tmp
 function rlk:player/dash_norm
-# 틱당 스텝 ×10, 이동 4틱
+execute if score #dgMv cb matches 1 if score #amove tmp matches 5..250 run scoreboard players set #dgMv cb 3
+# 더블 닷지의 옆돌기를 방향키 없이: 앞의 적(없으면 시선) 기준 옆 뒤로(player/dodge/side; 통합 11-12 — 시선을 따라 적 속으로 들어가던 것)
+execute if score #dgMv cb matches 2 unless score #amove tmp matches 5..250 run function rlk:player/dodge/side
+# 방향 단위 벡터 × 1000(dashDX · dashDZ); 틱마다의 속도와 길이는 player/dodge/speed · len
 scoreboard players operation @s dashDX = #ux tmp
 scoreboard players operation @s dashDX *= #st10 tmp
 scoreboard players operation @s dashDZ = #uz tmp
 scoreboard players operation @s dashDZ *= #st10 tmp
 scoreboard players operation @s dashUX = #ux tmp
 scoreboard players operation @s dashUZ = #uz tmp
-scoreboard players set @s dashMoveT 4
-scoreboard players set @s dashUpN 0
+function rlk:player/dodge/len

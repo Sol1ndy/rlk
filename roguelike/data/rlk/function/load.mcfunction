@@ -38,23 +38,57 @@ scoreboard objectives add uiHash dummy
 scoreboard objectives add scanTick dummy
 scoreboard objectives add manageTick dummy
 scoreboard objectives add invDirty dummy
+# 아이템 보유 칸 수 (9 = 둘째 줄, 최대 18 = 셋째 줄까지). 인벤토리 슬롯 노드가 2칸씩 연다
+scoreboard objectives add invCap dummy
 scoreboard objectives add invEvt dummy
 scoreboard objectives add invCnt dummy
-scoreboard objectives add hudKey dummy
+# 장비 스캔의 빠른 길: 플레이어 = 마지막 스캔 번호, #scEp = 전체 스캔 번호(items/equip_scan · items/scan_fast)
+scoreboard objectives add eqEp dummy
 scoreboard objectives add hudHold dummy
 
 # 전투/조작
 scoreboard objectives add atkCD dummy
 scoreboard objectives add comboStep dummy
 scoreboard objectives add cboIdle dummy
+# 평타 휘두르기 느려짐(player/swing/tick) · 1인칭 점프 통계(평타 사이 간격에서 뛰면 다음 평타는 1타부터)
+scoreboard objectives add swCut dummy
+scoreboard objectives add swHold dummy
+scoreboard objectives add swJump minecraft.custom:minecraft.jump
 scoreboard objectives add swungAt dummy
 scoreboard objectives add intOwner dummy
 scoreboard objectives add msid dummy
 
-# 대쉬(충전식)
-scoreboard objectives add dashCharge dummy
-scoreboard objectives add dashRegen dummy
+# 닷지(우클릭; 옛 대쉬의 이동 · 재사용 대기) · 패링(F) — 전투 개편 C (player/def/)
+# dashCool = 닷지 재사용 대기(틱), dashInvT = 대쉬가 아닌 무적(원소폭발 시전 · 로노바 부활 · 추락 뒤; 닷지는 쓰지 않음)
+# 시각(gametime) 도장: parAt 받은 F · parLk 이때까지 F 무시 · parHit 그 F 로 막은 틱 · dgAt 닷지 시작 · dgRw 보상을 준 닷지
 scoreboard objectives add dashCool dummy
+scoreboard objectives add parAt dummy
+scoreboard objectives add parLk dummy
+scoreboard objectives add parHit dummy
+scoreboard objectives add dgAt dummy
+scoreboard objectives add dgRw dummy
+# 전투 개편 C 의 전역 값(#now 이번 틱 gametime, #dgOpen 퍼펙트 닷지 창이 열림, #dgEnd · #dgKill · #dgBox 시작 자리 상자, 섬광 간격,
+# #parMl 무시한 F 뒤 받지 않는 끝, #dgRf 재사용 대기를 돌려준 닷지, #dgTry 마지막 닷지 시도)
+scoreboard objectives add cb dummy
+scoreboard players add #dgBox cb 0
+execute unless score #parMl cb matches -2147483648.. run scoreboard players set #parMl cb -1000000
+execute unless score #dgRf cb matches -2147483648.. run scoreboard players set #dgRf cb -1000000
+execute unless score #dgTry cb matches -2147483648.. run scoreboard players set #dgTry cb -1000000
+# round W: #dgMv 지금 닷지 동작(1 제자리 비틀기 · 3 내딛는 걸음 · 4 백스텝 · 2 더블 닷지의 옆돌기), #dgN 이번 세트의 동작 수(1 · 2),
+# #dgPrev 옆돌기 앞의 동작, #dgCr 닷지로 몸을 낮춘 마네킹 아바타가 있음
+scoreboard players add #dgMv cb 0
+scoreboard players add #dgN cb 0
+scoreboard players add #dgPrev cb 0
+# #dgSide 더블 닷지의 옆돌기(방향키 없음)를 번갈아 오른쪽 / 왼쪽 뒤로(player/dodge/side)
+scoreboard players add #dgSide cb 0
+scoreboard players add #dgCr cb 0
+# 피해 문맥(한 번 쓰고 지움, player/def/judge): 비어 있는 값으로
+scoreboard players set #hcK tmp 0
+scoreboard players set #hcC tmp 0
+scoreboard players set #hcNP tmp 0
+scoreboard players set #hcND tmp 0
+scoreboard players set #parT tmp 0
+scoreboard players set #pdg tmp 0
 scoreboard objectives add dashInvT dummy
 scoreboard objectives add dashMoveT dummy
 scoreboard objectives add dashPX dummy
@@ -140,6 +174,13 @@ scoreboard objectives add xp dummy
 scoreboard objectives add xpNeed dummy
 scoreboard objectives add xpDrop dummy
 scoreboard objectives add sapphire dummy
+# 주사위(레벨 업 아이템 선택의 리롤권, 런마다 0) · 생명력 노드로 늘어난 최대 체력 %(런마다 0)
+scoreboard objectives add dice dummy
+scoreboard objectives add nodeHp dummy
+# 월하대작(특수 보스 홍련의 이벤트 버프: 0 없음 · 1 켜짐, 런마다 0 = player/reset_one)
+scoreboard objectives add hrMoon dummy
+# 아이템 강화 단계 (가짜 플레이어 = 아이템 id, 0~3. rlk:pinv enh 와 같음)
+scoreboard objectives add enhL dummy
 
 # 방어력 · 깡/% 누산기(작업용) / 장비 보너스
 scoreboard objectives add def dummy
@@ -330,34 +371,12 @@ scoreboard objectives add eqDendroBonus dummy
 # 레벨 업 선택: 이번 선택에서 리롤한 횟수
 scoreboard objectives add pkRr dummy
 
-# 활: 당긴 시간 / 신호 끊긴 틱 / 아이템 사용 시작됨 / 사용 중 / 우클릭 신호 / 발사 뒤 대기 / 예약 화살 · 계수 / 연격 화살 / 염초 화살 수 / 풀차지 도달 / 아바타 활 모양
-scoreboard objectives add bowT dummy
-scoreboard objectives add bowGap dummy
-scoreboard objectives add bowSeen dummy
-scoreboard objectives add bowUse dummy
-scoreboard objectives add bowRc dummy
-scoreboard objectives add bowCd dummy
-scoreboard objectives add bowQ dummy
-scoreboard objectives add bowQc dummy
-scoreboard objectives add bowF dummy
-scoreboard objectives add bowK dummy
-scoreboard objectives add bowSt dummy
-scoreboard objectives add bowPm dummy
-
-# 화살: 종류 / 원소 / 틱당 이동 횟수 / 수명 / 부착 쿨
+# 투사체(로노바의 구체 · 잔향, char/bow/arrow_*): 종류 / 원소 / 틱당 이동 횟수 / 수명 / 부착 쿨
 scoreboard objectives add aKind dummy
 scoreboard objectives add aEl dummy
 scoreboard objectives add aSub dummy
 scoreboard objectives add aLife dummy
 scoreboard objectives add aIcd dummy
-
-# 요이미야: 스킬 남은 틱 / 원소 입자 쿨 · 횟수 / 소매불 스택 · 남은 틱 / 유금화광 끝나는 시각(몹)
-scoreboard objectives add yoiSk dummy
-scoreboard objectives add yoiPcCd dummy
-scoreboard objectives add yoiPcN dummy
-scoreboard objectives add yoiP dummy
-scoreboard objectives add yoiPT dummy
-scoreboard objectives add aurEnd dummy
 
 # 스커크: 일곱빛 섬광 남은 틱 / 빠른 이동 남은 틱 / 고갈 남은 횟수 · 피해 증가% · 간격 / 3타의 두 번째 참격 예약 / 멸 진행 틱 · 초과한 뱀의 계략(pt)
 scoreboard objectives add skM dummy
@@ -396,9 +415,8 @@ scoreboard objectives add fxId dummy
 scoreboard objectives add fxT dummy
 scoreboard objectives add bolKey dummy
 
-# 아를레키노 스킬 대기 / 두 번째 화살이 나가는 자리
+# 아를레키노 스킬 대기
 scoreboard objectives add arSk dummy
-scoreboard objectives add bowQo dummy
 
 # 살짝 전진 남은 틱
 scoreboard objectives add stepT dummy
@@ -426,6 +444,8 @@ scoreboard objectives add nvA dummy
 scoreboard objectives add nvGap dummy
 scoreboard objectives add nvFcd dummy
 scoreboard objectives add nvGun dummy
+# 나비아: 결정 축포 발사 대기(모션의 발사 틱 전)
+scoreboard objectives add nvShot dummy
 scoreboard objectives add nvHit dummy
 scoreboard objectives add naQn dummy
 
@@ -636,6 +656,8 @@ scoreboard players set #10 tmp 10
 scoreboard objectives remove vTtl
 
 # ===== 조절 지점 =====
+# rift (build_rift.py)
+scoreboard players set #riftPm room 30
 # 로비 · 튜토리얼 · 설정 · 체험 방(lobby/): 항상 불러와 둠
 forceload add 80 14 134 64
 scoreboard players set #c2 lob 2
@@ -656,6 +678,13 @@ scoreboard players set #cArc tmp 36
 scoreboard players set #fmDmg tmp 15
 scoreboard players set #fmEm tmp 80
 scoreboard players set #fmDur tmp 160
+# 월하대작(특수 보스 홍련의 이벤트 버프): 최종 공격력 +% · 치명타 확률 +% · 이동 속도 +% (아이템이 아니라 강화와 상관없음) · 범위
+#   #hrMoonRun 1 = 이번 런(player/reset_one 이 끄고 스탯 줄 "(이번 런)") / 0 = 영구(끄지 않고 "(영구)"). 영구로 바꾸려면 여기서
+#   8 · 4 · 4 와 #hrMoonRun 0, 그리고 tools/mboss_scarlet/api.py 의 EVENT['buff_scope'] = 'forever'(균열 채팅 문구; 재생성) (계획 §7.5.3)
+scoreboard players set #hrMoonAtk tmp 27
+scoreboard players set #hrMoonCrit tmp 10
+scoreboard players set #hrMoonSpd tmp 10
+scoreboard players set #hrMoonRun tmp 1
 # 서리달의 은잔: 중력의 물결 시간(틱) · 피해(최대 체력 ‰) · 중력 1번 · 발동 기준 · 중력 간섭(반응 기준 %) · 월광 시간(틱) · 월광 달 피해 +%
 scoreboard players set #cgRipDur tmp 500
 scoreboard players set #cgRipPm tmp 35
@@ -749,10 +778,10 @@ scoreboard players set #pactAtk tmp 18
 scoreboard players set #pactDmg tmp 25
 scoreboard players set #pactDur tmp 160
 # 스커크 (뱀의 계략 수치는 pt × 100)
-#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(35 = 초당 7pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
+#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(25 = 초당 5pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
 scoreboard players set #skGain tmp 4500
-scoreboard players set #skDrain tmp 35
-scoreboard players set #skModeDur tmp 180
+scoreboard players set #skDrain tmp 25
+scoreboard players set #skModeDur tmp 240
 scoreboard players set #skDashDur tmp 60
 scoreboard players set #skDashCd tmp 160
 scoreboard players set #skDashSpd tmp 150
@@ -764,31 +793,55 @@ scoreboard players set #skRiftLife tmp 300
 scoreboard players set #skBurstMin tmp 5000
 scoreboard players set #skPtBonus tmp 3478
 scoreboard players set #skPtMax tmp 12
-# 활: 기본 공격 사이 간격(공격 속도 100% 기준 틱×100) / 두 발짜리 타의 두 번째 화살까지(틱) / 풀차지까지(틱) / 짧게 눌렀을 때 발사까지 기다리는 틱 / 조준 중 숄더뷰 이동 속도(%)
-scoreboard players set #bowCdN tmp 800
-scoreboard players set #bowQGap tmp 3
-scoreboard players set #bowT1 tmp 20
-scoreboard players set #bowTap tmp 6
-scoreboard players set #bowSlow tmp 40
-# 요이미야: 염초 화살 하나가 더 생기기까지(틱, 풀차지 뒤부터) / 염초 정화의 춤 지속(틱) · 기본 공격 피해 배율(%) / 유금화광 지속(틱) · 폭발 쿨타임(틱) / 소매불 스택당 불 원소 피해 보너스(%) · 최대 스택 · 지속(틱)
-scoreboard players set #yoiKGap tmp 12
-scoreboard players set #yoiSkDur tmp 200
-scoreboard players set #yoiSkMul tmp 160
-scoreboard players set #yoiAurDur tmp 200
-scoreboard players set #yoiBoomCdT tmp 40
-scoreboard players set #yoiPPer tmp 2
-scoreboard players set #yoiPMax tmp 10
-scoreboard players set #yoiPDur tmp 60
 # 기본 공격에 맞은 몹: 경직 시간(틱) / 밀려나는 세기(칸/틱 × 1000. 바닐라 넉백 = 400, 0 이면 안 밀림)
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180
-# 대쉬: 최대 충전 수 / 1개 충전 시간(틱) / 대쉬 직후 자체 쿨타임(틱)
-# 대쉬 최대 충전 수·충전 시간의 기본값(Base). 실제 값(#dashMax, #dashRegenT)은 각인(질주)에 따라 engravings/scan_more 가 계산
-scoreboard players set #dashMaxBase tmp 2
-scoreboard players set #dashRegenBase tmp 20
-scoreboard players set #dashMax tmp 2
-scoreboard players set #dashRegenT tmp 20
-scoreboard players set #dashCoolT tmp 5
+# 닷지(우클릭; round W: 긴 대쉬는 없고 원작의 닷지 한 벌 — 일반 닷지의 짧은 스텝 · 더블 닷지 · 퍼펙트 닷지, player/dash): 재사용 대기(틱)의 기본값 — 누르면 #dashCoolBase(아무것도 피하지 못한 닷지), 그 닷지가 공격을 피하면(퍼펙트 ·
+# 넓은 닷지) #dashCoolHitBase 가 되게 차이만큼 돌려준다(닷지 한 번에 한 번, player/def/dg_refund). 실제 값 #dashCoolT · #dashCoolHitT 는
+# 각인(질주 2개: -#dashEngSpd %, 반올림)에 따라 engravings/scan_more 가 계산
+scoreboard players set #dashCoolBase tmp 18
+scoreboard players set #dashCoolHitBase tmp 12
+scoreboard players set #dashCoolT tmp 18
+scoreboard players set #dashCoolHitT tmp 12
+# 닷지 창(누른 틱 = 0): #dgPW 틱 미만에 맞을 공격 = 퍼펙트 닷지(모든 적), #dgLW 틱 미만 = 일반 몹(#dgLooseC: 0 일반만, 1 정예까지)만 회피
+scoreboard players set #dgPW tmp 3
+scoreboard players set #dgLW tmp 7
+scoreboard players set #dgLooseC tmp 1
+# 더블 닷지: 일반 닷지를 누른 지 1 ~ #dgChW 틱 안의 두 번째 누름이 두 번째 동작(공중 옆돌기)으로 이어진다(원작: 3~26프레임 뒤의 두 번째
+# 누름이 모두 더블 닷지 = 9틱까지 확인). 이동 거리 · 속도는 player/dodge/speed
+scoreboard players set #dgChW tmp 10
+# 퍼펙트 닷지: 원소 에너지(× 100, 고정량 · 원소 충전 효율 미적용)
+scoreboard players set #dgEn tmp 1000
+# 패링 창(F 를 받은 틱 = 0): #parW3 틱 미만 = 3단계(퍼펙트), #parW2 미만 = 2단계, #parW1 미만 = 1단계, 그 뒤 = 실패
+scoreboard players set #parW3 tmp 3
+scoreboard players set #parW2 tmp 6
+scoreboard players set #parW1 tmp 10
+# 받은 F 뒤 다시 받지 않는 시간(틱) = #parGap(언제나 같은 값; 막으면 #parChain). round W(w_brief §6): 헛누름 연속으로 잠금이 길어지던
+# 사다리(#parWs · #parWsMax · #parWsT · #parWsClr)는 사용자 결정으로 없앴다
+scoreboard players set #parGap tmp 12
+# 받지 않은 F(연타 · 키를 누르고 있어 생기는 반복 입력) 뒤 이 틱 수 동안은 어떤 F 도 받지 않는다(#parMl cb; 패링이 되어도 풀리지 않음:
+# 3틱보다 빠른 연타는 처음 한 번만 받는다) / 패링이 된 뒤 다음 F 를 받기까지(틱; 연속 공격을 3틱 간격으로도 이어 막게)
+scoreboard players set #parRe tmp 3
+scoreboard players set #parChain tmp 1
+# 2단계 · 1단계가 남기는 피해(%) / 퍼펙트 패링의 원소전투 스킬 재사용 대기 감소(틱)
+scoreboard players set #parKeep2 tmp 20
+scoreboard players set #parKeep1 tmp 50
+scoreboard players set #parCut tmp 20
+# round V: 퍼펙트 패링 · 퍼펙트 닷지의 박자(1 = 세계를 멈추고 / 늦춘다, 0 = 효과만; player/def/beat/*). 지금까지 멈춘 틱 수 #btLag cb 는
+# 전투 시계의 일부라 지우지 않는다. /reload 가 박자 중이었어도 아무것도 멈춘 채 남지 않는다(beat/reset)
+scoreboard players set #btOn tmp 1
+scoreboard objectives add btD dummy
+scoreboard objectives add btD0 dummy
+scoreboard objectives add btTp dummy
+scoreboard objectives add plActive dummy
+scoreboard objectives add plTick dummy
+scoreboard objectives add plClip dummy
+scoreboard objectives add plLen dummy
+scoreboard objectives add pbGlow dummy
+scoreboard objectives add pbTint dummy
+function rlk:player/def/beat/reset
+# 패링 불가 공격의 섬광: 같은 공격자에게 다시 띄우지 않는 간격(틱)
+scoreboard players set #npGap tmp 10
 # 기본공격 콤보 딜레이(공격속도 100% 기준 틱×100): 1타→2타, 2타→1타
 scoreboard players set #comboD12 tmp 600
 scoreboard players set #comboD21 tmp 1000
@@ -798,8 +851,6 @@ scoreboard players set #forbNeed tmp 250
 
 # 액션바 HUD: 다른 액션바 안내(골드 부족 등)가 뜰 때 HUD 를 잠시 멈추는 시간(틱)
 scoreboard players set #hudHoldT tmp 40
-# 대쉬 게이지 한 칸의 조각 수 (바꾸면 player/hud/setup 의 조각 수도 같이 바꿀 것)
-scoreboard players set #hudSeg tmp 15
 
 # 레벨: 1레벨 기초 수치 / 레벨당 증가량 / 필요 경험치(1레벨 → 2레벨) / 레벨당 필요 경험치 증가 / 몹 처치 경험치(몹의 xpDrop 스코어가 우선, 0 = 없음)
 scoreboard players set #lvHp0 tmp 100
@@ -835,17 +886,30 @@ scoreboard players set #enNeutral tmp 270
 scoreboard players set #enOther tmp 130
 # 액션바 원소 에너지 게이지 칸 수 (char/hud_setup 과 같아야 함)
 scoreboard players set #hudEnSeg tmp 15
-# 몬스터 레벨: 레벨당 체력 증가(%) / 레벨당 공격력 증가(%)
+# 몬스터 레벨 (x = 레벨 - 1). 플레이어는 레벨이 오를수록 좋은 아이템을 얻으므로, 몹은 레벨에 따라 플레이어 기초 수치보다 빠르게 강해짐
+#  체력 = 1레벨 체력 × (100 + #mobLvHp·x + #mobLvHp2·x²/100)%
+#  공격 = 원피해 × (100 + #mobLvAtk·x + #mobLvAtk2·x²/100)%
+#  방어: 플레이어 → 몹 레벨 보정의 몹 쪽 항 = 100 + 몹 레벨 × #mobLvDef/100 (플레이어 쪽 = 100 + 플레이어 레벨)
+#  플레이어 방어 상수: 실제 피해 = 원피해 × K/(K + 방어력), K = #defK + #defKLv·(때린 몹 레벨 - 1)
 scoreboard players set #mobLvHp tmp 30
+scoreboard players set #mobLvHp2 tmp 5
 # 모든 몹의 체력 배율(%). 400 = 4배. 몹이 너무 빨리/늦게 죽으면 이 숫자 하나만 바꾸면 됨
 scoreboard players set #mobHpMul tmp 400
-scoreboard players set #mobLvAtk tmp 8
+scoreboard players set #mobLvAtk tmp 14
+scoreboard players set #mobLvAtk2 tmp 6
+scoreboard players set #mobLvDef tmp 150
+scoreboard players set #defKLv tmp 4
+# 보스(나루카미) 공격 피해 배율(%). 레벨 보정과 별개로 곱함
+scoreboard players set #bossDmgMul tmp 160
 
 # 재련 맵을 한 판에 고를 수 있는 최대 횟수
 scoreboard players set #rfMax tmp 2
 # 시점 시스템(숄더뷰): 걷는 속도(칸/틱 × 10000, 이동 속도 100% 기준) / 달리기 배율(%)
 scoreboard players set #viewWalk tmp 2159
 scoreboard players set #viewSprint tmp 130
+# 평타를 휘두르는 동안(swHold) 걷는 속도(%, 달리기 배율 없음). 숄더뷰 · F5 시점의 아바타(view/move). 1인칭은 걷기를 늦추지 않고
+# 점프만 막는다(이동 속도 속성을 낮추면 바닐라가 화면을 확대함, player/swing/tick)
+scoreboard players set #swSlow tmp 50
 # 숄더뷰 카메라: 시선 고르게 펴기 보정의 한도(각도 × 100)
 # 숄더뷰: 점프로 떠오른 높이 중 카메라가 따라가는 비율(%). 100 = 예전처럼 전부 따라감, 0 = 전혀 안 따라감
 scoreboard players set #viewJump tmp 25
@@ -890,8 +954,7 @@ scoreboard players set #cycleCd tmp 15
 scoreboard players set #cycleCut tmp 10
 #   예리: 확정 치명타 쿨타임(틱)
 scoreboard players set #keenCdT tmp 80
-#   질주: 대쉬 충전 추가 개수 / 충전 속도 증가% (대쉬 통과 피해 80% 는 engravings/dash/hit)
-scoreboard players set #dashEngMax tmp 1
+#   질주: 닷지 재사용 대기 감소% (닷지 통과 피해 80% 는 engravings/dash/hit)
 scoreboard players set #dashEngSpd tmp 20
 #   빙설: 얼음 원소 피해 증가% / 빙결된 적 치명타 확률 증가(%p)
 scoreboard players set #frostDmg tmp 15
@@ -919,7 +982,8 @@ scoreboard players set #berTaken tmp 20
 scoreboard players set #berSpd tmp 30
 scoreboard players set #berT tmp 60
 # 아이템 수치 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc)
-scoreboard players set #hourglassCd tmp 5
+# #hourglassCd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b2)
+scoreboard players set #hourglassCd tmp 50
 scoreboard players set #slatePct tmp 30
 scoreboard players set #pouchGold tmp 1
 scoreboard players set #herbPct tmp 50
@@ -932,7 +996,8 @@ scoreboard players set #potN tmp 4
 scoreboard players set #potGap tmp 25
 scoreboard players set #flagDur tmp 160
 scoreboard players set #flagAtk tmp 20
-scoreboard players set #flagHeal tmp 2
+# #flagHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #flagHeal tmp 20
 scoreboard players set #mapleDur tmp 160
 scoreboard players set #mapleDmg tmp 25
 scoreboard players set #mapleCdT tmp 280
@@ -943,11 +1008,13 @@ scoreboard players set #quillDur tmp 200
 scoreboard players set #bunnyDur tmp 100
 scoreboard players set #bunnyCdT tmp 300
 scoreboard players set #talDur tmp 160
-scoreboard players set #talHeal tmp 2
+# #talHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #talHeal tmp 20
 scoreboard players set #talCdT tmp 10
 scoreboard players set #blossomDur tmp 400
 scoreboard players set #blossomCdT tmp 40
-scoreboard players set #huntPer tmp 3
+# #huntPer: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #huntPer tmp 30
 scoreboard players set #huntMax tmp 10
 scoreboard players set #thiefGold tmp 1
 scoreboard players set #thiefCdT tmp 20
@@ -956,7 +1023,8 @@ scoreboard players set #blossomHit itv 0
 scoreboard players set #basic itv 0
 # 아이템 수치 2차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc · calc_stat)
 scoreboard players set #jellyDur tmp 240
-scoreboard players set #jellyHeal tmp 2
+# #jellyHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b7)
+scoreboard players set #jellyHeal tmp 20
 scoreboard players set #gflagDur tmp 200
 scoreboard players set #gflagDef tmp 25
 scoreboard players set #gflagDmg tmp 15
@@ -973,10 +1041,12 @@ scoreboard players set #chalDur tmp 160
 scoreboard players set #wispFuse tmp 30
 scoreboard players set #wispCdT tmp 80
 scoreboard players set #houndDur tmp 200
-scoreboard players set #houndHeal tmp 1
+# #houndHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #houndHeal tmp 10
 scoreboard players set #gringCost tmp 20
 scoreboard players set #gringDur tmp 240
-scoreboard players set #gringHeal tmp 2
+# #gringHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #gringHeal tmp 20
 scoreboard players set #vortexDur tmp 40
 scoreboard players set #muskAtk tmp 20
 scoreboard players set #muskDur tmp 160
@@ -1032,8 +1102,10 @@ scoreboard players set #omenDur tmp 160
 scoreboard players set #omenDmg tmp 20
 scoreboard players set #caseDur tmp 400
 scoreboard players set #seamDur tmp 280
-scoreboard players set #seamShield tmp 6
-scoreboard players set #seamHeal tmp 2
+# #seamShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamShield tmp 60
+# #seamHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamHeal tmp 20
 scoreboard players set #dragDur tmp 240
 scoreboard players set #dragRx tmp 25
 scoreboard players set #dragFire tmp 15
@@ -1042,14 +1114,17 @@ scoreboard players set #tenguAtk tmp 15
 scoreboard players set #operaDur tmp 240
 scoreboard players set #operaMax tmp 20
 scoreboard players set #operaPm tmp 300
-scoreboard players set #barAdd tmp 2
+# #barAdd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #barAdd tmp 20
 scoreboard players set #barCap tmp 12
 scoreboard players set #barCdT tmp 10
-scoreboard players set #nightShield tmp 8
+# #nightShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #nightShield tmp 80
 scoreboard players set #nightDur tmp 240
 scoreboard players set #genieDur tmp 200
 scoreboard players set #genieEnergy tmp 400
-scoreboard players set #genieHeal tmp 2
+# #genieHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #genieHeal tmp 20
 scoreboard players set #kinDur tmp 100
 scoreboard players set #kinAtk tmp 15
 scoreboard players set #orbCdT tmp 60
@@ -1060,7 +1135,8 @@ scoreboard players set #neg1 tmp -1
 # 아이템 수치 4차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수·회복 계수는 items/proc/*)
 scoreboard players set #beadsHeal tmp 15
 scoreboard players set #thimbleDmg tmp 8
-scoreboard players set #bracerRes tmp 6
+# #bracerRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #bracerRes tmp 60
 scoreboard players set #inkBol tmp 15
 scoreboard players set #maidCdT tmp 40
 scoreboard players set #cocktailSpd tmp 10
@@ -1082,9 +1158,11 @@ scoreboard players set #pillowSpd tmp 10
 scoreboard players set #loomDur tmp 160
 scoreboard players set #loomEm tmp 150
 scoreboard players set #mechCdT tmp 60
-scoreboard players set #gourdHeal tmp 2
+# #gourdHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b9)
+scoreboard players set #gourdHeal tmp 20
 scoreboard players set #gourdDmg tmp 15
-scoreboard players set #lionRes tmp 15
+# #lionRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #lionRes tmp 150
 scoreboard players set #lionCdT tmp 40
 scoreboard players set #cmoonMax tmp 45
 scoreboard players set #lilyDur tmp 240
@@ -1093,11 +1171,18 @@ scoreboard players set #lilyCdT tmp 20
 scoreboard players set #pkChoices tmp 3
 # 레벨 업 선택지 한 칸이 캐릭터일 확률(%). 한 번의 선택지 묶음에 캐릭터는 최대 하나, 지금 캐릭터는 나오지 않는다
 scoreboard players set #pkCharPct tmp 8
+# 레벨 업 아이템 선택의 리롤: 첫 번째 무료, 그 뒤로 주사위 #pkRerollDice 개씩 (#pkRerollStep/#pkRerollMax 는 예전 골드 비용, 지금은 안 씀)
+scoreboard players set #pkRerollDice tmp 1
 scoreboard players set #pkRerollStep tmp 50
 scoreboard players set #pkRerollMax tmp 200
 # 방 시스템: 돈 구역 골드(× 챕터) / 사파이어 구역 개수
 scoreboard players set #roomGold tmp 100
 scoreboard players set #roomSapphire tmp 2
+# 노드: 선택지에 노드가 2개 붙을 확률(%), 주사위 구역에서 얻는 주사위 수, 생명력 구역의 최대 체력 %, 보유 칸 구역에서 늘어나는 칸 수
+scoreboard players set #node2Pct tmp 25
+scoreboard players set #diceGain tmp 2
+scoreboard players set #hpNodePct tmp 10
+scoreboard players set #slotGain tmp 2
 
 # 원소 반응: 격변 반응의 기준 피해 = 공격력 × #reactBase%
 scoreboard players set #reactBase tmp 50
@@ -1106,6 +1191,7 @@ scoreboard players set #rxPlayerPct tmp 50
 
 # 상수
 scoreboard players set #1000 tmp 1000
+scoreboard players set #500 tmp 500
 scoreboard players set #100 tmp 100
 scoreboard players set #31 tmp 31
 scoreboard players set #neg1 tmp -1
@@ -1128,8 +1214,9 @@ scoreboard players set #st20 tmp 20
 scoreboard players set #st48 tmp 48
 scoreboard players set #st150 tmp 150
 
-# 보유 아이템 목록(획득순, 최대 9). 최초만 초기화
+# 보유 아이템 목록(획득순, 최대 invCap). 최초만 초기화
 execute unless data storage rlk:pinv order run data modify storage rlk:pinv order set value []
+execute unless data storage rlk:pinv enh run data modify storage rlk:pinv enh set value {}
 
 function rlk:element/setup
 function rlk:char/setup
@@ -1139,10 +1226,13 @@ scoreboard players set #abyssHit tmp 0
 execute unless score #abStack eng matches 0.. run scoreboard players set #abStack eng 0
 execute unless score #aqN eng matches 0.. run scoreboard players set #aqN eng 0
 scoreboard players set @a[tag=player] invDirty 2
-# 시점 시스템: 처음이면 켜 둠 / 카메라 위치 기본값(아바타 머리에서 오른쪽 0.9, 위 0.3, 뒤 3.3)
-execute unless score #on view matches 0..1 run scoreboard players set #on view 1
-# 시점 종류: 1 숄더뷰 · 2 F5 위쪽 시점(처음엔 2)
+# 시점 시스템: F5 위쪽 시점 하나(1인칭 · 숄더뷰는 11-10 에 없앰; 개발자 모드만 아바타 없이 view/fps_tick). #on view 1 · #vmode view 2 는
+# 고정값으로 남긴다(읽는 곳: 생성된 mboss/guardian/p/pull/scr_end). 1인칭(#on 0) · 숄더뷰(#vmode 1)로 저장된 월드도 여기서 F5 가 되고,
+# 아바타 · 받침은 다음 틱의 view/fresh → view/tick 이 새로 만든다
+scoreboard players set #on view 1
 scoreboard players set #vmode view 2
+# 서버 시작·/reload 뒤 첫 틱에 시점 엔티티를 새로 만든다(view/fresh)
+scoreboard players set #vFresh view 1
 # F5 위쪽 시점: 카메라 거리(칸) · 받침 크기(1 = 머리 위 약 1칸, 0.5 = 0.5칸, 1.5 = 1.5칸)
 execute unless data storage rlk:view ride run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
 # 카메라 거리·높이 기본을 한 칸씩 당긴 판(ridev 2): 한 번만 '보통'으로 맞춤
@@ -1150,14 +1240,13 @@ execute unless data storage rlk:view {ridev:2} run data modify storage rlk:lobby
 execute unless data storage rlk:view {ridev:2} run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
 data modify storage rlk:view ridev set value 2
 execute unless score #avId view matches 0.. run scoreboard players set #avId view 0
-execute unless data storage rlk:view cam run data modify storage rlk:view cam set value {right:0.9d,up:0.3d,back:3.3d}
-function rlk:view/cam_calc
-# 카메라 따라오기: 보간 1틱, 회전 예측 없음(기본)
-# 기본값이 바뀌었으면(판 번호 optv) 새 기본값으로: 보간 2틱, 회전 예측 없음
-execute unless data storage rlk:view {optv:2} run data modify storage rlk:view opt set value {smooth:2,lead:0}
-data modify storage rlk:view optv set value 2
+# 없앤 숄더뷰 카메라의 저장값(위치 · 따라오기 · 작업 칸)
+data remove storage rlk:view cam
+data remove storage rlk:view opt
+data remove storage rlk:view optv
+data remove storage rlk:view st
+data remove storage rlk:view pr
 execute unless score #spr view matches 0..1 run scoreboard players set #spr view 0
-function rlk:view/tune_apply
 function rlk:view/rays
 team add rlk_cam
 team modify rlk_cam seeFriendlyInvisibles false
@@ -1166,9 +1255,14 @@ team add rlk_stun
 team modify rlk_stun seeFriendlyInvisibles false
 kill @e[tag=rlk_view]
 function rlk:items/register
+function rlk:engravings/byeng_build
+# 아이템 너프 · 강화 배율(상수 기준값 잡기 + 강화 단계 반영 + 설명 숫자)
+function rlk:items/tune/register
 function rlk:char/reg_items
 # 아이템 선택 공간(검은 방)이 있는 청크는 항상 불러와 둔다
 execute in minecraft:overworld run forceload add 104 4
+# 중간보스 원형 경기장(중심 200 201 8, 청크 9개)도 항상 불러와 둔다: 몸체 소환 · 정리가 같은 틱에 되어야 함
+execute in minecraft:overworld run forceload add 176 -16 223 31
 execute unless data storage rlk:lvpick choices run data modify storage rlk:lvpick choices set value []
 kill @e[tag=rlk_pk]
 scoreboard players set @a[scores={pkMode=1..}] pkRedraw 2
@@ -1178,6 +1272,7 @@ scoreboard players add #iver tmp 1
 execute store result storage rlk:items ver int 1 run scoreboard players get #iver tmp
 function rlk:shop/register
 function rlk:room/data
+function rlk:room/node/register
 execute unless score #active room matches 0.. run scoreboard players set #active room 0
 execute unless score #combat room matches 0.. run scoreboard players set #combat room 0
 execute unless score #setup room matches 0.. run scoreboard players set #setup room 0
@@ -1189,6 +1284,10 @@ execute unless data storage rlk:room {area:"s0"} run data modify storage rlk:roo
 # 접속 중인 플레이어 초기화
 execute as @a[tag=player] unless score @s init matches 1 run function rlk:player/init
 execute as @a[tag=player] unless score @s level matches 1.. run function rlk:player/init
+# 전투 개편 C 전에 저장된 플레이어: 패링 · 닷지 시각 도장(대쉬 충전은 없어짐)
+execute as @a[tag=player] unless score @s parHit matches -2147483648.. run function rlk:player/def/reset
+# 이미 초기화된 플레이어(업데이트 전 월드)도 보유 칸 수가 있게
+execute as @a[tag=player] unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 리로드 시 재생성: 클릭 감지 인터랙션 / 체력바 / 몹 실드
 kill @e[type=minecraft:interaction,tag=atkBlock]
@@ -1212,7 +1311,7 @@ kill @e[tag=rlk_dbtn]
 kill @e[tag=rlk_dlbl]
 data modify storage rlk:ditems records set value {}
 
-tellraw @a {"text":"[로그라이크] 시스템 로드 완료","color":"green"}
+tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 11-12b 2차 테스트 반영","color":"gray"}]
 # 리로드 시 전원 강제 재스캔(새 objective/아이템 플래그 즉시 반영)
 execute as @a[tag=player] if score @s init matches 1 run function rlk:items/equip_scan
 scoreboard players set @a[tag=player] invDirty 2
@@ -1224,6 +1323,11 @@ forceload add 1000000 1000000
 team add rlk_nfshade
 team modify rlk_nfshade color dark_green
 team modify rlk_nfshade collisionRule never
+# 퍼펙트 닷지의 잔상(빛나는 테두리 색, player/def/fx/pd_ghost; round V: 붉은 2페이즈 꽃밭에서도 보이게 흰색)
+team add rlk_cbred
+team modify rlk_cbred color white
+team modify rlk_cbred collisionRule never
+team modify rlk_cbred seeFriendlyInvisibles false
 # ===== 1챕터 커스텀 몹(cm) =====
 scoreboard players set #15 tmp 15
 scoreboard players set #6 tmp 6
@@ -1271,6 +1375,8 @@ scoreboard players set #3 tmp 3
 scoreboard players set #35 tmp 35
 team add rlk_cmx
 team modify rlk_cmx collisionRule never
+function rlk:cm/c2/load
+function rlk:cm/c3/load
 
 # 지도 클릭 화면 (2026-10-10)
 scoreboard objectives add vMapL dummy
@@ -1305,5 +1411,17 @@ kill @e[tag=rlk_melee_origin]
 
 function rlk:char/motion/install
 
+# 리소스팩 보스바(tools/build_bossbar.py)
+function rlk:bossui/init
 # Narukami encounter and rig, rebuilt without refilling an existing boss.
 function rlk:boss/raiden/init
+# 중간보스 틀(tools/build_mboss_core.py): 점수 · 보스바 · 레지스트리 · 경기장 확인, 진행 중 전투는 체력 유지
+function rlk:mboss/init
+# rift (build_rift.py)
+function rlk:room/rift/init
+# 균형치 · 그로기(tools/build_balance.py): 점수 · 조절값 · 마름모 줄 표
+function rlk:bal/load
+# 화면 위 미니맵(tools/build_minimap.py)
+function rlk:minimap/init
+# 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)
+function rlk:fx/nv/init

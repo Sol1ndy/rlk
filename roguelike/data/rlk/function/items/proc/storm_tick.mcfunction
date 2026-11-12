@@ -4,7 +4,7 @@ particle minecraft:cloud ~ ~1.5 ~ 1.2 1.2 1.2 0.05 6
 particle minecraft:dust{color:[0.44f,0.89f,0.76f],scale:1.5f} ~ ~1.5 ~ 2 1.4 2 0 12
 execute as @e[tag=rlk_mob,tag=!boss,distance=0.9..6] at @s facing entity @e[tag=rlk_storm,limit=1,sort=nearest] feet rotated ~ 0 if block ^ ^ ^0.7 #rlk:view_pass if block ^ ^1 ^0.7 #rlk:view_pass run tp @s ^ ^ ^0.35
 scoreboard players operation #t1 itv = @s life
-scoreboard players operation #t1 itv %= #st8 tmp
+scoreboard players operation #t1 itv %= #stormInt tmp
 execute if score #t1 itv matches 0 if entity @e[tag=rlk_mob,distance=..5,limit=1] run function rlk:items/proc/storm_hit
 execute if score @s life matches ..0 as @a[tag=player,limit=1] run function rlk:items/proc/storm_end
 execute if score @s life matches ..0 run kill @s

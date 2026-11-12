@@ -1,0 +1,10 @@
+# Pose "strike" over $(d) ticks (macro {d:N}).
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_leg_l,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.4f,0f,0f,0.02f,0f,1.15f,0f,0f,0f,0f,0.4f,-0.2f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_leg_r,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.4f,0f,0f,-0.42f,0f,1.15f,0f,0f,0f,0f,0.4f,-0.2f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_torso,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.9f,0f,0f,-0.45f,0f,0.9132f,0.1378f,1.0811f,0f,-0.2619f,0.4806f,-0.2403f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_head,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.62f,0f,0f,-0.31f,0f,0.596f,0.1709f,1.9778f,0f,-0.1709f,0.596f,-0.5598f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_eye,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.44f,0f,0f,-0.22f,0f,0.0769f,0.0055f,2.4947f,0f,-0.0221f,0.0192f,-0.0631f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_arm_l,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.313f,-0.2183f,0f,0.6718f,0.0538f,0.8309f,0.1881f,1.0152f,-0.0391f,-0.6037f,0.2589f,0.2595f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_arm_r,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.32f,0f,0f,-0.77f,0f,0.2183f,0.313f,1.5923f,0f,-1.0271f,0.0665f,0.7595f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_shaft,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.18f,0f,0f,-0.7f,0f,0.18f,0f,1.6733f,0f,0f,1.75f,0.4743f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_club,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.46f,0f,0f,-0.84f,0f,0.46f,0f,1.5333f,0f,0f,0.58f,2.0743f,0f,0f,0f,1f]}

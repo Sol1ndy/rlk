@@ -158,6 +158,7 @@ scoreboard players operation @s cmAX = #shX tmp
 scoreboard players operation @s cmAZ = #shZ tmp
 execute if score @s cmAH matches 1 as @e[tag=rlk_sh_this,tag=rlk_sh_part,tag=!rlk_sh_broken] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}
 execute if score @s frzT matches 1.. run return run function rlk:cm/sh/rig/frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/sh/rig/frozen
 scoreboard players add @s cmAF 1
 execute if score @s cmAF matches 48.. run scoreboard players set @s cmAF 0
 scoreboard players operation #shFrame tmp = @s cmAF

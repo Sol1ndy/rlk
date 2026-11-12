@@ -23,17 +23,12 @@ fill -35 201 39 -30 204 39 minecraft:tuff
 fill -24 201 39 -24 210 39 minecraft:stripped_dark_oak_log
 fill -40 210 20 -21 210 39 minecraft:polished_deepslate
 fill -39 210 21 -22 210 38 minecraft:air
-fill -39 201 25 -37 201 25 minecraft:podzol
-fill -37 201 26 -37 201 34 minecraft:podzol
 fill -25 201 30 -24 201 31 minecraft:podzol
 fill -23 201 31 -22 201 32 minecraft:podzol
 fill -25 201 32 -25 201 34 minecraft:podzol
 fill -22 201 33 -22 201 33 minecraft:podzol
-fill -39 201 34 -38 201 35 minecraft:podzol
 fill -31 201 35 -26 201 35 minecraft:podzol
 fill -31 201 36 -30 201 36 minecraft:podzol
-fill -39 201 26 -38 201 33 minecraft:dirt
-fill -39 202 26 -38 202 33 minecraft:podzol
 fill -24 201 32 -24 201 38 minecraft:dirt
 fill -24 202 32 -24 202 38 minecraft:podzol
 fill -23 201 33 -23 201 38 minecraft:dirt

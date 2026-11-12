@@ -23,21 +23,15 @@ fill -6 210 -21 -5 210 -21 minecraft:birch_leaves[persistent=true]
 fill -20 210 -40 -1 210 -21 minecraft:polished_deepslate
 fill -19 210 -39 -2 210 -22 minecraft:air
 fill -7 201 -39 -7 201 -35 minecraft:podzol
-fill -19 201 -35 -17 201 -35 minecraft:podzol
 fill -6 201 -35 -6 201 -35 minecraft:podzol
-fill -17 201 -34 -16 201 -27 minecraft:podzol
 fill -5 201 -34 -5 201 -33 minecraft:podzol
 fill -4 201 -33 -2 201 -33 minecraft:podzol
-fill -19 201 -26 -17 201 -26 minecraft:podzol
-fill -19 201 -25 -18 201 -25 minecraft:podzol
 fill -6 201 -39 -5 201 -39 minecraft:dirt
 fill -6 202 -39 -5 202 -39 minecraft:podzol
 fill -6 201 -38 -6 201 -36 minecraft:dirt
 fill -6 202 -38 -6 202 -36 minecraft:podzol
 fill -5 201 -35 -5 201 -35 minecraft:dirt
 fill -5 202 -35 -5 202 -35 minecraft:podzol
-fill -19 201 -34 -18 201 -27 minecraft:dirt
-fill -19 202 -34 -18 202 -27 minecraft:podzol
 fill -4 201 -34 -2 201 -34 minecraft:dirt
 fill -4 202 -34 -2 202 -34 minecraft:podzol
 fill -4 201 -39 -2 202 -35 minecraft:dirt
@@ -75,7 +69,7 @@ execute positioned -5 201 -25 run function rlk:room/prop/fo_flower
 execute positioned -14 201 -23 run function rlk:room/prop/fo_flower
 execute positioned -8 201 -22 run function rlk:room/prop/fo_flower
 execute positioned -15 201 -25 run function rlk:room/prop/p_grass
-execute positioned -17 202 -30 run function rlk:room/prop/fo_flower
+execute positioned -17 201 -30 run function rlk:room/prop/fo_flower
 setblock -11 209 -37 minecraft:short_grass keep
 setblock -10 209 -36 minecraft:birch_leaves[persistent=true] keep
 setblock -7 209 -23 minecraft:birch_leaves[persistent=true] keep

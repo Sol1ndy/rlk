@@ -1,0 +1,1 @@
+execute unless score @s knRigWl matches 2 run data merge entity 524c4b4d-4b4e-4100-8000-00000000000b {start_interpolation:0,interpolation_duration:8,transformation:{translation:[1.02444f,1.37341f,0.42377f],left_rotation:[-0.26513f,-0.1851f,0.4029f,0.85622f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}

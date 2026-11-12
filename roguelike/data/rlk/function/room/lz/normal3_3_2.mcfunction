@@ -117,10 +117,6 @@ fill 37 201 30 38 201 30 minecraft:podzol
 fill 28 201 31 32 201 31 minecraft:podzol
 fill 34 201 31 37 201 31 minecraft:podzol
 fill 43 201 31 45 201 31 minecraft:podzol
-fill 28 201 34 58 201 35 minecraft:podzol
-fill 26 201 35 27 201 35 minecraft:podzol
-fill 26 201 36 26 201 38 minecraft:podzol
-fill 25 201 37 25 201 38 minecraft:podzol
 fill 21 201 1 25 201 2 minecraft:dirt
 fill 21 202 1 25 202 2 minecraft:podzol
 fill 49 201 8 51 201 9 minecraft:dirt
@@ -189,10 +185,6 @@ fill 28 201 30 32 201 30 minecraft:dirt
 fill 28 202 30 32 202 30 minecraft:podzol
 fill 35 201 30 36 201 30 minecraft:dirt
 fill 35 202 30 36 202 30 minecraft:podzol
-fill 27 201 36 58 201 36 minecraft:dirt
-fill 27 202 36 58 202 36 minecraft:podzol
-fill 27 201 37 27 201 38 minecraft:dirt
-fill 27 202 37 27 202 38 minecraft:podzol
 fill 43 201 10 43 201 10 minecraft:mossy_cobblestone
 fill 43 202 10 43 202 10 minecraft:podzol
 fill 37 201 14 37 201 14 minecraft:mossy_cobblestone
@@ -213,8 +205,6 @@ fill 26 201 17 26 202 17 minecraft:dirt
 fill 26 203 17 26 203 17 minecraft:podzol
 fill 24 201 18 25 202 18 minecraft:dirt
 fill 24 203 18 25 203 18 minecraft:podzol
-fill 28 201 37 58 202 38 minecraft:dirt
-fill 28 203 37 58 203 38 minecraft:podzol
 fill 32 201 10 32 202 13 minecraft:mossy_cobblestone
 fill 32 203 10 32 203 13 minecraft:podzol
 fill 36 201 12 38 202 13 minecraft:mossy_cobblestone
@@ -266,7 +256,7 @@ execute positioned 32 201 18 run function rlk:room/prop/f_grass
 execute positioned 44 201 14 run function rlk:room/prop/f_grass
 execute positioned 38 201 4 run function rlk:room/prop/f_petal
 execute positioned 50 201 32 run function rlk:room/prop/f_moss
-execute positioned 35 203 36 run function rlk:room/prop/f_moss
+execute positioned 35 201 36 run function rlk:room/prop/f_moss
 execute positioned 56 201 8 run function rlk:room/prop/f_grass
 execute positioned 55 201 3 run function rlk:room/prop/f_grass
 execute positioned 21 201 24 run function rlk:room/prop/f_flower
@@ -282,4 +272,4 @@ execute positioned 31 201 25 run function rlk:room/prop/f_grass
 execute positioned 56 201 27 run function rlk:room/prop/f_flower
 execute positioned 34 201 32 run function rlk:room/prop/f_petal
 execute positioned 40 202 27 run function rlk:room/prop/f_grass
-execute positioned 32 203 36 run function rlk:room/prop/f_petal
+execute positioned 32 201 36 run function rlk:room/prop/f_petal

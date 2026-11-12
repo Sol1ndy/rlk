@@ -30,6 +30,9 @@ execute unless entity @s[tag=rlk_body] if entity @e[tag=rlk_av,limit=1] run func
 execute if score #shopHandled tmp matches 0 if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"skill"}}] at @e[tag=rlk_body,limit=1] run return run function rlk:char/cast_skill_l
 execute if score #shopHandled tmp matches 0 if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"burst"}}] at @e[tag=rlk_body,limit=1] run return run function rlk:char/cast_burst
 
+# 1인칭: 이 클릭보다 먼저 들어온 점프(평타 사이 간격, 통계 swJump)는 클릭 전에 반영해 이번 평타를 1타로(player/swing/jump).
+# 휘두르는 중(swHold)에 들어온 점프는 지연으로 새어 나온 것이라 player/swing/tick 이 버린다.
+execute if score @s swJump matches 1.. unless score @s swHold matches 1 if entity @s[tag=rlk_body] run function rlk:player/swing/jump
 # 공격 가능: 개발자 모드이거나, 기본공격 아이템(핫바 0번)을 들고 있을 때만
 execute if score #charN tmp matches 3 if score @s skDash matches 1.. run return 0
 scoreboard players set #canAtk tmp 0
@@ -37,10 +40,7 @@ execute if score @s devMode matches 1 run scoreboard players set #canAtk tmp 1
 execute if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"attack"}}] run scoreboard players set #canAtk tmp 1
 
 # 구매/리롤이 처리된 클릭은 일반 공격으로 이어지지 않음
-# 활: 조준 중이면 발사
-execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 if score #wType tmp matches 2 if score @s bowT matches 1.. at @e[tag=rlk_body,limit=1] run return run function rlk:char/bow/release
-execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 unless score @s atkCD matches 1.. unless score #wType tmp matches 2.. unless score #clShoot tmp matches 1 at @e[tag=rlk_body,limit=1] run function rlk:combat/find
+execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 unless score @s atkCD matches 1.. if score #wType tmp matches 1 unless score #clShoot tmp matches 1 at @e[tag=rlk_body,limit=1] run function rlk:combat/find
 # 법구(로노바): 구체 발사
 execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 unless score @s atkCD matches 1.. if score #wType tmp matches 3 at @e[tag=rlk_body,limit=1] run function rlk:char/ronova/na
 execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 if score #clShoot tmp matches 1 at @e[tag=rlk_body,limit=1] run function rlk:char/clorinde/auto_toggle
-execute if score #canAtk tmp matches 1 unless score #shopHandled tmp matches 1 unless score @s atkCD matches 1.. if score #wType tmp matches 2 at @e[tag=rlk_body,limit=1] run function rlk:char/bow/na

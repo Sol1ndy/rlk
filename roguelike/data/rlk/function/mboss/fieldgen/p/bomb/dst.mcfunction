@@ -1,0 +1,18 @@
+# @s = body, at it: the finisher destination D at most 6 b from the body toward the re-lock F
+# (rlk_mb_fg_p1f): 0.5 b steps toward F while it is farther than 0.5 b, the rest of the way when closer; then inside r 16.5.
+kill @e[type=minecraft:marker,tag=rlk_mb_fg_p1d]
+summon minecraft:marker ~ 201 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p1","rlk_mb_fg_p1d"]}
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=0.5..,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.5
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] at @s if entity @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,distance=..0.5,limit=1] run tp @s @e[type=minecraft:marker,tag=rlk_mb_fg_p1f,limit=1]
+execute as @e[type=minecraft:marker,tag=rlk_mb_fg_p1d,limit=1] run function rlk:mboss/fieldgen/u/clamp_b

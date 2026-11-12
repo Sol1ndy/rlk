@@ -1,17 +1,23 @@
 execute if score @s rdCam matches 1 run scoreboard players set @s dashMoveT 0
 execute if score @s rdCam matches 1 run scoreboard players set @s stepT 0
+# round W (통합): 연출 잠금이 플레이어를 잡은 동안(mboss/cam/hold, 태그 rlk_mb_camh) 날아가던 닷지는 끝난다 — 숨은 아바타가 더 움직이지
+# 않고, 웅크림 · 옆돌기의 대역 리그도 거둔다(player/dodge/cut)
+execute if entity @s[tag=rlk_mb_camh] run function rlk:player/dodge/cut
 # 플레이어별 매 틱 처리 (@s = 플레이어)
 
 # 아직 초기화되지 않았으면 초기화
 execute unless score @s init matches 1 run function rlk:player/init
 # 이전 버전에서 넘어온 플레이어(레벨 없음)는 다시 초기화
 execute unless score @s level matches 1.. run function rlk:player/init
+execute unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 상시 야간투시: 입자 없이 무한 유지. 사망/효과 해제 뒤에도 자동 복구.
 execute unless data entity @s active_effects[{id:"minecraft:night_vision",duration:-1}] run effect give @s minecraft:night_vision infinite 0 true
 
 # 이름이 바뀐 아이템(페보니우스 활 → 비전) 교체
 execute if items entity @s container.* *[minecraft:custom_data~{rlk:{id:"favonius_bow"}}] run function rlk:items/migrate_p
+# 없앤 캐릭터(요이미야, 11-10)로 저장된 플레이어: 한 번 루미네로 다시 고름(char/migrate_yoi)
+execute if data storage rlk:mig {yoi:1b} run function rlk:char/migrate_yoi
 # ===== 인벤 변화 감지(dirty): 인벤 정렬·장비 스캔은 변화 시에만 =====
 # 프로브: rlk 아이템 총 개수. 변하면 dirty (클릭→커서 이동도 개수 변화로 감지됨)
 execute store result score #ic tmp if items entity @s inventory.* *[minecraft:custom_data~{rlk:{}}]
@@ -19,8 +25,11 @@ execute store result score #ic2 tmp if items entity @s hotbar.* *[minecraft:cust
 scoreboard players operation #ic tmp += #ic2 tmp
 execute unless score #ic tmp = @s invCnt run scoreboard players set @s invDirty 2
 scoreboard players operation @s invCnt = #ic tmp
-# 발전과제 이벤트(inventory_changed) → dirty
-execute if score @s invEvt matches 1.. run scoreboard players set @s invDirty 2
+# 발전과제 이벤트(inventory_changed) → dirty. 단 F(양손 바꾸기)로 무기 · 스킬 · 폭발(UI) 아이템이 왼손에 와 있으면 그 이벤트는
+# 이 틱 hotbar/tick 이 되돌리는 UI 이동이라 정렬할 것이 없다(같은 틱에 rlk 아이템 수가 바뀌었으면 위의 프로브가 잡음). 지도(vMap)
+# 중에는 hotbar/tick 이 왼손을 비우지 않으므로 그대로 dirty
+execute if score @s invEvt matches 1.. unless items entity @s weapon.offhand *[minecraft:custom_data~{rlk_ui:{}}] run scoreboard players set @s invDirty 2
+execute if score @s invEvt matches 1.. if score @s vMap matches 1 run scoreboard players set @s invDirty 2
 # 폴백: 10초마다 강제 1회
 scoreboard players remove @s manageTick 1
 execute if score @s manageTick matches ..0 run scoreboard players set @s invDirty 2
@@ -43,17 +52,20 @@ execute at @s run function rlk:player/hotbar/tick
 
 # 공격 쿨다운 / 콤보 유지시간
 execute if score @s uiCd matches 1.. run scoreboard players remove @s uiCd 1
+# #pmChainOpen 1 = atkCD was already 0 before this tick's decrement, so a click this tick was accepted (it arrives
+# before the tick functions). Navia's normal-attack tails end on movement only from then on, never one tick before
+# the earliest chained click (char/motion/events/navia/physical_1..4).
+execute store result score #pmChainOpen tmp unless score @s atkCD matches 1..
 execute if score @s atkCD matches 1.. run scoreboard players remove @s atkCD 1
 scoreboard players add @s cboIdle 1
 execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0
 execute if score @s cboIdle matches 20.. run scoreboard players set @s comboStep 0
 
-# 대쉬: 자체 쿨 / 충전 / 무적 / 이동
-execute if score @s dashCool matches 1.. run scoreboard players remove @s dashCool 1
-execute if score @s dashCharge < #dashMax tmp run function rlk:player/dash_regen
+# 닷지: 재사용 대기(박자가 세계를 멈춘 틱 #btHold cb 에는 흐르지 않는다: 적의 시계와 같이 감) / 이동. 무적(dashInvT)은 닷지가 아닌 것(원소폭발 시전 · 로노바 부활 · 추락 뒤)만 쓴다
+execute if score @s dashCool matches 1.. unless score #btHold cb matches 1 run scoreboard players remove @s dashCool 1
 execute if score @s dashInvT matches 1.. run scoreboard players remove @s dashInvT 1
 execute if score @s dashMoveT matches 1.. at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_move_tick
-# 살짝 전진(찌르기 등). 대쉬가 시작되면 멈춘다
+# 살짝 전진(찌르기 등). 닷지가 시작되면 멈춘다
 execute if score @s dashMoveT matches 1.. run scoreboard players set @s stepT 0
 execute if score @s stepT matches 1.. at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/step_move_tick
 
@@ -70,7 +82,7 @@ function rlk:char/tick
 function rlk:player/bol/tick
 # 원소(부여 시간·방어막·부착/반응)
 function rlk:player/elem_tick
-# 액션바 HUD (대쉬 충전 게이지, 항상 표시)
+# 액션바 HUD (HP · 원소 에너지 · 골드, 항상 표시)
 function rlk:player/hud/tick
 
 # 아이템 틱(타이머/변신/사이드바)

@@ -1,0 +1,1805 @@
+{
+ "generator": "tools/build_mboss_tk_fx.py",
+ "api": "tools/mboss_tachy/api.py §8; scratchpad tk/contract.md §3.3",
+ "functions": "rlk:boss/tachy/fx/",
+ "item_models": "rlk:mboss/tk_kit/",
+ "font": "rlk:mboss_tk",
+ "font_range": [
+  "U+EA00",
+  "U+EAFF"
+ ],
+ "storage": "rlk:tk fx.*",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/boss/tachy/fx/e",
+   "data/rlk/function/boss/tachy/fx/p",
+   "data/rlk/function/boss/tachy/fx/tele",
+   "data/rlk/function/boss/tachy/fx/snd",
+   "data/rlk/function/boss/tachy/fx/hud",
+   "data/rlk/function/boss/tachy/fx/prop",
+   "data/rlk/function/boss/tachy/fx/test"
+  ],
+  "files": [
+   "data/rlk/function/boss/tachy/fx/card.mcfunction",
+   "data/rlk/function/boss/tachy/fx/cardx.mcfunction",
+   "data/rlk/function/boss/tachy/fx/look.mcfunction",
+   "data/rlk/function/boss/tachy/fx/clear.mcfunction",
+   "data/rlk/function/boss/tachy/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/tk_kit",
+   "assets/rlk/models/item/mboss/tk_kit",
+   "assets/rlk/items/mboss/tk_kit",
+   "assets/rlk/font/mboss_tk.json",
+   "assets/rlk/textures/font/mboss_tk"
+  ]
+ },
+ "caps": {
+  "fx": 64,
+  "ambient_soft": 40,
+  "cocoon": "replaced per call (3 cards)"
+ },
+ "objectives": [
+  "tkFx",
+  "tkFxS",
+  "tkFxG",
+  "tkFxH",
+  "tkFxK",
+  "tkFxD"
+ ],
+ "fake_players": "#n, #cn, #now, #wd, #c2, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #el, #p, #c, #demo, #dt (objective tkFx)",
+ "tags": [
+  "rlk_tk_fx",
+  "rlk_tk_fx_c",
+  "rlk_tk_fx_coc",
+  "rlk_tk_fx_new",
+  "rlk_tk_fx_go",
+  "rlk_tk_fx_sh",
+  "rlk_tk_fx_fd",
+  "rlk_tk_fx_hit",
+  "rlk_tk_fx_demo"
+ ],
+ "kinds": {
+  "arc_0": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/arc_0",
+   "source": "own",
+   "desc": "slash-arc sweep frame 0 (flame band on r 0.8, head at 34 % of the sweep)"
+  },
+  "arc_1": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/arc_1",
+   "source": "own",
+   "desc": "slash-arc sweep frame 1 (flame band on r 0.8, head at 60 % of the sweep)"
+  },
+  "arc_2": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/arc_2",
+   "source": "own",
+   "desc": "slash-arc sweep frame 2 (flame band on r 0.8, head at 84 % of the sweep)"
+  },
+  "arc_3": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/arc_3",
+   "source": "own",
+   "desc": "slash-arc sweep frame 3 (flame band on r 0.8, head at 100 % of the sweep)"
+  },
+  "arc_e": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/arc_e",
+   "source": "own",
+   "desc": "Electro crackle filaments along the slash arc"
+  },
+  "crescent_h": {
+   "plane": "face",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/crescent_h",
+   "source": "own",
+   "desc": "W1 ground crescent (one standing quad facing its flight)"
+  },
+  "crescent_v": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/crescent_v",
+   "source": "own",
+   "desc": "W2 upright air crescent (one quad facing its flight)"
+  },
+  "spin_ring": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/spin_ring",
+   "source": "own",
+   "desc": "C1 spin fire ring (unit radius)"
+  },
+  "shock_ring": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/shock_ring",
+   "source": "own",
+   "desc": "L / nova golden shock ring (unit radius)"
+  },
+  "bolt_0": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/bolt_0",
+   "source": "own",
+   "desc": "golden lightning bolt, strike at b 0, 1 b tall"
+  },
+  "bolt_1": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/bolt_1",
+   "source": "own",
+   "desc": "golden lightning bolt (variant)"
+  },
+  "sky_arc_0": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_0",
+   "source": "own",
+   "desc": "thin golden arc hanging from b 0 down to b -1 (variant 0)"
+  },
+  "sky_arc_1": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_1",
+   "source": "own",
+   "desc": "thin golden arc hanging from b 0 down to b -1 (variant 1)"
+  },
+  "sky_arc_2": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_2",
+   "source": "own",
+   "desc": "thin golden arc hanging from b 0 down to b -1 (variant 2)"
+  },
+  "sky_arc_3": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_3",
+   "source": "own",
+   "desc": "thin golden arc hanging from b 0 down to b -1 (variant 3)"
+  },
+  "glint_star": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/glint_star",
+   "source": "own",
+   "desc": "the blade glint: gold 4-point star with a ring"
+  },
+  "core_flare": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/core_flare",
+   "source": "own",
+   "desc": "chest core / visor flare burst (tinted)"
+  },
+  "cocoon": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/cocoon",
+   "source": "own",
+   "desc": "the overload mantle: wings wrapped into a cocoon"
+  },
+  "cocoon_crack": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/cocoon_crack",
+   "source": "own",
+   "desc": "cracks of light over the cocoon"
+  },
+  "feather": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/feather",
+   "source": "own",
+   "desc": "black metallic blade-feather, gold edge"
+  },
+  "feather_glow": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/feather_glow",
+   "source": "own",
+   "desc": "glowing gold-white feather (mantle feathers)"
+  },
+  "ember": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/ember",
+   "source": "own",
+   "desc": "glowing ember fleck (tinted)"
+  },
+  "ash": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/ash",
+   "source": "own",
+   "desc": "grey-black ash flake with a dim ember edge"
+  },
+  "flame": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/flame",
+   "source": "own",
+   "desc": "flame tongue, root at b 0 (tinted)"
+  },
+  "tear": {
+   "plane": "face",
+   "px": [
+    64,
+    96
+   ],
+   "extent": [
+    -0.3333,
+    0.3333,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/tear",
+   "source": "own",
+   "desc": "arrival tear fallback (void lens, pale rim)"
+  },
+  "gate_icon": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/gate_icon",
+   "source": "own",
+   "desc": "gate label icon: the long sword behind the visor skull"
+  },
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/glow",
+   "source": "fg kit (referenced)",
+   "desc": "soft white glow disc (tint it) (fg kit sprite)"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/mote",
+   "source": "fg kit (referenced)",
+   "desc": "soft mote (tint it) (fg kit sprite)"
+  },
+  "streak": {
+   "plane": "face",
+   "px": [
+    256,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0625,
+    0.0625
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/streak",
+   "source": "fg kit (referenced)",
+   "desc": "long thin streak along a (tint it) (fg kit sprite)"
+  },
+  "spark": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/spark",
+   "source": "fg kit (referenced)",
+   "desc": "gold spark star (fg kit sprite)"
+  },
+  "dust": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/dust",
+   "source": "fg kit (referenced)",
+   "desc": "tan dust puff (fg kit sprite)"
+  },
+  "chunk": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/chunk",
+   "source": "fg kit (referenced)",
+   "desc": "floor chunk / rock with an orange crack (fg kit sprite)"
+  },
+  "rift_void": {
+   "plane": "face",
+   "px": [
+    64,
+    96
+   ],
+   "extent": [
+    -0.3333,
+    0.3333,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/tk_kit/tear",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/void, fallback tear)"
+  },
+  "rift_rim": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/glow",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/rim, fallback glow)"
+  },
+  "rift_arc0": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_0",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/arc_0, fallback sky_arc_0)"
+  },
+  "rift_arc1": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_1",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/arc_1, fallback sky_arc_1)"
+  },
+  "rift_arc2": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_2",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/arc_2, fallback sky_arc_2)"
+  },
+  "rift_arc3": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -1.0,
+    0.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/tk_kit/sky_arc_3",
+   "source": "rift (S1 model or fallback)",
+   "desc": "arrival tear part (S1 rift/arc_3, fallback sky_arc_3)"
+  }
+ },
+ "fg_references": {
+  "glow": "rlk:mboss/fg_kit/glow",
+  "mote": "rlk:mboss/fg_kit/mote",
+  "streak": "rlk:mboss/fg_kit/streak",
+  "spark": "rlk:mboss/fg_kit/spark",
+  "dust": "rlk:mboss/fg_kit/dust",
+  "chunk": "rlk:mboss/fg_kit/chunk"
+ },
+ "rift_models": {
+  "rift_void": "rlk:item/rift/void",
+  "rift_rim": "rlk:item/rift/rim",
+  "rift_arc0": "rlk:item/rift/arc_0",
+  "rift_arc1": "rlk:item/rift/arc_1",
+  "rift_arc2": "rlk:item/rift/arc_2",
+  "rift_arc3": "rlk:item/rift/arc_3"
+ },
+ "atlas_px_new": 141312,
+ "atlas_budget": 180000,
+ "presets": {
+  "slash_arc": {
+   "args": [
+    "r",
+    "yaw",
+    "pitch",
+    "roll",
+    "el"
+   ],
+   "doc": "A slash arc of reach {r} (tenths) about the executor (the chest pivot, S3: at the body + 1.2, rotated as the body): {yaw} / {pitch} offsets of the aim from the executor rotation, {roll} the blade plane about the aim (0 horizontal, +-35 diagonal, 90 vertical, 175 backhand: the sweep reversed). Four sweep frames (1 tick apart, the last one fading over 8 t), el 1 orange flame / el 3 white-gold with a crackle overlay; flame or spark particles at the arc's front.",
+   "cards": 5,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "thrust_trail": {
+   "args": [
+    "len",
+    "el"
+   ],
+   "doc": "The thrust streak along the aim over {len} (tenths) from the executor (S3: the body + 1.0, rotated as the body): two crossed ribbons, a glow at the end, element particles along it.",
+   "cards": 4,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dash_trail": {
+   "args": [
+    "len",
+    "el"
+   ],
+   "doc": "The fire trail of a dash along the aim over {len} (tenths) from the executor (S3: the body + 1.0): wide crossed ribbons at the feet, four flame tongues revealed in turn, sand kicked up, element particles.",
+   "cards": 8,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spin_ring": {
+   "args": [
+    "r",
+    "el"
+   ],
+   "doc": "The C1 spin: a full ring of fire of radius {r} (tenths) about the executor (S3: the body + 1.0), two counter-turning rings, embers thrown out; el 3 gold with sparks.",
+   "cards": 8,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "glint": {
+   "args": [],
+   "doc": "The gold glint on the blade before the thrust (C / K): a spinning 4-point star with a ring and a glow, 0.4 b right / 1.4 b ahead of the executor (S3: the body + 1.6, rotated as the body).",
+   "cards": 2,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "high_glint": {
+   "args": [],
+   "doc": "The L high hover glint (every 30 t): a big gold star at the executor (the hovering body, 13 b up) readable from the floor.",
+   "cards": 2,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "core_flare": {
+   "args": [
+    "c"
+   ],
+   "doc": "The chest core + visor flare tell (A1 / B3 / C3; G3 windows): c 1 amber, 2 red, 3 gold. At the chest (S3: the body + 1.5, rotated as the body): a pulsing burst on the chest plate and a smaller one on the visor, ~20 t.",
+   "cards": 4,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "core_burst": {
+   "args": [],
+   "doc": "G3 backfire: an orange-gold explosion at the chest (the executor): a big flare, a shock ring, embers and feathers thrown out, explosion particles.",
+   "cards": 14,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "sky_arcs": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "K: thin golden lightning arcs crawl down from 8 b above the executor (the locked floor point) within radius {r} (tenths) for {t} ticks: 6 arcs revealed over the time, each growing down from the top over 6 t; not a floor marking (nothing below 1 b).",
+   "cards": 7,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "bolt": {
+   "args": [],
+   "doc": "A golden lightning bolt from 12 b down onto the executor (the floor point: K plunge, L shock): two crossed bolts, a white-gold flash and a burst of sparks.",
+   "cards": 4,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "shock_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "L shock / K plunge: a golden electric shockwave of radius {r} (tenths) at 0.35 b above the executor (the floor point), a second ring 1 tick later, small bolts flashing up on the ring, sparks.",
+   "cards": 9,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "ember_burst": {
+   "args": [],
+   "doc": "An ember burst at the executor (T1 cape split, intro stance, death): 12 embers flung out and up, a warm glow, flame particles.",
+   "cards": 14,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blink_out": {
+   "args": [],
+   "doc": "K vanish at the executor (the body + 1.2): a gold spark burst, a short flash, black feathers scattering (no blue: the player's blink is blue-white).",
+   "cards": 14,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blink_in": {
+   "args": [],
+   "doc": "K reappear at the executor (the body + 1.2): gold sparks converge, a pop of light, feathers settle.",
+   "cards": 10,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wing_flare": {
+   "args": [],
+   "doc": "The wings flare gold (B1 open, T1 flare): glints running out along both wing spans behind the executor (the body + 1.4, rotated as the body), a broad gold glow behind her, gold dust.",
+   "cards": 9,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "cocoon": {
+   "args": [
+    "pct"
+   ],
+   "doc": "The overload mantle cocoon over the hovering body (the executor = the body + 1.2; centre 1.1 b above it): the wrapped-wing shell (vertical billboard, 2.2 x 3.2 b), a warm glow, and cracks of light by {pct} (> 75 none, 51-75 dim, 26-50 bright, <= 25 white-hot). Long-lived (the cocoon pool, never counted against the fx cap); every call replaces the previous cocoon; cocoon_crack / fx/clear remove it.",
+   "cards": 3,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "cocoon_crack": {
+   "args": [],
+   "doc": "The mantle breaks: the cocoon pool is removed, the shell shatters into black feathers and light (a flash, a crack card bursting out, embers). At the executor (the body + 1.2).",
+   "cards": 18,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "nova_swell": {
+   "args": [
+    "t"
+   ],
+   "doc": "The nova tell (mantle_nova swell, 40 t): a white-gold glow and flare swelling over {t} ticks at the executor (the body + 1.2), gold motes drawn in from 4 b, rising sparks.",
+   "cards": 10,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "nova_flash": {
+   "args": [],
+   "doc": "The nova hit: an arena-wide white-gold flash at the executor (the body + 1.2): a huge glow, two shock rings racing out to 24 b at the floor, a flash, sparks.",
+   "cards": 4,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "ignite_blade": {
+   "args": [],
+   "doc": "Intro E10: the edge ignites. Executor = the sword guard, the blade straight up along +y for 2.2 b: five flame tongues climbing it in turn (vertical billboards, 14 t), embers and flame particles.",
+   "cards": 9,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dust_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "Sand thrown up in a ring of radius {r} (tenths) about the executor (the floor point: landings, the intro drop, B3 bangs): eight dust puffs riding out to the radius, sand particles. Airborne (no floor card).",
+   "cards": 8,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "swap_fx": {
+   "args": [
+    "el"
+   ],
+   "doc": "G1 element swap at the executor (the body + 1.2, rotated as the body): to Pyro (el 1) flame tongues swirling up and embers, to Electro (el 3) gold arcs crackling around her and sparks; a glow in the new colour.",
+   "cards": 11,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "arrive_rift": {
+   "args": [],
+   "doc": "The arrival tear behind the player (PLAN §6.4): at the executor (the floor point 1.5 b behind the start, facing the arena) the dungeon rift's void, rim and four lightning arcs (S1's rlk:rift models when the pack has them, else the kit's fallback tear) shrink shut over 30 t, sparks and portal motes.",
+   "cards": 6,
+   "el_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "ambient_dust": {
+   "args": [],
+   "doc": "Arena ambience (the module, every ~10 t): sand motes falling through the warm haze and white ash around the executor (the arena centre), particles only; skipped while the fx cards are busy.",
+   "cards": 0,
+   "el_split": false,
+   "ambient": true,
+   "particles_only": true
+  },
+  "impact": {
+   "args": [
+    "el"
+   ],
+   "doc": "A blade hit landing (S3: on the floor ahead of the body, + 0.2): a burst of light, a flare, sparks and floor chunks flung out; el 1 flame and embers, el 3 small golden bolts and sparks.",
+   "cards": 14,
+   "el_split": true,
+   "ambient": false,
+   "particles_only": false
+  }
+ },
+ "props": {
+  "crescent_h_1": "W1 ground crescent, Pyro: a 7 b wide golden-orange flame bow, 1.65 b high, one standing quad facing its flight, centred on the display.",
+  "crescent_h_3": "W1 ground crescent, Electro: white-gold.",
+  "crescent_v_1": "W2 air crescent, Pyro: an upright flame crescent 2.6 b (one quad facing its flight).",
+  "crescent_v_3": "W2 air crescent, Electro: white-gold.",
+  "feather": "Mantle feather: a glowing gold-white blade-feather 1.6 b, vertical billboard."
+ },
+ "sounds": {
+  "hang_amb": {
+   "use": "E0 t0: the hanging cocoon nest.",
+   "layers": [
+    [
+     "ambient.basalt_deltas.mood",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "chain_step": {
+   "use": "E0 t10 / t22: the cables creak.",
+   "layers": [
+    [
+     "block.chain.step",
+     0.4,
+     1.0
+    ]
+   ]
+  },
+  "cable_snap": {
+   "use": "E1 t30 / 33 / 36: a cable snaps (the caller varies nothing; three calls).",
+   "layers": [
+    [
+     "block.chain.break",
+     0.9,
+     0.7
+    ],
+    [
+     "item.lead.break",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "body_land": {
+   "use": "E1 t42: she lands prone.",
+   "layers": [
+    [
+     "entity.iron_golem.damage",
+     0.6,
+     1.0
+    ],
+    [
+     "block.anvil.land",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "heartbeat": {
+   "use": "E2 t48 / t56: the ring lights pulse.",
+   "layers": [
+    [
+     "entity.warden.heartbeat",
+     0.7,
+     1.0
+    ]
+   ]
+  },
+  "servo": {
+   "use": "E3 t62: the push up.",
+   "layers": [
+    [
+     "block.piston.extend",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "armor": {
+   "use": "E3 t74: armour plates settle.",
+   "layers": [
+    [
+     "item.armor.equip_netherite",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "bulb": {
+   "use": "E4 t96: the armour lights.",
+   "layers": [
+    [
+     "block.copper_bulb.turn_on",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "cape_gust": {
+   "use": "E5 t108: the cape flares (the caller may stop it at 116: stopsound @a hostile item.elytra.flying).",
+   "layers": [
+    [
+     "item.elytra.flying",
+     0.5,
+     1.2
+    ]
+   ]
+  },
+  "hair": {
+   "use": "E6 t116: the hair sweep.",
+   "layers": [
+    [
+     "item.armor.equip_leather",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "visor_close": {
+   "use": "E7 t126: the helmet slides down over the face.",
+   "layers": [
+    [
+     "block.iron_trapdoor.close",
+     0.7,
+     0.7
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "skull_ignite": {
+   "use": "E8 t136: the visor skull lights.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.6,
+     1.4
+    ],
+    [
+     "entity.blaze.ambient",
+     0.4,
+     1.0
+    ]
+   ]
+  },
+  "sword_draw": {
+   "use": "E9 t142: the sword is drawn.",
+   "layers": [
+    [
+     "item.trident.return",
+     0.6,
+     0.8
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "blade_ignite": {
+   "use": "E10 t156: the edge ignites.",
+   "layers": [
+    [
+     "item.firecharge.use",
+     0.8,
+     1.0
+    ],
+    [
+     "block.fire.ambient",
+     0.6,
+     1.0
+    ],
+    [
+     "entity.blaze.shoot",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "stance": {
+   "use": "E11 t170: the combat stance.",
+   "layers": [
+    [
+     "entity.wither.ambient",
+     0.3,
+     1.6
+    ]
+   ]
+  },
+  "t1_split": {
+   "use": "T1 t10: the cape panels split.",
+   "layers": [
+    [
+     "item.armor.equip_elytra",
+     0.8,
+     0.8
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.5,
+     0.8
+    ]
+   ]
+  },
+  "t1_flare": {
+   "use": "T1 t50: the wings flare gold.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.7,
+     1.2
+    ],
+    [
+     "item.firecharge.use",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "t2_flare": {
+   "use": "T2 t20: the visor flares red.",
+   "layers": [
+    [
+     "entity.warden.sonic_charge",
+     0.6,
+     1.4
+    ],
+    [
+     "block.respawn_anchor.set_spawn",
+     0.6,
+     0.7
+    ]
+   ]
+  },
+  "t2_dark": {
+   "use": "T2 t50: the dark falls (blindness, the abyss look).",
+   "layers": [
+    [
+     "block.beacon.deactivate",
+     0.8,
+     0.5
+    ],
+    [
+     "block.respawn_anchor.deplete",
+     0.7,
+     0.6
+    ]
+   ]
+  },
+  "death_knee": {
+   "use": "Death t20: the knees buckle.",
+   "layers": [
+    [
+     "entity.iron_golem.damage",
+     0.6,
+     0.6
+    ],
+    [
+     "item.armor.equip_netherite",
+     0.5,
+     0.7
+    ]
+   ]
+  },
+  "death_ash": {
+   "use": "Death t116: she dissolves into ash.",
+   "layers": [
+    [
+     "block.sand.break",
+     0.7,
+     0.7
+    ],
+    [
+     "block.fire.extinguish",
+     0.5,
+     0.6
+    ],
+    [
+     "block.soul_sand.break",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "arrive_rift": {
+   "use": "Arrival: the tear closes behind the player.",
+   "layers": [
+    [
+     "block.end_portal_frame.fill",
+     0.6,
+     0.7
+    ],
+    [
+     "block.respawn_anchor.deplete",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "flare_tell": {
+   "use": "A1 / C3 t0: the chest + visor flare.",
+   "layers": [
+    [
+     "entity.ravager.roar",
+     0.4,
+     1.8
+    ],
+    [
+     "item.firecharge.use",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "dash": {
+   "use": "A1 / B3 / C thrust dashes.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.6,
+     0.6
+    ],
+    [
+     "item.trident.riptide_1",
+     0.6,
+     1.2
+    ]
+   ]
+  },
+  "slash_light": {
+   "use": "T1 slashes.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.7,
+     1.2
+    ],
+    [
+     "entity.blaze.shoot",
+     0.3,
+     1.6
+    ]
+   ]
+  },
+  "slash_heavy": {
+   "use": "T2 / T3 slashes.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.9,
+     0.8
+    ],
+    [
+     "item.firecharge.use",
+     0.5,
+     0.8
+    ],
+    [
+     "entity.generic.explode",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "spin": {
+   "use": "C1 h2: the spin.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.7
+    ],
+    [
+     "item.trident.riptide_2",
+     0.6,
+     1.0
+    ],
+    [
+     "block.fire.ambient",
+     0.6,
+     1.4
+    ]
+   ]
+  },
+  "chop": {
+   "use": "B3 bangs (\"펑\").",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.7,
+     1.2
+    ],
+    [
+     "block.anvil.land",
+     0.4,
+     1.2
+    ],
+    [
+     "entity.player.attack.crit",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "glint": {
+   "use": "C / K glint.",
+   "layers": [
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.6
+    ],
+    [
+     "item.trident.return",
+     0.6,
+     1.2
+    ]
+   ]
+  },
+  "thrust": {
+   "use": "C / K thrust.",
+   "layers": [
+    [
+     "item.trident.throw",
+     0.9,
+     0.7
+    ],
+    [
+     "entity.player.attack.knockback",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "blink_out": {
+   "use": "K vanish.",
+   "layers": [
+    [
+     "entity.enderman.teleport",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "blink_in": {
+   "use": "K reappear.",
+   "layers": [
+    [
+     "entity.enderman.teleport",
+     0.6,
+     0.9
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.6,
+     1.4
+    ]
+   ]
+  },
+  "leap": {
+   "use": "K / W2 / L leaps.",
+   "layers": [
+    [
+     "entity.breeze.jump",
+     0.7,
+     0.8
+    ],
+    [
+     "entity.phantom.flap",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "sky_arcs": {
+   "use": "K: the sky arcs crawl down.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     1.6
+    ],
+    [
+     "item.trident.thunder",
+     0.5,
+     1.6
+    ]
+   ]
+  },
+  "plunge": {
+   "use": "K plunge hit.",
+   "layers": [
+    [
+     "entity.lightning_bolt.impact",
+     1.0,
+     1.0
+    ],
+    [
+     "entity.generic.explode",
+     0.7,
+     0.9
+    ],
+    [
+     "block.anvil.land",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "charge_core": {
+   "use": "B3 t0: the core charge.",
+   "layers": [
+    [
+     "entity.warden.sonic_charge",
+     0.5,
+     1.3
+    ]
+   ]
+  },
+  "wave_release": {
+   "use": "W1 waves.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.9,
+     0.6
+    ],
+    [
+     "item.firecharge.use",
+     0.7,
+     0.7
+    ],
+    [
+     "entity.blaze.shoot",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "wave_hit": {
+   "use": "W1 / W2 crescent impact.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.5,
+     1.4
+    ]
+   ]
+  },
+  "air_swoop": {
+   "use": "W2 pull back.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.7,
+     1.0
+    ]
+   ]
+  },
+  "dive": {
+   "use": "W2 / L dive.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.8,
+     0.7
+    ],
+    [
+     "item.trident.riptide_3",
+     0.6,
+     0.9
+    ]
+   ]
+  },
+  "shock": {
+   "use": "L shock.",
+   "layers": [
+    [
+     "entity.lightning_bolt.impact",
+     1.0,
+     1.0
+    ],
+    [
+     "entity.generic.explode",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "high_glint": {
+   "use": "L high hover glints (every 30 t).",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.4,
+     1.0
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "swap_pyro": {
+   "use": "G1 swap to Pyro.",
+   "layers": [
+    [
+     "item.firecharge.use",
+     0.7,
+     1.0
+    ],
+    [
+     "block.fire.extinguish",
+     0.5,
+     1.2
+    ]
+   ]
+  },
+  "swap_electro": {
+   "use": "G1 swap to Electro.",
+   "layers": [
+    [
+     "entity.lightning_bolt.impact",
+     0.4,
+     1.8
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     1.2
+    ]
+   ]
+  },
+  "mantle_wrap": {
+   "use": "G2 mantle_in.",
+   "layers": [
+    [
+     "item.elytra.flying",
+     0.5,
+     1.4
+    ],
+    [
+     "block.beacon.ambient",
+     0.6,
+     1.6
+    ],
+    [
+     "item.armor.equip_elytra",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "mantle_break": {
+   "use": "G2 break.",
+   "layers": [
+    [
+     "block.glass.break",
+     1.0,
+     0.7
+    ],
+    [
+     "entity.zombie_villager.cure",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "nova_swell": {
+   "use": "G2 nova swell.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.7,
+     1.0
+    ],
+    [
+     "entity.warden.sonic_charge",
+     0.7,
+     1.0
+    ]
+   ]
+  },
+  "nova_blast": {
+   "use": "G2 nova hit.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     1.0,
+     0.8
+    ],
+    [
+     "entity.lightning_bolt.impact",
+     0.8,
+     1.2
+    ],
+    [
+     "block.beacon.deactivate",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "feather_fall": {
+   "use": "Mantle feathers (each).",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.4,
+     1.6
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.4,
+     1.8
+    ]
+   ]
+  },
+  "core_backfire": {
+   "use": "G3 backfire.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.9,
+     0.9
+    ],
+    [
+     "entity.blaze.hurt",
+     0.7,
+     0.6
+    ]
+   ]
+  },
+  "stagger": {
+   "use": "Stagger.",
+   "layers": [
+    [
+     "entity.iron_golem.damage",
+     0.6,
+     0.8
+    ],
+    [
+     "item.armor.equip_netherite",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "step": {
+   "use": "Armoured footstep (walk events).",
+   "layers": [
+    [
+     "block.chain.step",
+     0.4,
+     0.8
+    ],
+    [
+     "entity.iron_golem.step",
+     0.3,
+     1.4
+    ]
+   ]
+  },
+  "wave_charge": {
+   "use": "W1 t0-40: the gold glow grows along the edge (S4 R3).",
+   "layers": [
+    [
+     "block.beacon.ambient",
+     0.6,
+     1.8
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     1.0
+    ]
+   ]
+  }
+ },
+ "sounds_beyond_api": [],
+ "hud": {
+  "badge": [
+   "el"
+  ],
+  "gauge": [
+   "pct"
+  ],
+  "clear": []
+ },
+ "badges": {
+  "1": {
+   "name": "불",
+   "colour": "#FF8A3D"
+  },
+  "3": {
+   "name": "번개",
+   "colour": "#E8C84A"
+  },
+  "9": {
+   "name": "외피",
+   "colour": "#FFD86B"
+  }
+ },
+ "glyphs": {
+  "badge": "U+EA00",
+  "g0": "U+EA30",
+  "g1": "U+EA31",
+  "g_l": "U+EA32",
+  "g_r": "U+EA33"
+ },
+ "gate_icon": "rlk:mboss/tk_kit/gate_icon",
+ "demos": {
+  "slash_arc": 115,
+  "spin_ring": 70,
+  "thrust_trail": 85,
+  "dash_trail": 80,
+  "glint": 65,
+  "core_flare": 95,
+  "core_burst": 52,
+  "sky_arcs": 60,
+  "bolt": 65,
+  "shock_ring": 45,
+  "ember_burst": 65,
+  "blink_out": 75,
+  "blink_in": 45,
+  "wing_flare": 70,
+  "cocoon": 160,
+  "cocoon_crack": 60,
+  "nova_swell": 85,
+  "nova_flash": 45,
+  "ignite_blade": 59,
+  "dust_ring": 65,
+  "swap_fx": 80,
+  "arrive_rift": 45,
+  "ambient_dust": 110,
+  "impact": 75,
+  "high_glint": 75
+ }
+}

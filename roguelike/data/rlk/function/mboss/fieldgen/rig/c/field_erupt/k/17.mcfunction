@@ -1,0 +1,6 @@
+data merge entity 524c4b4d-4647-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,4.2452f,0f],left_rotation:[0f,0f,0f,1f],scale:[0.504f,0.504f,0.504f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[4.1685f,4.26029f,0f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-4.144f,4.27512f,0f],left_rotation:[0f,0f,-0.95949f,0.28173f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[4.1685f,4.26029f,0f],left_rotation:[0f,0f,-0.70711f,0.70711f],scale:[0.4838f,2.8185f,0.4838f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-4.144f,4.27512f,0f],left_rotation:[0f,0f,0.70711f,0.70711f],scale:[0.4712f,2.794f,0.4712f],right_rotation:[0f,0f,0f,1f]}}
+data modify entity 524c4b4d-4647-4400-8000-00000000000a item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/glow_flash"

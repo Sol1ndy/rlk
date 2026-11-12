@@ -1,0 +1,64 @@
+hrfair 2.0 (HB): 175 runs, 3 at a time
+#     target                                                                                                          band                 s11                      s22                      s33                      pooled                         result
+T1    P1 walker intake / 타키 whole walker (measured 232.3 %/min)                                                       1.00-1.15            237.1 = 1.02 x           239.1 = 1.03 x           226.2 = 0.97 x *         234.1 = 1.01 x                 miss
+T1b   P1 parrier s3 intake / walker                                                                                   <= 0.60              0.50                     0.58                     0.59                     0.56                           PASS
+T1c   P1 mixed s0 intake %/min                                                                                        <= 5                 0.0                      0.0                      0.0                      0.0                            PASS
+T2    P2 walker intake / 타키 whole walker                                                                              <= 1.25              245.1 = 1.06 x           243.0 = 1.05 x           236.4 = 1.02 x           241.5 = 1.04 x                 PASS
+T3    standing max(P1, P2) / the Guardian standing (measured 165.1)                                                   <= 1.8               242.8 = 1.47 x           247.8 = 1.50 x           249.8 = 1.51 x           246.8 = 1.49 x                 PASS
+T4    walker's worst 40-t window % max HP                                                                             <= 40                19.0                     19.0                     19.0                     19.0                           PASS
+T5    every cut of a8 on a standing agent % max HP                                                                    <= 45                40.3                     40.3                     40.3                     40.3                           PASS
+T5b   every cut of a13 on a standing agent % max HP                                                                   <= 55                49.3                     49.3                     49.3                     49.3                           PASS
+T6s0  parrier s0 gauntlets (stand / walk x3): perfect per timed F (ceiling 100.0) / per F inside the window; cleared  - / >= 95; >= 95     100.0 (100%) / 100.0; 100 % of 8 100.0 (100%) / 100.0; 100 % of 8 100.0 (100%) / 100.0; 100 % of 8 100.0 (100%) / 100.0; 100 % of 24 PASS
+T6s1  parrier s1 gauntlets (stand / walk x3): perfect per timed F (ceiling 86.6) / per F inside the window; cleared   - / >= 95; >= 90     85.0 (98%) / 100.0; 100 % of 8 87.5 (101%) / 100.0; 100 % of 8 91.2 (105%) / 100.0; 100 % of 8 87.9 (101%) / 100.0; 100 % of 24 PASS
+T7    sloppy clears; masher clears; dodger clears (its damage)                                                        <= 35; 0; 0 (0)      0; 0; 0 (0.0)            0; 0; 0 (0.0)            0; 0; 0 (0.0)            0; 0; 0 (0.0)                  PASS
+T8    A6 starts in any 400 t (all phase runs)                                                                         <= 1                 1                        1                        1                        1                              PASS
+T9    walker kill, fighting s, Lv5 / 10 / 15                                                                          150-185              164 / 167 / 167          159 / 171 / 169          155 / 171 / 171          159 / 170 / 169                PASS
+T9b   parrier s1.5 kill, fighting s                                                                                   125-170              164                      164                      167                      165                            PASS
+T10   groggies / min: parrier s1.5; walker (band relaxed by the lead 11-11: was 0.8-1.3)                              0.8-1.6; <= 0.4      1.50; 0.00               1.33; 0.00               1.50; 0.00               1.44; 0.00                     PASS
+T11   U / min: walker; mixed s0                                                                                       0.8-1.5; 0.6-1.0     1.33; 0.67               1.33; 0.67               1.33; 0.67               1.33; 0.67                     PASS
+T12   dodger s1 avoids an N hit it times (ceiling 86.6) / of those inside the window                                  - / >= 95            92.2 (106%) of 51 / 100.0 90.4 (104%) of 52 / 100.0 78.2 (90%) of 55 / 100.0 86.7 (100%) of 158 / 100.0     PASS
+T13   parrier s0, every chain in reach (F at h - 1): perfect; refused F (one run, no seed)                            100 %; 0             53 / 53; 0               53 / 53; 0               53 / 53; 0               53 / 53; 0                     PASS
+W35   unparriable share of the pick weight, P1 / P2 near-mid-far-far rule (the lead 11-11)                            <= 35 % each         35 35 34 35 35 35 35 32  35 35 34 35 35 35 35 32  35 35 34 35 35 35 35 32  35 35 34 35 35 35 35 32        PASS
+T13f  ... free fight: perfect of the P hits that found it; refused F of presses                                       (report)             100.0 of 170; 0 / 170    100.0 of 172; 0 / 172    100.0 of 180; 0 / 180    100.0 of 522; 0 / 522          -
+(* = this seed misses the band)
+  base tachy walker seed 22: intake 228.6 %/min over 4206 t, worst 28.4 %, killed True
+  base tachy walker seed 11: intake 230.3 %/min over 4196 t, worst 33.2 %, killed True
+  base tachy walker seed 33: intake 238.0 %/min over 4336 t, worst 33.2 %, killed True
+  base guardian stand seed 11: intake 168.4 %/min over 3600 t, worst 53.0 %, killed False
+  base guardian stand seed 22: intake 159.0 %/min over 3600 t, worst 53.0 %, killed False
+  base guardian stand seed 33: intake 167.9 %/min over 3600 t, worst 53.0 %, killed False
+
+by agent, pooled (intake %/min, worst 40 t %, groggy / min, U / min, patterns / min, P hits (perfect), N hits (perfect dodge)):
+  P1 walker   s0   intake  234.1  worst  19.0  grog 0.00  U 1.33  pats/min 21.4  P hits 319 (pp 0)  N hits 76 (pd 0)  F 0 (refused 0)
+  P1 stand    s0   intake  246.8  worst  19.0  grog 0.00  U 1.44  pats/min 19.3  P hits 351 (pp 0)  N hits 74 (pd 0)  F 0 (refused 0)
+  P1 parrier  s0   intake   48.2  worst  13.1  grog 2.44  U 0.67  pats/min 18.8  P hits 265 (pp 265)  N hits 59 (pd 0)  F 265 (refused 0)
+  P1 parrier  s1.5 intake   84.2  worst  13.8  grog 1.67  U 1.00  pats/min 19.2  P hits 285 (pp 187)  N hits 67 (pd 0)  F 285 (refused 11)
+  P1 parrier  s3   intake  130.6  worst  19.0  grog 0.78  U 1.22  pats/min 20.2  P hits 302 (pp 101)  N hits 75 (pd 0)  F 302 (refused 36)
+  P1 mixed    s0   intake    0.0  worst   0.0  grog 2.44  U 0.67  pats/min 18.1  P hits 274 (pp 274)  N hits 57 (pd 57)  F 274 (refused 0)
+  P1 dodger   s1   intake   51.0  worst  19.0  grog 0.00  U 1.00  pats/min 21.2  P hits 307 (pp 0)  N hits 76 (pd 63)  F 0 (refused 0)
+  P1 masher   s0   intake  118.1  worst  14.6  grog 0.67  U 1.22  pats/min 20.3  P hits 298 (pp 93)  N hits 75 (pd 0)  F 2700 (refused 1693)
+  P2 walker   s0   intake  241.5  worst  19.0  grog 0.00  U 1.33  pats/min 19.6  P hits 309 (pp 0)  N hits 90 (pd 0)  F 0 (refused 0)
+  P2 stand    s0   intake  235.1  worst  19.0  grog 0.00  U 1.33  pats/min 18.9  P hits 297 (pp 0)  N hits 94 (pd 0)  F 0 (refused 0)
+  P2 parrier  s0   intake   54.9  worst  13.1  grog 2.33  U 0.67  pats/min 17.2  P hits 257 (pp 257)  N hits 69 (pd 0)  F 257 (refused 0)
+  P2 parrier  s1.5 intake  104.0  worst  13.4  grog 1.22  U 1.00  pats/min 19.2  P hits 244 (pp 152)  N hits 94 (pd 0)  F 245 (refused 14)
+  P2 parrier  s3   intake  137.5  worst  19.0  grog 0.78  U 1.00  pats/min 18.8  P hits 291 (pp 101)  N hits 85 (pd 0)  F 291 (refused 36)
+  P2 mixed    s0   intake    0.0  worst   0.0  grog 2.11  U 0.67  pats/min 18.2  P hits 236 (pp 236)  N hits 83 (pd 83)  F 236 (refused 0)
+  P2 dodger   s1   intake   61.8  worst  14.6  grog 0.00  U 1.00  pats/min 20.0  P hits 315 (pp 0)  N hits 82 (pd 74)  F 0 (refused 0)
+  P2 masher   s0   intake  128.9  worst  14.6  grog 0.44  U 1.22  pats/min 18.8  P hits 302 (pp 84)  N hits 88 (pd 0)  F 2700 (refused 1693)
+  P1 walker s0 patterns / min: a3s 4.00 a3 2.44 a10 2.22 rings 1.67 d4 1.56 a2 1.33 ult 1.33 a1 1.22 a6 1.22 kcut 1.22 blue 1.11 a9 1.11 a4 0.89 hcut 0.11
+  P1 parrier s1.5 patterns / min: a3s 3.67 a3 2.44 a10 1.56 a9 1.56 d4 1.44 rings 1.44 blue 1.22 kcut 1.22 a1 1.22 ult 1.00 a6 0.89 a2 0.78 a4 0.78
+  P2 walker s0 patterns / min: a3s 5.33 a9 1.78 kcut 1.56 rings 1.56 a3 1.56 mx 1.56 d4 1.33 a6 1.33 ult 1.33 blue 1.11 q 0.67 nb 0.44
+  P2 parrier s1.5 patterns / min: a3s 5.00 mx 2.78 blue 2.22 kcut 1.78 a9 1.67 rings 1.11 a3 1.11 d4 1.00 ult 1.00 a6 0.78 nb 0.56 tri 0.11 hcut 0.11
+  kill parrier Lv15 seed 11: killed True fighting 164 s, cutscenes 50 s, intake 54 %/min, groggies 3
+  kill parrier Lv15 seed 22: killed True fighting 164 s, cutscenes 50 s, intake 60 %/min, groggies 3
+  kill parrier Lv15 seed 33: killed True fighting 167 s, cutscenes 50 s, intake 66 %/min, groggies 2
+  kill walker Lv5 seed 11: killed True fighting 164 s, cutscenes 50 s, intake 135 %/min, groggies 0
+  kill walker Lv5 seed 22: killed True fighting 159 s, cutscenes 50 s, intake 135 %/min, groggies 0
+  kill walker Lv5 seed 33: killed True fighting 155 s, cutscenes 50 s, intake 130 %/min, groggies 0
+  kill walker Lv10 seed 11: killed True fighting 167 s, cutscenes 50 s, intake 146 %/min, groggies 0
+  kill walker Lv10 seed 22: killed True fighting 171 s, cutscenes 50 s, intake 154 %/min, groggies 0
+  kill walker Lv10 seed 33: killed True fighting 171 s, cutscenes 50 s, intake 149 %/min, groggies 0
+  kill walker Lv15 seed 11: killed True fighting 167 s, cutscenes 50 s, intake 145 %/min, groggies 0
+  kill walker Lv15 seed 22: killed True fighting 169 s, cutscenes 50 s, intake 151 %/min, groggies 0
+  kill walker Lv15 seed 33: killed True fighting 171 s, cutscenes 50 s, intake 148 %/min, groggies 0
+

@@ -49,6 +49,8 @@ execute if data storage rlk:io src.stats.dendroBonus run function rlk:items/lore
 # 2) 특수 능력 (abilities: 여러 줄 그대로 추가)
 execute if data storage rlk:io src.abilities[0] run data modify storage rlk:io lore append value {text:"",italic:false}
 data modify storage rlk:io aq set from storage rlk:io src.abilities
+# 숫자 자리표가 있는 설명은 지금 값으로 바꾼 사본(rlk:items disp.<id>, items/tune/disp_build)
+function rlk:items/tune/disp_get with storage rlk:io
 execute if data storage rlk:io src.abilities[0] run function rlk:items/ability_loop
 
 # 2.5) 각인 (engravings: 이름을 한 줄로)

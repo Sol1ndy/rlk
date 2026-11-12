@@ -2,4 +2,5 @@
 execute store result score #now tmp run time query gametime
 execute if score @s swungAt = #now tmp run return 0
 scoreboard players operation @s swungAt = #now tmp
+function rlk:player/def/beat/act
 function rlk:combat/combo

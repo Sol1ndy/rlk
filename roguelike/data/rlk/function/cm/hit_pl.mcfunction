@@ -9,5 +9,7 @@ execute if entity @s[tag=rlk_cmp_cb] run scoreboard players set #cmKB tmp 4
 execute if entity @s[tag=rlk_cmic] run scoreboard players set #cmKB tmp 0
 execute if entity @s[tag=rlk_cm_im] run scoreboard players set #cmKB tmp 0
 execute if score #cmKB tmp matches 1.. run function rlk:cm/knockback_direction
+# 피해 문맥(전투 개편 C, player/def/judge 가 읽고 지움): 공격한 적 · 등급 · 종류
+function rlk:player/def/ctx_cm
 execute as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
 kill @e[tag=rlk_plkb_source]

@@ -9,6 +9,8 @@ scoreboard players reset #seen5 room
 scoreboard players reset #seen6 room
 scoreboard players reset #seen7 room
 scoreboard players set #mapIdx room 0
+# 새 챕터: 고른 노드 기록 지우기
+data modify storage rlk:room seen set value []
 scoreboard players set #mapType room 0
 execute in minecraft:overworld run function rlk:room/gen
 

@@ -1,0 +1,543 @@
+"""Human-form patterns of the butterfly: H1 달빛 발차기, H2 달빛 점프, H3 달빛 돌진, H4 광폭한 진공.
+
+Stage 2 (the human-pattern author), faithful to the scratchpad specs mb2/spec/H1_kick_combo.md .. H4_vacuum.md and the
+binding plan mb2/plan.md (its "Stage-2 decisions"):
+- telegraphs (the user's telegraph rule, 10-20: a ground telegraph only where the reference footage shows one; the
+  footage shows none for her): every hit is a quiet framework hazard (hz/*, no outline and no strike flash:
+  #hzQuiet 1, silent: #hzSfx 0, Q7) with NO ground decal; the player reads her motion and sound, at least 10 t from
+  the first distinguishable tell (clip pose / body fx + sound) to the strike, and each strike has its own impact
+  visual (the attack's crescent, burst, wave, ring). Gone with the rule (scratchpad tele/bf/audit.md): the kit decals
+  of every hit, H2's knee-high dust rings and the glint over the disc target, the telegraph-only dash lane (H3) and
+  blade lane (H4); added: H1 hit 1's body tell at -2 (the kick whoosh and a glow on her kicking foot);
+- damage shapes, volley groups (one hit per group), element (Dendro, the registry default), knockback and the api.DMG
+  coefficients as the specs' §5; H4's blade is a framework projectile (blade shape, 0.75 b/t, no homing);
+- fx: the kit presets (bf_fx_api.md §7 / §9) plus single kit cards for the spec's extra layers; sounds: the kit's
+  vanilla recipes on the main events plus single vanilla layers for the rest of the spec's audio timeline;
+- AI: the bands and weights of README §2, H2's close-in (core), the facing / tracking spans and the aim locks of each
+  spec's §2 (a locked aim is the rotation of its marker), the walk-disc clamp (r 20.3) for the locked ground target
+  of H2 (plan Q8), the body moved by the module (plan Q1: the clips carry no horizontal root travel).
+
+Clock: #bfPT = the clip tick (the core plays the clip at clock 0); a pattern with lead L starts at -L. Rig events are
+read from the rig manifest (ev_or with the spec's tick as the fallback), fx anchors with api.h_anchor (the manifest's
+clips[].anchors; the spec's body-frame point where the manifest has none).
+
+Wind-up tuning (user "선딜 좀 줄이고", plan.md "User feedback after the 10-18 release"): the clips play through the rig's
+RETIME (butterfly_clips.mjs), so every event above is the played tick; a spec tick that is not an event is mapped with
+api.rt(clip, authored tick), and the aim locks / hazard tells longer than the 10 t floor are about 25 % shorter
+(api.tell_rt).
+"""
+import math
+import random
+
+from . import api as A
+from .api import Pattern, TL, ev_or, clip_len, rt, tell_rt, DMG, KB, CY
+
+TELL = 10                                     # wind-up floor (plan.md: every damaging hit >= 10 t after its first tell)
+K_KICK, K_JUMP, K_DASH, K_VAC = 'kick', 'jump', 'dash', 'vacuum'
+L_KICK, L_JUMP, L_DASH, L_VAC = (clip_len(c) for c in ('kick_combo', 'kick_jump', 'dash_kick', 'vacuum'))
+# H1 (kick_combo, played): run 0, hit1 8, backflip 9, land1 16, hop 19, hop2 22, leap 25, swirl 28, hit2 32 (authored 40)
+H1_HIT1, H1_HIT2 = ev_or('kick_combo', 'hit1', 8), ev_or('kick_combo', 'hit2', 40)
+H1_LEAD = max(0, TELL - H1_HIT1)              # hit 1 lands 8 t into the clip: its body tell starts 2 t before the clip
+H1_LOCK2 = H1_HIT2 - tell_rt(14)              # 21: kick 2 aimed (and its hazards made) 11 t ahead (spec Q22: 14 before the tuning)
+H1_LEAP = ev_or('kick_combo', 'leap', H1_HIT2 - 7)  # 25: the flying leap to the landing point B (4 t)
+H1_HOPS = (ev_or('kick_combo', 'hop', 19), ev_or('kick_combo', 'hop2', 22))   # the two sideways hops (3 t each)
+H1_SIDE = rt('kick_combo', 20)                # 17: the hop side is drawn, the kicking foot starts to glow
+# H2 (kick_jump): tell 0, sweep 13 (active 4 t, knee height), jump 33, orb 45, kick 52, impact 55, land 59 (plan Q2)
+H2_SWEEP = ev_or('kick_jump', 'sweep', 13)
+H2_JUMP = ev_or('kick_jump', 'jump', 33)
+H2_IMPACT = ev_or('kick_jump', 'impact', 55)
+H2_ORB = ev_or('kick_jump', 'orb', H2_IMPACT - 10)
+H2_KICK = ev_or('kick_jump', 'kick', H2_IMPACT - 3)
+H2_LAND = ev_or('kick_jump', 'land', H2_IMPACT + 4)
+H2_LOCK = H2_IMPACT - tell_rt(12)              # the disc locked under the player 10 t before the impact (12 before the tuning)
+H2_ACT, H2_Y1 = 4, 1.0                        # sweep: active 4 t, feet test up to 1.0 b (jumpable, Q12)
+# H3 (dash_kick): charge 0, dash 10, dash_end 12, kick 15, ring 19
+H3_DASH, H3_DASH_END = ev_or('dash_kick', 'dash', 10), ev_or('dash_kick', 'dash_end', 12)
+H3_KICK = ev_or('dash_kick', 'kick', 15)
+H3_RING = ev_or('dash_kick', 'ring', H3_KICK + 4)
+H3_LOCK = H3_KICK - tell_rt(12)               # 1: aim lock and both hazards (kick tell 10, ring tell 14; 12 / 16 before)
+H3_RING_ACT = 3
+# H4 (vacuum): crouch 0, tell 9 (the glint: aim lock), stomp 16, blade 17, backflip 17, land 38
+H4_GLINT = ev_or('vacuum', 'tell', 5)
+H4_BLADE = ev_or('vacuum', 'blade', 13)
+H4_STOMP = ev_or('vacuum', 'stomp', H4_BLADE - 1)
+H4_BACK = ev_or('vacuum', 'backflip', H4_BLADE)
+H4_LAND = ev_or('vacuum', 'land', 34)
+H4_SPD, H4_LIFE = 0.75, 60                    # 0.75 b/t (3 sub-steps of 0.25 b; FW-2), 60 t
+H4_HR = 1.5                                    # blade half width (the spec's 3.0 b wide blade): it reaches hr + 0.3 = 1.8 b off
+                                               # the line, the blade + the body pad (FW-1; the hr 1.2 workaround is gone)
+H4_EFF = 0.75                                  # effective speed (0.25 b sub-steps, rounded up)
+H4_REAR, H4_P0 = 0.3, 1.0                      # rear-up 0.3 b back (12-14); the blade spawns 1.0 b ahead of her
+assert H2_SWEEP - TELL >= 0 and H2_LOCK > H2_JUMP and H2_ORB < H2_KICK < H2_IMPACT <= H2_LAND < L_JUMP
+assert H3_LOCK < H3_DASH < H3_KICK <= H3_RING and H3_KICK - H3_LOCK >= TELL
+assert 0 < H4_GLINT < H4_STOMP < H4_BLADE <= H4_BACK < H4_LAND <= L_VAC
+
+PATTERNS = [
+    Pattern(1, K_KICK, '달빛 발차기', 'h', 'kick_combo', bands=('melee', 'mid'), weight={'melee': 2}, lead=H1_LEAD,
+            recover=16, max_len=L_KICK + 5, length=L_KICK),
+    Pattern(2, K_JUMP, '달빛 점프', 'h', 'kick_jump', bands=('melee', 'mid'), close=3.0, recover=16,
+            max_len=L_JUMP + 5, length=L_JUMP),
+    Pattern(3, K_DASH, '달빛 돌진', 'h', 'dash_kick', bands=('mid', 'far'), weight={'far': 2}, recover=16,
+            max_len=L_DASH + 5, length=L_DASH),
+    Pattern(4, K_VAC, '광폭한 진공', 'h', 'vacuum', bands=('far', 'mid'), weight={'far': 2}, recover=18,
+            max_len=L_VAC + 5, length=L_VAC),
+]
+
+# ---------------------------------------------------------------------------------------------
+# small helpers
+hx = A.hexrgb
+BODY = 'execute at @s rotated as @s rotated ~ 0 run '            # her feet, her yaw (the body frame)
+TEAL = '#297272'                                                  # the dark teal of the crescents (v1 §5)
+NAVY = '#394B75'                                                  # the crescent plates
+
+
+def mk(tag):
+    return f'@e[type=minecraft:marker,tag={tag},limit=1]'
+
+
+def kill_mk(*tags):
+    return [f'kill @e[type=minecraft:marker,tag={t}]' for t in tags]
+
+
+def at_mk(sel, extra=''):
+    """execute prefix: on the floor at a marker, rotated as the marker (its yaw = the locked aim)."""
+    return f'execute at {sel} rotated as {sel} rotated ~ 0 {extra}positioned ~ {CY} ~ run '
+
+
+def aim(sel):
+    """execute prefix: at her feet, rotated as the marker (the locked aim)."""
+    return f'execute at @s rotated as {sel} rotated ~ 0 run '
+
+
+def quiet(g, pre, hz, **opts):
+    """A framework hazard without any ground telegraph (the telegraph rule, 10-20: the footage shows none for her): the
+    framework outline and strike flash off with #hzQuiet 1, its strike sound off with #hzSfx 0 (Q7). The player reads
+    her motion and sound; the pattern draws the attack's own visual on the strike tick."""
+    return [*g.hz_opts(sfx=0, quiet=1, **opts), pre + hz]
+
+
+def snd(g, event, v, p):
+    return g.sound(event, v, p)
+
+
+def back_step(d):
+    """One step d b straight back along her own yaw (a backflip on the locked line), inside the safe disc."""
+    return f'execute at @s rotated as @s rotated ~180 0 positioned ^ ^ ^{A.L.num(d)} if function rlk:mboss/mv/ok run tp @s ~ ~ ~'
+
+
+def side_step(yaw_off, d):
+    """A sideways hop step (her yaw kept), as the core's strafe."""
+    return (f'execute at @s rotated as @s rotated ~{yaw_off} 0 positioned ^ ^ ^{A.L.num(d)} if function rlk:mboss/mv/ok '
+            'run tp @s ~ ~ ~')
+
+
+def radial(g, kind, n, pos, elev, s0, s1, dist, life, fade, col='#FFFFFF', yaw0=0.0, yaw_span=360.0, seed=1,
+           roll=0, bb='fixed'):
+    """n kit cards flung outward from pos (the kit's radial trick: rot '~yaw 90-elev', move (0, d, 0))."""
+    rnd = random.Random(seed)
+    out = []
+    for k in range(n):
+        yaw = yaw0 + (yaw_span * (k + 0.5) / n if yaw_span < 360 else 360.0 * k / n) + rnd.uniform(-8, 8)
+        el = elev if isinstance(elev, (int, float)) else rnd.uniform(*elev)
+        out.append(g.kcard(kind, pos, f'~{A.L.num(yaw, 1)} {A.L.num(90 - el, 1)}', col=col, bb=bb,
+                           roll=roll or rnd.randint(-15, 15), s0=s0, s1=s1, move=(0, dist, 0), life=life, fade=fade))
+    return out
+
+
+def emit(g):
+    kick(g)
+    jump(g)
+    dash(g)
+    vacuum(g)
+
+
+# =============================================================================================
+# H1 달빛 발차기 (spec H1_kick_combo.md): burst-run S -> A (the clip's own run, <= 4.5 b in 5 t), hit 1 = a narrow
+# vertical strip (lane 4.5 x 2.4 from 0.5 behind A + a splash disc r 1.5 1.2 ahead, one group) at 8, its body tell at -2
+# (the kick whoosh, a lime glow and glint on her kicking foot: the telegraph rule's readability fix, 10 t before the hit);
+# backflip 1.2 b, settle, two sideways hops (19, 22), kick 2 aimed at 21 (half disc r 5 + ground wave 6 x 2, one
+# group), the flying leap to B at 25, the axe kick at 32 (played ticks: 26 / 32 / 40 before the tuning); no ground
+# decal (footage v1 9.80-11.73: none); DMG h1a / h1b (0.55 / 0.7), at most 2 hits.
+def kick(g):
+    R = g.rig
+    k = K_KICK
+    a, b = 'rlk_mb_bf_p1a', 'rlk_mb_bf_p1b'
+    A_, B_ = mk(a), mk(b)
+    tl = TL(g, k)
+    t0 = H1_HIT1 - TELL                                       # -2
+    foot_run = A.h_anchor('kick_combo', 'run', 'foot_r', '^-0.42 ^0.5 ^0.4')
+    foot_hit = A.h_anchor('kick_combo', 'hit1', 'foot_r', '^-0.28 ^3.17 ^0.17')
+    core_bf = A.h_anchor('kick_combo', 'backflip', 'core', '^ ^2.6 ^-0.4')
+    foot_hop = A.h_anchor('kick_combo', 'hop', 'foot_r', '^-0.5 ^0.15 ^0.2')
+    foot_leap = A.h_anchor('kick_combo', 'leap', 'foot_r', '^-0.4 ^1.9 ^1.2')
+    lime_pale, lime = hx('#E5FBC8'), hx('#C1F788')
+
+    # ---- hit 1: lock A (<= 4.5 b toward the player, 1.5 b short), the strip and its splash, one group (quiet: no
+    # decal); the body tell 10 t before the hit, as the run starts only 8 t before it: the kick whoosh (kit
+    # snd/kick_whoosh, the "H1 hit 1 lead-in" recipe) and a lime glow + glint on her kicking foot, the resonate cue
+    tl.at(t0, R('face/player'), *kill_mk(a, b), g.dest(4.5, 1.5), g.keep(a), g.GRP_NEW,
+          *quiet(g, at_mk(A_), g.hz_line(4.0, 2.4, TELL, DMG['h1a']), grp=True, kb=KB['default'], back=0.5),
+          *quiet(g, at_mk(A_, 'positioned ^ ^ ^1.2 '), g.hz_disc(1.5, TELL, DMG['h1a']), grp=True, kb=KB['default']),
+          BODY + g.kcard('glow', foot_run, bb='center', col='#C1F788', s0=0.4, s1=1.3, life=9, fade=3),
+          f'execute at @s rotated as @s rotated ~ 0 positioned {foot_run} run ' + g.fx('glint'),
+          BODY + g.dust(lime_pale, 0.8, foot_run, (0.12, 0.15, 0.12), 4),
+          g.snd('kick_whoosh'), snd(g, 'block.amethyst_block.resonate', 0.35, 1.6))
+    tl.span(t0 + 1, 5, R('face/track'))
+    # the burst-run S -> A (0.6-0.9 b/t)
+    tl.at(0, f'execute positioned as {A_} run function rlk:mboss/mv/glide {{t:5}}',
+          snd(g, 'entity.breeze.jump', 0.6, 1.3), snd(g, 'block.moss_carpet.step', 0.5, 1.0),
+          snd(g, 'entity.player.attack.sweep', 0.25, 1.5),
+          BODY + g.kcard('leaf', '^ ^0.3 ^-0.6', bb='center', col='#A8DF74', s0=0.3, s1=0.4, move=(0, -0.3, 0), life=10, fade=4))
+    for t in (0, 2, 4):
+        tl.at(t, g.particle('poof', '~ ~0.1 ~', (0.25, 0.02, 0.25), 0.02, 2))
+    tl.at(2, BODY + g.kcard('glint', foot_run, bb='center', col='#E5FBC8', s0=0.2, s1=0.6, life=4, fade=2))
+    tl.at(3, snd(g, 'block.moss_carpet.step', 0.4, 1.1))
+    tl.at(5, aim(A_) + g.particle('wax_off', '^ ^0.1 ^0.6', (0.5, 0.05, 0.5), 0, 4),
+          aim(A_) + g.dust(lime_pale, 0.8, '^ ^0.1 ^0.6', (0.5, 0.1, 0.5), 6))
+    tl.at(6, f'execute at @s rotated as {A_} rotated ~ 0 positioned ^ ^0.5 ^1.0 run ' + g.fx('glint'),
+          snd(g, 'block.amethyst_block.chime', 0.5, 1.9))
+    tl.at(7, aim(A_) + g.kcard('burst', '^ ^0.08 ^1.2', '~ 90', s0=0.5, s1=3.0, life=5, fade=2))
+    # the rising flip-kick crescent (kit kick_rise; the kit's painted crescent carries the dark teal inner band of the
+    # spec's underlay), the core streak seen from the front, the jagged leaf blades at its base
+    tl.at(H1_HIT1, aim(A_) + g.fx('kick_rise'),
+          aim(A_) + g.kcard('streak', '^ ^2.5 ^1.0', '~ 0', col='#EDF9DA', roll=80, s0=4.0, s1=5.5, life=3, fade=1),
+          *[aim(A_) + c for c in radial(g, 'blade', 6, '^ ^0.1 ^1.2', (55, 78), 0.3, 1.3, 0.25, 6, 3, yaw0=-50,
+                                         yaw_span=100, seed=8)],
+          aim(A_) + g.dust(hx('#D7F899'), 1.2, '^ ^2 ^1.2', (0.6, 1.4, 0.3), 14),
+          aim(A_) + g.particle('wax_off', '^ ^1.5 ^1.2', (0.4, 1.0, 0.3), 0, 6),
+          g.snd('kick_impact'))
+    # the backflip: 1.2 b away, trail crescents breaking into leaves
+    tl.span(H1_HIT1 + 1, H1_HIT1 + 8, 'function rlk:mboss/mv/away {d:0.15}', BODY + g.dust(lime, 1.0, core_bf, (0.15, 0.2, 0.15), 2))
+    for t in (H1_HIT1 + 1, H1_HIT1 + 4):
+        tl.at(t, BODY + g.kcard('cres_lime', '^ ^1.4 ^', '~ -90', col='#BFF191', roll=90, spin=-150, s0=1.6, s1=2.4, life=4, fade=2))
+    for t, x in ((H1_HIT1 + 2, 0.3), (H1_HIT1 + 5, -0.3)):
+        tl.at(t, *[BODY + g.kcard('leaf', f'^{A.L.num(x + dx)} ^2.1 ^-0.2', bb='center', col='#A8DF74', s0=0.3, s1=0.4,
+                                  move=(0, -1.2, 0.4), life=12, fade=6) for dx in (0, 0.25)])
+    tl.at(H1_HIT1 + 3, snd(g, 'item.trident.riptide_1', 0.3, 1.6))
+    land1 = H1_HIT1 + 8                                       # 16: lands
+    tl.at(land1, BODY + g.fx('land'), g.particle('poof', '~ ~0.1 ~', (0.4, 0.05, 0.4), 0.02, 6),
+          g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.5, 0.05, 0.5), 0, 8),
+          snd(g, 'block.moss.fall', 0.6, 1.0))
+    tl.at(rt('kick_combo', 18), snd(g, 'block.moss.fall', 0.35, 1.2))
+    # wind-up: the kicking foot glows; two sideways hops of 0.75 b on the clip's hop events (a random side, then the other)
+    tl.at(H1_SIDE, 'execute store result score #bp1S mb run random value 0..1')
+    for t in range(H1_SIDE, H1_LEAP, 2):
+        tl.at(t, BODY + g.dust(lime_pale, 0.7, foot_hop, (0.1, 0.1, 0.1), 2))
+    for t0h, first in ((H1_HOPS[0], True), (H1_HOPS[1], False)):
+        s0 = 0 if first else 1
+        for t in range(t0h, t0h + 3):
+            tl.at(t, f'execute if score #bp1S mb matches {s0} run ' + side_step(90, 0.25),
+                  f'execute unless score #bp1S mb matches {s0} run ' + side_step(-90, 0.25))
+        tl.at(t0h, g.particle('poof', '~ ~0.1 ~', (0.3, 0.02, 0.3), 0.02, 3), snd(g, 'block.moss_carpet.step', 0.5, 1.2))
+    # ---- hit 2: aim at the player and lock B (the leap's landing point, <= 3.5 b, 1.2 b short), the hazards 11 t
+    # ahead (quiet: no decal; she reads by the foot glow from 17, the hops, the leap, the foot ripple and glint)
+    tl.at(H1_LOCK2, R('face/player'), *kill_mk(b), g.dest(3.5, 1.2), g.keep(b), g.GRP_NEW,
+          *quiet(g, at_mk(B_), g.hz_sector(5.0, 90, H1_HIT2 - H1_LOCK2, DMG['h1b']), grp=True, kb=KB['default']),
+          *quiet(g, at_mk(B_), g.hz_line(6.0, 2.0, H1_HIT2 - H1_LOCK2, DMG['h1b']), grp=True, kb=KB['default']),
+          snd(g, 'block.amethyst_block.resonate', 0.35, 1.5))
+    tl.at(H1_LEAP, f'execute positioned as {B_} run function rlk:mboss/mv/glide {{t:4}}',
+          BODY + g.kcard('streak', '^ ^1.0 ^-1', '~90 0', col='#D7F899', s0=3.0, s1=3.5, life=4, fade=2),
+          snd(g, 'entity.breeze.jump', 0.6, 1.1))
+    tl.at(H1_LEAP + 2, BODY + g.kcard('streak', '^ ^1.2 ^', '~90 0', col='#EDF9DA', s0=2.0, s1=3.0, life=3, fade=1))
+    tl.at(H1_HIT2 - 4, BODY + g.kcard('ripple', foot_leap, bb='center', col='#D7F899', spin=160, s0=0.4, s1=1.4, life=6, fade=2),
+          snd(g, 'block.amethyst_block.resonate', 0.5, 1.6))
+    tl.at(H1_HIT2 - 2, f'execute at @s rotated as @s rotated ~ 0 positioned {foot_leap} run ' + g.fx('glint'))
+    # the axe kick (kit kick_axe, two crescent layers) and the ground wave (kit ground_wave: blades along 6 b)
+    tl.at(H1_HIT2, aim(B_) + g.fx('kick_axe'),
+          aim(B_) + g.kcard('burst', '^ ^0.08 ^2.0', '~ 90', s0=1.0, s1=4.0, life=5, fade=2),
+          aim(B_) + g.particle('flash{color:[0.93,0.98,0.85,0.9]}', '^ ^0.5 ^2.0', (0, 0, 0), 0, 1),
+          at_mk(B_) + g.fx('ground_wave'),
+          g.snd('kick_impact'), snd(g, 'block.big_dripleaf.break', 0.6, 1.0))
+    for i in range(3):
+        lines = []
+        for kk in (2 * i + 1, 2 * i + 2):
+            lines += [at_mk(B_) + g.dust(hx(TEAL), 1.4, f'^ ^0.2 ^{kk}', (0.3, 0.1, 0.3), 3),
+                      at_mk(B_) + g.dust_fade(hx('#E5FBC8'), hx(TEAL), 1.2, f'^ ^0.3 ^{kk}', (0.3, 0.2, 0.3), 4)]
+        tl.at(H1_HIT2 + i, *lines)
+    tl.at(H1_HIT2 + 1, at_mk(B_, 'positioned ^ ^ ^3 ') + g.snd('crescent_fly'), snd(g, 'block.azalea.break', 0.5, 1.0))
+    tl.at(H1_HIT2 + 2, snd(g, 'block.azalea.break', 0.5, 1.1),
+          at_mk(B_) + g.dust(hx('#B7D8AF'), 1.0, '^ ^0.2 ^3', (0.3, 0.1, 2.5), 8))
+    for t in (H1_HIT2 + 3, H1_HIT2 + 6):
+        tl.at(t, *[at_mk(B_) + g.kcard('leaf', f'^{A.L.num(x)} ^2.2 ^{A.L.num(z)}', bb='center', col='#A8DF74',
+                                       s0=0.3, s1=0.4, move=(0, -1.5, 0.6), life=14, fade=6)
+                   for x, z in ((0.4, 1.0), (-0.3, 2.2), (0.2, 3.4), (-0.5, 4.6))])
+    tl.at(H1_HIT2 + 4, at_mk(B_) + g.dust(hx('#AEE08B'), 1.2, '^ ^0.2 ^3', (0.3, 0.1, 2.5), 6),
+          at_mk(B_) + g.dust(hx('#B7D8AF'), 1.0, '^ ^0.2 ^3', (0.3, 0.1, 2.5), 8),
+          BODY + g.fx('land'), g.snd('land'), snd(g, 'block.moss.fall', 0.6, 0.9),
+          g.particle('poof', '~ ~0.1 ~', (0.4, 0.05, 0.4), 0.02, 6),
+          g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.5, 0.05, 0.5), 0, 8))
+    tl.at(L_KICK, *kill_mk(a, b), g.end())
+    tl.write([f'# H1 달빛 발차기 (lead {H1_LEAD}: start at clock {t0}, clip kick_combo at 0). Hit 1 {H1_HIT1}: the strip (lane',
+              f'# 4.5 x 2.4 from 0.5 behind A + splash r 1.5, one group, quiet hazards and the body tell from {t0}); kick 2 locked at {H1_LOCK2}, the leap',
+              f'# at {H1_LEAP}, hit 2 {H1_HIT2}: half disc r 5 + ground wave 6 x 2 at B (one group); {DMG["h1a"] / 100:g} / {DMG["h1b"] / 100:g} Dendro.'],
+             ['# H1 tick.'], t0=t0)
+    g.pw(k, 'cancel', ['# Markers A / B (the hazards go with lib_clear; no ground decal to clear: the telegraph rule).',
+                       f'kill @e[type=minecraft:marker,tag={a}]', f'kill @e[type=minecraft:marker,tag={b}]'])
+
+
+# =============================================================================================
+# H2 달빛 점프 (spec H2_kick_jump.md): after the core's close-in to 3 b, the arm-shard / chain tell (0-10), the 360 low
+# sweep r 3 at knee height (active 10-13, jumpable; its hazard from 0, read from the shard tell), the spiral jump at 22
+# (glide to A, 0.8 b short of the player), the disc locked under the player 10 t before the impact at 42 (clamped to the
+# walk disc), the orb at her foot, the star flash, the kick, the falling disc and the impact r 2.5 (heavy knockback);
+# no ground decal, no knee-high ring, no target mark (footage v1 25.30-28.13, v4 28.45-31.13: none; the footage's star
+# flash is orb_star); DMG h2a / h2b (0.45 / 0.7), two separate hits (played ticks; 13 / 33 / 55 before the tuning).
+def jump(g):
+    R = g.rig
+    k = K_JUMP
+    a, b = 'rlk_mb_bf_p2a', 'rlk_mb_bf_p2b'
+    A_, L_ = mk(a), mk(b)
+    tl = TL(g, k)
+    hand = A.h_anchor('kick_jump', 'tell', 'hand_l_a', '^0.62 ^2.6 ^0.1')
+    orb = A.h_anchor('kick_jump', 'orb', 'foot_r', '^-0.36 ^2.77 ^0.3')
+    orb_k = A.h_anchor('kick_jump', 'kick', 'foot_r', '^-0.4 ^4.43 ^0.97')
+    tl.at(0, R('face/player'), f'execute at @s rotated as @s rotated ~ 0 positioned {hand} run ' + g.fx('shard_tell'),
+          g.snd('shard_tell'))
+    tl.span(1, rt('kick_jump', 10), R('face/track'))
+    for t in range(0, H2_SWEEP, 2):
+        tl.at(t, BODY + g.dust(hx('#B8F060'), 0.9, hand, (0.1, 0.25, 0.1), 3))
+    for t in range(0, H2_SWEEP, 4):
+        tl.at(t, BODY + g.particle('end_rod', hand, (0.1, 0.2, 0.1), 0.01, 1))
+    # the sweep: a disc r 3 around her floor point, feet test -0.5..1.0 b, active 4 t (quiet: no decal, no knee ring)
+    tl.at(H2_SWEEP - TELL, *quiet(g, f'execute positioned ~ {CY} ~ run ', g.hz_disc(3.0, TELL, DMG['h2a']),
+                                  act=H2_ACT, y1=H2_Y1, kb=KB['default']),
+          snd(g, 'block.amethyst_block.resonate', 0.35, 1.6))
+    tl.at(rt('kick_jump', 5), snd(g, 'block.amethyst_block.chime', 0.5, 1.8))
+    tl.at(H2_SWEEP - 3, BODY + g.kcard('streak', '^ ^0.1 ^0.3', '~ 90', col='#B8F060', s0=1.2, s1=1.6, life=3, fade=1),
+          snd(g, 'block.amethyst_block.resonate', 0.4, 1.6))
+    tl.at(H2_SWEEP, BODY + g.fx('sweep'), g.snd('sweep'), snd(g, 'entity.breeze.whirl', 0.6, 1.4))
+    tl.at(H2_SWEEP + 1, *g.h_ring_dust(hx('#B9E4A7'), 2.8, 16, y=0.4, scale=1.0))
+    tl.at(H2_SWEEP + 2, BODY + g.kcard('cres_lime', '^ ^0.5 ^', '~90 0', col='#D6FAC5', spin=170, s0=5.0, s1=6.0, life=4, fade=2),
+          BODY + g.kcard('cres_lime', '^ ^0.52 ^', '~270 0', col='#D6FAC5', spin=170, s0=5.0, s1=6.0, life=4, fade=2))
+    tl.at(H2_SWEEP + 4, *[BODY + c for c in radial(g, 'leaf', 6, '^ ^0.4 ^', 10, 0.3, 0.4, 2.0, 12, 6, col='#A8DF74', seed=17,
+                                                    bb='fixed')],
+          snd(g, 'block.moss.fall', 0.7, 0.8))
+    tl.at(H2_SWEEP + 5, snd(g, 'entity.player.attack.sweep', 0.4, 1.4))
+    tl.at(H2_SWEEP + 7, BODY + g.kcard('cres_lime', '^ ^0.05 ^0.6', '~ 0', col='#B9E4A7', s0=1.0, s1=1.3, life=20, fade=8))
+    # the spiral jump toward the player (A, 3.5 b at most, 0.8 b short), facing re-locked, tracking until the disc lock
+    tl.at(H2_JUMP - 2, R('face/player'))
+    tl.span(H2_JUMP - 1, H2_LOCK, R('face/track'))
+    tl.at(H2_JUMP, R('face/player'), *kill_mk(a), g.dest(3.5, 0.8), g.keep(a),
+          f'execute positioned as {A_} run function rlk:mboss/mv/glide {{t:{H2_LAND - H2_JUMP}}}',
+          BODY + g.fx('spiral_jump'), g.snd('spiral_jump'), snd(g, 'entity.breeze.whirl', 0.5, 1.0))
+    for i in range(9):                                       # helix dust on a rising r 1.4 helix
+        ang = math.radians(50 * i)
+        y = 0.3 + 0.35 * i
+        lines = []
+        for off in (0, math.pi):
+            x, z = 1.4 * math.sin(ang + off), 1.4 * math.cos(ang + off)
+            lines.append(g.dust(hx('#AADB84'), 1.0, f'~{A.L.num(x, 2)} ~{A.L.num(y, 2)} ~{A.L.num(z, 2)}', (0, 0, 0), 1))
+        tl.at(H2_JUMP + i, *lines)
+    tl.at(H2_JUMP + 3, snd(g, 'item.elytra.flying', 0.2, 1.4))
+    tl.at(H2_JUMP + 4, BODY + g.kcard('ripple', '^ ^2.4 ^', bb='center', col='#AADB84', spin=170, s0=1.5, s1=3.0, life=8, fade=3))
+    tl.at(H2_JUMP + 5, snd(g, 'entity.breeze.idle_air', 0.4, 0.8))
+    # the disc: locked under the player (walk disc), r 2.5, tell 10, heavy knockback (quiet: no decal, no target mark;
+    # the player reads the orb overhead, the star flash at 38 and the visibly falling disc, as in the footage)
+    tl.at(H2_LOCK, *g.h_lock_walk(b),
+          *quiet(g, at_mk(L_), g.hz_disc(2.5, H2_IMPACT - H2_LOCK, DMG['h2b']), kb=KB['heavy']),
+          f'execute at {L_} run ' + snd(g, 'block.amethyst_cluster.hit', 0.45, 1.8))
+    # the orb at her raised foot, its trail, the star flash, the kick and the falling disc
+    tl.at(H2_ORB, BODY + g.kcard('sphere', orb, bb='center', s0=0.6, s1=1.3, life=8, fade=2),
+          BODY + g.kcard('ripple', orb, bb='center', col='#D4F8C6', spin=120, s0=1.2, s1=1.8, life=8, fade=2),
+          snd(g, 'block.conduit.activate', 0.4, 1.8))
+    for t in range(H2_ORB + 2, H2_KICK - 1):
+        tl.at(t, BODY + g.dust(hx('#D4F8C6'), 1.0, orb, (0.15, 0.15, 0.15), 3))
+    tl.at(H2_ORB + 3, snd(g, 'item.trident.riptide_1', 0.25, 1.6))
+    tl.at(H2_KICK - 1, f'execute at @s rotated as @s rotated ~ 0 positioned {orb_k} run ' + g.fx('orb_star'))
+    tl.at(H2_KICK, f'execute at @s rotated as @s rotated ~ 0 positioned {orb_k} run ' + g.fx('orb_kick'),
+          g.snd('disc_kick'), at_mk(L_) + g.fx('disc_fall', h=2.7))
+    tl.at(H2_IMPACT, at_mk(L_) + g.fx('disc_impact'),
+          at_mk(L_) + g.kcard('glow', '~ ~0.06 ~', '~ 90', col='#C2ECB0', s0=4.0, s1=5.0, life=6, fade=3),
+          at_mk(L_) + g.particle('flash{color:[0.76,0.93,0.69,0.8]}', '~ ~0.6 ~', (0, 0, 0), 0, 1),
+          at_mk(L_) + g.dust(hx('#84C75D'), 1.6, '~ ~0.2 ~', (1.2, 0.2, 1.2), 20),
+          *[at_mk(L_) + c for c in radial(g, 'leaf', 6, '~ ~0.5 ~', (15, 40), 0.3, 0.4, 2.2, 14, 6, col='#A8DF74', seed=55)],
+          at_mk(L_) + g.snd('disc_impact'))
+    for t in range(H2_IMPACT + 1, H2_IMPACT + 8, 2):
+        tl.at(t, at_mk(L_) + g.dust(hx('#A8DF74'), 3.0, '~ ~1 ~', (1.2, 0.8, 1.2), 4),
+              at_mk(L_) + g.dust(hx('#8DC07E'), 3.5, '~ ~1 ~', (1.2, 0.8, 1.2), 3))
+    tl.at(H2_IMPACT + 2, at_mk(L_) + snd(g, 'block.azalea_leaves.break', 0.4, 1.2))
+    tl.at(H2_LAND, BODY + g.fx('land'), g.snd('land'), snd(g, 'block.moss.fall', 0.6, 1.0),
+          g.particle('poof', '~ ~0.1 ~', (0.4, 0.05, 0.4), 0.02, 6),
+          g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.5, 0.05, 0.5), 0, 8))
+    tl.at(L_JUMP, *kill_mk(a, b), g.end())
+    tl.write([f'# H2 달빛 점프 (clip kick_jump; after the core\'s close-in to 3 b). Sweep r 3 (quiet) {H2_SWEEP - TELL} -> {H2_SWEEP}',
+              f'# (active {H2_ACT} t, y <= {H2_Y1} b: jumpable), the jump {H2_JUMP} -> {H2_LAND}, the disc r 2.5 locked under the',
+              f'# player (walk disc) at {H2_LOCK} -> impact {H2_IMPACT} (orb {H2_ORB}, kick {H2_KICK}); {DMG["h2a"] / 100:g} / {DMG["h2b"] / 100:g} Dendro, 2 hits.'],
+             ['# H2 tick.'])
+    g.pw(k, 'cancel', [f'kill @e[type=minecraft:marker,tag={a}]', f'kill @e[type=minecraft:marker,tag={b}]'])
+
+
+# =============================================================================================
+# H3 달빛 돌진 (spec H3_dash_kick.md): the mote charge (0-5), the aim locked at 1 (D <= 7 b toward the player, 1.5 b
+# short; the kick disc r 1.5 1.2 b past D, tell 10, and the ring r 3.5 around D, tell 14, active 3: one group = one 1.3
+# hit), the dash in 2 t at 6, the kick at 11, the all-around ring at 15 (played ticks; lock 3, dash 10, kick 15, ring 19
+# before the tuning). No ground decal and no dash lane (footage v2 3.90-4.75: only the charge glow at her own feet,
+# kept in dash_charge); the player reads the mote charge, the rising chimes, the foot glint and the dash.
+
+
+def dash(g):
+    R = g.rig
+    k = K_DASH
+    a = 'rlk_mb_bf_p3a'
+    D_ = mk(a)
+    tl = TL(g, k)
+    foot = A.h_anchor('dash_kick', 'dash_end', 'foot_r', '^-0.4 ^1.1 ^1.1')
+    tl.at(0, R('face/player'), BODY + g.fx('dash_charge'), g.snd('dash_charge'))
+    tl.span(1, H3_LOCK - 1, R('face/track'))
+    for t in range(0, H3_DASH):
+        tl.at(t, g.dust(hx('#C7DB75'), 0.6, '~ ~1.0 ~', (0.9, 0.9, 0.9), 3), g.particle('end_rod', '~ ~1.0 ~', (0.8, 0.6, 0.8), 0.02, 1))
+    c0 = rt('dash_kick', 5)                                   # the motes converge (r 1.6 -> 1.0) until the dash
+    for t in range(c0, H3_DASH):
+        tl.at(t, *g.h_ring_dust(hx('#E6F6F8'), 1.6 - 0.6 * (t - c0) / max(1, H3_DASH - 1 - c0), 6, y=1.2, scale=0.5))
+    for t, p in ((2, 1.6), (4, 1.7), (6, 1.8), (8, 1.9)):
+        tl.at(rt('dash_kick', t), snd(g, 'block.amethyst_block.chime', 0.3, p))
+    # the lock: D, the kick + ring group (quiet: no decal)
+    tl.at(H3_LOCK, R('face/player'), *kill_mk(a), g.dest(7.0, 1.5), g.keep(a), g.GRP_NEW,
+          *quiet(g, at_mk(D_, 'positioned ^ ^ ^1.2 '), g.hz_disc(1.5, H3_KICK - H3_LOCK, DMG['h3']), grp=True, kb=KB['default']),
+          *quiet(g, at_mk(D_), g.hz_disc(3.5, H3_RING - H3_LOCK, DMG['h3']), grp=True, kb=KB['default'], act=H3_RING_ACT),
+          snd(g, 'block.amethyst_block.resonate', 0.35, 1.6))
+    tl.at(rt('dash_kick', 5), snd(g, 'block.azalea_leaves.break', 0.3, 1.7))
+    tl.at(H3_DASH - 2, BODY + g.kcard('glint', foot, bb='center', col='#F0FEF6', s0=0.3, s1=1.0, life=4, fade=2))
+    # the dash: S -> D in 2 t, a speed streak along the path, the afterimage at the start
+    tl.at(H3_DASH, f'execute positioned as {D_} run function rlk:mboss/mv/glide {{t:{H3_DASH_END - H3_DASH}}}',
+          f'execute at @s facing entity {D_} feet rotated ~ 0 run ' + g.fx('dash_streak'),
+          BODY + g.kcard('glow', '^ ^1.2 ^', bb='center', col='#B2FBDD', s0=1.2, s1=0.4, life=4, fade=2),
+          g.snd('dash'))
+    tl.at(H3_KICK - 1, aim(D_) + g.kcard('streak', '^ ^1.6 ^1.0', '~ 0', col='#F0FEF6', roll=35, s0=3.0, s1=4.0, life=3, fade=1),
+          snd(g, 'entity.player.attack.sweep', 0.5, 1.2))
+    tl.at(H3_KICK, aim(D_) + g.kcard('burst', '^ ^1.4 ^1.2', bb='center', s0=1.0, s1=4.0, life=4, fade=2),
+          aim(D_) + g.kcard('glow', '^ ^1.4 ^1.2', bb='center', col='#F9FDE0', s0=1.5, s1=3.5, life=4, fade=2),
+          aim(D_) + g.particle('flash{color:[0.98,0.99,0.88,0.9]}', '^ ^1.4 ^1.2', (0, 0, 0), 0, 1),
+          g.snd('dash_kick'), snd(g, 'entity.player.attack.strong', 0.5, 1.2))
+    tl.at(H3_KICK + 1, *[aim(D_) + c for c in radial(g, 'shard', 6, '^ ^1.4 ^1.2', (-20, 20), 0.6, 1.5, 1.4, 5, 2,
+                                                      col='#EAFDB2', seed=16)])
+    tl.at(H3_KICK + 2, snd(g, 'block.cherry_leaves.break', 0.7, 1.0))
+    tl.at(H3_RING - 1, snd(g, 'entity.player.attack.sweep', 0.8, 0.7))
+    # the all-around ring slash r 3.5 (kit kick_burst: crescent ring, flung blades, floor ripple) + its rim and dust
+    tl.at(H3_RING, at_mk(D_) + g.fx('kick_burst'),
+          at_mk(D_) + g.kcard('ripple', '^ ^1.0 ^', '~ 90', col='#E1F0A0', s0=6.0, s1=8.1, life=5, fade=2),
+          *[f'execute at {D_} run ' + x for x in g.h_ring_dust(hx('#D3FAB9'), 3.3, 24, y=1.0, scale=1.2)],
+          snd(g, 'block.cherry_leaves.break', 0.7, 1.1), snd(g, 'block.azalea.break', 0.6, 1.0))
+    tl.at(H3_RING + 1, at_mk(D_) + g.kcard('cres_lime', '^ ^1.05 ^', '~90 0', col='#B6F392', spin=170, s0=6.4, s1=7.0, life=4, fade=2),
+          at_mk(D_) + g.kcard('cres_lime', '^ ^1.05 ^', '~270 0', col='#B6F392', spin=170, s0=6.4, s1=7.0, life=4, fade=2))
+    tl.at(H3_RING + 2, snd(g, 'block.cherry_leaves.break', 0.5, 1.2))
+    for t in range(H3_RING + 3, H3_RING + 8, 2):
+        tl.at(t, g.dust(hx('#B6F392'), 0.9, '~ ~1.0 ~', (1.5, 0.3, 1.5), 3), g.particle('end_rod', '~ ~1.0 ~', (1.2, 0.3, 1.2), 0.03, 1))
+    tl.at(H3_RING + 4, *[BODY + g.kcard('leaf', f'^{x} ^1.6 ^{z}', bb='center', col='#A9ED97', s0=0.3, s1=0.4,
+                                         move=(0, -1.0, 0.3), life=12, fade=5) for x, z in ((0.8, 0.4), (-0.6, -0.5), (0.2, -1.0))])
+    tl.span(H3_RING + 7, L_DASH - 1, R('face/track'))
+    tl.at(L_DASH, *kill_mk(a), g.end())
+    tl.write([f'# H3 달빛 돌진 (clip dash_kick). Lock D at {H3_LOCK}: kick r 1.5 1.2 b past D (tell {H3_KICK - H3_LOCK}) + ring r 3.5',
+              f'# around D (tell {H3_RING - H3_LOCK}, act {H3_RING_ACT}), one group = one 1.3 hit; the dash {H3_DASH}-{H3_DASH_END}, kick {H3_KICK}, ring {H3_RING}.'],
+             ['# H3 tick.'])
+    g.pw(k, 'cancel', [f'kill @e[type=minecraft:marker,tag={a}]'])
+
+
+# =============================================================================================
+# H4 광폭한 진공 (spec H4_vacuum.md): crouch (0-4, tracking), the glint at 5 locks the yaw (no lane on the floor: the
+# footage v2 13.20-14.40 shows none), the rear-up, the stomp at 12, the vertical crescent blade (the kit's vblade look, 3 wide x 4
+# tall) launched at 13 along the locked line at 0.75 b/t (blade hit shape, hr 1.5, no homing, 60 t, stopped by the
+# wall, one hit and it flies on), the backflip 2.5 b straight back, the landing at 34; 1.2 Dendro (played ticks; glint
+# 9, stomp 16, blade 17, landing 38 before the tuning).
+H4_TAG, H4_SEL = 'rlk_mb_bf_p4b', '@e[type=minecraft:item_display,tag=rlk_mb_bf_p4b]'
+
+
+def vacuum(g):
+    R = g.rig
+    k = K_VAC
+    tl = TL(g, k)
+    foot0 = A.h_anchor('vacuum', 'crouch', 'foot_r', '^-0.42 ^0.15 ^0.06')
+    foot_t = A.h_anchor('vacuum', 'tell', 'foot_r', '^-0.3 ^0.21 ^0.12')
+    core_b = A.h_anchor('vacuum', 'backflip', 'core', '^ ^2.4 ^0.46')
+    tl.at(0, R('face/player'), f'execute at @s rotated as @s rotated ~ 0 positioned {foot0} run ' + g.fx('vac_crouch'),
+          snd(g, 'block.moss_carpet.step', 0.4, 0.9))
+    tl.span(1, H4_GLINT - 1, R('face/track'))
+    for t in range(0, H4_GLINT, 2):
+        tl.at(t, BODY + g.dust(hx('#E2FC88'), 0.8, foot0, (0.1, 0.15, 0.1), 2),
+              BODY + g.dust(hx('#C9F2AD'), 0.6, foot0, (0.1, 0.3, 0.1), 1, 0.01))
+    # the glint: the yaw is locked (face/player once, no tracking after)
+    tl.at(H4_GLINT, R('face/player'),
+          f'execute at @s rotated as @s rotated ~ 0 positioned {foot_t} run ' + g.fx('vac_glint'), g.snd('vacuum_glint'))
+    # rear-up 0.3 b back on the line, the stomp
+    tl.span(H4_GLINT + 3, H4_GLINT + 5, back_step(0.1))
+    tl.at(H4_GLINT + 3, g.particle('poof', '~ ~0.1 ~', (0.25, 0.02, 0.25), 0.02, 2))
+    tl.at(H4_GLINT + 4, snd(g, 'entity.breeze.jump', 0.4, 1.0))
+    tl.at(H4_STOMP, f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^1.0 positioned ~ {CY} ~ run ' + g.fx('vac_stomp'),
+          BODY + g.kcard('flame_tongue', '^ ^ ^1.0', bb='vertical', s0=0.4, s1=1.2, life=4, fade=2),
+          BODY + g.particle('block{block_state:"minecraft:mossy_cobblestone"}', '^ ^0.2 ^1.0', (0.4, 0.2, 0.4), 0.2, 8))
+    # (no stomp sound layers here: snd/vacuum_blade one tick later is the stomp + blade rise; review fix FX-4)
+    # the blade: an item_display 0.9 b over the floor 1 b ahead, the kit's lime crescent, rising from its lower tip
+    # (scale 0.3 -> 1 over 3 t about the tip 0.9 b under the prop), launched along the locked yaw at pitch 0
+    s = 0.3
+    t0 = (-1.9 * s, -0.9 + s * (1.02 + 0.9), 0.0)
+    small = (f'{{translation:[{A.L.num(t0[0], 3)}f,{A.L.num(t0[1], 3)}f,0f],left_rotation:[0.5f,0.5f,0.5f,0.5f],'
+             f'scale:[{A.L.num(4.4 * s, 3)}f,{A.L.num(1.0 * s, 3)}f,{A.L.num(6.8 * s, 3)}f],right_rotation:[0f,0f,0f,1f]}}')
+    new = '@e[type=minecraft:item_display,tag=rlk_mb_bf_p4n,limit=1]'
+    tl.at(H4_BLADE,
+          f'execute rotated as @s rotated ~ 0 positioned ^ ^0.9 ^{A.L.num(H4_P0)} run summon minecraft:item_display ~ ~ ~ '
+          f'{{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p4","{H4_TAG}","rlk_mb_bf_p4n","rlk_mb_bf_p4g"],teleport_duration:1,'
+          f'interpolation_duration:3,billboard:"fixed",view_range:1.5f,shadow_radius:0f,brightness:{{block:15,sky:15}},'
+          f'item:{{id:"minecraft:paper",count:1}},transformation:{small}}}',
+          f'execute rotated as @s rotated ~ 0 positioned ^ ^0.9 ^{A.L.num(H4_P0)} run tp {new} ~ ~ ~ ~ 0',
+          f'execute as {new} run ' + g.kit.look('cres_lime'),
+          f'scoreboard players set {new} mbId 4',
+          *g.pj_opts(shape=1, kb=KB['default'], wall=1),
+          f'execute as {new} at @s run ' + g.pj_launch(H4_SPD, H4_LIFE, DMG['h4'], H4_HR),
+          'tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n] remove rlk_mb_bf_p4n',
+          'scoreboard players set #bp4B mb 1',
+          g.snd('vacuum_blade'), snd(g, 'block.azalea_leaves.break', 0.6, 0.9))
+    tl.at(H4_BLADE + 1, 'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p4g] run data merge entity @s {start_interpolation:0}',
+          'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p4g] run ' + g.kprop('vblade'),
+          'tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p4g] remove rlk_mb_bf_p4g')
+    # the backflip: 2.5 b straight back along the locked line, airborne to the landing
+    tl.span(H4_BACK + 1, H4_BACK + 17, back_step(0.15))
+    for t in range(H4_BACK, H4_BACK + 18, 2):
+        tl.at(t, BODY + g.dust(hx('#C9F2AD'), 0.7, core_b, (0.15, 0.15, 0.15), 1))
+    tl.at(H4_BACK + 3, snd(g, 'item.trident.riptide_1', 0.3, 1.6))
+    tl.at(H4_LAND, BODY + g.fx('land'), g.snd('land'), snd(g, 'block.moss.fall', 0.5, 1.0),
+          g.particle('poof', '~ ~0.1 ~', (0.4, 0.05, 0.4), 0.02, 6),
+          g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.5, 0.05, 0.5), 0, 8))
+    tl.at(L_VAC, g.end())
+    tl.write([f'# H4 광폭한 진공 (clip vacuum). The glint {H4_GLINT}: the yaw locked (no lane decal: the telegraph rule); the stomp {H4_STOMP};',
+              f'# the blade at {H4_BLADE} (pj blade hr {H4_HR}, {H4_SPD} b/t -> {H4_EFF}, {H4_LIFE} t, no homing; it outlives the',
+              f'# pattern: p/{k}/blades from the core ai/state); the backflip {H4_BACK + 1}-{H4_BACK + 17}, the landing {H4_LAND}; 1.2 Dendro.'],
+             ['# H4 tick.'])
+    g.pw(k, 'cancel', ['# The blade (and any helper of this pattern).',
+                       'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_p4]', 'scoreboard players set #bp4B mb 0'])
+    # the blade's own tick (from the core's ai/state while #bp4B >= 1; it lives on after the pattern's end)
+    g.pw(k, 'blades', ['# Core hook (ai/state, while #bp4B >= 1): every flying vacuum blade, then their count.',
+                       'scoreboard players set #bp4B mb 0',
+                       f'execute as {H4_SEL} at @s run function {A.NS}p/{k}/blade'])
+    g.pw(k, 'blade', [
+        '# @s = a blade prop, at and rotated as it (0.9 b over the floor), before the framework moves it this tick',
+        f'# (core ai/state, so its age mbPjT = pattern clock - {H4_BLADE}: the trail from {H4_BLADE + 1}, every 2 t).',
+        'scoreboard players add #bp4B mb 1',
+        g.dust(hx('#64BC56'), 1.4, '^ ^-0.85 ^', (1.3, 0.2, 0.1), 3),
+        g.dust_fade(hx('#F6FDE0'), hx('#64BC56'), 1.0, '^ ^2.9 ^', (1.0, 0.2, 0.1), 2),
+        'scoreboard players operation #bfM mb = @s mbPjT', 'scoreboard players operation #bfM mb %= #bfK2 mb',
+        f'execute if score #bfM mb matches 1 positioned ^ ^-0.9 ^ run ' + g.fx('vac_trail'),
+        'scoreboard players operation #bfM mb = @s mbPjT', 'scoreboard players operation #bfM mb %= #bfK4 mb',
+        f'execute if score #bfM mb matches 1 run function {A.NS}p/{k}/debris',
+        'execute if score @s mbPjT matches 6 run ' + snd(g, 'entity.breeze.idle_air', 0.4, 1.0),
+        f'execute unless entity @s[tag=rlk_mb_bf_p4s] if entity @e[tag=rlk_body,distance=..4,limit=1] run function {A.NS}p/{k}/pass'])
+    g.pw(k, 'debris', ['# Every 4 t: rock debris and two lime leaves thrown up and forward, the grass rustle.',
+                       g.particle('block{block_state:"minecraft:mossy_cobblestone"}', '^ ^-0.8 ^', (0.6, 0.1, 0.2), 0.15, 2),
+                       g.kcard('leaf', '^0.6 ^-0.5 ^', bb='center', col='#A9E97D', s0=0.3, s1=0.4, move=(0, 1.2, 1.5), life=10, fade=5),
+                       g.kcard('leaf', '^-0.6 ^-0.5 ^', bb='center', col='#A9E97D', s0=0.3, s1=0.4, move=(0, 1.2, 1.5), life=10, fade=5),
+                       snd(g, 'block.grass.break', 0.5, 1.0)])
+    g.pw(k, 'pass', ['# The blade rushes past the player (once per blade): the hiss and low thump at the blade.',
+                     'tag @s add rlk_mb_bf_p4s', g.snd('vacuum_pass')])
+    g.pw(k, 'pj_end', [
+        '# @s = the blade (#pjEv 1 wall, 2 life over, 4 hit the player). A hit: a spark at the player, the blade flies on',
+        '# harmlessly (#pjKeep 1, the framework default). The wall or the end of its life: it shatters.',
+        f'execute if score #pjEv mb matches 4 run return run function {A.NS}p/{k}/hit',
+        g.kcard('burst', '~ ~1.1 ~', bb='center', s0=1.0, s1=3.0, life=4, fade=2),
+        *[f'execute rotated as @s rotated ~ 0 run ' + c for c in radial(g, 'shard', 5, '~ ~1.1 ~', (10, 50), 0.5, 1.2, 1.8, 8, 4,
+                                                                         col='#A9E97D', seed=4)],
+        g.particle('block{block_state:"minecraft:lime_stained_glass"}', '~ ~1.0 ~', (0.8, 1.2, 0.3), 0, 14),
+        snd(g, 'block.amethyst_cluster.break', 0.6, 1.2), snd(g, 'entity.breeze.wind_burst', 0.4, 1.4),
+        'scoreboard players set #pjKeep mb 0'])
+    g.pw(k, 'hit', ['# The blade hit the player: a lime spark there; it flies on harmlessly to the wall.',
+                    'scoreboard players set #pjKeep mb 1',
+                    'execute at @e[tag=rlk_body,limit=1] run ' + g.kcard('glint', '~ ~1 ~', bb='center', col='#D6F7B9', s0=0.4, s1=1.4, life=4, fade=2),
+                    'execute at @e[tag=rlk_body,limit=1] run ' + g.particle('crit', '~ ~1 ~', (0.3, 0.5, 0.3), 0.3, 8)])

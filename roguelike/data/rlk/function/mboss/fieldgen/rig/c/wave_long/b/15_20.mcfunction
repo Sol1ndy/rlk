@@ -1,0 +1,4 @@
+execute if score @s fgRigT matches 15 run return run function rlk:mboss/fieldgen/rig/c/wave_long/k/15
+execute if score @s fgRigT matches 17 run return run function rlk:mboss/fieldgen/rig/c/wave_long/k/17
+execute if score @s fgRigT matches 19 run return run function rlk:mboss/fieldgen/rig/c/wave_long/k/19
+execute if score @s fgRigT matches 20 run return run function rlk:mboss/fieldgen/rig/c/wave_long/k/20

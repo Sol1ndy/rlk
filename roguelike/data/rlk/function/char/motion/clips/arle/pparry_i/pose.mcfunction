@@ -1,0 +1,17 @@
+execute if score @s pmTick matches 0 run function rlk:char/motion/clips/arle/pparry_i/pose/0 with storage rlk:player_motion active
+execute if score @s pmTick matches 1 run function rlk:char/motion/clips/arle/pparry_i/pose/1 with storage rlk:player_motion active
+execute if score @s pmTick matches 2 run function rlk:char/motion/clips/arle/pparry_i/pose/2 with storage rlk:player_motion active
+execute if score @s pmTick matches 3 run function rlk:char/motion/clips/arle/pparry_i/pose/3 with storage rlk:player_motion active
+execute if score @s pmTick matches 4 run function rlk:char/motion/clips/arle/pparry_i/pose/4 with storage rlk:player_motion active
+execute if score @s pmTick matches 5 run function rlk:char/motion/clips/arle/pparry_i/pose/5 with storage rlk:player_motion active
+execute if score @s pmTick matches 6 run function rlk:char/motion/clips/arle/pparry_i/pose/6 with storage rlk:player_motion active
+execute if score @s pmTick matches 7 run function rlk:char/motion/clips/arle/pparry_i/pose/7 with storage rlk:player_motion active
+execute if score @s pmTick matches 8 run function rlk:char/motion/clips/arle/pparry_i/pose/8 with storage rlk:player_motion active
+execute if score @s pmTick matches 9 run function rlk:char/motion/clips/arle/pparry_i/pose/9 with storage rlk:player_motion active
+execute if score @s pmTick matches 10 run function rlk:char/motion/clips/arle/pparry_i/pose/10 with storage rlk:player_motion active
+execute if score @s pmTick matches 11 run function rlk:char/motion/clips/arle/pparry_i/pose/11 with storage rlk:player_motion active
+execute if score @s pmTick matches 12 run function rlk:char/motion/clips/arle/pparry_i/pose/12 with storage rlk:player_motion active
+execute if score @s pmTick matches 13 run function rlk:char/motion/clips/arle/pparry_i/pose/13 with storage rlk:player_motion active
+execute if score @s pmTick matches 14 run function rlk:char/motion/clips/arle/pparry_i/pose/14 with storage rlk:player_motion active
+execute if score @s pmTick matches 15 run function rlk:char/motion/clips/arle/pparry_i/pose/15 with storage rlk:player_motion active
+execute if score @s pmTick matches 16 run function rlk:char/motion/clips/arle/pparry_i/pose/16 with storage rlk:player_motion active

@@ -59,10 +59,6 @@ fill 6 201 -5 8 201 -5 minecraft:podzol
 fill 14 201 7 18 201 8 minecraft:podzol
 fill 14 201 9 14 201 11 minecraft:podzol
 fill 15 201 11 18 201 11 minecraft:podzol
-fill 7 201 14 18 201 15 minecraft:podzol
-fill 5 201 15 6 201 15 minecraft:podzol
-fill 5 201 16 5 201 18 minecraft:podzol
-fill 4 201 17 4 201 18 minecraft:podzol
 fill 7 201 -19 11 201 -18 minecraft:dirt
 fill 7 202 -19 11 202 -18 minecraft:podzol
 fill 6 201 -18 6 201 -16 minecraft:dirt
@@ -77,14 +73,8 @@ fill 7 201 -16 11 201 -16 minecraft:dirt
 fill 7 202 -16 11 202 -16 minecraft:podzol
 fill 15 201 9 18 201 10 minecraft:dirt
 fill 15 202 9 18 202 10 minecraft:podzol
-fill 6 201 16 18 201 16 minecraft:dirt
-fill 6 202 16 18 202 16 minecraft:podzol
-fill 6 201 17 6 201 18 minecraft:dirt
-fill 6 202 17 6 202 18 minecraft:podzol
 fill 7 201 -17 11 202 -17 minecraft:dirt
 fill 7 203 -17 11 203 -17 minecraft:podzol
-fill 7 201 17 18 202 18 minecraft:dirt
-fill 7 203 17 18 203 18 minecraft:podzol
 fill 3 201 6 4 205 7 minecraft:calcite
 fill 3 206 6 4 206 7 minecraft:podzol
 fill 18 201 -18 18 207 -14 minecraft:calcite
@@ -138,7 +128,7 @@ execute positioned 6 203 -17 run function rlk:room/prop/fo_lamp
 execute positioned 1 201 -2 run function rlk:room/prop/fo_rock
 execute positioned 1 201 6 run function rlk:room/prop/p_grass
 execute positioned 2 201 6 run function rlk:room/prop/fo_flower
-execute positioned 14 202 15 run function rlk:room/prop/fo_flower
+execute positioned 14 201 15 run function rlk:room/prop/fo_flower
 execute positioned 13 201 4 run function rlk:room/prop/p_grass
 execute positioned 11 203 -19 run function rlk:room/prop/fo_flower
 execute positioned 11 201 9 run function rlk:room/prop/p_grass
@@ -148,9 +138,9 @@ execute positioned 3 201 16 run function rlk:room/prop/p_grass
 execute positioned 4 201 15 run function rlk:room/prop/p_grass
 execute positioned 8 201 4 run function rlk:room/prop/p_grass
 execute positioned 10 201 -7 run function rlk:room/prop/fo_flower
-execute positioned 12 202 14 run function rlk:room/prop/fo_white
+execute positioned 12 201 14 run function rlk:room/prop/fo_white
 execute positioned 3 201 -2 run function rlk:room/prop/fo_flower
-execute positioned 9 204 17 run function rlk:room/prop/fo_flower
+execute positioned 9 201 17 run function rlk:room/prop/fo_flower
 execute positioned 16 202 8 run function rlk:room/prop/p_grass
 execute positioned 11 201 8 run function rlk:room/prop/fo_flower
 execute positioned 4 201 14 run function rlk:room/prop/fo_flower

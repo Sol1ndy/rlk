@@ -32,17 +32,12 @@ fill 1 201 6 1 201 8 minecraft:podzol
 fill 5 201 6 5 201 11 minecraft:podzol
 fill 3 201 9 3 201 10 minecraft:podzol
 fill 4 201 10 4 201 11 minecraft:podzol
-fill 7 201 15 18 201 16 minecraft:podzol
-fill 6 201 16 6 201 18 minecraft:podzol
-fill 5 201 17 5 201 18 minecraft:podzol
 fill 5 201 5 5 201 5 minecraft:dirt
 fill 5 202 5 5 202 5 minecraft:podzol
 fill 3 201 6 4 201 8 minecraft:dirt
 fill 3 202 6 4 202 8 minecraft:podzol
 fill 4 201 9 4 201 9 minecraft:dirt
 fill 4 202 9 4 202 9 minecraft:podzol
-fill 7 201 17 18 201 18 minecraft:dirt
-fill 7 202 17 18 202 18 minecraft:podzol
 fill 3 201 4 4 207 5 minecraft:stone
 fill 3 208 4 4 208 5 minecraft:podzol
 execute positioned 7 202 4 run function rlk:room/prop/p_boulder
@@ -50,9 +45,9 @@ execute positioned 3 201 12 run function rlk:room/prop/p_ruin_x
 execute positioned 11 201 4 run function rlk:room/prop/p_dandelion
 execute positioned 8 202 4 run function rlk:room/prop/p_dandelion
 execute positioned 18 201 11 run function rlk:room/prop/p_wildflower
-execute positioned 8 203 18 run function rlk:room/prop/p_wildflower
+execute positioned 8 201 18 run function rlk:room/prop/p_wildflower
 execute positioned 5 201 14 run function rlk:room/prop/p_dandelion
 execute positioned 14 201 11 run function rlk:room/prop/p_wildflower
-execute positioned 14 202 15 run function rlk:room/prop/p_grass
+execute positioned 14 201 15 run function rlk:room/prop/p_grass
 setblock 3 209 5 minecraft:azalea_leaves[persistent=true] keep
 setblock 4 209 4 minecraft:azalea_leaves[persistent=true] keep

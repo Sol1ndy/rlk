@@ -25,9 +25,7 @@ fill 7 202 19 7 202 19 minecraft:diorite
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
 fill 2 201 1 3 201 1 minecraft:podzol
-fill 6 201 1 6 201 3 minecraft:podzol
 fill 3 201 2 3 201 5 minecraft:podzol
-fill 7 201 3 18 201 4 minecraft:podzol
 fill 4 201 6 4 201 6 minecraft:podzol
 fill 5 201 7 5 201 9 minecraft:podzol
 fill 16 201 7 18 201 7 minecraft:podzol
@@ -43,8 +41,6 @@ fill 14 201 17 14 201 18 minecraft:podzol
 fill 15 201 18 16 201 18 minecraft:podzol
 fill 1 201 1 1 201 9 minecraft:dirt
 fill 1 202 1 1 202 9 minecraft:podzol
-fill 7 201 1 18 201 2 minecraft:dirt
-fill 7 202 1 18 202 2 minecraft:podzol
 fill 2 201 2 2 201 8 minecraft:dirt
 fill 2 202 2 2 202 8 minecraft:podzol
 fill 3 201 6 3 201 8 minecraft:dirt
@@ -77,7 +73,7 @@ execute positioned 5 202 8 run function rlk:room/prop/fo_white
 execute positioned 9 201 6 run function rlk:room/prop/fo_white
 execute positioned 16 203 13 run function rlk:room/prop/p_grass
 execute positioned 15 202 12 run function rlk:room/prop/fo_flower
-execute positioned 7 203 1 run function rlk:room/prop/p_grass
+execute positioned 7 201 1 run function rlk:room/prop/p_grass
 execute positioned 15 203 16 run function rlk:room/prop/p_grass
 execute positioned 3 203 7 run function rlk:room/prop/p_grass
 execute positioned 5 201 1 run function rlk:room/prop/fo_flower

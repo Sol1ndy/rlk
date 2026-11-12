@@ -1,5 +1,8 @@
 execute unless score #k197 snd matches 1 run function rlk:snd/f213
-execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"maxHealth",pm:60}
+# 피해 = 최대 체력의 #salonPm‰ (강화 단계로 조정)
+data modify storage rlk:tune m_salon_invite.obj set value "maxHealth"
+execute store result storage rlk:tune m_salon_invite.pm int 1 run scoreboard players get #salonPm tmp
+execute as @a[tag=player,limit=1] run function rlk:items/calc_stat with storage rlk:tune m_salon_invite
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 2

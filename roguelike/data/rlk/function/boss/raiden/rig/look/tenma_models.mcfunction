@@ -1,0 +1,11 @@
+# Internal: the Tenma body models.
+data modify entity 524c4b4d-5244-4900-8000-000000000001 item.components."minecraft:item_model" set value "rlk:raiden/t_head"
+data modify entity 524c4b4d-5244-4900-8000-000000000002 item.components."minecraft:item_model" set value "rlk:raiden/t_body"
+data modify entity 524c4b4d-5244-4900-8000-000000000003 item.components."minecraft:item_model" set value "rlk:raiden/t_right_arm"
+data modify entity 524c4b4d-5244-4900-8000-000000000004 item.components."minecraft:item_model" set value "rlk:raiden/t_right_forearm"
+data modify entity 524c4b4d-5244-4900-8000-000000000005 item.components."minecraft:item_model" set value "rlk:raiden/t_left_arm"
+data modify entity 524c4b4d-5244-4900-8000-000000000006 item.components."minecraft:item_model" set value "rlk:raiden/t_left_forearm"
+data modify entity 524c4b4d-5244-4900-8000-000000000007 item.components."minecraft:item_model" set value "rlk:raiden/t_right_leg"
+data modify entity 524c4b4d-5244-4900-8000-000000000008 item.components."minecraft:item_model" set value "rlk:raiden/t_right_shin"
+data modify entity 524c4b4d-5244-4900-8000-000000000009 item.components."minecraft:item_model" set value "rlk:raiden/t_left_leg"
+data modify entity 524c4b4d-5244-4900-8000-00000000000a item.components."minecraft:item_model" set value "rlk:raiden/t_left_shin"

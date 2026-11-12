@@ -1,0 +1,8 @@
+particle minecraft:dust{color:[0.62f,0.15f,0.24f],scale:3} 216.21 204 18.83 1.2 2.6 1.2 0 5 force @a[tag=player]
+particle minecraft:dust{color:[0.49f,0.15f,0.22f],scale:2} 216.21 208 18.83 1.6 2 1.6 0 3 force @a[tag=player]
+particle minecraft:dust{color:[0.62f,0.15f,0.24f],scale:3} 210.83 204 -8.21 1.2 2.6 1.2 0 5 force @a[tag=player]
+particle minecraft:dust{color:[0.49f,0.15f,0.22f],scale:2} 210.83 208 -8.21 1.6 2 1.6 0 3 force @a[tag=player]
+particle minecraft:dust{color:[0.62f,0.15f,0.24f],scale:3} 183.79 204 -2.83 1.2 2.6 1.2 0 5 force @a[tag=player]
+particle minecraft:dust{color:[0.49f,0.15f,0.22f],scale:2} 183.79 208 -2.83 1.6 2 1.6 0 3 force @a[tag=player]
+particle minecraft:dust{color:[0.62f,0.15f,0.24f],scale:3} 189.17 204 24.21 1.2 2.6 1.2 0 5 force @a[tag=player]
+particle minecraft:dust{color:[0.49f,0.15f,0.22f],scale:2} 189.17 208 24.21 1.6 2 1.6 0 3 force @a[tag=player]

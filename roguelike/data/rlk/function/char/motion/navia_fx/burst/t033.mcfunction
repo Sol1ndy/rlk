@@ -1,0 +1,31 @@
+# (retimed from t033)
+# energy drawn in toward her chest (the video's radial zoom, rel 30-34)
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^-0.667 ^1.15 ^0.343 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^-0.485 ^1.15 ^0.572 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^-0.229 ^1.15 ^0.714 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^0.062 ^1.15 ^0.747 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^0.343 ^1.15 ^0.667 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^0.572 ^1.15 ^0.485 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^0.714 ^1.15 ^0.229 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^0.747 ^1.15 ^-0.062 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^0.667 ^1.15 ^-0.343 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^0.485 ^1.15 ^-0.572 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^0.229 ^1.15 ^-0.714 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^-0.062 ^1.15 ^-0.747 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^-0.343 ^1.15 ^-0.667 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^-0.572 ^1.15 ^-0.485 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^-0.714 ^1.15 ^-0.229 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^-0.747 ^1.15 ^0.062 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.606 ^0.08 ^0.614 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.218 ^0.08 ^0.835 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.229 ^0.08 ^0.832 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.614 ^0.08 ^0.606 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.835 ^0.08 ^0.218 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.832 ^0.08 ^-0.229 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.606 ^0.08 ^-0.614 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.218 ^0.08 ^-0.835 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.229 ^0.08 ^-0.832 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.614 ^0.08 ^-0.606 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.835 ^0.08 ^-0.218 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.832 ^0.08 ^0.229 0 0 0 0 1 normal
+particle minecraft:end_rod ^0 ^1.2 ^0 0.3 0.3 0.3 0 4 normal

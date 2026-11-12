@@ -1,0 +1,4 @@
+# Chain into org_die now (its tick 0); basic/tick then advances to 1. @s = the husk.
+scoreboard players set @s apOI 5
+scoreboard players set @s apOC 0
+function rlk:boss/apep/om/basic/c/org_die/k/0

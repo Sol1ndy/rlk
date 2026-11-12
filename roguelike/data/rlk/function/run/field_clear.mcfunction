@@ -36,6 +36,7 @@ kill @e[tag=rlk_storm]
 kill @e[tag=rlk_meteor]
 kill @e[tag=rlk_case]
 kill @e[tag=rlk_tengu]
+function rlk:fx/nv/clear
 kill @e[type=minecraft:experience_orb]
 tag @e[tag=rlk_llm] remove rlk_llm
 # 따라다니던 효과의 남은 시간도 끝낸다(까마귀·고리·살롱 멤버 등)

@@ -1,0 +1,12 @@
+# (macro px.o) @s = the anchor: one tp per proxy to ^x ^y ^z from the anchor (yaw only; y 0 live, -8 parked).
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000041 run tp @s ^$(head_x) ^$(head_y) ^$(head_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000042 run tp @s ^$(chest_x) ^$(chest_y) ^$(chest_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000043 run tp @s ^$(abd_x) ^$(abd_y) ^$(abd_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000044 run tp @s ^$(tail_a_x) ^$(tail_a_y) ^$(tail_a_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000045 run tp @s ^$(tail_b_x) ^$(tail_b_y) ^$(tail_b_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000046 run tp @s ^$(a_l_x) ^$(a_l_y) ^$(a_l_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000047 run tp @s ^$(b_l_x) ^$(b_l_y) ^$(b_l_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000048 run tp @s ^$(c_l_x) ^$(c_l_y) ^$(c_l_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-000000000049 run tp @s ^$(a_r_x) ^$(a_r_y) ^$(a_r_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-00000000004a run tp @s ^$(b_r_x) ^$(b_r_y) ^$(b_r_z)
+$execute at @s rotated as @s rotated ~ 0 as 524c4b4d-4150-4400-8000-00000000004b run tp @s ^$(c_r_x) ^$(c_r_y) ^$(c_r_z)

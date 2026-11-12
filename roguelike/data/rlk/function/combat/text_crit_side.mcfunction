@@ -1,0 +1,3 @@
+# combat/text_normal_side: 홍련 옆의 작은 피해 숫자(실행 방향 = 그녀에게서 플레이어 쪽 + 90도, 수평; oy = 높이, oz = 그 방향으로
+# ±1.1 ~ 1.5칸(그녀의 옆), ox = 플레이어 쪽으로 ±0.2칸). 치명타: 1.2배, ✦ 장식(바깥 ✧ 없이)
+$execute positioned ~ ~$(oy) ~ run summon minecraft:text_display ^$(ox) ^ ^$(oz) {billboard:"center",Tags:["dmgText"],background:0,brightness:{sky:15,block:15},shadow:true,alignment:"center",see_through:true,text:{text:"",extra:[{text:"✦ ",color:"$(sc2)",bold:true},{text:"$(dmg)",color:"$(col)",bold:true},{text:" ✦",color:"$(sc2)",bold:true}]},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f]}}

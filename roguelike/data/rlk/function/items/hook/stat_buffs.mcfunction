@@ -36,8 +36,6 @@ execute if score #srcN itv matches 3.. run scoreboard players operation @s cryoB
 execute if score #srcN itv matches 3.. run scoreboard players operation @s geoBonus += #srcDmg tmp
 execute if score #srcN itv matches 3.. run scoreboard players operation @s anemoBonus += #srcDmg tmp
 execute if score #srcN itv matches 3.. run scoreboard players operation @s dendroBonus += #srcDmg tmp
-# 요이미야 고유 특성 소매불 백경도: 스택당 불 원소 피해 보너스
-execute if score #charN tmp matches 2 if score @s yoiP matches 1.. run function rlk:char/yoimiya/passive_stat
 # 클로린드 고유 특성: 생명의 계약이 변할 때마다 치명타 확률
 execute if score #charN tmp matches 4 if score @s clP matches 1.. run function rlk:char/clorinde/passive_stat
 # 아를레키노: 붉은 죽음의 가면 중 불 원소 피해 보너스
@@ -53,3 +51,10 @@ execute if score #loomT itv matches 1.. run scoreboard players operation @s elem
 # 네페르: 기본 원소 마스터리 +#nfEm, 기만의 장막 3스택 = +100
 execute if score #charN tmp matches 8 run scoreboard players operation @s elemMastery += #nfEm tmp
 execute if score #charN tmp matches 8 if score @s nfVeil matches 3.. run scoreboard players add @s elemMastery 100
+# 중간보스 전투 중 치명타 확률 · 치명타 피해 보정(#mbCritAdd: 달빛 고치 −100, 달빛 축복 받음 +15 / #mbCritDmgAdd: 달빛 축복 받음 +50). 전투가 끝나면 0
+execute if score #mbLive mb matches 1 run scoreboard players operation @s critChance += #mbCritAdd mb
+execute if score #mbLive mb matches 1 run scoreboard players operation @s critDamage += #mbCritDmgAdd mb
+# 화무십일홍: 육참골단 중첩(공격력%) · 체력 60% 이하 치명타 피해 · 홍련일섬 뒤 치명타 확률
+execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_stat
+# 월하대작(특수 보스 홍련의 이벤트 버프, 이번 런): 최종 공격력(ampAtk) · 치명타 확률 · 이동 속도(load 의 조절 지점 #hrMoon*)
+execute if score @s hrMoon matches 1.. run function rlk:player/hr_moon/apply

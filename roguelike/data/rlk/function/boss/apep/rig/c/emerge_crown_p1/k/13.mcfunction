@@ -1,0 +1,9 @@
+data merge entity 524c4b4d-4150-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,4.69025f,1.73404f],left_rotation:[-0.02913f,0f,0f,0.99958f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,5.04789f,1.68313f],left_rotation:[-0.02913f,0f,0f,0.99958f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000000c {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,5.15597f,2.84881f],left_rotation:[-0.02913f,0f,0f,0.99958f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[3.68608f,3.97255f,0.98622f],left_rotation:[-0.13862f,-0.00947f,-0.07427f,0.98751f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-3.68608f,3.97255f,0.98622f],left_rotation:[-0.13862f,0.00947f,0.07427f,0.98751f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001d {start_interpolation:0,interpolation_duration:1,transformation:{translation:[2.21468f,2.62429f,1.95928f],left_rotation:[-0.08453f,0.08725f,-0.01175f,0.99252f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001e {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-2.21468f,2.62429f,1.95928f],left_rotation:[-0.08453f,-0.08725f,0.01175f,0.99252f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+scoreboard players set @s apRigFy 10
+scoreboard players reset @s apRigQx

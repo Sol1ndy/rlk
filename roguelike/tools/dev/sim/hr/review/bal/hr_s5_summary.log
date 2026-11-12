@@ -1,0 +1,141 @@
+== 홍련 (hrfair)
+scarlet a13 melee:dash:sword                   n 3 %max/min  108.1 w40   9.0% (no fail   9.0) deaths 0.0+0.0 hits/min 23.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 0 -> pips 0 (- %; w/o refused - %), presses 0 refused 0, pips taken 60/108 cuts, cut hits 48, cuts %max per gauntlet mean 17.9 max 17.9, discs 5.6, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 0.00 b
+    damage share by pattern {'27': 100.0}  (wall 26 s, cmd/t 487)
+scarlet a13 stand:none:sword g=in22            n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {'27': 100.0}  (wall 24 s, cmd/t 480)
+scarlet a13 stand:none:sword g=in28            n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {'27': 100.0}  (wall 24 s, cmd/t 481)
+scarlet a13 stand:none:sword                   n 3 %max/min  262.5 w40  16.8% (no fail  16.8) deaths 0.0+4.0 hits/min 55.2 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 0 (0 %), timed dashes 0 -> pips 0 (- %; w/o refused - %), presses 0 refused 0, pips taken 0/108 cuts, cut hits 108, cuts %max per gauntlet mean 40.3 max 40.3, discs 16.8, fail hit 42.9, pips left [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], feet-lock max 0.00 b
+    damage share by pattern {'27': 100.0}  (wall 25 s, cmd/t 498)
+scarlet a13 stand:none:sword g=out22           n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {'27': 100.0}  (wall 24 s, cmd/t 477)
+scarlet a13 stand:none:sword g=out28           n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {'27': 100.0}  (wall 23 s, cmd/t 477)
+scarlet a13 stand:none:sword g=rand            n 3 %max/min  188.7 w40  16.8% (no fail  16.8) deaths 0.0+2.7 hits/min 38.7 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 4 (33 %), timed dashes 33 -> pips 33 (100 %; w/o refused 100 %), presses 108 refused 10, pips taken 43/108 cuts, cut hits 65, cuts %max per gauntlet mean 24.3 max 40.3, discs 16.8, fail hit 36.8, pips left [3, 2, 2, 0, 0, 2, 0, 0, 2, 1, 1, 5], feet-lock max 5.00 b
+    damage share by pattern {'27': 100.0}  (wall 25 s, cmd/t 498)
+scarlet a13 stand:none:sword g=side22          n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {'27': 100.0}  (wall 24 s, cmd/t 486)
+scarlet a13 stand:none:sword g=side28          n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {'27': 100.0}  (wall 24 s, cmd/t 485)
+scarlet a13 stand:none:sword g=stand           n 3 %max/min   77.2 w40  16.8% (no fail  16.8) deaths 0.0+0.0 hits/min 13.8 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 16.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'27': 100.0}  (wall 25 s, cmd/t 486)
+scarlet a8 melee:dash:sword                    n 3 %max/min  440.9 w40  59.0% (no fail  13.4) deaths 0.0+0.0 hits/min 36.5 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 0 (0 %), timed dashes 0 -> pips 0 (- %; w/o refused - %), presses 0 refused 0, pips taken 48/108 cuts, cut hits 60, cuts %max per gauntlet mean 22.4 max 22.4, discs 0.0, fail hit 50.0, pips left [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], feet-lock max 0.00 b
+    damage share by pattern {'21': 100.0}  (wall 22 s, cmd/t 502)
+scarlet a8 stand:none:sword g=in22             n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {}  (wall 18 s, cmd/t 454)
+scarlet a8 stand:none:sword g=in28             n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {}  (wall 17 s, cmd/t 453)
+scarlet a8 stand:none:sword                    n 3 %max/min  550.0 w40  59.0% (no fail  13.4) deaths 0.0+0.0 hits/min 60.9 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 0 (0 %), timed dashes 0 -> pips 0 (- %; w/o refused - %), presses 0 refused 0, pips taken 0/108 cuts, cut hits 108, cuts %max per gauntlet mean 40.3 max 40.3, discs 0.0, fail hit 50.0, pips left [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], feet-lock max 0.00 b
+    damage share by pattern {'21': 100.0}  (wall 19 s, cmd/t 503)
+scarlet a8 stand:none:sword g=out22            n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {}  (wall 18 s, cmd/t 454)
+scarlet a8 stand:none:sword g=out28            n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {}  (wall 18 s, cmd/t 454)
+scarlet a8 stand:none:sword g=rand             n 3 %max/min  376.2 w40  59.0% (no fail  13.4) deaths 0.0+0.0 hits/min 37.6 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 3 (25 %), timed dashes 33 -> pips 33 (100 %; w/o refused 100 %), presses 108 refused 12, pips taken 43/108 cuts, cut hits 65, cuts %max per gauntlet mean 24.3 max 40.3, discs 0.0, fail hit 37.5, pips left [3, 2, 2, 0, 0, 2, 0, 1, 1, 1, 1, 5], feet-lock max 4.00 b
+    damage share by pattern {'21': 100.0}  (wall 19 s, cmd/t 501)
+scarlet a8 stand:none:sword g=side22           n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.32 b
+    damage share by pattern {}  (wall 18 s, cmd/t 454)
+scarlet a8 stand:none:sword g=side28           n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 4.68 b
+    damage share by pattern {}  (wall 18 s, cmd/t 453)
+scarlet a8 stand:none:sword g=stand            n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 0.00 hit/s 0.0 dps
+    gauntlets 12: clears 12 (100 %), timed dashes 108 -> pips 108 (100 %; w/o refused 100 %), presses 108 refused 0, pips taken 108/108 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 0.0, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {}  (wall 18 s, cmd/t 454)
+scarlet p1 melee:dash:sword                    n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 1.90 hit/s 32.3 dps
+    damage share by pattern {}  (wall 76 s, cmd/t 409)
+scarlet p1 melee:walk:sword                    n 3 %max/min  130.6 w40  14.9% (no fail  14.9) deaths 3.3+0.0 hits/min 19.4 pl 1.98 hit/s 33.7 dps
+    damage share by pattern {'0': 85.4, '3': 14.6}  (wall 82 s, cmd/t 455)
+scarlet p1 melee:walk:sword skill 150          n 3 %max/min  126.7 w40  14.9% (no fail  14.9) deaths 3.3+0.0 hits/min 18.6 pl 1.94 hit/s 35.0 dps
+    A6 11 starts, 1.22 / min, at most 1 in 400 t, shortest gap 457
+    damage share by pattern {'0': 80.2, '3': 13.2, '4': 6.5}  (wall 81 s, cmd/t 454)
+scarlet p1 ranged:walk:bow                     n 3 %max/min   88.9 w40  18.7% (no fail  18.7) deaths 2.0+0.0 hits/min 11.9 pl 2.30 hit/s 36.9 dps
+    damage share by pattern {'0': 82.8, '3': 12.6, '4': 4.7}  (wall 91 s, cmd/t 513)
+scarlet p1 stand:none:sword                    n 3 %max/min  234.6 w40  15.7% (no fail  15.7) deaths 6.3+0.0 hits/min 46.4 pl 0.00 hit/s 0.0 dps
+    damage share by pattern {'0': 59.5, '3': 37.4, '4': 3.1}  (wall 73 s, cmd/t 455)
+scarlet p2 melee:dash:sword                    n 3 %max/min   14.7 w40  14.9% (no fail  14.9) deaths 0.0+0.0 hits/min 1.7 pl 1.68 hit/s 28.5 dps
+    damage share by pattern {'13': 85.9, '11': 14.1}  (wall 81 s, cmd/t 423)
+scarlet p2 melee:walk:sword                    n 3 %max/min  138.0 w40  20.5% (no fail  20.5) deaths 3.3+0.0 hits/min 20.6 pl 1.85 hit/s 31.4 dps
+    damage share by pattern {'0': 43.4, '13': 42.1, '3': 12.4, '11': 1.7, '12': 0.5}  (wall 87 s, cmd/t 459)
+scarlet p2 melee:walk:sword skill 60           n 3 %max/min  148.3 w40  20.5% (no fail  20.5) deaths 4.0+0.0 hits/min 22.7 pl 1.79 hit/s 34.8 dps
+    A6 7 starts, 0.78 / min, at most 1 in 400 t, shortest gap 582
+    damage share by pattern {'0': 43.1, '13': 36.9, '3': 13.6, '11': 3.1, '4': 2.1, '12': 1.3}  (wall 85 s, cmd/t 459)
+scarlet p2 melee:walk:sword skill 150          n 3 %max/min  153.3 w40  20.5% (no fail  20.5) deaths 4.0+0.0 hits/min 22.4 pl 1.71 hit/s 31.0 dps
+    A6 15 starts, 1.67 / min, at most 1 in 400 t, shortest gap 458
+    damage share by pattern {'0': 37.8, '13': 35.7, '11': 13.4, '3': 9.5, '4': 2.0, '12': 1.6}  (wall 84 s, cmd/t 458)
+scarlet p2 ranged:walk:bow                     n 3 %max/min  136.4 w40  20.5% (no fail  20.5) deaths 3.7+0.0 hits/min 19.7 pl 1.89 hit/s 30.2 dps
+    damage share by pattern {'11': 35.1, '0': 25.5, '13': 25.5, '12': 7.3, '3': 5.7, '4': 0.8}  (wall 93 s, cmd/t 512)
+scarlet p2 stand:none:sword                    n 3 %max/min  244.0 w40  20.5% (no fail  20.5) deaths 6.7+0.0 hits/min 47.2 pl 0.00 hit/s 0.0 dps
+    damage share by pattern {'0': 36.8, '3': 34.9, '13': 21.1, '11': 3.7, '4': 3.0, '12': 0.5}  (wall 75 s, cmd/t 460)
+scarlet whole melee:dash:sword g=stand         n 3 %max/min    6.3 w40  14.9% (no fail  14.9) deaths 0.0+0.0 hits/min 0.8 pl 1.43 hit/s 24.0 dps kill 220 s from start, 252 s incl. cutscenes, fighting 169 s
+    per phase a13 25 a8 0 cs1 0 cs2 0 cs3 0 down 0 lead 0 p1 0 p2 12   ticks/run a13 270 a8 206 cs1 213 cs2 104 cs3 102 down 220 lead 70 p1 1427 p2 1735 sq1 60
+    gauntlets 6: clears 6 (100 %), timed dashes 54 -> pips 54 (100 %; w/o refused 100 %), presses 54 refused 0, pips taken 54/54 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 2.8, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'13': 75.7, '27': 24.3}  (wall 89 s, cmd/t 404)
+scarlet whole melee:walk:sword g=stand Lv5     n 3 %max/min   96.9 w40  16.2% (no fail  16.2) deaths 2.7+0.0 hits/min 14.5 pl 1.46 hit/s 11.3 dps kill 209 s from start, 241 s incl. cutscenes, fighting 157 s
+    per phase a13 72 a8 0 cs1 0 cs2 0 cs3 0 down 0 lead 0 p1 111 p2 149   ticks/run a13 270 a8 206 cs1 213 cs2 104 cs3 102 down 220 lead 70 p1 1356 p2 1572 sq1 60
+    gauntlets 6: clears 6 (100 %), timed dashes 54 -> pips 54 (100 %; w/o refused 100 %), presses 54 refused 0, pips taken 54/54 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 8.1, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'0': 58.3, '13': 23.5, '3': 13.4, '27': 4.8}  (wall 90 s, cmd/t 433)
+scarlet whole melee:walk:sword g=stand Lv10    n 3 %max/min   89.5 w40  15.9% (no fail  15.9) deaths 3.0+0.0 hits/min 12.6 pl 1.48 hit/s 18.1 dps kill 211 s from start, 243 s incl. cutscenes, fighting 160 s
+    per phase a13 71 a8 0 cs1 0 cs2 0 cs3 0 down 0 lead 0 p1 115 p2 125   ticks/run a13 270 a8 206 cs1 213 cs2 104 cs3 102 down 220 lead 70 p1 1384 p2 1587 sq1 60
+    gauntlets 6: clears 6 (100 %), timed dashes 54 -> pips 54 (100 %; w/o refused 100 %), presses 54 refused 0, pips taken 54/54 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 7.9, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'0': 58.1, '13': 26.8, '3': 10.0, '27': 5.0}  (wall 91 s, cmd/t 434)
+scarlet whole melee:walk:sword g=stand         n 3 %max/min   92.4 w40  16.8% (no fail  16.8) deaths 2.7+0.0 hits/min 13.6 pl 1.49 hit/s 24.8 dps kill 213 s from start, 245 s incl. cutscenes, fighting 162 s
+    per phase a13 75 a8 0 cs1 0 cs2 0 cs3 0 down 0 lead 0 p1 115 p2 132   ticks/run a13 270 a8 206 cs1 213 cs2 104 cs3 102 down 220 lead 70 p1 1430 p2 1592 sq1 60
+    gauntlets 6: clears 6 (100 %), timed dashes 54 -> pips 54 (100 %; w/o refused 100 %), presses 54 refused 0, pips taken 54/54 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 8.4, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'0': 58.1, '13': 24.2, '3': 12.6, '27': 5.1}  (wall 92 s, cmd/t 435)
+scarlet whole ranged:walk:bow g=stand          n 3 %max/min   92.6 w40  20.5% (no fail  20.5) deaths 2.7+0.0 hits/min 13.3 pl 1.58 hit/s 24.7 dps kill 214 s from start, 246 s incl. cutscenes, fighting 163 s
+    per phase a13 75 a8 0 cs1 0 cs2 0 cs3 0 down 0 lead 0 p1 98 p2 143   ticks/run a13 270 a8 206 cs1 213 cs2 104 cs3 102 down 220 lead 70 p1 1280 p2 1760 sq1 60
+    gauntlets 6: clears 6 (100 %), timed dashes 54 -> pips 54 (100 %; w/o refused 100 %), presses 54 refused 0, pips taken 54/54 cuts, cut hits 0, cuts %max per gauntlet mean 0.0 max 0.0, discs 8.4, fail hit 0.0, pips left [0, 0, 0, 0, 0, 0], feet-lock max 3.00 b
+    damage share by pattern {'0': 36.7, '13': 19.6, '11': 18.6, '12': 9.6, '3': 5.8, '27': 5.1, '4': 4.7}  (wall 101 s, cmd/t 481)
+
+== 홍련 / 타키 by agent (%max HP / min, both from hrfair; ratios vs 타키 whole-fight and phase-matched)
+melee:walk:sword   홍련 p1  130.6 p2  138.0 whole   92.4 | 타키 p1  137.2 p2  140.8 p3  109.0 whole  124.0 | p1/tk_whole 1.05 p2/tk_whole 1.11 p1/tk_p1 0.95 p2/tk_p3 1.27 whole/tk_whole 0.75
+stand:none:sword   홍련 p1  234.6 p2  244.0 whole      - | 타키 p1  195.9 p2  204.1 p3  222.8 whole      - | p1/tk_whole - p2/tk_whole - p1/tk_p1 1.20 p2/tk_p3 1.10 whole/tk_whole -
+ranged:walk:bow    홍련 p1   88.9 p2  136.4 whole   92.6 | 타키 p1   62.9 p2   75.6 p3   53.0 whole   68.2 | p1/tk_whole 1.30 p2/tk_whole 2.00 p1/tk_p1 1.41 p2/tk_p3 2.57 whole/tk_whole 1.36
+melee:dash:sword   홍련 p1    0.0 p2   14.7 whole    6.3 | 타키 p1   24.3 p2    0.0 p3    0.0 whole   22.5 | p1/tk_whole 0.00 p2/tk_whole 0.66 p1/tk_p1 0.00 p2/tk_p3 - whole/tk_whole 0.28
+
+== PLAN §4.8 targets (ratio = 홍련 / 타키, both from hrfair; 타키 = base_tachy.json)
+T1   P1 melee walker %max/min                                          130.6  타키  124.0  ratio  1.05  target 1.00-1.15 x 타키 whole                   PASS  (vs 타키 phase p1: 0.95 x)
+T2   P2 melee walker %max/min                                          138.0  타키  124.0  ratio  1.11  target <= 1.25 x 타키 whole                     PASS  (vs 타키 phase p2: 0.98 x, p3: 1.27 x)
+T3   standing %max/min (max of P1, P2)                                 244.0  타키  222.8  ratio  1.49  target <= 1.80 x the Guardian standing (same agent) PASS  (Guardian standing 164.0; vs 타키 standing 1.10 x)
+T4   worst 40-t window, melee walker (% max HP, w/o the A8 fail hit)     20.5  타키   33.2  ratio  0.62  target <= 40 %                                PASS  (all agents: p1 melee:dash 0, p1 melee:walk 15, p1 melee:walk 15, p1 ranged:walk 19, p1 stand:none 16, p2 melee:dash 15, p2 melee:walk 21, p2 melee:walk 21, p2 melee:walk 21, p2 ranged:walk 21, p2 stand:none 21, whole melee:dash 15, whole melee:walk 16, whole melee:walk 16, whole melee:walk 17, whole ranged:walk 21)
+T5   A8: the 9 cuts on a standing agent (% max HP, max)                 40.3  타키      -  ratio     -  target <= 45 %                                PASS  (discs 0.0 %, fail hit 50.0 %)
+T5b  A13: the 9 cuts on a standing agent (% max HP, max)                40.3  타키      -  ratio     -  target <= 45 %                                PASS  (discs 16.8 %, fail hit 42.9 %)
+T6   dash agent stand: pips per correctly timed dash                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent stand: shield clears                                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent out22: pips per correctly timed dash                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent out22: shield clears                                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent out28: pips per correctly timed dash                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent out28: shield clears                                   100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent side22: pips per correctly timed dash                  100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent side22: shield clears                                  100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent side28: pips per correctly timed dash                  100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent side28: shield clears                                  100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent in22: pips per correctly timed dash                    100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent in22: shield clears                                    100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T6   dash agent in28: pips per correctly timed dash                    100 %  타키      -  ratio     -  target >= 90 %                                PASS  (216/216 (refused 0))
+T6   dash agent in28: shield clears                                    100 %  타키      -  ratio     -  target >= 90 %                                PASS  (24/24 gauntlets (a13 12/12, a8 12/12))
+T7   random dasher (+-8 t): shield clears                               29 %  타키      -  ratio     -  target <= 50 %                                PASS  (7/24 gauntlets (a13 4/12, a8 3/12); pips 86/216 cuts)
+T8   A6: most starts in any 20 s (skill runs)                              1  타키      -  ratio     -  target <= 1 (and <= 3 / min)                  PASS  (p1 11 starts 1.22/min gap>=457, p2 7 starts 0.78/min gap>=582, p2 15 starts 1.67/min gap>=458)
+T9   item-less sword kill incl. the cutscenes (s), Lv5 vs L6           240.7  타키  214.4  ratio  0.97  target 230-270 s                              PASS  (from the fight start 209 s (ratio to 타키 from its fight start), fighting 157 s (target ~150-185), with the intro skip 215 s; runs [236.9, 245.9]; ends ['dead', 'dead', 'dead'])
+T9   item-less sword kill incl. the cutscenes (s), Lv10 vs L11         242.8  타키  214.4  ratio  0.98  target 230-270 s                              PASS  (from the fight start 211 s (ratio to 타키 from its fight start), fighting 160 s (target ~150-185), with the intro skip 217 s; runs [240.6, 244.8]; ends ['dead', 'dead', 'dead'])
+T9   item-less sword kill incl. the cutscenes (s), Lv15 vs L16         245.4  타키  214.4  ratio  1.00  target 230-270 s                              PASS  (from the fight start 213 s (ratio to 타키 from its fight start), fighting 162 s (target ~150-185), with the intro skip 220 s; runs [243.05, 248.7]; ends ['dead', 'dead', 'dead'])
+T9   T9 over the levels (headline: the lowest level, Lv5)              240.7  타키  214.4  ratio     -  target 230-270 s at every level               PASS  (per level Lv5 240.7, Lv10 242.8, Lv15 245.4)
+wrote hr_s5_summary.json

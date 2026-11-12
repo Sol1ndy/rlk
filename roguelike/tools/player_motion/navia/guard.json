@@ -1,0 +1,331 @@
+{
+ "clips": {
+  "guard": {
+   "length": 8,
+   "weapon": "navia_halberd",
+   "note": "Combat overhaul C (lane C): the guard / parry pose on a plain F press (player/def/guard -> char/motion/guard). Reuses physical_1 (ready tick 0, raised tick 1), held 4 ticks; no hits, no audio, no fx.",
+   "frames": [
+    {
+     "tick": 0,
+     "pose": {
+      "shift": [
+       0,
+       0.028,
+       0
+      ],
+      "root": [
+       -0.6,
+       0,
+       0
+      ],
+      "torso": [
+       -0.4,
+       0,
+       0
+      ],
+      "head": [
+       1.2,
+       -3,
+       2.5
+      ],
+      "right_arm": [
+       12,
+       -4,
+       -12
+      ],
+      "right_elbow": [
+       38,
+       0,
+       0
+      ],
+      "left_arm": [
+       4,
+       2,
+       8.5
+      ],
+      "left_elbow": [
+       13,
+       0,
+       0
+      ],
+      "right_leg": [
+       1.2,
+       0,
+       -1.2
+      ],
+      "right_knee": [
+       -1.5,
+       0,
+       0
+      ],
+      "left_leg": [
+       3,
+       -4,
+       1.2
+      ],
+      "left_knee": [
+       -5,
+       0,
+       0
+      ],
+      "weapon": [
+       -110.557,
+       10.417,
+       -85.346
+      ],
+      "weapon_shift": [
+       0,
+       0,
+       0
+      ],
+      "weapon_scale": [
+       1,
+       1,
+       1
+      ]
+     }
+    },
+    {
+     "tick": 2,
+     "pose": {
+      "shift": [
+       0,
+       -0.08,
+       0
+      ],
+      "root": [
+       -5,
+       16.1,
+       0
+      ],
+      "torso": [
+       -5,
+       6.9,
+       0
+      ],
+      "head": [
+       2,
+       -15,
+       0
+      ],
+      "right_arm": [
+       -17.24,
+       -12.091,
+       -9.253
+      ],
+      "right_elbow": [
+       92.549,
+       0,
+       0
+      ],
+      "left_arm": [
+       10,
+       0,
+       10
+      ],
+      "left_elbow": [
+       20,
+       0,
+       0
+      ],
+      "right_leg": [
+       42.827,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -42.412,
+       0,
+       0
+      ],
+      "left_leg": [
+       9.585,
+       0,
+       3
+      ],
+      "left_knee": [
+       -42.412,
+       0,
+       0
+      ],
+      "weapon": [
+       -85.346,
+       59.357,
+       -65.391
+      ],
+      "weapon_shift": [
+       0,
+       0,
+       0
+      ],
+      "weapon_scale": [
+       1,
+       1,
+       1
+      ]
+     }
+    },
+    {
+     "tick": 6,
+     "pose": {
+      "shift": [
+       0,
+       -0.08,
+       0
+      ],
+      "root": [
+       -5,
+       16.1,
+       0
+      ],
+      "torso": [
+       -5,
+       6.9,
+       0
+      ],
+      "head": [
+       2,
+       -15,
+       0
+      ],
+      "right_arm": [
+       -17.24,
+       -12.091,
+       -9.253
+      ],
+      "right_elbow": [
+       92.549,
+       0,
+       0
+      ],
+      "left_arm": [
+       10,
+       0,
+       10
+      ],
+      "left_elbow": [
+       20,
+       0,
+       0
+      ],
+      "right_leg": [
+       42.827,
+       0,
+       -3
+      ],
+      "right_knee": [
+       -42.412,
+       0,
+       0
+      ],
+      "left_leg": [
+       9.585,
+       0,
+       3
+      ],
+      "left_knee": [
+       -42.412,
+       0,
+       0
+      ],
+      "weapon": [
+       -85.346,
+       59.357,
+       -65.391
+      ],
+      "weapon_shift": [
+       0,
+       0,
+       0
+      ],
+      "weapon_scale": [
+       1,
+       1,
+       1
+      ]
+     }
+    },
+    {
+     "tick": 8,
+     "pose": {
+      "shift": [
+       0,
+       0.028,
+       0
+      ],
+      "root": [
+       -0.6,
+       0,
+       0
+      ],
+      "torso": [
+       -0.4,
+       0,
+       0
+      ],
+      "head": [
+       1.2,
+       -3,
+       2.5
+      ],
+      "right_arm": [
+       12,
+       -4,
+       -12
+      ],
+      "right_elbow": [
+       38,
+       0,
+       0
+      ],
+      "left_arm": [
+       4,
+       2,
+       8.5
+      ],
+      "left_elbow": [
+       13,
+       0,
+       0
+      ],
+      "right_leg": [
+       1.2,
+       0,
+       -1.2
+      ],
+      "right_knee": [
+       -1.5,
+       0,
+       0
+      ],
+      "left_leg": [
+       3,
+       -4,
+       1.2
+      ],
+      "left_knee": [
+       -5,
+       0,
+       0
+      ],
+      "weapon": [
+       -110.557,
+       10.417,
+       -85.346
+      ],
+      "weapon_shift": [
+       0,
+       0,
+       0
+      ],
+      "weapon_scale": [
+       1,
+       1,
+       1
+      ]
+     }
+    }
+   ]
+  }
+ }
+}

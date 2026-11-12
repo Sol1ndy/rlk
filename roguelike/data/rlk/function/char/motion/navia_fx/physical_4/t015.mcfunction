@@ -1,0 +1,13 @@
+# (retimed from t013)
+function rlk:fx/nv/card {kind:"crescent",pos:"^0 ^1.4 ^0.1",rot:"~-70 ~",bb:"fixed",roll:90,spin:60,s0:4.5,s1:5.5,move:"0f,0f,0f",life:10,fade:3}
+function rlk:fx/nv/card {kind:"shard",pos:"^0.22 ^0 ^2.7",rot:"~-10 ~",bb:"center",roll:14,spin:0,s0:0,s1:1.6,move:"0f,0f,0f",life:7,fade:3}
+function rlk:fx/nv/card {kind:"shard",pos:"^-0.3 ^0 ^2.6",rot:"~15 ~",bb:"center",roll:-18,spin:0,s0:0,s1:1.3,move:"0f,0f,0f",life:7,fade:3}
+function rlk:fx/nv/p/glint {pos:"^-0.76 ^2.88 ^-0.99"}
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.9} ^-0.05 ^0.8 ^2.5 0.3 0.3 0.3 0 6 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.6} ^-0.05 ^1.2 ^2.5 0.2 0.2 0.2 0 4 normal
+execute if score @s nvP matches 1.. run function rlk:fx/nv/card {kind:"shard",pos:"^0 ^0 ^2.35",rot:"~5 ~",bb:"center",roll:0,spin:0,s0:0,s1:1.1,move:"0f,0f,0f",life:7,fade:3}
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.46 ^2.59 ^0.59 0.03 0.03 0.03 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.54 ^2.66 ^0.19 0.03 0.03 0.03 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.61 ^2.73 ^-0.2 0.03 0.03 0.03 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.69 ^2.81 ^-0.6 0.03 0.03 0.03 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.76 ^2.88 ^-0.99 0.03 0.03 0.03 0 1 normal

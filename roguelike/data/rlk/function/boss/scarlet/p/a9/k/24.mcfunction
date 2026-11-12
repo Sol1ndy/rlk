@@ -1,0 +1,5 @@
+# A9 pattern tick 24
+function rlk:boss/scarlet/fx/hud/ovl {g:"magenta",in:0,hold:3,out:6}
+execute at @s run function rlk:boss/scarlet/fx/snd/a9_flash
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.2215f,0.7103f,0.336f],left_rotation:[-0.683f,-0.7044f,0.183f,0.0616f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a9","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a9_24","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[-0.1954f,0.7526f,0.4082f],left_rotation:[0.9719f,0.0151f,-0.2201f,0.0819f],scale:[0f,0.22f,1.7348f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[14060543]}}}}

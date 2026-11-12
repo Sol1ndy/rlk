@@ -15,7 +15,6 @@ scoreboard players set @s uiCd 8
 scoreboard players set @s vSnk 1
 scoreboard players set @s rcU 0
 scoreboard players set @s rcT 0
-execute if score #active room matches 1 if data storage rlk:room map_id run function rlk:room/map_give with storage rlk:room
 tag @s remove rlk_mgS
 tag @s remove rlk_mgA
 tag @s remove rlk_mgC

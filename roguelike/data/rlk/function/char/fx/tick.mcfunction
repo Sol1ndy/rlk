@@ -1,5 +1,6 @@
 execute if score #charN tmp matches 3 run return 0
 execute if score #charN tmp matches 5 run return 0
+execute if score #charN tmp matches 6 run return 0
 # 진행 중인 모션의 다음 조각 (@s = 플레이어, at 몸)
 function rlk:char/fx/run
 scoreboard players add @s fxT 1

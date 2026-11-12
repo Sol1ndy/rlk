@@ -1,3 +1,5 @@
+# 나비아 조준 중 다시 들어온 우클릭 = 아직 누르고 있음(조준 모션이 행동을 잠가도 신호는 받는다)
+execute if score #charN tmp matches 6 if score @s nvA matches 1.. run return run scoreboard players set @s nvGap 0
 execute if score @s pmMoveLock matches 1 run return 0
 # 원소전투 스킬 발동 (@s = 플레이어, at @s)
 # 스커크는 스킬·폭발의 조건과 재사용 대기가 따로 돈다
@@ -14,7 +16,6 @@ execute if score @s it_hourglass_shard matches 1.. run function rlk:items/proc/h
 execute if score cycle engN matches 2.. run function rlk:engravings/cycle/cd
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 execute if score #charN tmp matches 1 run function rlk:char/lumine/skill
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/skill
 execute if score #charN tmp matches 5 run function rlk:char/arlecchino/skill
 # 아이템: 원소전투 스킬을 썼을 때
 function rlk:items/hook/on_cast_skill

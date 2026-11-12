@@ -1,0 +1,13 @@
+{
+ "values": [
+  "minecraft:mud",
+  "minecraft:soul_sand",
+  "minecraft:farmland",
+  "minecraft:dirt_path",
+  "minecraft:honey_block",
+  "minecraft:chest",
+  "minecraft:trapped_chest",
+  "minecraft:ender_chest",
+  "minecraft:end_portal_frame"
+ ]
+}

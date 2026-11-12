@@ -1,4 +1,4 @@
-# macro: i, j = 보유 목록의 순번. 목록에서 둘을 맞바꾸고 실물(inventory.9~17)을 다시 놓는다
+# macro: i, j = 보유 목록의 순번. 목록에서 둘을 맞바꾸고 실물(inventory.9~)을 다시 놓는다
 scoreboard players set @s pkSel -1
 scoreboard players set @s pkRedraw 1
 $execute unless data storage rlk:pinv order[$(i)] run return 0

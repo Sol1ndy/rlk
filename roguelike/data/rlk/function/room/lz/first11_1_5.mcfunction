@@ -31,17 +31,12 @@ fill 1 201 6 1 201 8 minecraft:red_sand
 fill 5 201 6 5 201 11 minecraft:red_sand
 fill 3 201 9 3 201 10 minecraft:red_sand
 fill 4 201 10 4 201 11 minecraft:red_sand
-fill 7 201 15 18 201 16 minecraft:red_sand
-fill 6 201 16 6 201 18 minecraft:red_sand
-fill 5 201 17 5 201 18 minecraft:red_sand
 fill 5 201 5 5 201 5 minecraft:sandstone
 fill 5 202 5 5 202 5 minecraft:red_sand
 fill 3 201 6 4 201 8 minecraft:sandstone
 fill 3 202 6 4 202 8 minecraft:red_sand
 fill 4 201 9 4 201 9 minecraft:sandstone
 fill 4 202 9 4 202 9 minecraft:red_sand
-fill 7 201 17 18 201 18 minecraft:sandstone
-fill 7 202 17 18 202 18 minecraft:red_sand
 fill 3 201 4 4 207 5 minecraft:smooth_red_sandstone
 fill 3 208 4 4 208 5 minecraft:red_sand
 execute positioned 10 201 1 run function rlk:room/prop/sd_ruin_z

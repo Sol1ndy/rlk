@@ -1,0 +1,23 @@
+# slam tick 9 (@s = body, at the body).
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.67 ^0.08 ^-2.45 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.05 ^0.08 ^2.31 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.79 ^0.08 ^-2.19 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.18 ^0.08 ^-0.41 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.26 ^0.08 ^1.7 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.26 ^0.08 ^0.25 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^0.23 ^0.08 ^2.05 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^2.98 ^0.08 ^-0.73 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^2.91 ^0.08 ^-1.62 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-3.28 ^0.08 ^-0.71 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^2.79 ^0.08 ^-1.98 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^0.54 ^0.08 ^2.89 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.83 ^0.08 ^-1.78 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.88 ^0.08 ^-0.06 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^2.82 ^0.08 ^1.91 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.11 ^0.08 ^3.43 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.4 ^0.08 ^1.39 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star",pos:"^-0.26 ^6.82 ^0.3",rot:"~ ~",bb:"center",roll:0,spin:90,s0:0.2,s1:1.8,move:"0f,0f,0f",life:9,fade:3}
+execute rotated as @s rotated ~ 0 run particle minecraft:end_rod ^-0.26 ^6.82 ^0.3 0.1 0.1 0.1 0.04 3 force @a[tag=player]
+playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.6 2 0.2
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:0.8} ^-0.26 ^6.22 ^0.3 0.12 0.4 0.12 0 3 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:wax_on ^-0.26 ^6.82 ^0.3 0.2 0.3 0.2 0 1 force @a[tag=player]

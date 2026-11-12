@@ -1,0 +1,7 @@
+# D1 pattern tick 27
+scoreboard players operation #hzSzR mb = #d1_dl kn
+scoreboard players set #t3 kn 10
+scoreboard players operation #hzSzR mb *= #t3 kn
+scoreboard players set #t3 kn 4
+scoreboard players operation #hzSzR mb /= #t3 kn
+execute as @e[type=minecraft:marker,tag=rlk_kn_dl,tag=rlk_kn_p_d1] run function rlk:boss/arlecchino/core/dash/grow

@@ -32,12 +32,9 @@ fill -13 201 -18 -11 201 -18 minecraft:tuff
 fill -5 201 -18 -3 201 -18 minecraft:tuff
 fill -13 201 -17 -12 201 -15 minecraft:tuff
 fill -4 201 -17 -3 201 -14 minecraft:tuff
-fill -19 201 -15 -17 201 -15 minecraft:tuff
 fill -11 201 -15 -6 201 -15 minecraft:tuff
-fill -17 201 -14 -17 201 -6 minecraft:tuff
 fill -5 201 -14 -5 201 -12 minecraft:tuff
 fill -4 201 -13 -4 201 -13 minecraft:tuff
-fill -19 201 -6 -18 201 -5 minecraft:tuff
 fill -9 201 -19 -7 201 -16 minecraft:cobbled_deepslate
 fill -9 202 -19 -7 202 -16 minecraft:tuff
 fill -10 201 -18 -10 201 -16 minecraft:cobbled_deepslate
@@ -48,8 +45,6 @@ fill -11 201 -17 -11 201 -16 minecraft:cobbled_deepslate
 fill -11 202 -17 -11 202 -16 minecraft:tuff
 fill -5 201 -17 -5 201 -15 minecraft:cobbled_deepslate
 fill -5 202 -17 -5 202 -15 minecraft:tuff
-fill -19 201 -14 -18 201 -7 minecraft:cobbled_deepslate
-fill -19 202 -14 -18 202 -7 minecraft:tuff
 execute positioned -5 201 -9 run function rlk:room/prop/m_arch_x4
 execute positioned -2 201 -11 run function rlk:room/prop/m_pebble
 execute positioned -2 201 -13 run function rlk:room/prop/m_rail_x

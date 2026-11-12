@@ -33,6 +33,7 @@ scoreboard players set @s eqAtkSpeed 0
 # 자원: 골드는 새로 시작할 때만 0, 사파이어는 리셋해도 유지
 execute unless score @s gold matches 0.. run scoreboard players set @s gold 0
 execute unless score @s sapphire matches 0.. run scoreboard players set @s sapphire 0
+execute unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 내부값
 scoreboard players set @s atkCD 0
@@ -41,13 +42,11 @@ scoreboard players set @s comboStep 0
 scoreboard players set @s cboIdle 0
 scoreboard players set @s dead 0
 execute unless score @s pid matches 1.. run function rlk:player/assign_pid
-# 대쉬(충전식)
-scoreboard players operation @s dashCharge = #dashMax tmp
-scoreboard players set @s dashRegen 0
+# 닷지 · 패링(시각 도장은 먼 과거로: 창이 열려 있지 않음)
 scoreboard players set @s dashCool 0
 scoreboard players set @s dashInvT 0
 scoreboard players set @s dashMoveT 0
-scoreboard players set @s hudKey -1
+function rlk:player/def/reset
 scoreboard players set @s hpKey -1
 # 원소
 scoreboard players set @s infuse 0

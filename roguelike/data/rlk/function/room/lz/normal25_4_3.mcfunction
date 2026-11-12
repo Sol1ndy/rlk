@@ -49,8 +49,6 @@ fill 27 201 -46 27 201 -45 minecraft:podzol
 fill 26 201 -45 26 201 -45 minecraft:podzol
 fill 25 201 -44 25 201 -40 minecraft:podzol
 fill 21 201 -40 24 201 -40 minecraft:podzol
-fill 21 201 -36 22 201 -35 minecraft:podzol
-fill 23 201 -35 23 201 -26 minecraft:podzol
 fill 26 201 -35 31 201 -35 minecraft:podzol
 fill 26 201 -34 26 201 -29 minecraft:podzol
 fill 31 201 -34 31 201 -28 minecraft:podzol
@@ -58,7 +56,6 @@ fill 27 201 -29 28 201 -28 minecraft:podzol
 fill 30 201 -29 30 201 -28 minecraft:podzol
 fill 29 201 -28 29 201 -28 minecraft:podzol
 fill 34 201 -27 38 201 -27 minecraft:podzol
-fill 21 201 -26 22 201 -25 minecraft:podzol
 fill 36 201 -26 36 201 -23 minecraft:podzol
 fill 37 201 -23 38 201 -23 minecraft:podzol
 fill 21 201 -47 25 201 -47 minecraft:dirt
@@ -73,8 +70,6 @@ fill 24 201 -44 24 201 -41 minecraft:dirt
 fill 24 202 -44 24 202 -41 minecraft:podzol
 fill 22 201 -41 23 201 -41 minecraft:dirt
 fill 22 202 -41 23 202 -41 minecraft:podzol
-fill 21 201 -34 22 201 -27 minecraft:dirt
-fill 21 202 -34 22 202 -27 minecraft:podzol
 fill 27 201 -34 30 201 -33 minecraft:dirt
 fill 27 202 -34 30 202 -33 minecraft:podzol
 fill 27 201 -32 28 201 -30 minecraft:dirt
@@ -139,7 +134,7 @@ execute positioned 34 201 -38 run function rlk:room/prop/p_litter
 execute positioned 29 203 -34 run function rlk:room/prop/p_grass
 execute positioned 32 201 -33 run function rlk:room/prop/p_wildflower
 execute positioned 28 201 -46 run function rlk:room/prop/p_grass
-execute positioned 23 202 -31 run function rlk:room/prop/p_litter
+execute positioned 23 201 -31 run function rlk:room/prop/p_litter
 execute positioned 36 201 -57 run function rlk:room/prop/p_grass
 execute positioned 35 201 -24 run function rlk:room/prop/p_dandelion
 execute positioned 33 201 -34 run function rlk:room/prop/p_grass

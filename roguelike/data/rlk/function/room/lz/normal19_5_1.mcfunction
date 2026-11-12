@@ -45,7 +45,6 @@ fill -26 201 3 -26 201 4 minecraft:tuff
 fill -24 201 4 -24 201 5 minecraft:tuff
 fill -18 201 4 -18 201 5 minecraft:tuff
 fill -23 201 5 -19 201 5 minecraft:tuff
-fill -39 201 6 -37 201 13 minecraft:tuff
 fill -9 201 6 -5 201 7 minecraft:tuff
 fill -2 201 8 -2 201 12 minecraft:tuff
 fill -15 201 14 -15 201 15 minecraft:tuff

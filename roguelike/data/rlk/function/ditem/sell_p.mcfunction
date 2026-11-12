@@ -2,6 +2,8 @@
 scoreboard players set #retok tmp 1
 function rlk:ditem/sell_price with storage rlk:dtmp
 scoreboard players operation @s gold += #price tmp
+function rlk:ditem/retrieve_getid with storage rlk:dtmp
+function rlk:items/enh_forget with storage rlk:dtmp
 function rlk:ditem/kill_group with storage rlk:dtmp
 execute store result storage rlk:sell amt int 1 run scoreboard players get #price tmp
 title @s times 5 40 10

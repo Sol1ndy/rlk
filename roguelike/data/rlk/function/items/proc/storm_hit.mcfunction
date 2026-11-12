@@ -1,5 +1,7 @@
 execute unless score #k137 snd matches 1 run function rlk:snd/f209
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:40}
+# 피해 계수 = #stormCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_skyward_verse.coef int 1 run scoreboard players get #stormCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_skyward_verse
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 6

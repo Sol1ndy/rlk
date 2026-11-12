@@ -1,7 +1,12 @@
-"""Compile frame-addressed Minecraft sound layers for Arlecchino and Skirk.
+"""Compile frame-addressed Minecraft sound layers for the rig characters (Arlecchino, Skirk, Navia).
 
 Run: python tools/build_player_audio.py [--catalog <installed sounds.json>]
 No recorded/reference audio or additional resource-pack sound files are used.
+Clips are read like build_player_rig.mjs does: tools/player_motion/<char>.json plus the clip
+fragments tools/player_motion/<char>/*.json.
+Navia's layers come from one module per clip, tools/player_motion/navia_audio/<clip>.py, through
+player_motion/audio_navia.py. A clip with a module always gets its audio file (comment-only when the
+module has no layers), so events/navia/<clip> keeps its hook line while the sound is being authored.
 """
 from pathlib import Path
 import argparse
@@ -10,22 +15,44 @@ import sys
 sys.dont_write_bytecode=True
 from player_motion.audio_arle import timeline as arle_timeline
 from player_motion.audio_skirk import timeline as skirk_timeline
+from player_motion.audio_navia import timeline as navia_timeline
 
 here=Path(__file__).resolve().parent
 pack=here.parent
 motion=pack/'data/rlk/function/char/motion'
+
+
+def load_clips(char):
+    """<char>.json clips merged with tools/player_motion/<char>/*.json fragments (duplicates are errors)."""
+    clips=json.loads((here/'player_motion'/f'{char}.json').read_text(encoding='utf-8')).get('clips',{})
+    origin={name:f'{char}.json' for name in clips}
+    folder=here/'player_motion'/char
+    if folder.is_dir():
+        for path in sorted(folder.glob('*.json')):
+            part=json.loads(path.read_text(encoding='utf-8')).get('clips')
+            if not isinstance(part,dict):
+                raise ValueError(f'{char}/{path.name}: a clip fragment must be {{"clips":{{...}}}}')
+            for name,clip in part.items():
+                if name in origin:
+                    raise ValueError(f'Duplicate clip "{name}" for {char}: {origin[name]} and {char}/{path.name}')
+                origin[name]=f'{char}/{path.name}'
+                clips[name]=clip
+    return clips
+
+
 parser=argparse.ArgumentParser()
 parser.add_argument('--catalog',type=Path)
 args=parser.parse_args()
 catalog=json.loads(args.catalog.read_text(encoding='utf-8')) if args.catalog else None
 compiled={}
 used=set()
-for char, author in (('arle',arle_timeline),('skirk',skirk_timeline)):
-    clips=json.loads((here/'player_motion'/f'{char}.json').read_text(encoding='utf-8'))['clips']
+# (character, timeline(name, clip) -> list of layers or None, write a file even with no layers)
+for char, author, keep_empty in (('arle',arle_timeline,False),('skirk',skirk_timeline,False),('navia',navia_timeline,True)):
+    clips=load_clips(char)
     compiled[char]={}
     for name, clip in clips.items():
         layers=author(name,clip)
-        if not layers:
+        if layers is None or (not layers and not keep_empty):
             # The existing movement-loop silence remains untouched.
             continue
         hook=f'function rlk:char/motion/audio/{char}/{name}'
@@ -45,7 +72,10 @@ for char, author in (('arle',arle_timeline),('skirk',skirk_timeline)):
             used.add(sound)
             lines.append(f'# {layer["layer"]}')
             lines.append(f'execute if score @s pmTick matches {tick} run playsound minecraft:{sound} player @s ~ ~ ~ {volume:g} {pitch:g} 0')
+        if not layers:
+            lines.append('# No layers yet (tools/player_motion/navia_audio/%s.py).' % name)
         target=motion/'audio'/char/f'{name}.mcfunction'
+        target.parent.mkdir(parents=True,exist_ok=True)
         target.write_text('\n'.join(lines)+'\n',encoding='utf-8',newline='\n')
         compiled[char][name]={'playback_rate':clip.get('playback_rate',100),
                               'hit_ticks':clip.get('hit_ticks',[]),'layers':layers}

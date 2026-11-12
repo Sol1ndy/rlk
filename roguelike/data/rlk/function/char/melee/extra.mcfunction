@@ -40,8 +40,8 @@ execute if score #charN tmp matches 6 run scoreboard players set #fxId tmp 87
 execute if score #charN tmp matches 6 if score @s nvP matches 1.. run scoreboard players set #fxId tmp 97
 execute if score #charN tmp matches 8 run scoreboard players set #fxId tmp 107
 function rlk:char/fx/play
-execute unless score #charN tmp matches 5 run execute unless score #k310 snd matches 1 run function rlk:snd/f357
-execute unless score #charN tmp matches 5 run execute if score #hitLanded tmp matches 1 unless score #k311 snd matches 1 run function rlk:snd/f358
+execute unless score #charN tmp matches 5 unless score #charN tmp matches 6 run execute unless score #k310 snd matches 1 run function rlk:snd/f357
+execute unless score #charN tmp matches 5 unless score #charN tmp matches 6 run execute if score #hitLanded tmp matches 1 unless score #k311 snd matches 1 run function rlk:snd/f358
 execute if score #hitLanded tmp matches 1 run function rlk:combat/on_hit
 execute if score #mobKilled tmp matches 1.. run function rlk:combat/on_kill
 execute if score #charN tmp matches 5 run function rlk:char/arlecchino/na_post

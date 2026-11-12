@@ -1,0 +1,4 @@
+# 42 inside a forced B3: the tail element electro (RES, looks follow), tail-up.
+scoreboard players set #azTail mb 3
+function rlk:boss/azhdaha/test/pair_sync
+function rlk:boss/azhdaha/test/p3_tail

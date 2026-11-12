@@ -1,0 +1,2480 @@
+{
+ "schema": 1,
+ "id": "arlecchino",
+ "source": "rig",
+ "_doc": "Arlecchino rig (tools/build_arlecchino_rig.mjs, API tools/arlecchino_rig_api.md): the D0 stub schema (parts, clips with id / len / loop / events / form, looks, anchors, calls) plus transforms, models, budgets and sprites. Generated: do not edit.",
+ "height": 2.8,
+ "hip_y": 1.05,
+ "size": 1.4,
+ "uuid": "524c4b4d-4b4e-4100-8000-0000000000{:02x}",
+ "parts": [
+  {
+   "name": "head",
+   "nn": 0,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/head",
+    "p2": "rlk:mboss/arlecchino/p2/head"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000000",
+   "tag": "rlk_kn_head",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.00383,
+      2.13031,
+      0.03644
+     ],
+     "q": [
+      -0.0001,
+      -0.00003,
+      0.00182,
+      1
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.00383,
+      2.13031,
+      0.03644
+     ],
+     "q": [
+      -0.0001,
+      -0.00003,
+      0.00182,
+      1
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "body",
+   "nn": 1,
+   "parent": null,
+   "model": {
+    "p1": "rlk:player_motion/arle/body",
+    "p2": "rlk:mboss/arlecchino/p2/body"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000001",
+   "tag": "rlk_kn_body",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.00383,
+      2.13031,
+      0.03644
+     ],
+     "q": [
+      0.01743,
+      -0.05233,
+      0.00091,
+      0.99848
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.00383,
+      2.13031,
+      0.03644
+     ],
+     "q": [
+      0.01743,
+      -0.05233,
+      0.00091,
+      0.99848
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "right_arm",
+   "nn": 2,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_arm",
+    "p2": "rlk:mboss/arlecchino/p2/right_arm"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000002",
+   "tag": "rlk_kn_right_arm",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.48181,
+      1.95541,
+      -0.01993
+     ],
+     "q": [
+      0.22677,
+      0.13946,
+      -0.217,
+      0.93917
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.52532,
+      1.95541,
+      -0.02451
+     ],
+     "q": [
+      0.18273,
+      0.1258,
+      -0.24118,
+      0.94478
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "right_forearm",
+   "nn": 3,
+   "parent": "right_arm",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_forearm",
+    "p2": "rlk:mboss/arlecchino/p2/right_forearm"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000003",
+   "tag": "rlk_kn_right_forearm",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.6466,
+      1.67437,
+      -0.14783
+     ],
+     "q": [
+      -0.47234,
+      0.24981,
+      -0.06428,
+      0.84283
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.70091,
+      1.66951,
+      -0.12412
+     ],
+     "q": [
+      -0.50845,
+      0.25624,
+      -0.0913,
+      0.817
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "left_arm",
+   "nn": 4,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_arm",
+    "p2": "rlk:mboss/arlecchino/p2/left_arm"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000004",
+   "tag": "rlk_kn_left_arm",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      0.47542,
+      1.95541,
+      0.08067
+     ],
+     "q": [
+      0.06925,
+      -0.29381,
+      0.16003,
+      0.93982
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      0.51893,
+      1.95541,
+      0.08525
+     ],
+     "q": [
+      0.15652,
+      -0.22387,
+      0.25896,
+      0.92646
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "left_forearm",
+   "nn": 5,
+   "parent": "left_arm",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_forearm",
+    "p2": "rlk:mboss/arlecchino/p2/left_forearm"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000005",
+   "tag": "rlk_kn_left_forearm",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      0.59495,
+      1.6267,
+      0.06803
+     ],
+     "q": [
+      -0.09605,
+      -0.31726,
+      0.10623,
+      0.93746
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      0.7114,
+      1.66951,
+      0.02432
+     ],
+     "q": [
+      -0.5152,
+      -0.34024,
+      0.03766,
+      0.78574
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "right_leg",
+   "nn": 6,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_leg",
+    "p2": "rlk:mboss/arlecchino/p2/right_leg"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000006",
+   "tag": "rlk_kn_right_leg",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.175,
+      1.08095,
+      0
+     ],
+     "q": [
+      -0.09843,
+      -0.07175,
+      -0.02962,
+      0.99211
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.175,
+      1.08095,
+      0
+     ],
+     "q": [
+      -0.09843,
+      -0.07175,
+      -0.02962,
+      0.99211
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "right_shin",
+   "nn": 7,
+   "parent": "right_leg",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_shin",
+    "p2": "rlk:mboss/arlecchino/p2/right_shin"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000007",
+   "tag": "rlk_kn_right_shin",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.21358,
+      0.56284,
+      0.10112
+     ],
+     "q": [
+      0.00117,
+      -0.07435,
+      -0.0223,
+      0.99698
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.21358,
+      0.56284,
+      0.10112
+     ],
+     "q": [
+      0.00117,
+      -0.07435,
+      -0.0223,
+      0.99698
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "left_leg",
+   "nn": 8,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_leg",
+    "p2": "rlk:mboss/arlecchino/p2/left_leg"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000008",
+   "tag": "rlk_kn_left_leg",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      0.175,
+      1.08095,
+      0
+     ],
+     "q": [
+      -0.15011,
+      0.0693,
+      0.03839,
+      0.98549
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      0.175,
+      1.08095,
+      0
+     ],
+     "q": [
+      -0.15011,
+      0.0693,
+      0.03839,
+      0.98549
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "left_shin",
+   "nn": 9,
+   "parent": "left_leg",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_shin",
+    "p2": "rlk:mboss/arlecchino/p2/left_shin"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000009",
+   "tag": "rlk_kn_left_shin",
+   "brightness": 13,
+   "rest": {
+    "p1": {
+     "t": [
+      0.22565,
+      0.58116,
+      0.15254
+     ],
+     "q": [
+      0.2644,
+      0.07893,
+      0.00683,
+      0.96115
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      0.22565,
+      0.58116,
+      0.15254
+     ],
+     "q": [
+      0.2644,
+      0.07893,
+      0.00683,
+      0.96115
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "scythe_r",
+   "nn": 10,
+   "parent": "right_forearm",
+   "model": {
+    "p1": "rlk:player_motion/weapons/scythe",
+    "p2": "rlk:player_motion/weapons/scythe"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000a",
+   "tag": "rlk_kn_scythe_r",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.58518,
+      1.41184,
+      0.25079
+     ],
+     "q": [
+      0.23163,
+      -0.1707,
+      0.86458,
+      0.41195
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.64731,
+      1.4451,
+      0.29822
+     ],
+     "q": [
+      0.19417,
+      -0.1509,
+      0.87657,
+      0.4137
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "scythe_l",
+   "nn": 11,
+   "parent": "left_forearm",
+   "model": {
+    "p1": "rlk:player_motion/weapons/scythe",
+    "p2": "rlk:player_motion/weapons/scythe"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000b",
+   "tag": "rlk_kn_scythe_l",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.66147,
+      1.16519,
+      0.18713
+     ],
+     "q": [
+      -0.09605,
+      -0.31726,
+      0.10623,
+      0.93746
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.57116,
+      1.4451,
+      0.42629
+     ],
+     "q": [
+      -0.87669,
+      -0.42947,
+      0.17838,
+      -0.12312
+     ],
+     "s": [
+      1.4,
+      1.4,
+      1.4
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_1a",
+   "nn": 12,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000c",
+   "tag": "rlk_kn_leg_1a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11508,
+      1.87131,
+      -0.15735
+     ],
+     "q": [
+      0.51751,
+      0.10849,
+      0.83071,
+      0.17415
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.11508,
+      1.87131,
+      -0.15735
+     ],
+     "q": [
+      0.4225,
+      0.10367,
+      0.87448,
+      0.21457
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_1b",
+   "nn": 13,
+   "parent": "leg_1a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000d",
+   "tag": "rlk_kn_leg_1b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11508,
+      1.87131,
+      -0.15735
+     ],
+     "q": [
+      0.49747,
+      0.27362,
+      0.72129,
+      0.39673
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.56091,
+      3.2451,
+      -0.71933
+     ],
+     "q": [
+      0.18506,
+      0.34987,
+      0.42937,
+      0.81178
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_2a",
+   "nn": 14,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000e",
+   "tag": "rlk_kn_leg_2a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07985,
+      1.87131,
+      -0.17784
+     ],
+     "q": [
+      -0.76913,
+      -0.1545,
+      -0.60799,
+      -0.12213
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.07985,
+      1.87131,
+      -0.17784
+     ],
+     "q": [
+      -0.85286,
+      -0.19398,
+      -0.47269,
+      -0.10751
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_2b",
+   "nn": 15,
+   "parent": "leg_2a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-00000000000f",
+   "tag": "rlk_kn_leg_2b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07985,
+      1.87131,
+      -0.17784
+     ],
+     "q": [
+      -0.66396,
+      -0.35795,
+      -0.5779,
+      -0.31155
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.43512,
+      3.26865,
+      -0.74626
+     ],
+     "q": [
+      -0.43155,
+      -0.78338,
+      -0.21582,
+      -0.39178
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_3a",
+   "nn": 16,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000010",
+   "tag": "rlk_kn_leg_3a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11544,
+      1.77337,
+      -0.16075
+     ],
+     "q": [
+      0.47014,
+      0.18235,
+      0.80511,
+      0.31227
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.11544,
+      1.77337,
+      -0.16075
+     ],
+     "q": [
+      0.35641,
+      0.16376,
+      0.83586,
+      0.38404
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_3b",
+   "nn": 17,
+   "parent": "leg_3a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000011",
+   "tag": "rlk_kn_leg_3b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11544,
+      1.77337,
+      -0.16075
+     ],
+     "q": [
+      0.41891,
+      0.34125,
+      0.6524,
+      0.53145
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.92952,
+      2.78289,
+      -1.00929
+     ],
+     "q": [
+      0.12417,
+      0.31443,
+      0.34567,
+      0.87534
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_4a",
+   "nn": 18,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000012",
+   "tag": "rlk_kn_leg_4a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07949,
+      1.77337,
+      -0.18124
+     ],
+     "q": [
+      -0.74755,
+      -0.28903,
+      -0.55778,
+      -0.21566
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.07949,
+      1.77337,
+      -0.18124
+     ],
+     "q": [
+      -0.8148,
+      -0.37209,
+      -0.4044,
+      -0.18468
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_4b",
+   "nn": 19,
+   "parent": "leg_4a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000013",
+   "tag": "rlk_kn_leg_4b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07949,
+      1.77337,
+      -0.18124
+     ],
+     "q": [
+      -0.60175,
+      -0.48912,
+      -0.48996,
+      -0.39825
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.78774,
+      2.78831,
+      -1.11407
+     ],
+     "q": [
+      -0.33998,
+      -0.85512,
+      -0.1446,
+      -0.3637
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_5a",
+   "nn": 20,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000014",
+   "tag": "rlk_kn_leg_5a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11579,
+      1.67543,
+      -0.16416
+     ],
+     "q": [
+      0.40783,
+      0.24791,
+      0.7509,
+      0.45646
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.11579,
+      1.67543,
+      -0.16416
+     ],
+     "q": [
+      0.27576,
+      0.20812,
+      0.74905,
+      0.5653
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_5b",
+   "nn": 21,
+   "parent": "leg_5a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000015",
+   "tag": "rlk_kn_leg_5b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      0.11579,
+      1.67543,
+      -0.16416
+     ],
+     "q": [
+      0.32804,
+      0.39451,
+      0.54878,
+      0.65999
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      1.2504,
+      2.10045,
+      -1.13054
+     ],
+     "q": [
+      0.07084,
+      0.27489,
+      0.23927,
+      0.92853
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_6a",
+   "nn": 22,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_a",
+    "p2": "rlk:mboss/arlecchino/leg_a"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000016",
+   "tag": "rlk_kn_leg_6a",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07913,
+      1.67543,
+      -0.18464
+     ],
+     "q": [
+      -0.69706,
+      -0.43089,
+      -0.48748,
+      -0.30134
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.07913,
+      1.67543,
+      -0.18464
+     ],
+     "q": [
+      -0.72355,
+      -0.56298,
+      -0.31523,
+      -0.24528
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "leg_6b",
+   "nn": 23,
+   "parent": "leg_6a",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/wing_b",
+    "p2": "rlk:mboss/arlecchino/leg_b"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000017",
+   "tag": "rlk_kn_leg_6b",
+   "brightness": 15,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.07913,
+      1.67543,
+      -0.18464
+     ],
+     "q": [
+      -0.50383,
+      -0.61521,
+      -0.38418,
+      -0.46912
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -1.10207,
+      2.05636,
+      -1.28481
+     ],
+     "q": [
+      -0.22122,
+      -0.91379,
+      -0.08015,
+      -0.33108
+     ],
+     "s": [
+      1.89,
+      1.89,
+      1.89
+     ]
+    }
+   }
+  },
+  {
+   "name": "cup",
+   "nn": 24,
+   "parent": "right_forearm",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/cup",
+    "p2": "rlk:mboss/arlecchino/cup"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000018",
+   "tag": "rlk_kn_cup",
+   "brightness": 14,
+   "rest": {
+    "p1": {
+     "t": [
+      -0.58518,
+      1.43984,
+      0.25079
+     ],
+     "q": [
+      0,
+      -0.03141,
+      0,
+      0.99951
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      -0.64731,
+      1.4731,
+      0.29822
+     ],
+     "q": [
+      0,
+      -0.03141,
+      0,
+      0.99951
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "name": "saucer",
+   "nn": 25,
+   "parent": "left_forearm",
+   "model": {
+    "p1": "rlk:mboss/arlecchino/saucer",
+    "p2": "rlk:mboss/arlecchino/saucer"
+   },
+   "uuid": "524c4b4d-4b4e-4100-8000-000000000019",
+   "tag": "rlk_kn_saucer",
+   "brightness": 14,
+   "rest": {
+    "p1": {
+     "t": [
+      0.66147,
+      1.10219,
+      0.18713
+     ],
+     "q": [
+      0,
+      -0.03141,
+      0,
+      0.99951
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    },
+    "p2": {
+     "t": [
+      0.57116,
+      1.3821,
+      0.42629
+     ],
+     "q": [
+      0,
+      -0.03141,
+      0,
+      0.99951
+     ],
+     "s": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  }
+ ],
+ "shadow": {
+  "uuid": "524c4b4d-4b4e-4100-8000-000000000040",
+  "tags": [
+   "rlk_room",
+   "rlk_mb_aux",
+   "rlk_kn_part",
+   "rlk_kn_shadow"
+  ]
+ },
+ "clips": {
+  "idle": {
+   "id": 0,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 11,
+   "keys": 39,
+   "keys_per_tick": 1,
+   "looks": [],
+   "source": "v1 4.6-5.0 (the stance after the intro), v2 16.3: crescent low by the right foot",
+   "note": ""
+  },
+  "walk": {
+   "id": 1,
+   "len": 24,
+   "loop": [
+    0,
+    24
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 12
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 21,
+   "keys": 92,
+   "keys_per_tick": 3.7,
+   "looks": [],
+   "source": "v5 13-39 (her prowl toward the player), stride with the scythe trailing low",
+   "note": ""
+  },
+  "strafe_l": {
+   "id": 2,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 17,
+   "keys": 84,
+   "keys_per_tick": 4,
+   "looks": [],
+   "source": "v2 12.5-27 (side steps between strings)",
+   "note": ""
+  },
+  "strafe_r": {
+   "id": 3,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 17,
+   "keys": 85,
+   "keys_per_tick": 4,
+   "looks": [],
+   "source": "v2 12.5-27 (side steps between strings)",
+   "note": ""
+  },
+  "idle2": {
+   "id": 4,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 23,
+   "keys": 80,
+   "keys_per_tick": 2,
+   "looks": [],
+   "source": "v4 22.4-23.0, v6 7.4: twin scythes low, the blade legs folded and swaying",
+   "note": ""
+  },
+  "walk2": {
+   "id": 5,
+   "len": 24,
+   "loop": [
+    0,
+    24
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 12
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 22,
+   "keys": 130,
+   "keys_per_tick": 5.2,
+   "looks": [],
+   "source": "v4 23.5-28 (her approach in P2)",
+   "note": ""
+  },
+  "strafe2_l": {
+   "id": 6,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 18,
+   "keys": 120,
+   "keys_per_tick": 5.7,
+   "looks": [],
+   "source": "v6 5-14 (circling)",
+   "note": ""
+  },
+  "strafe2_r": {
+   "id": 7,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 18,
+   "keys": 119,
+   "keys_per_tick": 5.7,
+   "looks": [],
+   "source": "v6 5-14 (circling)",
+   "note": ""
+  },
+  "backstep": {
+   "id": 8,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "land": 10
+   },
+   "form": null,
+   "compiled_forms": [
+    "p1",
+    "p2"
+   ],
+   "key_files": 9,
+   "keys": 186,
+   "keys_per_tick": 14.3,
+   "looks": [],
+   "source": "v2 37.5 (the hop back before 와리가리)",
+   "note": ""
+  },
+  "flinch": {
+   "id": 9,
+   "len": 6,
+   "loop": null,
+   "events": {},
+   "form": null,
+   "compiled_forms": [
+    "p1",
+    "p2"
+   ],
+   "key_files": 4,
+   "keys": 105,
+   "keys_per_tick": 15,
+   "looks": [],
+   "source": "hit reaction (designed)",
+   "note": ""
+  },
+  "brk": {
+   "id": 10,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "hit": 0
+   },
+   "form": null,
+   "compiled_forms": [
+    "p1",
+    "p2"
+   ],
+   "key_files": 20,
+   "keys": 314,
+   "keys_per_tick": 15,
+   "looks": [],
+   "source": "v3 27.05-28.3 (the counter: she reels, then sinks to the knee)",
+   "note": ""
+  },
+  "stun": {
+   "id": 11,
+   "len": 140,
+   "loop": [
+    20,
+    120
+   ],
+   "events": {
+    "kneel": 10,
+    "rise": 120
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 69,
+   "keys": 243,
+   "keys_per_tick": 1.7,
+   "looks": [],
+   "source": "v3 27.3-29.5 (groggy after the counter: on one knee, the scythe planted)",
+   "note": ""
+  },
+  "stun2": {
+   "id": 12,
+   "len": 140,
+   "loop": [
+    20,
+    120
+   ],
+   "events": {
+    "kneel": 10,
+    "rise": 120
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 110,
+   "keys": 454,
+   "keys_per_tick": 3.2,
+   "looks": [],
+   "source": "v7 24.15-27 (the P2 counter: on one knee, both scythes planted, the legs drooping)",
+   "note": ""
+  },
+  "intro": {
+   "id": 13,
+   "len": 150,
+   "loop": null,
+   "events": {
+    "sip": 14,
+    "lower": 22,
+    "embers": 34,
+    "flee": 35,
+    "reach": 44,
+    "vortex": 52,
+    "form": 60,
+    "blade": 70,
+    "hold": 72,
+    "title": 80,
+    "twirl": 92,
+    "ring": 98,
+    "twirl_end": 104,
+    "flip": 110,
+    "stance": 116,
+    "set": 120,
+    "beat": 126,
+    "music": 136,
+    "push": 140,
+    "end": 150
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 107,
+   "keys": 422,
+   "keys_per_tick": 2.8,
+   "looks": [
+    [
+     0,
+     "props/tea"
+    ],
+    [
+     34,
+     "props/none"
+    ],
+    [
+     60,
+     "weapon_r/hand"
+    ]
+   ],
+   "source": "v5 33-39.5, v1 0.0-5.2 (ref/intro_v1_tea, _summon, _fine, _twirl, _stance)",
+   "note": ""
+  },
+  "a2": {
+   "id": 14,
+   "len": 46,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "h1": 14,
+    "h2": 24,
+    "end": 46
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 44,
+   "keys": 269,
+   "keys_per_tick": 5.7,
+   "looks": [],
+   "source": "v2 13.0-16.6 (ref/p1_A_normal_2hit.jpg)",
+   "note": ""
+  },
+  "a4": {
+   "id": 15,
+   "len": 100,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 24,
+    "h3": 44,
+    "h4": 64,
+    "end": 100
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 90,
+   "keys": 673,
+   "keys_per_tick": 6.7,
+   "looks": [],
+   "source": "v2 19-24.5 (ref/p1_A_normal_5hit.jpg: sweep, backhand, spin ring 21.05, slam burst 22.25)",
+   "note": ""
+  },
+  "a5": {
+   "id": 16,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 24,
+    "h3": 44,
+    "h4": 64,
+    "h5": 84,
+    "end": 124
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 113,
+   "keys": 900,
+   "keys_per_tick": 7.2,
+   "looks": [],
+   "source": "v2 19-26.8 (ref/p1_A_normal_5hit.jpg: + the second spin ring 23.3-23.9)",
+   "note": ""
+  },
+  "b1": {
+   "id": 17,
+   "len": 60,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "spin": 10,
+    "release": 28,
+    "catch": 52,
+    "end": 60
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 48,
+   "keys": 214,
+   "keys_per_tick": 3.5,
+   "looks": [],
+   "source": "v1 15.4-18.1 (ref/p1_B_throw.jpg: the wheel spin 16.0-16.9, release 17.0, the catch)",
+   "note": ""
+  },
+  "b2": {
+   "id": 18,
+   "len": 130,
+   "loop": null,
+   "events": {
+    "spin": 10,
+    "rel1": 28,
+    "spin2": 40,
+    "rel2": 58,
+    "reach": 76,
+    "lock": 80,
+    "grab": 96,
+    "end": 130
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 108,
+   "keys": 426,
+   "keys_per_tick": 3.3,
+   "looks": [],
+   "source": "v1 19.5-24.6 (ref/p1_B_throw2_grab.jpg: two wheels, then the crimson grab 23.9-24.4)",
+   "note": ""
+  },
+  "c1": {
+   "id": 19,
+   "len": 80,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "jump": 8,
+    "apex": 18,
+    "lock": 44,
+    "dive": 48,
+    "impact": 54,
+    "end": 80
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 59,
+   "keys": 328,
+   "keys_per_tick": 4,
+   "looks": [],
+   "source": "v1 26.5-29.0, 32.0-35.0 (ref/p1_C_leap.jpg)",
+   "note": ""
+  },
+  "c2": {
+   "id": 20,
+   "len": 140,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "jump": 8,
+    "apex": 18,
+    "lock": 44,
+    "dive": 48,
+    "impact": 54,
+    "wing_open": 84,
+    "wing": 90,
+    "end": 140
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 114,
+   "keys": 848,
+   "keys_per_tick": 6,
+   "looks": [
+    [
+     80,
+     "wings/open"
+    ],
+    [
+     138,
+     "wings/off"
+    ]
+   ],
+   "source": "v1 26.5-39.9 (ref/p1_C_leap.jpg, ref/p1_C_wing.jpg: the wings burst 36.6, the wing strike 36.8-37.2)",
+   "note": ""
+  },
+  "d1": {
+   "id": 21,
+   "len": 56,
+   "loop": null,
+   "events": {
+    "flare": 0,
+    "go": 26,
+    "hit": 30,
+    "end": 56
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 49,
+   "keys": 290,
+   "keys_per_tick": 5.1,
+   "looks": [],
+   "source": "v2 0-11.5 (ref/p1_D_dash.jpg: the flare 7.8, the dash 8.6-9.0)",
+   "note": ""
+  },
+  "d2": {
+   "id": 22,
+   "len": 76,
+   "loop": null,
+   "events": {
+    "flare": 0,
+    "go": 26,
+    "hit": 30,
+    "fhit": 46,
+    "end": 76
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 70,
+   "keys": 375,
+   "keys_per_tick": 4.9,
+   "looks": [],
+   "source": "v2 0-11.5 (ref/p1_D_dash.jpg, ref/p1_D_follow.jpg: the follow-up 9.9-10.2)",
+   "note": ""
+  },
+  "e1": {
+   "id": 23,
+   "len": 112,
+   "loop": null,
+   "events": {
+    "rise": 0,
+    "zig1": 16,
+    "zig2": 26,
+    "zig3": 36,
+    "zig4": 46,
+    "zig5": 56,
+    "lock": 64,
+    "go": 70,
+    "sweep": 76,
+    "spin": 92,
+    "end": 112
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 110,
+   "keys": 724,
+   "keys_per_tick": 6.4,
+   "looks": [],
+   "source": "v2 37.5-40, v3 0-7.25 (ref/p1_E_zigzag_a.jpg, _b.jpg, _far.jpg)",
+   "note": ""
+  },
+  "f1": {
+   "id": 24,
+   "len": 232,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "centre": 40,
+    "arms": 100,
+    "flood": 110,
+    "hit1": 160,
+    "wings": 166,
+    "hit2": 196,
+    "end": 232
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 150,
+   "keys": 975,
+   "keys_per_tick": 4.2,
+   "looks": [
+    [
+     163,
+     "wings/open"
+    ],
+    [
+     228,
+     "wings/off"
+    ]
+   ],
+   "source": "v3 7.5-29.5 (ref/p1_F_banquet.jpg, _sigil.jpg, _field.jpg, _counter.jpg)",
+   "note": ""
+  },
+  "g1": {
+   "id": 25,
+   "len": 140,
+   "loop": null,
+   "events": {
+    "plant": 0,
+    "blades": 6,
+    "cross1": 34,
+    "relock": 40,
+    "cross2": 62,
+    "rim": 70,
+    "field": 104,
+    "end": 140
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 91,
+   "keys": 463,
+   "keys_per_tick": 3.3,
+   "looks": [],
+   "source": "v3 29.5-40, v4 0-3.4 (ref/p1_G_blades.jpg, _cross.jpg, _rim.jpg, _field.jpg)",
+   "note": ""
+  },
+  "h1": {
+   "id": 26,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "leap": 0,
+    "perch": 10,
+    "clones": 20,
+    "strike": 34,
+    "drop": 64,
+    "wing": 72,
+    "sweep": 84,
+    "end": 124
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 104,
+   "keys": 868,
+   "keys_per_tick": 6.9,
+   "looks": [
+    [
+     68,
+     "wings/open"
+    ],
+    [
+     118,
+     "wings/off"
+    ]
+   ],
+   "source": "v4 0-13 (ref/p1_H_clones.jpg, _launch.jpg, _leapback.jpg); timing R-S3-1 (drop 64, wing 72, sweep 84, end 124)",
+   "note": ""
+  },
+  "e70": {
+   "id": 27,
+   "len": 110,
+   "loop": null,
+   "events": {
+    "glow": 0,
+    "rise": 20,
+    "pool": 40,
+    "brand": 70,
+    "wings": 74,
+    "land": 96,
+    "end": 110
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 86,
+   "keys": 513,
+   "keys_per_tick": 4.6,
+   "looks": [
+    [
+     72,
+     "wings/open"
+    ],
+    [
+     108,
+     "wings/off"
+    ]
+   ],
+   "source": "v2 28-37.7 (ref/p1_E70_event.jpg)",
+   "note": ""
+  },
+  "t_p2": {
+   "id": 28,
+   "len": 180,
+   "loop": null,
+   "events": {
+    "kneel": 0,
+    "pillar": 24,
+    "dark": 50,
+    "rise": 70,
+    "swap": 90,
+    "legs1": 110,
+    "legs2": 116,
+    "legs3": 122,
+    "scythes": 130,
+    "title": 140,
+    "launch": 150,
+    "end": 180
+   },
+   "form": "p1",
+   "compiled_forms": [
+    "p1"
+   ],
+   "key_files": 121,
+   "keys": 1185,
+   "keys_per_tick": 6.5,
+   "looks": [
+    [
+     130,
+     "weapon_l/hand"
+    ]
+   ],
+   "source": "designed (PLAN §3.2); v4 13.5-21.4 (ref/p2_T_transition.jpg), wiki: six legs, twin scythes",
+   "note": ""
+  },
+  "q0_hover": {
+   "id": 29,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 23,
+   "keys": 76,
+   "keys_per_tick": 1.9,
+   "looks": [],
+   "source": "v4 17.6-19.5 (ref/p2_Q0_fall.jpg: her silhouette high, legs spread)",
+   "note": ""
+  },
+  "q0_dive": {
+   "id": 30,
+   "len": 40,
+   "loop": null,
+   "events": {
+    "go": 0,
+    "impact": 20,
+    "blades": 28,
+    "end": 40
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 34,
+   "keys": 439,
+   "keys_per_tick": 10.7,
+   "looks": [],
+   "source": "v4 19.5-21.4 (ref/p2_Q0_fall.jpg: the crimson streak, the impact, the blade eruption)",
+   "note": ""
+  },
+  "q1": {
+   "id": 31,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 30,
+    "h3": 46,
+    "h4": 66,
+    "h5": 82,
+    "h6": 100,
+    "end": 124
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 118,
+   "keys": 1599,
+   "keys_per_tick": 12.8,
+   "looks": [],
+   "source": "v4 28.5-37 (ref/p2_Q1_twin.jpg)",
+   "note": ""
+  },
+  "q2": {
+   "id": 32,
+   "len": 70,
+   "loop": null,
+   "events": {
+    "windup": 0,
+    "release": 20,
+    "go": 34,
+    "slash": 42,
+    "end": 70
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 67,
+   "keys": 579,
+   "keys_per_tick": 8.2,
+   "looks": [],
+   "source": "v4 37-40, v6 0-5 (ref/p2_Q2_throw_a.jpg, _b.jpg)",
+   "note": ""
+  },
+  "q3": {
+   "id": 33,
+   "len": 36,
+   "loop": null,
+   "events": {
+    "whip": 0,
+    "spin": 14,
+    "end": 36
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 33,
+   "keys": 526,
+   "keys_per_tick": 14.2,
+   "looks": [],
+   "source": "v6 5-15.5 (ref/p2_Q3_rear.jpg)",
+   "note": ""
+  },
+  "q4_up": {
+   "id": 34,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "top": 20
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 20,
+   "keys": 311,
+   "keys_per_tick": 14.8,
+   "looks": [],
+   "source": "v6 15.5-17 (ref/p2_Q4_beam.jpg)",
+   "note": ""
+  },
+  "q4_shot": {
+   "id": 35,
+   "len": 50,
+   "loop": null,
+   "events": {
+    "aim": 0,
+    "lock": 20,
+    "fire": 26,
+    "end": 50
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 36,
+   "keys": 242,
+   "keys_per_tick": 4.7,
+   "looks": [],
+   "source": "v6 17-25 (ref/p2_Q4_beam.jpg: shots 17.75 / 20.25 / 22.75)",
+   "note": ""
+  },
+  "q4_land": {
+   "id": 36,
+   "len": 16,
+   "loop": null,
+   "events": {
+    "land": 12
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 14,
+   "keys": 244,
+   "keys_per_tick": 14.4,
+   "looks": [],
+   "source": "v6 25-26.5 (ref/p2_Q4_beam.jpg)",
+   "note": ""
+  },
+  "q5a": {
+   "id": 37,
+   "len": 180,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "ring1": 60,
+    "hit1": 95,
+    "donut": 100,
+    "hit2": 121,
+    "ring3": 130,
+    "hit3": 158,
+    "end": 180
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 141,
+   "keys": 1088,
+   "keys_per_tick": 6,
+   "looks": [],
+   "source": "v7 4.2-12.3 (ref/p2_Q5_banquet_b.jpg: disc, donut, the wide disc)",
+   "note": ""
+  },
+  "q5b": {
+   "id": 38,
+   "len": 136,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "x": 26,
+    "mark": 50,
+    "s1": 56,
+    "s2": 59,
+    "s3": 62,
+    "s4": 65,
+    "s5": 68,
+    "s6": 71,
+    "s7": 74,
+    "s8": 77,
+    "s9": 80,
+    "final": 96,
+    "end": 136
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 122,
+   "keys": 1323,
+   "keys_per_tick": 9.7,
+   "looks": [],
+   "source": "v6 31.5-35.3, v7 16-19.3 (ref/p2_Q5_banquet_a.jpg, _b.jpg)",
+   "note": ""
+  },
+  "q6": {
+   "id": 39,
+   "len": 200,
+   "loop": null,
+   "events": {
+    "fly": 0,
+    "gone": 20,
+    "moon": 30,
+    "v1": 50,
+    "v2": 60,
+    "v3": 70,
+    "v4": 80,
+    "v5": 90,
+    "v6": 100,
+    "orbs": 110,
+    "toss": 125,
+    "lock": 140,
+    "dive": 160,
+    "impact": 168,
+    "end": 200
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 172,
+   "keys": 1516,
+   "keys_per_tick": 7.5,
+   "looks": [],
+   "source": "v7 28-40 (ref/p2_Q6_feast.jpg)",
+   "note": ""
+  },
+  "death": {
+   "id": 40,
+   "len": 110,
+   "loop": null,
+   "events": {
+    "stop": 0,
+    "lower": 10,
+    "fade": 30,
+    "stand": 50,
+    "flames": 70,
+    "gone": 96,
+    "wisps": 100,
+    "end": 110
+   },
+   "form": "p2",
+   "compiled_forms": [
+    "p2"
+   ],
+   "key_files": 69,
+   "keys": 460,
+   "keys_per_tick": 4.1,
+   "looks": [],
+   "source": "designed (PLAN §3.3, wiki 「자신의 낫을 집어넣는 모션과 함께 불꽃으로 사라진다」)",
+   "note": ""
+  }
+ },
+ "looks": {
+  "form": [
+   "p1",
+   "p2"
+  ],
+  "wings": [
+   "off",
+   "open"
+  ],
+  "weapon_r": [
+   "hand",
+   "gone",
+   "world"
+  ],
+  "weapon_l": [
+   "hand",
+   "gone",
+   "world"
+  ],
+  "glow": [
+   "normal",
+   "crimson"
+  ],
+  "props": [
+   "none",
+   "tea"
+  ]
+ },
+ "arm_layout": {
+  "p1": "slim",
+  "p2": "classic"
+ },
+ "anchors": [
+  "hand_r",
+  "hand_l",
+  "blade_r",
+  "blade_l",
+  "palm_r",
+  "chest",
+  "spine"
+ ],
+ "calls": [
+  "init",
+  "spawn",
+  "spawn_hidden",
+  "tick",
+  "kill",
+  "uninstall",
+  "flash",
+  "state/normal",
+  "state/hidden",
+  "face/player",
+  "face/track",
+  "look/form/p1",
+  "look/form/p2",
+  "look/wings/off",
+  "look/wings/open",
+  "look/weapon_r/hand",
+  "look/weapon_r/gone",
+  "look/weapon_r/world",
+  "look/weapon_l/hand",
+  "look/weapon_l/gone",
+  "look/weapon_l/world",
+  "look/glow/normal",
+  "look/glow/crimson",
+  "look/props/none",
+  "look/props/tea",
+  "anchor/hand_r",
+  "anchor/hand_l",
+  "anchor/blade_r",
+  "anchor/blade_l",
+  "anchor/palm_r",
+  "anchor/chest",
+  "anchor/spine"
+ ],
+ "macro_calls": {
+  "face/set": [
+   "yaw"
+  ]
+ },
+ "stored_looks": {
+  "wings": "knRigWi",
+  "weapon_r": "knRigWr",
+  "weapon_l": "knRigWl",
+  "glow": "knRigGl",
+  "props": "knRigPr"
+ },
+ "tags": {
+  "part": "rlk_kn_part",
+  "anchor": "rlk_kn_anchor",
+  "per_part": "rlk_kn_<part>",
+  "all": [
+   "rlk_room",
+   "rlk_mb_aux",
+   "rlk_mb_part",
+   "rlk_kn_part"
+  ]
+ },
+ "objectives": [
+  "knRigC",
+  "knRigT",
+  "knRigF",
+  "knRigY",
+  "knRigS",
+  "knRigForm",
+  "knRigWi",
+  "knRigWr",
+  "knRigWl",
+  "knRigGl",
+  "knRigPr",
+  "knRigFl",
+  "knRigQ",
+  "knRigQx",
+  "knRigQy",
+  "knRigQz",
+  "knRigQw"
+ ],
+ "culling": {
+  "width": 10,
+  "height": 10
+ },
+ "view_range": 2,
+ "storage": {
+  "anchors": "rlk:kn rig.an",
+  "version": 190586752
+ },
+ "reused_models": {
+  "avatar": [
+   "rlk:player_motion/arle/head",
+   "rlk:player_motion/arle/body",
+   "rlk:player_motion/arle/right_arm",
+   "rlk:player_motion/arle/right_forearm",
+   "rlk:player_motion/arle/left_arm",
+   "rlk:player_motion/arle/left_forearm",
+   "rlk:player_motion/arle/right_leg",
+   "rlk:player_motion/arle/right_shin",
+   "rlk:player_motion/arle/left_leg",
+   "rlk:player_motion/arle/left_shin"
+  ],
+  "scythe": "rlk:player_motion/weapons/scythe",
+  "skin": "rlk:skin/arlecchino"
+ },
+ "budgets": {
+  "atlas_px": 57600,
+  "atlas_budget": 150000,
+  "sprites": 7,
+  "elements_at_rest": {
+   "p1": 40,
+   "p2": 84
+  },
+  "elements_budget": 6500,
+  "parts": 26,
+  "models": 17,
+  "key_files": 2672,
+  "keys": 19927,
+  "rig_functions": 3244,
+  "rig_bytes": 6324286,
+  "edge_warn_ticks": 289
+ },
+ "sprites": {
+  "skin_p2": 4096,
+  "wing_a": 16896,
+  "wing_b": 18432,
+  "leg_a": 8448,
+  "leg_b": 9216,
+  "cup": 256,
+  "saucer": 256
+ }
+}

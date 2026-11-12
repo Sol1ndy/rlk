@@ -1,0 +1,15 @@
+# Look field: seam hot, the iris open, the eye red-orange, both halos violet, the white-gold bubble round the core at the stored crack stage (역장). Stored in fgRigLook (kept over a respawn). @s = rig anchor.
+scoreboard players set @s fgRigLook 2
+scoreboard players set @s fgRigTmp 0
+data modify entity 524c4b4d-4647-4400-8000-000000000002 item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/ring_glow_hot"
+data modify entity 524c4b4d-4647-4400-8000-000000000003 item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/hub_open"
+data modify entity 524c4b4d-4647-4400-8000-000000000007 item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/eye_field"
+data modify entity 524c4b4d-4647-4400-8000-000000000004 item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/halo_v"
+data modify entity 524c4b4d-4647-4400-8000-000000000005 item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/halo2_v"
+data modify entity 524c4b4d-4647-4400-8000-00000000000e item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/medal_eye"
+data modify entity 524c4b4d-4647-4400-8000-00000000000f item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/medal_gear"
+execute if score @s fgRigCrack matches 0 run data modify entity 524c4b4d-4647-4400-8000-00000000000b item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/bubble_0"
+execute if score @s fgRigCrack matches 1 run data modify entity 524c4b4d-4647-4400-8000-00000000000b item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/bubble_1"
+execute if score @s fgRigCrack matches 2 run data modify entity 524c4b4d-4647-4400-8000-00000000000b item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/bubble_2"
+execute if score @s fgRigCrack matches 3 run data modify entity 524c4b4d-4647-4400-8000-00000000000b item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/bubble_3"
+execute if score @s fgRigCrack matches 4 run data modify entity 524c4b4d-4647-4400-8000-00000000000b item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/bubble_burst"

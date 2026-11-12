@@ -1,0 +1,6 @@
+# A8 pattern tick 109.
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b76] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.6176f,0.9144f,0.2848f],left_rotation:[-0.368f,-0.1786f,-0.3602f,-0.8384f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_107] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_108,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5602f,1.2051f,0.0647f],left_rotation:[0.0187f,0.0522f,-0.3541f,0.9336f],scale:[0.5837f,0.3f,1.9802f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_108,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5073f,1.188f,-0.0435f],left_rotation:[0.0702f,0.1873f,-0.3437f,0.9175f],scale:[0.5998f,0.3f,2.0349f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8_108,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4618f,1.163f,-0.0732f],left_rotation:[0.1202f,0.3184f,-0.3259f,0.882f],scale:[0.6047f,0.3f,2.0513f],right_rotation:[0f,0f,0f,1f]}}

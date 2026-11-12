@@ -1,5 +1,11 @@
-function rlk:boss/raiden/cleanup
+function rlk:boss/raiden/uninstall
 kill @e[tag=rlk_raiden]
+# 중간보스: 전투 정리 · 보스바 · 점수 · 경기장 청크 고정 해제
+function rlk:mboss/uninstall
+# rift (build_rift.py)
+function rlk:room/rift/uninstall
+# 균형치(tools/build_balance.py): 그로기 몹의 AI · 마름모 줄 · 점수
+function rlk:bal/uninstall
 scoreboard objectives remove lcSeen
 execute as @a[tag=player] run function rlk:char/motion/stop
 # 시스템 제거: 임시 엔티티/UI 아이템/스코어보드 정리 후 틱 처리 정지 (사용: /function rlk:uninstall)
@@ -78,6 +84,10 @@ tag @a remove rlk_setup
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:frozen
 execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:frozen
+# 휘두르기: 지금 판은 점프 힘 수정자만 쓴다. 이동 속도 수정자는 D12 판에서 남았을 수 있는 것(player/swing/legacy)
+execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:swing_hold
+execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:swing_hold
+tag @a remove rlk_sw13
 kill @e[tag=rlk_shop_item]
 kill @e[tag=rlk_shop_info]
 kill @e[tag=rlk_shop_lbl]
@@ -90,6 +100,7 @@ clear @a *[minecraft:custom_data~{rlk_stat:1b}]
 clear @a *[minecraft:custom_data~{rlk_eng:1b}]
 clear @a *[minecraft:custom_data~{rlk_engi:1b}]
 clear @a *[minecraft:custom_data~{rlk_invd:1b}]
+clear @a *[minecraft:custom_data~{rlk_lock:1b}]
 clear @a *[minecraft:custom_data~{rlk_ui:{}}]
 clear @a *[minecraft:custom_data~{rlk:{}}]
 # 아이템 보유 플래그(it_<id>) 제거
@@ -225,6 +236,29 @@ scoreboard objectives remove dashRegen
 scoreboard objectives remove dashUX
 scoreboard objectives remove dashUZ
 scoreboard objectives remove dashUpN
+scoreboard objectives remove parAt
+scoreboard objectives remove parLk
+scoreboard objectives remove parHit
+scoreboard objectives remove dgAt
+scoreboard objectives remove dgRw
+scoreboard objectives remove cb
+team remove rlk_cbred
+kill @e[tag=rlk_cb_fx]
+kill @e[tag=rlk_dgo]
+# round V (lane VP): 박자 — 세워 둔 몹 · 기울인 부품 · 늘인 보간을 되돌리고(beat/end) 그 점수판 · 표식 · 대역 리그를 지운다
+function rlk:player/def/beat/end
+kill @e[tag=rlk_pl]
+kill @e[tag=rlk_pl_basis]
+kill @e[type=minecraft:marker,tag=rlk_bt_pt]
+scoreboard objectives remove btD
+scoreboard objectives remove btD0
+scoreboard objectives remove btTp
+scoreboard objectives remove plActive
+scoreboard objectives remove plTick
+scoreboard objectives remove plClip
+scoreboard objectives remove plLen
+scoreboard objectives remove pbGlow
+scoreboard objectives remove pbTint
 scoreboard objectives remove db
 scoreboard objectives remove dbgDropI
 scoreboard objectives remove dbgPage
@@ -271,6 +305,7 @@ scoreboard objectives remove eqDendroBonus
 scoreboard objectives remove eqElectroBonus
 scoreboard objectives remove eqElemMastery
 scoreboard objectives remove eqEnergyRecharge
+scoreboard objectives remove eqEp
 scoreboard objectives remove eqGeoBonus
 scoreboard objectives remove eqHpFlat
 scoreboard objectives remove eqHpPct
@@ -315,6 +350,7 @@ scoreboard objectives remove init
 scoreboard objectives remove intOwner
 scoreboard objectives remove invCnt
 scoreboard objectives remove invDirty
+scoreboard objectives remove invCap
 scoreboard objectives remove invEvt
 scoreboard objectives remove iqK
 scoreboard objectives remove itv
@@ -375,6 +411,7 @@ scoreboard objectives remove nvCdE
 scoreboard objectives remove nvFcd
 scoreboard objectives remove nvGap
 scoreboard objectives remove nvGun
+scoreboard objectives remove nvShot
 scoreboard objectives remove nvHit
 scoreboard objectives remove nvP
 scoreboard objectives remove nvQ
@@ -434,6 +471,10 @@ scoreboard objectives remove rxEl
 scoreboard objectives remove rxQ
 scoreboard objectives remove sT
 scoreboard objectives remove sapphire
+scoreboard objectives remove dice
+scoreboard objectives remove nodeHp
+scoreboard objectives remove hrMoon
+scoreboard objectives remove enhL
 scoreboard objectives remove scT
 scoreboard objectives remove scanTick
 scoreboard objectives remove sdelay
@@ -460,6 +501,9 @@ scoreboard objectives remove stacks
 scoreboard objectives remove starlight
 scoreboard objectives remove stepT
 scoreboard objectives remove stunT
+scoreboard objectives remove swCut
+scoreboard objectives remove swHold
+scoreboard objectives remove swJump
 scoreboard objectives remove swungAt
 scoreboard objectives remove talEnd
 scoreboard objectives remove tmp
@@ -513,12 +557,15 @@ scoreboard objectives remove cmAX
 scoreboard objectives remove cmAZ
 scoreboard objectives remove cmAP
 scoreboard objectives remove cmAD
+function rlk:cm/c2/uninstall
+function rlk:cm/c3/uninstall
 
 scoreboard objectives remove pmAtkPending
 scoreboard objectives remove pmAtkStep
 scoreboard objectives remove pmAtkKind
 scoreboard objectives remove pmStrike
 scoreboard objectives remove pmSecond
+scoreboard objectives remove pmThird
 scoreboard objectives remove pmChain
 scoreboard objectives remove pmMoveLock
 scoreboard objectives remove pmLockUntil
@@ -544,4 +591,27 @@ scoreboard objectives remove pmPZ
 scoreboard objectives remove pmPosValid
 scoreboard objectives remove pmWeapon
 scoreboard objectives remove pmWantW
+scoreboard objectives remove pmSheath
+scoreboard objectives remove pmShT
+scoreboard objectives remove pmLocS
+scoreboard objectives remove pmShFx
+scoreboard objectives remove pmWAt
+scoreboard objectives remove pmWModel
 data remove storage rlk:player_motion loco
+
+# 나비아 금빛 카드 효과(fx/nv/init 의 점수판 · 저장소; 카드 자체는 rlk_room 으로 위에서 지운다)
+scoreboard objectives remove nvfx
+scoreboard objectives remove nvfxT
+scoreboard objectives remove nvfxD
+scoreboard objectives remove nvfxK
+data remove storage rlk:nvfx a
+
+# 화면 미니맵
+bossbar remove rlk:minimap
+scoreboard objectives remove mm
+
+# 리소스팩 보스바
+scoreboard objectives remove bu
+scoreboard objectives remove buTrail
+scoreboard objectives remove buLast
+scoreboard objectives remove buT

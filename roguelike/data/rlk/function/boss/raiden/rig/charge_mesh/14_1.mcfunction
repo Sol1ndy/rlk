@@ -1,5 +1,0 @@
-data modify entity @e[tag=rlk_rd_palm_main_r,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_weapon/palm_closed_charge_1"
-data modify entity @e[tag=rlk_rd_palm_main_l,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_weapon/palm_closed_charge_1"
-data modify entity @e[tag=rlk_rd_palm_rear_r,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_weapon/palm_open_charge_1"
-data modify entity @e[tag=rlk_rd_palm_rear_l,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_weapon/palm_open_charge_1"
-data modify entity @e[tag=rlk_rd_palm_skin,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_weapon/palm_open_charge_1"

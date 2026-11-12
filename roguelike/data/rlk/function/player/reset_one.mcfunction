@@ -7,9 +7,22 @@ execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 function rlk:player/init
 function rlk:lvup/init
 scoreboard players set @s gold 0
+scoreboard players set @s dice 0
+scoreboard players set @s nodeHp 0
+# 월하대작(홍련 이벤트 버프): 범위가 이번 런이면(load 조절 지점 #hrMoonRun 1, 없으면 이번 런) 끈다. 영구(#hrMoonRun 0)면 남긴다(계획 §7.5.3)
+execute unless score #hrMoonRun tmp matches 0 run scoreboard players set @s hrMoon 0
+# 화무십일홍: 런마다 상태 · 재사용 대기를 지운다(버렸다 주웠을 때의 hw_clear 와 달리 재사용 대기도)
+function rlk:items/proc/hw_reset
+scoreboard players set @s invCap 9
 # 아이템 전부 제거 + 인벤 시스템 상태 초기화
 clear @s
 data modify storage rlk:pinv order set value []
+# 아이템 강화 단계 (id → 0~3)
+data modify storage rlk:pinv enh set value {}
+scoreboard players reset * enhL
+function rlk:items/tune/reapply_all
+# 세계수의 기적 받은 각인
+data remove storage rlk:pinv mir
 data remove storage rlk:pinv pcnt
 function rlk:player/reset_stacks
 function rlk:element/infuse_end

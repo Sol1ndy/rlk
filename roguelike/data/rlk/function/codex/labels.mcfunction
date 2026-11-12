@@ -66,6 +66,7 @@ data modify storage rlk:codex lab.salon_invite set value {t:"살롱의\n초대�
 data modify storage rlk:codex lab.skandha_seed set value {t:"스칸다의\n씨앗",dy:"-0.795"}
 data modify storage rlk:codex lab.skyward_verse set value {t:"바람 신의 시",dy:"-0.632"}
 data modify storage rlk:codex lab.stormy_eye set value {t:"초월 ·\n악요개안",dy:"-0.795"}
+data modify storage rlk:codex lab.sword_hwamu set value {t:"화무십일홍",dy:"-0.632"}
 data modify storage rlk:codex lab.banner set value {t:"격려의 깃발",dy:"-0.632"}
 data modify storage rlk:codex lab.baron_bunny set value {t:"토끼 백작",dy:"-0.632"}
 data modify storage rlk:codex lab.blazing_barrier set value {t:"불꽃 방벽",dy:"-0.632"}
@@ -100,4 +101,3 @@ data modify storage rlk:codex lab.char_lumine set value {t:"루미네",dy:"-0.63
 data modify storage rlk:codex lab.char_navia set value {t:"나비아",dy:"-0.632"}
 data modify storage rlk:codex lab.char_ronova set value {t:"로노바",dy:"-0.632"}
 data modify storage rlk:codex lab.char_skirk set value {t:"스커크",dy:"-0.632"}
-data modify storage rlk:codex lab.char_yoimiya set value {t:"요이미야",dy:"-0.632"}

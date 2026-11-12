@@ -3,3 +3,5 @@
 execute if score @s it_maid_gauntlet matches 1.. unless score #maidCd itv matches 1.. run function rlk:items/proc/maid
 # 수련의 무희: 적중 표시(다음 틱에 물 폭발)
 execute if score #lilyT itv matches 1.. unless score #lilyCd itv matches 1.. run scoreboard players set #lilyHit itv 1
+# 화무십일홍: 육참골단(기본 공격 4번 적중마다 중첩 + 체력 소모)
+execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_hit

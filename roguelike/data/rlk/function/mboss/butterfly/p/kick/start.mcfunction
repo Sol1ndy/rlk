@@ -1,0 +1,30 @@
+# H1 달빛 발차기 (lead 2: start at clock -2, clip kick_combo at 0). Hit 1 8: the strip (lane
+# 4.5 x 2.4 from 0.5 behind A + splash r 1.5, one group, quiet hazards and the body tell from -2); kick 2 locked at 21, the leap
+# at 25, hit 2 32: half disc r 5 + ground wave 6 x 2 at B (one group); 0.55 / 0.7 Dendro.
+function rlk:mboss/butterfly/rig/face/player
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1a]
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1b]
+scoreboard players set #bfDMax mb 45
+scoreboard players set #bfDKeep mb 15
+function rlk:mboss/butterfly/u/dest
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1a]
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_dest] add rlk_mb_bf_p1a
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_p1a] add rlk_mb_bf_kept
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_p1a] remove rlk_mb_bf_dest
+function rlk:mboss/grp_new
+scoreboard players operation #hzGrp mb = #mbGrp mb
+scoreboard players set #hzKB mb 3
+scoreboard players set #hzSfx mb 0
+scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzBack mb 5
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/line {len:40,w:24,tell:10,dmg:55}
+scoreboard players operation #hzGrp mb = #mbGrp mb
+scoreboard players set #hzKB mb 3
+scoreboard players set #hzSfx mb 0
+scoreboard players set #hzQuiet mb 1
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ^ ^ ^1.2 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:15,tell:10,dmg:55}
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"^-0.342 ^0.407 ^-0.166",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.4,s1:1.3,move:"0f,0f,0f",life:9,fade:3,col:12711816}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.342 ^0.407 ^-0.166 run function rlk:mboss/butterfly/fx/p/glint
+execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.8} ^-0.342 ^0.407 ^-0.166 0.12 0.15 0.12 0 4 force @a[tag=player]
+function rlk:mboss/butterfly/fx/snd/kick_whoosh
+playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.12

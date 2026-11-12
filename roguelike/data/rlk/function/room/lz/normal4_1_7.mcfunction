@@ -28,16 +28,11 @@ fill -6 201 3 -6 201 5 minecraft:podzol
 fill -2 201 3 -2 201 12 minecraft:podzol
 fill -8 201 4 -8 201 5 minecraft:podzol
 fill -5 201 4 -3 201 11 minecraft:podzol
-fill -19 201 5 -17 201 5 minecraft:podzol
-fill -17 201 6 -17 201 15 minecraft:podzol
 fill -4 201 12 -3 201 12 minecraft:podzol
-fill -19 201 14 -18 201 16 minecraft:podzol
 fill -6 201 1 -2 201 2 minecraft:dirt
 fill -6 202 1 -2 202 2 minecraft:podzol
 fill -5 201 3 -3 201 3 minecraft:dirt
 fill -5 202 3 -3 202 3 minecraft:podzol
-fill -19 201 6 -18 201 13 minecraft:dirt
-fill -19 202 6 -18 202 13 minecraft:podzol
 fill -15 199 13 -15 199 18 minecraft:clay
 fill -15 200 13 -15 200 18 minecraft:water
 fill -14 199 15 -8 199 18 minecraft:clay
@@ -53,7 +48,7 @@ execute positioned -15 201 5 run function rlk:room/prop/fo_rock_s
 execute positioned -11 201 13 run function rlk:room/prop/fo_flower
 execute positioned -15 201 9 run function rlk:room/prop/fo_flower
 execute positioned -12 201 1 run function rlk:room/prop/fo_white
-execute positioned -19 203 12 run function rlk:room/prop/fo_white
+execute positioned -19 201 12 run function rlk:room/prop/fo_white
 execute positioned -3 201 17 run function rlk:room/prop/p_grass
 execute positioned -3 201 13 run function rlk:room/prop/fo_flower
 execute positioned -19 201 17 run function rlk:room/prop/p_grass

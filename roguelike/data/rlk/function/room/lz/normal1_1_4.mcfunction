@@ -28,15 +28,8 @@ fill 15 201 -19 17 201 -19 minecraft:podzol
 fill 14 201 -18 14 201 -18 minecraft:podzol
 fill 6 201 -17 6 201 -15 minecraft:podzol
 fill 13 201 -17 13 201 -17 minecraft:podzol
-fill 1 201 -16 2 201 -15 minecraft:podzol
 fill 12 201 -16 12 201 -15 minecraft:podzol
-fill 17 201 -16 18 201 -15 minecraft:podzol
-fill 3 201 -15 3 201 -6 minecraft:podzol
 fill 7 201 -15 11 201 -15 minecraft:podzol
-fill 16 201 -15 16 201 -6 minecraft:podzol
-fill 15 201 -14 15 201 -7 minecraft:podzol
-fill 1 201 -6 2 201 -5 minecraft:podzol
-fill 17 201 -6 18 201 -5 minecraft:podzol
 fill 7 201 -19 14 201 -19 minecraft:dirt
 fill 7 202 -19 14 202 -19 minecraft:podzol
 fill 7 201 -18 13 201 -18 minecraft:dirt
@@ -45,10 +38,6 @@ fill 7 201 -17 12 201 -17 minecraft:dirt
 fill 7 202 -17 12 202 -17 minecraft:podzol
 fill 7 201 -16 11 201 -16 minecraft:dirt
 fill 7 202 -16 11 202 -16 minecraft:podzol
-fill 1 201 -14 2 201 -7 minecraft:dirt
-fill 1 202 -14 2 202 -7 minecraft:podzol
-fill 17 201 -14 18 201 -7 minecraft:dirt
-fill 17 202 -14 18 202 -7 minecraft:podzol
 execute positioned 6 202 -16 run function rlk:room/prop/i_bamboo
 execute positioned 4 201 -9 run function rlk:room/prop/i_pillar
 execute positioned 5 201 -14 run function rlk:room/prop/i_flower
@@ -57,4 +46,4 @@ execute positioned 10 201 -13 run function rlk:room/prop/i_grass
 execute positioned 5 201 -3 run function rlk:room/prop/i_grass
 execute positioned 6 201 -6 run function rlk:room/prop/i_flower
 execute positioned 9 201 -2 run function rlk:room/prop/i_grass
-execute positioned 1 202 -15 run function rlk:room/prop/i_grass
+execute positioned 1 201 -15 run function rlk:room/prop/i_grass

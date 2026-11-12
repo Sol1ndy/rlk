@@ -1,0 +1,7 @@
+# kick clock 33
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.161f,0.447f,0.447f],scale:1.4} ^ ^0.2 ^3 0.3 0.1 0.3 0 3 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust_color_transition{from_color:[0.898f,0.984f,0.784f],to_color:[0.161f,0.447f,0.447f],scale:1.2} ^ ^0.3 ^3 0.3 0.2 0.3 0 4 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.161f,0.447f,0.447f],scale:1.4} ^ ^0.2 ^4 0.3 0.1 0.3 0 3 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust_color_transition{from_color:[0.898f,0.984f,0.784f],to_color:[0.161f,0.447f,0.447f],scale:1.2} ^ ^0.3 ^4 0.3 0.2 0.3 0 4 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ^ ^ ^3 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/snd/crescent_fly
+playsound minecraft:block.azalea.break hostile @a[tag=player] ~ ~ ~ 0.5 1 0.17

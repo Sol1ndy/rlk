@@ -1,0 +1,2836 @@
+{
+ "generator": "tools/build_mboss_az_fx.py",
+ "api": "scratchpad az/az_fx_api.md (tools-side copy: tools/az_fx_api.md)",
+ "functions": "rlk:boss/azhdaha/fx/",
+ "item_models": "rlk:mboss/az_kit/",
+ "font": "rlk:mboss_az",
+ "storage": "rlk:azkit",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/boss/azhdaha/fx/e",
+   "data/rlk/function/boss/azhdaha/fx/p",
+   "data/rlk/function/boss/azhdaha/fx/tele",
+   "data/rlk/function/boss/azhdaha/fx/snd",
+   "data/rlk/function/boss/azhdaha/fx/hud",
+   "data/rlk/function/boss/azhdaha/fx/prop",
+   "data/rlk/function/boss/azhdaha/fx/test"
+  ],
+  "files": [
+   "data/rlk/function/boss/azhdaha/fx/card.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/cardx.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/look.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/clear.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/az_kit",
+   "assets/rlk/models/item/mboss/az_kit",
+   "assets/rlk/items/mboss/az_kit",
+   "assets/rlk/font/mboss_az.json",
+   "assets/rlk/textures/font/mboss_az"
+  ]
+ },
+ "caps": {
+  "fx": 64,
+  "telegraph": 40,
+  "telegraph_skip_from": 34,
+  "field": 16,
+  "ambient_skip_from": 40,
+  "trail_skip_from": 36
+ },
+ "objectives": [
+  "akS",
+  "akG",
+  "akH",
+  "akK",
+  "akD"
+ ],
+ "fake_players": "#ak* (objective mb)",
+ "tags": [
+  "rlk_ak",
+  "rlk_ak_t",
+  "rlk_ak_fp",
+  "rlk_ak_f<k>",
+  "rlk_ak_ml<k>",
+  "rlk_ak_ml<k>c",
+  "rlk_ak_wv<k>",
+  "rlk_ak_sr<k>",
+  "rlk_ak_sb",
+  "rlk_ak_g",
+  "rlk_ak_demo"
+ ],
+ "kinds": {
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "soft white glow disc"
+  },
+  "glint": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "white 4-point glint"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "soft mote (embers, motes, frost glints)"
+  },
+  "streak": {
+   "plane": "face",
+   "px": [
+    128,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0625,
+    0.0625
+   ],
+   "tint": "neutral",
+   "desc": "long thin streak along a"
+  },
+  "ripple": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "ripple / shock ring (unit radius)"
+  },
+  "spark": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "spark star"
+  },
+  "beam": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "light beam / column, foot at b 0"
+  },
+  "vortex": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "absorb vortex swirl (unit radius)"
+  },
+  "cracks": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "radial floor cracks (unit radius)"
+  },
+  "crackfan": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.6,
+    0.6,
+    -0.05,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "crack fan from the apex forward, about +-32 degrees"
+  },
+  "blade": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "translucent crystal blade"
+  },
+  "dust": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "dust puff (toon cloud)"
+  },
+  "arc": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.25,
+    0.25
+   ],
+   "tint": "neutral",
+   "desc": "electric arc"
+  },
+  "crystal": {
+   "plane": "cross",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "arena crystal cluster, foot at b 0"
+  },
+  "water": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "shallow-water sheet tile (seamless)"
+  },
+  "boulder": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "dark boulder / rubble chunk"
+  },
+  "slab": {
+   "plane": "box",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.135,
+    0.135
+   ],
+   "tint": "painted",
+   "desc": "rock slab with a gold crack rim (box 1 x 0.27 x 0.4)"
+  },
+  "mound": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "dust mound, foot at b 0"
+  },
+  "cone": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "stone cone, foot at b 0"
+  },
+  "leaf": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "orange tail leaf"
+  },
+  "gold_leaf": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold leaf"
+  },
+  "splash": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "water splash crown, foot at b 0"
+  },
+  "geyser": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "water geyser column, foot at b 0"
+  },
+  "orb": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "격류 범람 Hydro orb"
+  },
+  "flame": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "flame tongue, root at b 0"
+  },
+  "fire_dome": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "impact fire dome (half dome, pivot at the base)"
+  },
+  "lava": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "molten rock lump"
+  },
+  "meteor": {
+   "plane": "face",
+   "px": [
+    64,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "운석 meteor: molten head at the bottom, flame trail up"
+  },
+  "smoke": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "smoke / steam puff"
+  },
+  "ice_spike": {
+   "plane": "cross",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "ice crystal spike, foot at b 0"
+  },
+  "frost": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "frost mist puff"
+  },
+  "icicle": {
+   "plane": "cross",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "ice lance, tip at +b"
+  },
+  "ice_sphere": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "쏟아지는 천화 spiky ice sphere"
+  },
+  "bolt": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "lightning bolt, foot at b 0"
+  },
+  "shell": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "번개의 가루 shell"
+  },
+  "spike_geo": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "Geo 천동만상 spike, tip at +b"
+  },
+  "spike_cryo": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "Cryo dark spike, tip at +b"
+  },
+  "spike_electro": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "Electro spike, tip at +b"
+  },
+  "stele": {
+   "plane": "box",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.35,
+    0.35,
+    -1.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "intro seal stele (box 0.7 x 2 x 0.24)"
+  },
+  "prism": {
+   "plane": "prism",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "intro seal prism (8 walls, radius 1, height 1.5)"
+  },
+  "gate_icon": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gate label icon"
+  },
+  "cure_burst": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "cleanse burst sphere"
+  },
+  "sigil_pyro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "absorb sigil (pyro)"
+  },
+  "glyph_pyro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "stele / arrival glyph (pyro)"
+  },
+  "front_pyro": {
+   "plane": "band",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "wave front band segment (pyro)"
+  },
+  "sigil_hydro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "absorb sigil (hydro)"
+  },
+  "glyph_hydro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "stele / arrival glyph (hydro)"
+  },
+  "front_hydro": {
+   "plane": "band",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "wave front band segment (hydro)"
+  },
+  "sigil_electro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "absorb sigil (electro)"
+  },
+  "glyph_electro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "stele / arrival glyph (electro)"
+  },
+  "front_electro": {
+   "plane": "band",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "wave front band segment (electro)"
+  },
+  "sigil_cryo": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "absorb sigil (cryo)"
+  },
+  "glyph_cryo": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "stele / arrival glyph (cryo)"
+  },
+  "front_cryo": {
+   "plane": "band",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "wave front band segment (cryo)"
+  },
+  "sigil_geo": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "absorb sigil (geo)"
+  },
+  "glyph_geo": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "stele / arrival glyph (geo)"
+  },
+  "front_geo": {
+   "plane": "band",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "wave front band segment (geo)"
+  },
+  "rune_pyro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "brand rune (pyro)"
+  },
+  "shard_pyro": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.4,
+    0.4,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "응결 결정 (pyro)"
+  },
+  "rune_hydro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "brand rune (hydro)"
+  },
+  "shard_hydro": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.4,
+    0.4,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "응결 결정 (hydro)"
+  },
+  "rune_electro": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "brand rune (electro)"
+  },
+  "shard_electro": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.4,
+    0.4,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "응결 결정 (electro)"
+  },
+  "rune_cryo": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "brand rune (cryo)"
+  },
+  "shard_cryo": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.4,
+    0.4,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "응결 결정 (cryo)"
+  },
+  "t_rim": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph rim, unit radius"
+  },
+  "t_rim_s": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "thick telegraph rim (r <= 2.5)"
+  },
+  "t_crack": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P4 zig-zag crack ring outline (keep)"
+  },
+  "t_chev": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P9 chevron ring outline (keep)"
+  },
+  "t_swirl": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P1 Hydro geyser water-swirl outline (keep)"
+  },
+  "t_ring": {
+   "plane": "flat",
+   "px": [
+    192,
+    192
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "thin travelling ring (fronts, halo)"
+  },
+  "t_fill": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph progress fill, unit radius"
+  },
+  "t_bar": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane rail / cap bar"
+  },
+  "t_lane": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane progress fill, unit length"
+  },
+  "t_frame": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "strip outline (field pool)"
+  },
+  "t_sf15": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "15-degree slice fill"
+  },
+  "t_sf30": {
+   "plane": "flat",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.27081904510252075,
+    0.27081904510252075,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "30-degree slice fill"
+  },
+  "t_sa30": {
+   "plane": "flat",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.27081904510252075,
+    0.27081904510252075,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "30-degree slice arc rim"
+  },
+  "t_nd": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "undodgeable 回 mark (tinted red-amber)"
+  },
+  "t_ndj": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "undodgeable + jump chevron mark"
+  },
+  "t_hept": {
+   "plane": "flat",
+   "px": [
+    192,
+    192
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "서리 습격 heptagram {7/2} + 大巛 rune"
+  },
+  "t_hex": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "번개 가시 hexagram + 번개 rune"
+  },
+  "t_star": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "얼음 가시 star seal + rune"
+  },
+  "t_seal8": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "운석 seal: two squares + 火 runes"
+  },
+  "t_mask": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "벼락 습격 violet strike wash"
+  },
+  "t_safe": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "벼락 습격 safe circle (rim + glyph)"
+  },
+  "t_crater": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "B3 crater (also the crater prop)"
+  },
+  "t_wall": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "dust wall on a flank strip rail"
+  },
+  "t_gcircle": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "intro seal gold floor glyph circle"
+  },
+  "t_sa15": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "15-degree slice arc rim"
+  },
+  "t_sa15l": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "15-degree slice arc rim + edge l"
+  },
+  "t_sa15r": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "15-degree slice arc rim + edge r"
+  },
+  "t_sa15b": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "15-degree slice arc rim + edge b"
+  },
+  "t_bo25": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.25 (outer band)"
+  },
+  "t_bi25": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.25 (inner band)"
+  },
+  "t_bo50": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.5 (outer band)"
+  },
+  "t_bi50": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.5 (inner band)"
+  },
+  "t_bo71": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.7071 (outer band)"
+  },
+  "t_bi71": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.7071 (inner band)"
+  },
+  "t_bo84": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.8409 (outer band)"
+  },
+  "t_bi84": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.14252619222005158,
+    0.14252619222005158,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "annular 15-degree fill, inner 0.8409 (inner band)"
+  },
+  "fld1": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "lingering field disc (pyro)"
+  },
+  "fld2": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "lingering field disc (hydro)"
+  },
+  "fld3": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "lingering field disc (electro)"
+  },
+  "fld4": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "lingering field disc (cryo)"
+  },
+  "fld5": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "lingering field disc (geo)"
+  },
+  "fst3": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "lingering strip (electro)"
+  },
+  "fst4": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "lingering strip (cryo)"
+  }
+ },
+ "atlas_px": 595712,
+ "telegraphs": {
+  "disc": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "ring": [
+   "r0",
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "sector": [
+   "r",
+   "a",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "wedge": [
+   "r0",
+   "r1",
+   "a0",
+   "a1",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "line": [
+   "len",
+   "w",
+   "back",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "lane_side": [
+   "len",
+   "w",
+   "back",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "wave": [
+   "id",
+   "r0",
+   "r1",
+   "w",
+   "tell",
+   "dur",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "wave_to": [
+   "id",
+   "r",
+   "dur"
+  ],
+  "wave_end": [
+   "id"
+  ],
+  "mline": [
+   "id",
+   "len",
+   "w",
+   "back",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "mline_aim": [
+   "id"
+  ],
+  "mline_turn": [
+   "id",
+   "d"
+  ],
+  "mline_end": [
+   "id"
+  ],
+  "heptagram": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "hexagram": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "starseal": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "seal8": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "disc_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "heptagram_o": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "crack_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "chev_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "swirl_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "hexagram_o": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "starseal_o": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "seal8_o": [
+   "r",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "mask_wash": [
+   "r",
+   "tell",
+   "hold"
+  ],
+  "safe_rim": [
+   "id",
+   "r",
+   "tell",
+   "hold"
+  ],
+  "safe_beam": [
+   "id"
+  ],
+  "safe_end": [
+   "id"
+  ],
+  "crater": [
+   "r",
+   "tell",
+   "hold"
+  ],
+  "halo": [
+   "r",
+   "h",
+   "tell",
+   "el",
+   "hold"
+  ],
+  "glyph_circle": [
+   "r",
+   "tell",
+   "hold"
+  ],
+  "field": [
+   "id",
+   "r",
+   "el",
+   "life"
+  ],
+  "strip": [
+   "id",
+   "len",
+   "w",
+   "yaw",
+   "el",
+   "life"
+  ],
+  "field_end": [
+   "id"
+  ],
+  "field_clear": [],
+  "clear": []
+ },
+ "telegraph_colours": {
+  "0": [
+   "#E5304A",
+   "#FF6474",
+   "#FFB8C4"
+  ],
+  "1": [
+   "#C8461E",
+   "#FF8A3D",
+   "#FFD2A0"
+  ],
+  "2": [
+   "#1E6FC8",
+   "#4FB8FF",
+   "#CDEBFF"
+  ],
+  "3": [
+   "#6A3FC8",
+   "#C58BFF",
+   "#EEDDFF"
+  ],
+  "4": [
+   "#3AA6C0",
+   "#9FE8F5",
+   "#E8FBFF"
+  ],
+  "5": [
+   "#D27A0C",
+   "#F0A93A",
+   "#FFE8A0"
+  ],
+  "6": [
+   "#D27A0C",
+   "#F0A93A",
+   "#FFE8A0"
+  ],
+  "7": [
+   "#D27A0C",
+   "#F0A93A",
+   "#FFE8A0"
+  ],
+  "8": [
+   "#D27A0C",
+   "#F0A93A",
+   "#FFE8A0"
+  ]
+ },
+ "undodgeable_rim": "#FF5A1E",
+ "safe_rim": "#2FCF5E",
+ "presets": {
+  "geyser": {
+   "args": [],
+   "doc": "P1 Hydro geyser (the chin addon): a water column erupting with spray and a ripple. At the floor point.",
+   "cards": 3,
+   "ambient": false
+  },
+  "blade_trail": {
+   "args": [],
+   "doc": "Hydro water-blade trail (at the blade prop, every 2 t): a short water streak and spray.",
+   "cards": 1,
+   "ambient": true
+  },
+  "lump_trail": {
+   "args": [],
+   "doc": "Pyro lump trail (at a flying lump, every 2 t): a flame lick and smoke.",
+   "cards": 2,
+   "ambient": true
+  },
+  "meteor_big": {
+   "args": [
+    "h"
+   ],
+   "doc": "32 big meteor fall: the molten meteor drops from {h} (tenths) above onto the floor point in 6 t with a flame trail and a darkening floor glow.",
+   "cards": 3,
+   "ambient": false
+  },
+  "meteor_small": {
+   "args": [
+    "h"
+   ],
+   "doc": "32 small meteor fall from {h} (tenths) in 4 t with a short flame trail.",
+   "cards": 2,
+   "ambient": false
+  },
+  "fire_dome": {
+   "args": [
+    "r"
+   ],
+   "doc": "32 meteor impact: a fire dome of radius {r} (tenths) with flame tongues, a flash and a fire ring. At the floor point.",
+   "cards": 9,
+   "ambient": false
+  },
+  "frost_burst": {
+   "args": [
+    "r"
+   ],
+   "doc": "Cryo frost burst of radius {r} (tenths; Cryo rings, 41 bursts): a ring of ice spikes, frost mist and a white flash. At the floor point.",
+   "cards": 10,
+   "ambient": false
+  },
+  "ice_wall": {
+   "args": [],
+   "doc": "P7 Cryo ice-wall piece (on the swept arc): four tall ice spikes in a row along the executor's forward axis (the radial line of the piece, 5.0 .. 11.5 b from the tail root when called at 8.25 b), frost. At the floor point, rotated along the arc.",
+   "cards": 5,
+   "ambient": false
+  },
+  "hail": {
+   "args": [
+    "r"
+   ],
+   "doc": "Hail falling in a field of radius {r} (tenths; ambient, call every 5-10 t): three ice pellets, snow.",
+   "cards": 3,
+   "ambient": true
+  },
+  "bolt": {
+   "args": [],
+   "doc": "A single Electro sky bolt onto the floor point: the bolt, a flash, a spark and a scorch ripple.",
+   "cards": 3,
+   "ambient": false
+  },
+  "bolt_round": {
+   "args": [
+    "r"
+   ],
+   "doc": "42 floor-wide crackle over radius {r} (tenths): two waves of six bolts 8 t apart at spread points. At the arena centre.",
+   "cards": 12,
+   "ambient": false
+  },
+  "shell_dive": {
+   "args": [],
+   "doc": "44 shell impact: a violet dome flash, arcs and a crackle ring. At the floor point.",
+   "cards": 5,
+   "ambient": false
+  },
+  "icicle_trail": {
+   "args": [],
+   "doc": "Icicle / lance trail (at the icicle, every 2 t; 41, 43): frost motes and a pale streak.",
+   "cards": 2,
+   "ambient": true
+  },
+  "ice_sphere": {
+   "args": [],
+   "doc": "43 ice-sphere aura (at the sphere prop, every 4-6 t): frost glints and snow around it.",
+   "cards": 2,
+   "ambient": true
+  },
+  "orb_ribbon": {
+   "args": [],
+   "doc": "31 orb ribbon (at an orb, every 2 t): a water ribbon streak and a drop.",
+   "cards": 2,
+   "ambient": true
+  },
+  "spark_column": {
+   "args": [
+    "h"
+   ],
+   "doc": "44 tell: a violet spark column {h} (tenths) tall from the tail tip with crawling arcs. At the tip, foot of the column.",
+   "cards": 4,
+   "ambient": false
+  },
+  "stele_shatter": {
+   "args": [],
+   "doc": "E a seal stele shatters: red-brown chunks flung out, dust and a gold crack flash. At the stele foot.",
+   "cards": 9,
+   "ambient": false
+  },
+  "prism_shatter": {
+   "args": [],
+   "doc": "E the seal prism shatters (t112): gold glass blades burst outward from the prism, a white flash and a gold ring. At the prism centre (floor).",
+   "cards": 14,
+   "ambient": false
+  },
+  "seal_reform": {
+   "args": [],
+   "doc": "D the seal re-forms around the dying body: gold glass blades converging inward, a gold glow and rising motes. At the body's floor point.",
+   "cards": 9,
+   "ambient": false
+  },
+  "petrify_pulse": {
+   "args": [],
+   "doc": "D petrify pulse (the rig turns to stone): a grey-gold ripple and dust. At the body's floor point.",
+   "cards": 3,
+   "ambient": false
+  },
+  "splash": {
+   "args": [],
+   "doc": "Water step splash (Hydro walk, water-sheet impacts): a small splash and ripple.",
+   "cards": 2,
+   "ambient": false
+  },
+  "splash_wall": {
+   "args": [
+    "r"
+   ],
+   "doc": "P5b Hydro splash wall at the ring edge of radius {r} (tenths): ten water walls rising around the paw point.",
+   "cards": 10,
+   "ambient": false
+  },
+  "dust": {
+   "args": [],
+   "doc": "P9 dust puff (rock rings, rush trails): three khaki dust clouds. At the floor point.",
+   "cards": 3,
+   "ambient": false
+  },
+  "rock_rain": {
+   "args": [
+    "r"
+   ],
+   "doc": "P9 rock rain: six rocks falling from above within radius {r} (tenths), dust. At the floor point.",
+   "cards": 6,
+   "ambient": false
+  },
+  "mound": {
+   "args": [],
+   "doc": "P9 / B3 dust mound plume at the dig / surfacing point.",
+   "cards": 3,
+   "ambient": false
+  },
+  "light_shaft": {
+   "args": [],
+   "doc": "P9 gold light shaft over a rock-ring marker (8 b tall).",
+   "cards": 2,
+   "ambient": false
+  },
+  "gold_plume": {
+   "args": [],
+   "doc": "P4 gold plume (the back flares and the spikes launch): a gold column up, rising glints, dust. At the back (launch point).",
+   "cards": 7,
+   "ambient": false
+  },
+  "shard_fall": {
+   "args": [
+    "h"
+   ],
+   "doc": "P4 falling spike shard (the last 4 t before a landing): a dark gold shard dropping from {h} (tenths) with a glowing streak.",
+   "cards": 2,
+   "ambient": false
+  },
+  "dust_wall": {
+   "args": [
+    "len"
+   ],
+   "doc": "P6 dust walls along a strip of length {len} (tenths) from the point along the executor's forward axis: five rising cream-gold walls.",
+   "cards": 5,
+   "ambient": false
+  },
+  "boulders": {
+   "args": [],
+   "doc": "P7 boulders thrown up along the swept arc (five rocks fanning out from the point).",
+   "cards": 3,
+   "ambient": false
+  },
+  "tail_lane": {
+   "args": [],
+   "doc": "P7 / P8 tail lane: dust and grit kicked along the tail's path (a streak and puffs along the executor's forward axis, 6 b).",
+   "cards": 3,
+   "ambient": false
+  },
+  "leaf_burst": {
+   "args": [],
+   "doc": "P8 orange leaf burst (the tail's leaves scatter at the impact): ten leaves flung out and up.",
+   "cards": 6,
+   "ambient": false
+  },
+  "cones": {
+   "args": [],
+   "doc": "P8 planted stone cones along the line (five cones from 2 to 12 b, staying 60 t). At the tail root, rotated as the line.",
+   "cards": 5,
+   "ambient": false
+  },
+  "skid": {
+   "args": [],
+   "doc": "P3 skid gouge: a crack fan behind the stop point, dust and slabs kicked forward.",
+   "cards": 4,
+   "ambient": false
+  },
+  "dust_trail": {
+   "args": [],
+   "doc": "P3 gallop dust (ambient, every 4 t of the run at the body): two dust puffs.",
+   "cards": 2,
+   "ambient": true
+  },
+  "shock_dome": {
+   "args": [
+    "r"
+   ],
+   "doc": "Roar shock dome of radius {r} (tenths): a floor ring and a camera-facing ring expanding (v6 roar shock domes, v7 C).",
+   "cards": 3,
+   "ambient": false
+  },
+  "emerge_spikes": {
+   "args": [
+    "r"
+   ],
+   "doc": "B3 emergence: an earth-spike cluster of radius {r} (tenths) bursting out of the floor with dust. At the surfacing point.",
+   "cards": 12,
+   "ambient": false
+  },
+  "glyph_glow": {
+   "args": [],
+   "doc": "Entrance stele / arrival glyph glow (ambient, every 10 t at a glyph): a soft glow and motes.",
+   "cards": 2,
+   "ambient": true
+  },
+  "gold_leaves": {
+   "args": [],
+   "doc": "E the intro roar (t120): twelve gold leaves flung radially from the head height.",
+   "cards": 12,
+   "ambient": false
+  },
+  "gold_motes": {
+   "args": [],
+   "doc": "Drifting gold motes (arena ambience; ambient, every 20 t at a mote point): three slow motes.",
+   "cards": 3,
+   "ambient": true
+  },
+  "cure": {
+   "args": [],
+   "doc": "The brand cleanse (butterfly-style cure fx, about 16 t): a pale-gold beam down, a white-gold burst and glints. At the player's feet.",
+   "cards": 4,
+   "ambient": false
+  },
+  "fire_field": {
+   "args": [
+    "r"
+   ],
+   "doc": "Fire-field ambience (ambient; every 10-20 t at a live fire field of radius {r} tenths): flames, lava pops and embers over the field (33).",
+   "cards": 1,
+   "ambient": true
+  }
+ },
+ "epresets": {
+  "impact": {
+   "args": [],
+   "doc": "Impact burst at the floor point: Geo crystal-blade crown, Hydro splash, Pyro flame dome, Cryo ice spikes, Electro bolt and arcs; a flash and a shock ripple.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 8,
+    "2": 7,
+    "3": 7,
+    "4": 10,
+    "5": 10
+   },
+   "ambient": false
+  },
+  "cracks": {
+   "args": [
+    "r"
+   ],
+   "doc": "Crack fan along the executor yaw over radius {r} (tenths): glowing cracks in the element colour (Geo gold, Hydro white-cyan, Pyro lava, Cryo frost, Electro violet) with debris. At the impact point, rotated as the crack line.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 5,
+    "2": 3,
+    "3": 4,
+    "4": 5,
+    "5": 5
+   },
+   "ambient": false
+  },
+  "crown": {
+   "args": [],
+   "doc": "Blade crown burst (P1 / the blade crowns): 10 element blades erupting out-and-up (Geo gold crystal, Hydro water, Pyro flame, Cryo ice, Electro violet crystal). At the floor point.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 11,
+    "2": 11,
+    "3": 11,
+    "4": 11,
+    "5": 11
+   },
+   "ambient": false
+  },
+  "dust_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "Ring of element dust around the point at radius {r} (tenths): Geo khaki dust, Hydro spray, Pyro embers and smoke, Cryo frost, Electro sparks; a ripple out to r.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 9,
+    "2": 9,
+    "3": 9,
+    "4": 9,
+    "5": 9
+   },
+   "ambient": false
+  },
+  "slab_throw": {
+   "args": [],
+   "doc": "Slab / boulder throw streaks (at the slab, rotated along the throw): speed streaks behind it and a trail in the element (Geo grit, Hydro water, Pyro embers, Cryo frost, Electro sparks).",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 3,
+    "2": 3,
+    "3": 3,
+    "4": 3,
+    "5": 3
+   },
+   "ambient": false
+  },
+  "footfall": {
+   "args": [],
+   "doc": "Footfall at a planted foot (walk / turn plant events, plan §2.6): Geo dust, Hydro splash, Pyro flame splash, Cryo frost, Electro sparks.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 3,
+    "2": 2,
+    "3": 2,
+    "4": 2,
+    "5": 2
+   },
+   "ambient": false
+  },
+  "brand_rune": {
+   "args": [],
+   "doc": "The brand rune over the player's chest (call every 4 t at the chest): the element rune card (Pyro \")火(\", Hydro \"ccc / |||\", Electro square rune, Cryo \"大巛\"; Geo draws its sigil), life 5 t.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "ambient": false
+  },
+  "vortex": {
+   "args": [
+    "t"
+   ],
+   "doc": "Absorb vortex for {t} ticks around the body: a floor vortex spinning in, a smaller one at the chest, the element particles drawn inward (v4 A water vortex, v5 A Pyro swirl, v6 A Electro orb, v7 C Cryo).",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 3,
+    "2": 3,
+    "3": 3,
+    "4": 3,
+    "5": 3
+   },
+   "ambient": false
+  },
+  "recolour": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "The recolour wave from the boss outward to {r} (tenths) over {t} ticks (absorb bursts, plan §2.6): an element ripple and a glow band sweeping the floor.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 3,
+    "2": 3,
+    "3": 3,
+    "4": 3,
+    "5": 3
+   },
+   "ambient": false
+  },
+  "sigils": {
+   "args": [],
+   "doc": "Sigil cards around the body for the absorb (火 / 水 / ⚡ / ❄ / Geo emblem): six sigils rising and turning at 3-6 b (v5 A, v5 §4.2).",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 6,
+    "2": 6,
+    "3": 6,
+    "4": 6,
+    "5": 6
+   },
+   "ambient": false
+  },
+  "front": {
+   "args": [
+    "r0",
+    "r1",
+    "w",
+    "dur"
+   ],
+   "doc": "The 3-D wave front (N10) moving with tele/wave: 12 band segments (element strip + wall: Geo dust and slabs, Hydro water wall, Pyro fire wall, Cryo frost, Electro sparks) travel from {r0} to {r1} in {dur} ticks keeping {w} deep (tenths / ticks). Call it on the tick BEFORE the strike (the fg wave_band rule). At the floor centre.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 12,
+    "2": 12,
+    "3": 12,
+    "4": 12,
+    "5": 12
+   },
+   "ambient": false
+  },
+  "dig": {
+   "args": [],
+   "doc": "B3 dig in place: dust mounds and debris with the element (Geo slabs, Hydro water, Pyro embers, Cryo ice puffs, Electro violet slabs). At the body's floor point.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 6,
+    "2": 5,
+    "3": 7,
+    "4": 5,
+    "5": 7
+   },
+   "ambient": false
+  },
+  "flank_blades": {
+   "args": [
+    "len"
+   ],
+   "doc": "P6 element blades out-and-up along a flank strip of length {len} (tenths) from the point along the executor's forward axis, leaning to its left (+x, the outer side): Geo gold blades, Hydro water jets, Pyro flames, Cryo ice spikes, Electro violet crystals.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 6,
+    "2": 6,
+    "3": 6,
+    "4": 6,
+    "5": 6
+   },
+   "ambient": false
+  },
+  "spike_line": {
+   "args": [
+    "len"
+   ],
+   "doc": "P8 spike line along the aim, length {len} (tenths): six element spikes bursting from the floor one after another (Geo gold blades, Hydro jets, Pyro flames, Cryo ice spikes, Electro crystals).",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 6,
+    "2": 6,
+    "3": 6,
+    "4": 6,
+    "5": 6
+   },
+   "ambient": false
+  },
+  "shard_rain": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "Absorb-2 cosmetic shard rain over radius {r} (tenths) for {t} ticks: falling element shards (Geo gold, Hydro drops, Pyro embers, Cryo icicles, Electro bolts) spread over the window. At the arena centre.",
+   "els": [
+    1,
+    5
+   ],
+   "cards": {
+    "1": 8,
+    "2": 8,
+    "3": 8,
+    "4": 8,
+    "5": 8
+   },
+   "ambient": false
+  }
+ },
+ "props": {
+  "seal_stele": "Intro seal stele (6 at r 8 around the spawn): a dark red-brown carved tablet with glowing gold cracks, 1.1 x 3.2 x 0.4 b standing on the prop (box kind, pivot at its centre: spawn it 1.6 b up).",
+  "seal_chunk": "Seal stele chunk (shatter pieces): a 0.6 b block of the stele stone.",
+  "seal_prism": "Intro seal prism (UUID 0x80): an eight-walled translucent gold glyph prism, radius 6 b, 9 b tall, standing on the prop.",
+  "gate_icon": "The gate label icon (registry icon.model; also the item model rlk:mboss/az_kit/gate_icon), 1 b, turning to the viewer.",
+  "orb": "격류 범람 Hydro orb (31): a water sphere 2.6 b across (hz r 1.3), camera-facing; pair with p/orb_ribbon every 2 t.",
+  "meteor_big": "운석 낙하 big meteor (32): molten head with a flame trail up, 3.6 b, upright.",
+  "meteor_small": "운석 낙하 small meteor (32), 1.7 b, upright.",
+  "lump": "Pyro molten lump (P1 / P2 / P5 extras), 1 b, camera-facing; pair with p/lump_trail.",
+  "elump": "Electro crystal lump (46), a violet crystal cluster 1.4 b.",
+  "shell": "번개의 가루 shell (44): a violet sphere with the square glyph, 1.2 b, camera-facing.",
+  "icicle": "Ice lance / icicle (41, 43): tip along the prop's facing (local +z; aim it with tp ... facing), 1.6 b long.",
+  "ice_sphere": "쏟아지는 천화 spiky ice sphere (43), 2.2 b, camera-facing; pair with p/ice_sphere.",
+  "cone": "Planted stone cone (P8), 2 b tall, foot at the prop, upright.",
+  "crater": "B3 crater at the floor cut (UUID 0x81): the rubble crater, radius 7.5 b, flat at the prop (spawn it 0.03 b over the floor).",
+  "arena_crystal": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale).",
+  "water_sheet": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14).",
+  "glyph": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation.",
+  "spike": "천동만상 spike (P4 Geo / 45 Cryo / 46 Electro): 2.5 b, tip up at scale 1 (pitch the prop to plant it point first).",
+  "shard": "응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing.",
+  "arena_crystal/1": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale). (element 1)",
+  "arena_crystal/2": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale). (element 2)",
+  "arena_crystal/3": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale). (element 3)",
+  "arena_crystal/4": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale). (element 4)",
+  "arena_crystal/5": "Arena crystal cluster in the element look (plan §2.6; theme.md §6.3): pale crystals tinted geo gold / Pyro / Hydro / Electro / Cryo. Keeps the module's transformation (the theme record's scale). (element 5)",
+  "water_sheet/1": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14). (element 1)",
+  "water_sheet/2": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14). (element 2)",
+  "water_sheet/3": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14). (element 3)",
+  "water_sheet/4": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14). (element 4)",
+  "water_sheet/5": "The 14-b shallow-water tile at y 201.005 in the element look (about 40 % alpha). Keeps the module's transformation (the theme record's scale 14). (element 5)",
+  "glyph/1": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation. (element 1)",
+  "glyph/2": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation. (element 2)",
+  "glyph/3": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation. (element 3)",
+  "glyph/4": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation. (element 4)",
+  "glyph/5": "Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro|hydro|electro|cryo|geo>). Keeps the module's transformation. (element 5)",
+  "spike/3": "천동만상 spike (P4 Geo / 45 Cryo / 46 Electro): 2.5 b, tip up at scale 1 (pitch the prop to plant it point first). (element 3)",
+  "spike/4": "천동만상 spike (P4 Geo / 45 Cryo / 46 Electro): 2.5 b, tip up at scale 1 (pitch the prop to plant it point first). (element 4)",
+  "spike/5": "천동만상 spike (P4 Geo / 45 Cryo / 46 Electro): 2.5 b, tip up at scale 1 (pitch the prop to plant it point first). (element 5)",
+  "shard/1": "응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing. (element 1)",
+  "shard/2": "응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing. (element 2)",
+  "shard/3": "응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing. (element 3)",
+  "shard/4": "응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing. (element 4)"
+ },
+ "prop_families": {
+  "arena_crystal": [
+   1,
+   5
+  ],
+  "water_sheet": [
+   1,
+   5
+  ],
+  "glyph": [
+   1,
+   5
+  ],
+  "spike": [
+   3,
+   5
+  ],
+  "shard": [
+   1,
+   4
+  ]
+ },
+ "item_models_public": {
+  "gate_icon": "rlk:mboss/az_kit/gate_icon",
+  "glyph_pyro": "rlk:mboss/az_kit/glyph_pyro",
+  "glyph_hydro": "rlk:mboss/az_kit/glyph_hydro",
+  "glyph_electro": "rlk:mboss/az_kit/glyph_electro",
+  "glyph_cryo": "rlk:mboss/az_kit/glyph_cryo",
+  "glyph_geo": "rlk:mboss/az_kit/glyph_geo"
+ },
+ "sounds": {
+  "chin_rear": "P1 rear-up (t0..t10): a deep roar and growl.",
+  "chin_impact": "P1 impact t35: heavy smash, boom and crystal crack.",
+  "jump_takeoff": "P2 take-off t6: a heave and a whoosh.",
+  "jump_land": "P2 landing t21: smash, boom, anvil.",
+  "jump_wave2": "P2 second ground wave t32: deep crack and falling stone.",
+  "charge_growl": "P3 growl and coil (t0): roar + growl.",
+  "charge_gallop": "P3 gallop step (every 4 t of the run): heavy steps and gravel.",
+  "charge_skid": "P3 skid stop: gravel scrape and grind.",
+  "spikes_bristle": "P4 bristle (t0, gold glow): charge hum.",
+  "spikes_launch": "P4 launch t14: four rockets of spikes.",
+  "spikes_land": "P4 spike landing: crack, dripstone thud, crystal.",
+  "spikes_explode": "P4 planted spike explodes: boom and crystal.",
+  "stomp_slam": "P5 / P5b paw slam: boom, golem thud, crystal.",
+  "stomp_wave": "P5 / P5b ground wave: deplete thrum and a sonic charge.",
+  "feint_sway": "P6 sway (call twice): heartbeat and a heavy step.",
+  "feint_burst": "P6 flank eruption t22: boom, crystal, basalt.",
+  "whip_raise": "P7 tail raise: a low rumble.",
+  "whip_sweep": "P7 sweep t23: a wind burst and a riptide whoosh.",
+  "whip_erupt": "P7 end-line eruption t33: boom and crystal.",
+  "tslam_raise": "P8 tail raised high: dripping lava tick and a rumble.",
+  "tslam_impact": "P8 impact t39: boom, anvil, three dripstone thuds, leaves.",
+  "burrow_dive": "P9 dive: digging and roots tearing.",
+  "burrow_loop": "P9 underground loop (every 30 t): muffled digging.",
+  "burrow_ring": "P9 rock-ring marker: rising charge and a chime.",
+  "burrow_rock": "P9 rock lands: smash and crystal.",
+  "burrow_rush": "P9 surfacing rush / emergence: emerge, roar, boom.",
+  "slide_lift": "T1 lift (fore + hind paw rise): heavy step and deepslate.",
+  "slide_wave": "T1 waves 1-5: a wide boom (volume 2 = heard across the arena), basalt, crystal, falling stone.",
+  "slide_wave6": "T1 wave 6 (the whole arena): the wave layers + the warden emerging.",
+  "absorb_roar": "Absorb roar (roar_rear): growl and roar.",
+  "roar_ring": "One roar shock-dome ring.",
+  "msg_chime": "The transition message: resonating bell and a charge.",
+  "b3_sink": "B3 sink: dig and gravel.",
+  "b3_rise": "B3 tail rises: emerge and dripstone.",
+  "b3_emerge": "B3 emergence burst t388: boom, emerge, basalt.",
+  "orb_spawn": "31 orbs appear / pass: a riptide swirl and a splash.",
+  "orb_loop": "31 orb loop (every 20-40 t): whirlpool and conduit hum.",
+  "orb_hit": "31 orb hits a player: a splash.",
+  "meteor_glyph": "32 seal glyph: charge and beacon.",
+  "meteor_fall": "32 meteor falling.",
+  "meteor_impact": "32 big meteor impact: boom, dragon fireball, sizzle.",
+  "meteor_small": "32 small meteor: a blast and a light boom.",
+  "fire_loop": "33 fire field loop (every 20 t): fire and crackle.",
+  "frost_draw": "41 star drawn: resonance and a thin beacon.",
+  "frost_icicle": "41 icicle thrown and shattering.",
+  "frost_burst": "41 burst: powder snow breaking and a light boom.",
+  "bolt_marker": "42 round markers (48 t before): high charge and a select tone.",
+  "bolt_strike": "42 strike: thunder, bolt impacts (call again over 20 t for the 6-8 impacts), crystal.",
+  "safe_chime": "42 the player is inside a safe circle: a bright chime.",
+  "sphere_form": "43 sphere forms: select tone and chimes.",
+  "sphere_loop": "43 sphere loop: conduit hum.",
+  "lance": "43 lance: riptide whoosh, glass and a light boom.",
+  "shell_spawn": "44 shell spawn: spell cast and resonance.",
+  "shell_hover": "44 shells hovering: high beacon hum.",
+  "shell_dive": "44 shell dives: a swoop.",
+  "shell_impact": "44 shell impact: bolt impact and a light boom.",
+  "ice_launch": "45 launch: three breeze shots and dripstone.",
+  "ice_land": "45 dark spike lands.",
+  "ice_erupt": "45 ice eruption.",
+  "hail": "45 hail ticking (quiet).",
+  "hex_draw": "46 hexagram drawn: spawn-point set and enchanting.",
+  "hex_bolt": "46 bolt before a lump: thin thunder.",
+  "hex_impact": "46 lump impact: dripstone, crystal, bolt.",
+  "intro_drone": "E sealed drone (loop every 40 t).",
+  "intro_thump": "E heartbeat thump of the sealed body.",
+  "stele_break": "E a seal stele shatters.",
+  "seal_shatter": "E the seal prism shatters (t112).",
+  "intro_roar": "E the roar (t120).",
+  "death_sting": "D music cut with a sting.",
+  "death_fall": "D the body falls (chin t34 / tail t66 / head t92).",
+  "death_seal": "D the seal re-forms.",
+  "brand_apply": "Brand applied: a searing tone and a crystal tick.",
+  "brand_tick": "A brand DoT tick (quiet).",
+  "cleanse": "The brand is cleansed (butterfly-style cure chime).",
+  "shard_spawn": "응결 결정 sheds from the back.",
+  "shard_pick": "응결 결정 picked up (the shield).",
+  "hint": "A first-time hint line.",
+  "absorb_vortex/1": "T2 Pyro swirl.",
+  "absorb_vortex/2": "T2 Hydro vortex.",
+  "absorb_vortex/3": "T3 Electro charge.",
+  "absorb_vortex/4": "T3 Cryo gather.",
+  "absorb_burst/1": "T2 Pyro burst.",
+  "absorb_burst/2": "T2 Hydro burst.",
+  "absorb_burst/3": "T3 Electro discharge.",
+  "absorb_burst/4": "T3 Cryo burst.",
+  "footfall/1": "Pyro footfall: a flame splash on the step.",
+  "footfall/2": "Hydro footfall: a splash.",
+  "footfall/3": "Electro footfall: sparks.",
+  "footfall/4": "Cryo footfall: frost crunch.",
+  "footfall/5": "Geo footfall: heavy stone step."
+ },
+ "sound_families": {
+  "absorb_vortex": [
+   1,
+   4
+  ],
+  "absorb_burst": [
+   1,
+   4
+  ],
+  "footfall": [
+   1,
+   5
+  ]
+ },
+ "hud": {
+  "functions": [
+   "banner_end",
+   "flash_white",
+   "flash_gold",
+   "flash_amber",
+   "flash_violet",
+   "flash_end",
+   "clear"
+  ],
+  "families": {
+   "banner_tr": [
+    1,
+    4
+   ],
+   "banner_ab": [
+    1,
+    4
+   ],
+   "banner_ab2": [
+    1,
+    4
+   ],
+   "banner_brand": [
+    1,
+    4
+   ]
+  }
+ },
+ "glyphs": {
+  "badge": "U+E800",
+  "brand": "U+E801",
+  "el_pyro": "U+E802",
+  "el_hydro": "U+E803",
+  "el_electro": "U+E804",
+  "el_cryo": "U+E805",
+  "el_geo": "U+E806",
+  "safe": "U+E807",
+  "fl_white": "U+E810",
+  "fl_gold": "U+E811",
+  "fl_amber": "U+E812",
+  "fl_violet": "U+E813",
+  "chevron": "U+E821",
+  "hui": "U+E822",
+  "orn_l": "U+E840",
+  "orn_r": "U+E841"
+ },
+ "spaces": {
+  "U+E8F0": -1,
+  "U+E8F1": 2,
+  "U+E8F2": 1
+ },
+ "demos": {
+  "p1": {
+   "desc": "P1 갈라지는 봉인의 땅 (chin slam)",
+   "len": 65
+  },
+  "p2": {
+   "desc": "P2 바위 분쇄 충돌 (jump slam)",
+   "len": 53
+  },
+  "p3": {
+   "desc": "P3 바위 용왕의 돌진 (charge)",
+   "len": 70
+  },
+  "p4": {
+   "desc": "P4 천동만상 (back spikes)",
+   "len": 90
+  },
+  "p5": {
+   "desc": "P5 산명곡응 (foot stomp)",
+   "len": 63
+  },
+  "p5b": {
+   "desc": "P5b 산명곡응 – 연속 발구르기",
+   "len": 85
+  },
+  "p6": {
+   "desc": "P6 성동격서 (side feint)",
+   "len": 50
+  },
+  "p7": {
+   "desc": "P7 교활한 통수 (tail whip, the wedge union)",
+   "len": 64
+  },
+  "p7ice": {
+   "desc": "P7 Cryo ice wall (annular wedges)",
+   "len": 50
+  },
+  "p8": {
+   "desc": "P8 꼬리찍기 (rear tail slam)",
+   "len": 100
+  },
+  "p9": {
+   "desc": "P9 잠복 돌진 (burrow charge, shortened)",
+   "len": 160
+  },
+  "t1": {
+   "desc": "T1 파멸의 산사태 (landslide)",
+   "len": 203
+  },
+  "t2": {
+   "desc": "T2 absorb 1 + roar",
+   "len": 140
+  },
+  "t3": {
+   "desc": "T3 absorb 2 + roar",
+   "len": 110
+  },
+  "b3": {
+   "desc": "B3 phase-3 burrow (shortened)",
+   "len": 190
+  },
+  "m31": {
+   "desc": "31 격류 범람 (orb ribbons)",
+   "len": 62
+  },
+  "m32": {
+   "desc": "32 운석 낙하 (meteors)",
+   "len": 100
+  },
+  "m33": {
+   "desc": "33 화염 잠식 (fire field)",
+   "len": 165
+  },
+  "m41": {
+   "desc": "41 서리 습격 (frost circles)",
+   "len": 70
+  },
+  "m42": {
+   "desc": "42 벼락 습격 (lightning round)",
+   "len": 90
+  },
+  "m43": {
+   "desc": "43 쏟아지는 천화 (ice sphere)",
+   "len": 120
+  },
+  "m44": {
+   "desc": "44 번개의 가루 (shells)",
+   "len": 130
+  },
+  "m45": {
+   "desc": "45 천동만상 – 얼음 가시",
+   "len": 180
+  },
+  "m46": {
+   "desc": "46 천동만상 – 번개 가시",
+   "len": 140
+  },
+  "e": {
+   "desc": "E intro",
+   "len": 150
+  },
+  "d": {
+   "desc": "D death",
+   "len": 140
+  }
+ }
+}

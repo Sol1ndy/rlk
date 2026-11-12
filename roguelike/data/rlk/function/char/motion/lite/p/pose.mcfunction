@@ -1,0 +1,17 @@
+execute if score @s plTick matches 0 run return run function rlk:char/motion/lite/p/0
+execute if score @s plTick matches 1 run return run function rlk:char/motion/lite/p/1
+execute if score @s plTick matches 2 run return run function rlk:char/motion/lite/p/2
+execute if score @s plTick matches 3 run return run function rlk:char/motion/lite/p/3
+execute if score @s plTick matches 4 run return run function rlk:char/motion/lite/p/4
+execute if score @s plTick matches 5 run return run function rlk:char/motion/lite/p/5
+execute if score @s plTick matches 6 run return run function rlk:char/motion/lite/p/6
+execute if score @s plTick matches 7 run return run function rlk:char/motion/lite/p/7
+execute if score @s plTick matches 8 run return run function rlk:char/motion/lite/p/8
+execute if score @s plTick matches 9 run return run function rlk:char/motion/lite/p/9
+execute if score @s plTick matches 10 run return run function rlk:char/motion/lite/p/10
+execute if score @s plTick matches 11 run return run function rlk:char/motion/lite/p/11
+execute if score @s plTick matches 12 run return run function rlk:char/motion/lite/p/12
+execute if score @s plTick matches 13 run return run function rlk:char/motion/lite/p/13
+execute if score @s plTick matches 14 run return run function rlk:char/motion/lite/p/14
+execute if score @s plTick matches 15 run return run function rlk:char/motion/lite/p/15
+execute if score @s plTick matches 16 run return run function rlk:char/motion/lite/p/16

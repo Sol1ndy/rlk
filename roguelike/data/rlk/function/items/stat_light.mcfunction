@@ -9,6 +9,8 @@ function rlk:player/level/apply
 scoreboard players operation @s atkPct = @s eqAtkPct
 scoreboard players operation @s atkFlat = @s eqAtkFlat
 scoreboard players operation @s hpPct = @s eqHpPct
+# 생명력 노드
+scoreboard players operation @s hpPct += @s nodeHp
 scoreboard players operation @s hpFlat = @s eqHpFlat
 scoreboard players operation @s defPct = @s eqDefPct
 scoreboard players operation @s defFlat = @s eqDefFlat

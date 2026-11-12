@@ -1,0 +1,42 @@
+p1 stand none sword 11 ticks 2400 end limit lost %max/min 495.6 deaths 9 phases {'p1': 2400}
+p1 stand none sword 22 ticks 2400 end limit lost %max/min 383.1 deaths 6 phases {'p1': 2400}
+p1 stand none sword 33 ticks 2400 end limit lost %max/min 479.4 deaths 9 phases {'p1': 2400}
+p1 melee walk sword 11 ticks 2400 end limit lost %max/min 346.3 deaths 6 phases {'p1': 2400}
+p1 melee walk sword 22 ticks 2400 end limit lost %max/min 316.2 deaths 5 phases {'p1': 2400}
+p1 melee walk sword 33 ticks 2400 end limit lost %max/min 314.9 deaths 5 phases {'p1': 2400}
+p1 ranged walk bow 11 ticks 2400 end limit lost %max/min 62.8 deaths 1 phases {'p1': 2400}
+p1 ranged walk bow 22 ticks 2400 end limit lost %max/min 96.6 deaths 1 phases {'p1': 2400}
+p1 ranged walk bow 33 ticks 2400 end limit lost %max/min 84.5 deaths 1 phases {'p1': 2400}
+p1 melee dash sword 11 ticks 2400 end limit lost %max/min 101.4 deaths 2 phases {'p1': 2400}
+p1 melee dash sword 22 ticks 2400 end limit lost %max/min 76.0 deaths 1 phases {'p1': 2400}
+p1 melee dash sword 33 ticks 2400 end limit lost %max/min 92.9 deaths 1 phases {'p1': 2400}
+p2 stand none sword 11 ticks 2400 end limit lost %max/min 554.1 deaths 10 phases {'p2': 2400}
+p2 stand none sword 22 ticks 2400 end limit lost %max/min 524.0 deaths 9 phases {'p2': 2400}
+p2 stand none sword 33 ticks 2400 end limit lost %max/min 452.4 deaths 8 phases {'p2': 2400}
+p2 melee walk sword 11 ticks 2400 end limit lost %max/min 325.3 deaths 6 phases {'p2': 2400}
+p2 melee walk sword 22 ticks 2400 end limit lost %max/min 356.4 deaths 6 phases {'p2': 2400}
+p2 melee walk sword 33 ticks 2400 end limit lost %max/min 296.6 deaths 5 phases {'p2': 2400}
+p2 ranged walk bow 11 ticks 2400 end limit lost %max/min 148.6 deaths 2 phases {'p2': 2400}
+p2 ranged walk bow 22 ticks 2400 end limit lost %max/min 174.0 deaths 3 phases {'p2': 2400}
+p2 ranged walk bow 33 ticks 2400 end limit lost %max/min 134.1 deaths 2 phases {'p2': 2400}
+p2 melee dash sword 11 ticks 2400 end limit lost %max/min 16.9 deaths 0 phases {'p2': 2400}
+p2 melee dash sword 22 ticks 2400 end limit lost %max/min 0.0 deaths 0 phases {'p2': 2400}
+p2 melee dash sword 33 ticks 2400 end limit lost %max/min 0.0 deaths 0 phases {'p2': 2400}
+p3 stand none sword 11 ticks 2400 end limit lost %max/min 495.3 deaths 9 phases {'p3': 2400}
+p3 stand none sword 22 ticks 2400 end limit lost %max/min 592.9 deaths 10 phases {'p3': 2400}
+p3 stand none sword 33 ticks 2400 end limit lost %max/min 558.4 deaths 10 phases {'p3': 2400}
+p3 melee walk sword 11 ticks 2400 end limit lost %max/min 255.7 deaths 4 phases {'p3': 2400}
+p3 melee walk sword 22 ticks 2400 end limit lost %max/min 189.5 deaths 3 phases {'p3': 2400}
+p3 melee walk sword 33 ticks 2400 end limit lost %max/min 272.3 deaths 5 phases {'p3': 2400}
+p3 ranged walk bow 11 ticks 2400 end limit lost %max/min 134.5 deaths 2 phases {'p3': 2400}
+p3 ranged walk bow 22 ticks 2400 end limit lost %max/min 83.4 deaths 1 phases {'p3': 2400}
+p3 ranged walk bow 33 ticks 2400 end limit lost %max/min 197.0 deaths 3 phases {'p3': 2400}
+p3 melee dash sword 11 ticks 2400 end limit lost %max/min 0.0 deaths 0 phases {'p3': 2400}
+p3 melee dash sword 22 ticks 2400 end limit lost %max/min 0.0 deaths 0 phases {'p3': 2400}
+p3 melee dash sword 33 ticks 2400 end limit lost %max/min 0.0 deaths 0 phases {'p3': 2400}
+whole melee walk sword 11 ticks 4077 end dead lost %max/min 273.5 deaths 8 phases {'p1': 1181, 'm2': 345, 't2': 110, 'p3': 2441}
+whole melee walk sword 22 ticks 4048 end dead lost %max/min 237.6 deaths 7 phases {'p1': 1190, 'm2': 345, 't2': 110, 'p3': 2403}
+whole melee walk sword 33 ticks 4028 end dead lost %max/min 230.9 deaths 7 phases {'p1': 1204, 'm2': 345, 't2': 110, 'p3': 2369}
+whole melee dash sword 11 ticks 4096 end dead lost %max/min 26.5 deaths 0 phases {'p1': 1288, 'm2': 345, 't2': 110, 'p3': 2353}
+whole melee dash sword 22 ticks 4171 end dead lost %max/min 40.6 deaths 1 phases {'p1': 1266, 'm2': 345, 't2': 110, 'p3': 2450}
+whole melee dash sword 33 ticks 4353 end dead lost %max/min 38.9 deaths 1 phases {'p1': 1301, 'm2': 345, 't2': 110, 'p3': 2597}
