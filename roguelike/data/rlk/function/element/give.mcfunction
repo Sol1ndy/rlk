@@ -1,4 +1,6 @@
-# 테스트: 가장 가까운 몹(8칸)에 해당 원소를 피해 0 으로 부착 (@s = 플레이어). 사용: /function rlk:element/give {id:"water"}
+# 테스트: 가장 가까운 몹(8칸)에 해당 원소를 피해 0 으로 부착 (@s = 플레이어). 사용: /function rlk:element/give {id:"water"}  ({id:"help"}: 원소 id 목록)
+$data modify storage rlk:tmp hq set value "$(id)"
+execute if data storage rlk:tmp {hq:"help"} run return run function rlk:element/help {cmd:"/function rlk:element/give {id:…}",pre:'/function rlk:element/give {id:"',post:'"}'}
 $execute unless data storage rlk:elem byid."$(id)" run return fail
 function rlk:combat/clear_atkflags
 $execute store result score #elem tmp run data get storage rlk:elem byid."$(id)".n

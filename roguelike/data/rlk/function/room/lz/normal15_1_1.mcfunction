@@ -24,28 +24,10 @@ fill -9 202 -1 -6 204 -1 minecraft:cobblestone
 fill -17 201 -1 -14 202 -1 minecraft:cobblestone
 fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
 fill -19 210 -19 -2 210 -2 minecraft:air
-fill -13 201 -19 -13 201 -17 minecraft:tuff
-fill -12 201 -17 -2 201 -16 minecraft:tuff
-fill -19 201 -16 -17 201 -15 minecraft:tuff
-fill -16 201 -15 -16 201 -6 minecraft:tuff
-fill -4 201 -15 -2 201 -15 minecraft:tuff
-fill -4 201 -14 -4 201 -6 minecraft:tuff
-fill -19 201 -6 -17 201 -6 minecraft:tuff
-fill -3 201 -6 -2 201 -4 minecraft:tuff
-fill -15 201 -4 -4 201 -4 minecraft:tuff
 fill -19 201 -3 -18 201 -2 minecraft:tuff
-fill -15 201 -3 -15 201 -2 minecraft:tuff
-fill -12 201 -19 -2 201 -18 minecraft:cobbled_deepslate
-fill -12 202 -19 -2 202 -18 minecraft:tuff
-fill -19 201 -14 -17 201 -7 minecraft:cobbled_deepslate
-fill -19 202 -14 -17 202 -7 minecraft:tuff
-fill -3 201 -14 -2 201 -7 minecraft:cobbled_deepslate
-fill -3 202 -14 -2 202 -7 minecraft:tuff
-fill -14 201 -3 -2 201 -2 minecraft:cobbled_deepslate
-fill -14 202 -3 -2 202 -2 minecraft:tuff
 execute positioned -19 202 -2 run function rlk:room/prop/m_crate_a
 execute positioned -18 201 -17 run function rlk:room/prop/m_rail_x
-execute positioned -2 202 -6 run function rlk:room/prop/m_rail_z
-execute positioned -9 203 -2 run function rlk:room/prop/m_pebble
+execute positioned -2 201 -6 run function rlk:room/prop/m_rail_z
+execute positioned -9 201 -2 run function rlk:room/prop/m_pebble
 setblock -18 203 -19 minecraft:wall_torch[facing=south]
 setblock -19 203 -19 minecraft:wall_torch[facing=south]

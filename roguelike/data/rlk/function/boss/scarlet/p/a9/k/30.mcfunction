@@ -1,0 +1,11 @@
+# A9 pattern tick 30
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.434f,0.907f,-0.1285f],left_rotation:[-0.6797f,-0.646f,-0.1949f,-0.2876f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9_24] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9_26] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a9_28] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9_29,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.1762f,0.8764f,0.1828f],left_rotation:[0.0245f,0.7384f,-0.0541f,0.6717f],scale:[0.7069f,0.3f,1.9527f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9_29,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.1814f,0.9142f,0.1798f],left_rotation:[0.018f,0.8465f,-0.0633f,0.5284f],scale:[0.7061f,0.3f,1.9497f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_a9","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_a9_30","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.1692f,0.9509f,0.1875f],left_rotation:[0.0061f,0.8904f,-0.0722f,0.4493f],scale:[0f,0.3f,2.0133f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[15584255]}}}}
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_a9r0r26] remove rlk_hr_trg
+kill @e[type=minecraft:marker,tag=rlk_hr_trt]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a9w0w] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_rib_1"

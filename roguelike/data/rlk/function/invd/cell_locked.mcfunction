@@ -1,0 +1,3 @@
+# 잠긴 칸 (위치 = 칸의 가운데): 어두운 판 + 방벽. 누를 수 없음 (인벤토리 상세 · 레벨업 화면 공용)
+summon minecraft:block_display ~ ~ ~0.05 {Tags:["rlk_pk"],brightness:{sky:5,block:5},block_state:{id:"minecraft:gray_concrete"},transformation:{translation:[-0.42f,-0.42f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.84f,0.84f,0.02f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:8,block:8},item_display:"gui",item:{id:"minecraft:barrier",count:1},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.36f,0.36f,0.36f]}}

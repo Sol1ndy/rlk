@@ -1,0 +1,623 @@
+{
+ "namespace": "rlk:raiden/fxg/",
+ "texture_dir": "assets/rlk/textures/raiden/fxg",
+ "conventions": {
+  "strip": "u along the bolt (u=0 start, u=1 end, soft-faded ends), v=0.5 centre row",
+  "column": "v along height: v=0 top (sky), v=1 bottom (impact), u=0.5 centre",
+  "radial": "centred at (0.5,0.5)",
+  "crescent": "pivot at bottom-centre (0.5,1.0); bright outer edge radius 0.94*h; +-72 deg",
+  "blade": "chord along u: tips (0.04/0.96, 0.69), outer edge apex (0.5, 0.21), arc centroid (0.5, 0.38)",
+  "decal": "top view: u = local +x, v = local +z (forward)",
+  "quarter": "circle centre at texture corner (0,0); mirror uv for other quadrants"
+ },
+ "model_rules": "flat cards (from==to on one axis), faces on both sides, shade false, uv 0..16 (per-face rotation 0/90/180/270, u1>u2 mirrors), single-axis element rotation 0/+-22.5/+-45, from/to within -16..32, layers >= 0.02 block apart",
+ "vanilla_rules": [
+  "fragments with alpha < 0.1 are discarded",
+  "translucent item quads are sorted back-to-front by centroid distance and WRITE DEPTH: a card drawn earlier hides translucent cards behind it wherever its alpha >= 0.1; keep halos of overlay cards tight, prefer centred cards under centred overlays, split tall vertical cards so the low part sorts after the floor",
+  "magnified sampling is nearest-neighbour: >= ~32 texels per block for things seen up close",
+  "vertical faces may receive entity diffuse light 0.5..0.74 (up faces 1.0)"
+ ],
+ "textures": [
+  {
+   "name": "bolt_a",
+   "texture": "rlk:raiden/fxg/bolt_a",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_b",
+   "texture": "rlk:raiden/fxg/bolt_b",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_c",
+   "texture": "rlk:raiden/fxg/bolt_c",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_d",
+   "texture": "rlk:raiden/fxg/bolt_d",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_after_c",
+   "texture": "rlk:raiden/fxg/bolt_after_c",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "same path as bolt_c",
+   "use": "afterglow of bolt_c",
+   "notes": ""
+  },
+  {
+   "name": "blade_a",
+   "texture": "rlk:raiden/fxg/blade_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.08, r~1.3px",
+   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
+   "notes": "tight glow; short frequent forks"
+  },
+  {
+   "name": "rim_crackle_a",
+   "texture": "rlk:raiden/fxg/rim_crackle_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "rim_crackle_b",
+   "texture": "rlk:raiden/fxg/rim_crackle_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "rim_crackle_c",
+   "texture": "rlk:raiden/fxg/rim_crackle_c",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "blade_trail_a",
+   "texture": "rlk:raiden/fxg/blade_trail_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
+   "name": "blade_trail_b",
+   "texture": "rlk:raiden/fxg/blade_trail_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
+   "name": "vbolt_a",
+   "texture": "rlk:raiden/fxg/vbolt_a",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_b",
+   "texture": "rlk:raiden/fxg/vbolt_b",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_c",
+   "texture": "rlk:raiden/fxg/vbolt_c",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_after_c",
+   "texture": "rlk:raiden/fxg/vbolt_after_c",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "same path as vbolt_c",
+   "use": "afterglow of vbolt_c",
+   "notes": ""
+  },
+  {
+   "name": "pillar_a",
+   "texture": "rlk:raiden/fxg/pillar_a",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 column glow, 3 winding bolts",
+   "use": "stake/pillar current, eye beams",
+   "notes": "soft top and bottom; no impact bloom"
+  },
+  {
+   "name": "pillar_b",
+   "texture": "rlk:raiden/fxg/pillar_b",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 column glow, 3 winding bolts",
+   "use": "stake/pillar current, eye beams",
+   "notes": "soft top and bottom; no impact bloom"
+  },
+  {
+   "name": "arc_a",
+   "texture": "rlk:raiden/fxg/arc_a",
+   "w": 256,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "arch from (0.06,0.86) via apex v~0.2 to (0.94,0.86)",
+   "use": "palm/finger arcs, small jumping arcs",
+   "notes": ""
+  },
+  {
+   "name": "arc_b",
+   "texture": "rlk:raiden/fxg/arc_b",
+   "w": 256,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "arch from (0.06,0.86) via apex v~0.2 to (0.94,0.86)",
+   "use": "palm/finger arcs, small jumping arcs",
+   "notes": ""
+  },
+  {
+   "name": "chakra_a",
+   "texture": "rlk:raiden/fxg/chakra_a",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "ring radius 0.40*w",
+   "use": "circular chakra / halo ring of electricity",
+   "notes": ""
+  },
+  {
+   "name": "chakra_b",
+   "texture": "rlk:raiden/fxg/chakra_b",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "ring radius 0.40*w",
+   "use": "circular chakra / halo ring of electricity",
+   "notes": ""
+  },
+  {
+   "name": "orb_core",
+   "texture": "rlk:raiden/fxg/orb_core",
+   "w": 128,
+   "h": 128,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "eye/orb core glow",
+   "notes": ""
+  },
+  {
+   "name": "crescent_a",
+   "texture": "rlk:raiden/fxg/crescent_a",
+   "w": 352,
+   "h": 176,
+   "kind": "crescent",
+   "along": "arc",
+   "core": "outer edge r=0.94*h around pivot (0.5,1.0), +-72deg",
+   "use": "clean sword-light crescent / slash wave",
+   "notes": ""
+  },
+  {
+   "name": "crescent_b",
+   "texture": "rlk:raiden/fxg/crescent_b",
+   "w": 352,
+   "h": 176,
+   "kind": "crescent",
+   "along": "arc",
+   "core": "as crescent_a + bolt along the edge",
+   "use": "lightning crescent slash",
+   "notes": ""
+  },
+  {
+   "name": "wave_blade",
+   "texture": "rlk:raiden/fxg/wave_blade",
+   "w": 320,
+   "h": 112,
+   "kind": "blade",
+   "along": "u",
+   "core": "outer edge apex (0.5, 0.21), tips (0.04 / 0.96, 0.69), arc centroid (0.5, 0.38); edge radius 2.05*h",
+   "use": "flying crescent sword wave (\ucc30\ub098\uc758 \ud3ec\uc601 tr_wave): shallow crescent moon, 80 deg of arc",
+   "notes": "lens body under the edge, sharp tips"
+  },
+  {
+   "name": "slash_wave",
+   "texture": "rlk:raiden/fxg/slash_wave",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "edge at v~0.30, tail toward v~0.9",
+   "use": "straight slash wave / sword beam (travels toward -v)",
+   "notes": ""
+  },
+  {
+   "name": "rift_a",
+   "texture": "rlk:raiden/fxg/rift_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5 thin white tear in a dark void band",
+   "use": "rift / cut ribbon, teleport tears",
+   "notes": ""
+  },
+  {
+   "name": "shockwave",
+   "texture": "rlk:raiden/fxg/shockwave",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "leading edge r=0.46*w, tail inward to ~0.28*w",
+   "use": "expanding ring / shockwave (scale the card)",
+   "notes": ""
+  },
+  {
+   "name": "crackle_a",
+   "texture": "rlk:raiden/fxg/crackle_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "band v=0.22..0.86, floor glow at v=0.93",
+   "use": "vertical lightning wall band, chainable along u",
+   "notes": ""
+  },
+  {
+   "name": "crackle_b",
+   "texture": "rlk:raiden/fxg/crackle_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "band v=0.22..0.86, floor glow at v=0.93",
+   "use": "vertical lightning wall band, chainable along u",
+   "notes": ""
+  },
+  {
+   "name": "flash",
+   "texture": "rlk:raiden/fxg/flash",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre, visible radius ~0.3*w",
+   "use": "compact strike / impact flash",
+   "notes": ""
+  },
+  {
+   "name": "impact_sparks",
+   "texture": "rlk:raiden/fxg/impact_sparks",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "shield / hit impact sparks",
+   "notes": ""
+  },
+  {
+   "name": "scorch",
+   "texture": "rlk:raiden/fxg/scorch",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre, burn radius ~0.44*w",
+   "use": "floor scorch decal",
+   "notes": "dark (not glowing) except the ember ring"
+  },
+  {
+   "name": "scorch_strip",
+   "texture": "rlk:raiden/fxg/scorch_strip",
+   "w": 256,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5",
+   "use": "burn streak under floor bolts",
+   "notes": ""
+  },
+  {
+   "name": "spark",
+   "texture": "rlk:raiden/fxg/spark",
+   "w": 32,
+   "h": 32,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "spark dot",
+   "notes": ""
+  },
+  {
+   "name": "glint",
+   "texture": "rlk:raiden/fxg/glint",
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "four-point star glint (armour shards)",
+   "notes": ""
+  },
+  {
+   "name": "glow_soft",
+   "texture": "rlk:raiden/fxg/glow_soft",
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "plain soft glow",
+   "notes": ""
+  },
+  {
+   "name": "glow_strip",
+   "texture": "rlk:raiden/fxg/glow_strip",
+   "w": 256,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5",
+   "use": "plain soft beam glow",
+   "notes": ""
+  },
+  {
+   "name": "beam_soft",
+   "texture": "rlk:raiden/fxg/beam_soft",
+   "w": 64,
+   "h": 256,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 smooth gaussian shaft, top faded, brightest low",
+   "use": "soft light beam (guard break); near-white, tint it",
+   "notes": "no lightning, no sparks"
+  },
+  {
+   "name": "dk_ring",
+   "texture": "rlk:raiden/fxg/dk_ring",
+   "w": 256,
+   "h": 256,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at texel (0,0), unit radius at 0.8929 of the side",
+   "use": "ring decal r >= 6 (eyes r 12)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_ring_s",
+   "texture": "rlk:raiden/fxg/dk_ring_s",
+   "w": 128,
+   "h": 128,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at texel (0,0), unit radius at 0.8929 of the side",
+   "use": "ring decal r < 6 (eye 5, bomb 3.5, recovery 4.5, vajra 2.5, stagger)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_rings3",
+   "texture": "rlk:raiden/fxg/dk_rings3",
+   "w": 256,
+   "h": 256,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at texel (0,0), unit radius at 0.8929 of the side",
+   "use": "rings3 decal (Musou orbs r 4)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_disc",
+   "texture": "rlk:raiden/fxg/dk_disc",
+   "w": 128,
+   "h": 128,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at texel (0,0), unit radius at 0.8929 of the side",
+   "use": "disc_pale decal (field lightning r 2.5)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_band",
+   "texture": "rlk:raiden/fxg/dk_band",
+   "w": 64,
+   "h": 256,
+   "kind": "band",
+   "along": "v",
+   "core": "u across (edge lines at u 0.07 / 0.93), v along the band",
+   "use": "band decal (\ub2e8\uc808 w 5, to the wall)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_pool",
+   "texture": "rlk:raiden/fxg/dk_pool",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centred at (0.5, 0.5), unit radius = half the side",
+   "use": "pool decal (shadow r 1.5 -> grown 4.5)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "dk_tint",
+   "texture": "rlk:raiden/fxg/dk_tint",
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centred at (0.5, 0.5), unit radius = half the side",
+   "use": "tint (whole-field darkening)",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "tr_band",
+   "texture": "rlk:raiden/fxg/tr_band",
+   "w": 32,
+   "h": 256,
+   "kind": "segment",
+   "along": "radial",
+   "core": "u along the chord (periodic), v across: front at v 0.05, tail to v 1",
+   "use": "travelling ring / wave segment card",
+   "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
+  },
+  {
+   "name": "rig_shard",
+   "texture": "rlk:raiden/fxg/rig_shard",
+   "w": 48,
+   "h": 128,
+   "kind": "column",
+   "along": "v",
+   "core": "lens tips at v=0.03/0.97, widest at v~0.39, ridge u~0.5",
+   "use": "translucent crystal splinter (death_shard_*)",
+   "notes": ""
+  },
+  {
+   "name": "obj_wave_band",
+   "texture": "rlk:raiden/fxg/obj_wave_band",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5 white core, lens envelope sin(pi*u)",
+   "use": "flying sword-wave front band (chord cards along the crescent edge)",
+   "notes": "layered glow, crackle along the core, cyan sparks"
+  },
+  {
+   "name": "obj_shard",
+   "texture": "rlk:raiden/fxg/obj_shard",
+   "w": 64,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "tip at u~0.93, body u 0.42..0.93, streak toward u=0",
+   "use": "flying electro shard (break bursts)",
+   "notes": ""
+  }
+ ],
+ "kit_decals": {
+  "dk_ring": {
+   "w": 256,
+   "h": 256,
+   "kind": "quarter",
+   "use": "ring decal r >= 6 (eyes r 12)"
+  },
+  "dk_ring_s": {
+   "w": 128,
+   "h": 128,
+   "kind": "quarter",
+   "use": "ring decal r < 6 (eye 5, bomb 3.5, recovery 4.5, vajra 2.5, stagger)"
+  },
+  "dk_rings3": {
+   "w": 256,
+   "h": 256,
+   "kind": "quarter",
+   "use": "rings3 decal (Musou orbs r 4)"
+  },
+  "dk_disc": {
+   "w": 128,
+   "h": 128,
+   "kind": "quarter",
+   "use": "disc_pale decal (field lightning r 2.5)"
+  },
+  "dk_band": {
+   "w": 64,
+   "h": 256,
+   "kind": "band",
+   "use": "band decal (\ub2e8\uc808 w 5, to the wall)"
+  },
+  "dk_pool": {
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "use": "pool decal (shadow r 1.5 -> grown 4.5)"
+  },
+  "dk_tint": {
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "use": "tint (whole-field darkening)"
+  },
+  "tr_band": {
+   "w": 32,
+   "h": 256,
+   "kind": "segment",
+   "use": "travelling ring / wave segment card"
+  }
+ },
+ "kit_quarter_extent": 1.12
+}

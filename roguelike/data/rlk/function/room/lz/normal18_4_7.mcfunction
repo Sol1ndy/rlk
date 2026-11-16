@@ -101,7 +101,6 @@ fill 49 201 -9 49 201 -7 minecraft:podzol
 fill 38 201 -8 38 201 -6 minecraft:podzol
 fill 31 201 -6 37 201 -6 minecraft:podzol
 fill 43 201 -6 47 201 -6 minecraft:podzol
-fill 28 201 -3 58 201 -2 minecraft:podzol
 fill 31 201 -32 31 201 -32 minecraft:calcite
 fill 31 202 -32 31 202 -32 minecraft:podzol
 fill 31 201 -30 31 201 -30 minecraft:calcite
@@ -295,7 +294,7 @@ execute positioned 40 202 -28 run function rlk:room/prop/fo_white
 execute positioned 25 201 -31 run function rlk:room/prop/fo_white
 execute positioned 52 201 -39 run function rlk:room/prop/p_grass
 execute positioned 32 201 -26 run function rlk:room/prop/p_grass
-execute positioned 50 202 -2 run function rlk:room/prop/fo_flower
+execute positioned 50 201 -2 run function rlk:room/prop/fo_flower
 execute positioned 30 201 -4 run function rlk:room/prop/p_grass
 execute positioned 30 203 -38 run function rlk:room/prop/fo_white
 execute positioned 24 201 -37 run function rlk:room/prop/fo_white

@@ -1,0 +1,12 @@
+# GENERATED dispatcher: rlk:<fn root>/aux_hit of the running boss (#mbId mb = registry n).
+execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/aux_hit
+execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/aux_hit
+execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/aux_hit
+execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/aux_hit
+execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/aux_hit
+execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/aux_hit
+execute if score #mbId mb matches 11 run return run function rlk:boss/apep/aux_hit
+execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/aux_hit
+execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/aux_hit
+execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/aux_hit
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/aux_hit

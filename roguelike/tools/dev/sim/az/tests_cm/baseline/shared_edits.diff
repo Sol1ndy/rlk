@@ -1,0 +1,402 @@
+=== data/rlk/function/bossui/draw.mcfunction
+@@ -20 +20,3 @@
+-function rlk:bossui/run_hp {col:"#E0484B"}
++execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {col:"#E0484B"}
++# #buHpCol 1..10: the coloured HP run (bossui/hp_col; a caller without the option pays this one test)
++execute if score #buHpCol bu matches 1..10 run function rlk:bossui/hp_col
+@@ -25,37 +27,2 @@
+-# Numbers "hp/max" centred on the bar (default font, 6 px per character).
+-scoreboard players set #n bu 1
+-scoreboard players set #nh bu 1
+-scoreboard players set #nm bu 1
+-execute if score #buHp bu matches 1.. run scoreboard players set #nh bu 1
+-execute if score #buMax bu matches 1.. run scoreboard players set #nm bu 1
+-execute if score #buHp bu matches 10.. run scoreboard players set #nh bu 2
+-execute if score #buMax bu matches 10.. run scoreboard players set #nm bu 2
+-execute if score #buHp bu matches 100.. run scoreboard players set #nh bu 3
+-execute if score #buMax bu matches 100.. run scoreboard players set #nm bu 3
+-execute if score #buHp bu matches 1000.. run scoreboard players set #nh bu 4
+-execute if score #buMax bu matches 1000.. run scoreboard players set #nm bu 4
+-execute if score #buHp bu matches 10000.. run scoreboard players set #nh bu 5
+-execute if score #buMax bu matches 10000.. run scoreboard players set #nm bu 5
+-execute if score #buHp bu matches 100000.. run scoreboard players set #nh bu 6
+-execute if score #buMax bu matches 100000.. run scoreboard players set #nm bu 6
+-execute if score #buHp bu matches 1000000.. run scoreboard players set #nh bu 7
+-execute if score #buMax bu matches 1000000.. run scoreboard players set #nm bu 7
+-scoreboard players operation #n bu += #nh bu
+-scoreboard players operation #n bu += #nm bu
+-scoreboard players operation #w bu = #n bu
+-scoreboard players operation #w bu *= #digit bu
+-scoreboard players operation #half bu = #w bu
+-scoreboard players operation #half bu /= #2 bu
+-# back from the bar end to the text start: BAR/2 + w/2
+-scoreboard players set #len bu 100
+-scoreboard players operation #len bu += #half bu
+-function rlk:bossui/space_neg
+-# The nbt component joins the list as children of its first entry (a bar piece in font
+-# rlk:bossbar), so the numbers must name the default font or they inherit the bar font.
+-data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white",font:"minecraft:default"}
+-data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0",font:"minecraft:default"}
+-data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0",font:"minecraft:default"}
+-# forward to the bar end again: BAR/2 - w/2
+-scoreboard players set #len bu 100
+-scoreboard players operation #len bu -= #half bu
+-execute if score #len bu matches 1.. run function rlk:bossui/space_pos
++# Numbers "hp/max" centred on the bar (#buNoNum 1: none; the cursor already stands at the bar end).
++execute unless score #buNoNum bu matches 1.. run function rlk:bossui/nums
+@@ -63,0 +31,3 @@
++# The options hold for this draw only.
++scoreboard players set #buHpCol bu 0
++scoreboard players set #buNoNum bu 0
+=== data/rlk/function/bossui/hp_col.mcfunction
+@@ -0,0 +1,12 @@
++# The HP run of bossui/draw in the #buHpCol colour (1..9 = SUB_COLORS, 10 = gold); #len bu = the HP fill.
++execute if score #buHpCol bu matches 1 run return run function rlk:bossui/run_hp {col:"#C58BFF"}
++execute if score #buHpCol bu matches 2 run return run function rlk:bossui/run_hp {col:"#FF8A3D"}
++execute if score #buHpCol bu matches 3 run return run function rlk:bossui/run_hp {col:"#4FB8FF"}
++execute if score #buHpCol bu matches 4 run return run function rlk:bossui/run_hp {col:"#9FE8F5"}
++execute if score #buHpCol bu matches 5 run return run function rlk:bossui/run_hp {col:"#F2C14E"}
++execute if score #buHpCol bu matches 6 run return run function rlk:bossui/run_hp {col:"#6FE3C1"}
++execute if score #buHpCol bu matches 7 run return run function rlk:bossui/run_hp {col:"#A5D94A"}
++execute if score #buHpCol bu matches 8 run return run function rlk:bossui/run_hp {col:"#E8C35A"}
++execute if score #buHpCol bu matches 9 run return run function rlk:bossui/run_hp {col:"#7BD88F"}
++execute if score #buHpCol bu matches 10 run return run function rlk:bossui/run_hp {col:"#EDCF63"}
++
+=== data/rlk/function/bossui/nums.mcfunction
+@@ -0,0 +1,38 @@
++# Numbers "hp/max" centred on the bar (default font, 6 px per character); from draw.
++scoreboard players set #n bu 1
++scoreboard players set #nh bu 1
++scoreboard players set #nm bu 1
++execute if score #buHp bu matches 1.. run scoreboard players set #nh bu 1
++execute if score #buMax bu matches 1.. run scoreboard players set #nm bu 1
++execute if score #buHp bu matches 10.. run scoreboard players set #nh bu 2
++execute if score #buMax bu matches 10.. run scoreboard players set #nm bu 2
++execute if score #buHp bu matches 100.. run scoreboard players set #nh bu 3
++execute if score #buMax bu matches 100.. run scoreboard players set #nm bu 3
++execute if score #buHp bu matches 1000.. run scoreboard players set #nh bu 4
++execute if score #buMax bu matches 1000.. run scoreboard players set #nm bu 4
++execute if score #buHp bu matches 10000.. run scoreboard players set #nh bu 5
++execute if score #buMax bu matches 10000.. run scoreboard players set #nm bu 5
++execute if score #buHp bu matches 100000.. run scoreboard players set #nh bu 6
++execute if score #buMax bu matches 100000.. run scoreboard players set #nm bu 6
++execute if score #buHp bu matches 1000000.. run scoreboard players set #nh bu 7
++execute if score #buMax bu matches 1000000.. run scoreboard players set #nm bu 7
++scoreboard players operation #n bu += #nh bu
++scoreboard players operation #n bu += #nm bu
++scoreboard players operation #w bu = #n bu
++scoreboard players operation #w bu *= #digit bu
++scoreboard players operation #half bu = #w bu
++scoreboard players operation #half bu /= #2 bu
++# back from the bar end to the text start: BAR/2 + w/2
++scoreboard players set #len bu 100
++scoreboard players operation #len bu += #half bu
++function rlk:bossui/space_neg
++# The nbt component joins the list as children of its first entry (a bar piece in font
++# rlk:bossbar), so the numbers must name the default font or they inherit the bar font.
++data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white",font:"minecraft:default"}
++data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0",font:"minecraft:default"}
++data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0",font:"minecraft:default"}
++# forward to the bar end again: BAR/2 - w/2
++scoreboard players set #len bu 100
++scoreboard players operation #len bu -= #half bu
++execute if score #len bu matches 1.. run function rlk:bossui/space_pos
++
+=== data/rlk/function/char/arlecchino/skill_hit.mcfunction
+@@ -22,0 +23,2 @@
++# 챕터 보스의 판정체(rlk_mb_px)가 맞았으면 핏값과 표식은 보스 몸에 한 번만 (mboss/px/to_body)
++execute as @e[tag=rlk_hit,tag=rlk_mb_px] run function rlk:mboss/px/to_body
+=== data/rlk/function/char/navia/pellet_go.mcfunction
+@@ -6,0 +7,3 @@
++# 챕터 보스 히트 프록시(rlk_mb_px)에 맞은 탄 = 몸체에 맞은 탄(몸체는 한 번만 셈, 프록시는 셈하지 않음)
++execute if entity @e[tag=rlk_np,tag=rlk_mb_px,limit=1] run tag @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] add rlk_np
++tag @e[tag=rlk_np,tag=rlk_mb_px] remove rlk_np
+=== data/rlk/function/combat/apply.mcfunction
+@@ -8,0 +9,3 @@
++# 챕터 보스 히트 프록시(rlk_mb_px): 같은 공격의 중복을 거르고 몸체로 넘김(숫자는 프록시 자리). 큰 몸체(rlk_mb_big)를 직접 맞힌 공격도 같은 거름
++execute if entity @s[tag=rlk_mb_px] run return run function rlk:mboss/px/hit
++execute if entity @s[tag=rlk_mb_big] unless score #pxIn mb matches 1 unless score #trueDmg tmp matches 1 unless function rlk:mboss/px/dup run return 0
+@@ -21,0 +25,2 @@
++# 원소별 저항(챕터 보스 몸체 · 보조 오브젝트, rlk_mb_resel): mres = mbRes<#elem>. 모듈 on_hit 앞이라 모듈이 덮어쓸 수 있음
++execute if entity @s[tag=rlk_mb_resel] unless score #trueDmg tmp matches 1 run function rlk:mboss/res_pre
+=== data/rlk/function/combat/clear_atkflags.mcfunction
+@@ -1,0 +2,2 @@
++# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
++scoreboard players add #atkSeq tmp 1
+=== data/rlk/function/combat/gold_drop.mcfunction
+@@ -14,2 +14,2 @@
+-# 중간보스(boss + miniboss): 골드 × #mbGoldMul, 사파이어 조각 #mbSap (레지스트리 goldMul · sap)
+-execute if entity @s[tag=rlk_mb_body] run scoreboard players operation #gv tmp *= #mbGoldMul mb
++# 중간보스(boss + miniboss): 골드 × #mbGoldMul, 사파이어 조각 #mbSap (레지스트리 goldMul · sap). 챕터 보스(boss만, miniboss 없음)는 위의 보스 경제(× #bossGoldMul, #bossSapphire)
++execute if entity @s[tag=rlk_mb_body,tag=miniboss] run scoreboard players operation #gv tmp *= #mbGoldMul mb
+@@ -23,2 +23,2 @@
+-execute if entity @s[tag=rlk_mb_body] if score #mbSap mb matches 1.. run scoreboard players operation #sapN tmp = #mbSap mb
+-execute if entity @s[tag=rlk_mb_body] if score #mbSap mb matches 1.. run function rlk:combat/sap_loop
++execute if entity @s[tag=rlk_mb_body,tag=miniboss] if score #mbSap mb matches 1.. run scoreboard players operation #sapN tmp = #mbSap mb
++execute if entity @s[tag=rlk_mb_body,tag=miniboss] if score #mbSap mb matches 1.. run function rlk:combat/sap_loop
+=== data/rlk/function/combat/melee_begin.mcfunction
+@@ -2,0 +3,2 @@
++# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
++scoreboard players add #atkSeq tmp 1
+=== data/rlk/function/element/dot.mcfunction
+@@ -1,0 +2,2 @@
++# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
++scoreboard players add #atkSeq tmp 1
+=== data/rlk/function/element/lunar/hit.mcfunction
+@@ -1,0 +2,2 @@
++# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
++scoreboard players add #atkSeq tmp 1
+=== data/rlk/function/element/rx_run.mcfunction
+@@ -1,0 +2,2 @@
++# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
++scoreboard players add #atkSeq tmp 1
+=== data/rlk/function/mob/shield_ensure.mcfunction
+@@ -6,0 +7,2 @@
++# 챕터 보스(rlk_mb_noshield: 히트 프록시로 맞는 큰 몸체 · 숨은 몸체): 클릭 실드 없음
++execute if entity @s[tag=rlk_mb_noshield] run return 0
+=== data/rlk/function/player/take_damage.mcfunction
+@@ -22 +22 @@
+-execute if score #elem tmp matches 1.. run function rlk:element/player_hit
++execute if score #elem tmp matches 1.. unless score #mbNRNow mb matches 1 run function rlk:element/player_hit
+=== data/rlk/function/room/boss_spawn.mcfunction
+@@ -1,0 +2,2 @@
++# 챕터 보스 구역(data.cboss): 그 보스의 경기장 전투(mboss/cb/spawn_route), 나루카미로 넘어가지 않음
++execute if data entity @s data.cboss run return run function rlk:mboss/cb/spawn_route
+=== data/rlk/function/room/combat_clear.mcfunction
+@@ -8,0 +9,2 @@
++# 챕터 보스 구역: 경기장 정리 → 귀환 → 처치했으면 다음 챕터 오브젝트, 취소면 문이 다시 나타남(mboss/cb/clear)
++execute if score @s zkind matches 9 if data entity @s data.cboss run return run function rlk:mboss/cb/clear
+=== data/rlk/function/room/map_mobs.mcfunction
+@@ -5 +5 @@
+-execute as @e[tag=rlk_mob,limit=48] run function rlk:room/map_mob
++execute as @e[tag=rlk_mob,tag=!rlk_mb_px,limit=48] run function rlk:room/map_mob
+=== data/rlk/function/room/obj/click.mcfunction
+@@ -25,0 +26,2 @@
++# 챕터 보스 문(oact 16, 입구 구역 한가운데): 경기장 준비가 끝났으면 구역 전투 시작 → 경기장
++execute if score @s oact matches 16 run return run function rlk:mboss/cb/gate
+=== data/rlk/function/room/obj/k_cboss.mcfunction
+@@ -0,0 +1,5 @@
++# 챕터 보스 문 오브젝트 (위치 = 실행 위치 = 입구 구역 한가운데, @s = 그 구역 표식, data.boss_id 보유)
++# 표시 내용은 보스 모듈의 prep(입구를 지을 때)이 rlk:mboss cprep.<boss_id>.gate 에 적어 둔 것: 아이콘 두 개 + 세 줄.
++# 누르면(oact 16 → mboss/cb/gate) 구역 전투가 시작되고 1.5초 뒤 그 보스의 경기장으로 이동한다. 저장 내용이 없으면 아무것도 없음
++function rlk:room/obj/k_cboss2 with entity @s data
++
+=== data/rlk/function/room/obj/k_cboss2.mcfunction
+@@ -0,0 +1,7 @@
++# (매크로 boss_id) 그 보스의 문 표시 저장소가 있으면 문 오브젝트를 세운다. oarg = 레지스트리 번호 n
++# 저장소가 없어도(prep이 돌지 않았거나 실패, 저장소가 지워짐) 문은 꼭 세운다(문이 없는 보스 맵 = 진행 불가): 레지스트리의 문 기록으로
++$execute unless data storage rlk:mboss cprep.$(boss_id).gate run return run function rlk:room/obj/k_cboss_fb with storage rlk:mboss cbyid.$(boss_id)
++scoreboard players set #oact tmp 16
++$execute store result score #oarg tmp run data get storage rlk:mboss cprep.$(boss_id).gate.n
++$function rlk:room/obj/k_cboss3 with storage rlk:mboss cprep.$(boss_id).gate
++
+=== data/rlk/function/room/obj/k_cboss3.mcfunction
+@@ -0,0 +1,13 @@
++# 챕터 보스 문: 아이콘 두 개(나란히) + 이름표 세 줄(텍스트 구성 요소 l1 l2 l3, 그대로 넣음) + 안내 줄. 입력: #oact #oarg tmp,
++# 매크로 item/model/item2/model2/l1/l2/l3 (make_node2 와 같은 구조, 이름표만 보스 모듈의 것)
++$summon minecraft:item_display ~ ~1.1 ~ {Tags:["rlk_room","rlk_odisp","rlk_new"],billboard:"vertical",brightness:{sky:15,block:15},item:{id:"$(item)",count:1,components:{"minecraft:item_model":"$(model)"}},transformation:{translation:[-0.45f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.0f,1.0f,1.0f]}}
++$summon minecraft:item_display ~ ~1.1 ~ {Tags:["rlk_room","rlk_odisp","rlk_new"],billboard:"vertical",brightness:{sky:15,block:15},item:{id:"$(item2)",count:1,components:{"minecraft:item_model":"$(model2)"}},transformation:{translation:[0.45f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.0f,1.0f,1.0f]}}
++summon minecraft:marker ~ ~1 ~ {Tags:["rlk_room","rlk_obj","rlk_new"]}
++$summon minecraft:text_display ~ ~2.55 ~ {Tags:["rlk_room","rlk_olbl","rlk_new"],billboard:"center",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,text:[$(l1),{text:"\n"},$(l2),{text:"\n"},$(l3)],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
++summon minecraft:text_display ~ ~2.2 ~ {Tags:["rlk_room","rlk_ohint","rlk_new"],billboard:"center",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,text:{text:""},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.8f,0.8f,0.8f]}}
++execute store result score #ogid room run scoreboard players add #ogid room 1
++scoreboard players operation @e[tag=rlk_new] ogid = #ogid room
++scoreboard players operation @e[tag=rlk_new,tag=rlk_obj] oact = #oact tmp
++scoreboard players operation @e[tag=rlk_new,tag=rlk_obj] oarg = #oarg tmp
++tag @e[tag=rlk_new] remove rlk_new
++
+=== data/rlk/function/room/obj/k_cboss_fb.mcfunction
+@@ -0,0 +1,6 @@
++# (매크로 = rlk:mboss cbyid.<id>, 레지스트리 기록) 문 표시 저장소 없이 문을 세움: 아이콘 하나 + 이름 + 설명(room/obj/make_node), 회색 경고
++$tellraw @a[tag=player] [{text:"[챕터 보스] ",color:"#E0703A",bold:true},{text:"문 표시 정보가 없어 기본 문을 세웠습니다($(id)).",color:"gray",bold:false}]
++scoreboard players set #oact tmp 16
++$scoreboard players set #oarg tmp $(n)
++$function rlk:room/obj/make_node with storage rlk:mboss cbyid.$(id).gate
++
+=== data/rlk/function/room/pick/boss.mcfunction
+@@ -1,3 +1,3 @@
+-# 임시로 모든 챕터 보스 = 마가츠 미타케 나루카미노 미코토.
+-# 원형·무장식 필드는 boss_id:narukami인 구역에만 적용된다.
+-function rlk:room/raiden/layout
++# 보스 맵 배치: 챕터 보스 라우팅(mboss/cb/route, 레지스트리 kind chapter의 ch · route에서 생성). 라우팅되지 않은 챕터는
++# 마가츠 미타케 나루카미노 미코토(room/raiden/layout). 원형·무장식 필드는 boss_id:narukami인 구역에만 적용된다.
++function rlk:mboss/cb/route
+=== data/rlk/function/room/remove.mcfunction
+@@ -11,0 +12,2 @@
++# 챕터 보스 경기장도 제거(블록이 로드돼 있을 때) + 청크 고정 해제, 돌던 경기장 작업은 중단
++execute in minecraft:overworld run function rlk:mboss/cb/remove
+=== data/rlk/function/room/wave_start.mcfunction
+@@ -4 +4 @@
+-execute if data entity @s data{boss_id:"narukami"} run return 0
++execute if data entity @s data.boss_id run return 0
+=== data/rlk/function/room/zone_build.mcfunction
+@@ -3,0 +4 @@
++execute if data entity @s data.cboss run function rlk:room/cboss/build
+@@ -5 +6 @@
+-execute unless data entity @s data{boss_id:"narukami"} run function rlk:room/zb_fn with storage rlk:room zbm
++execute unless data entity @s data.boss_id run function rlk:room/zb_fn with storage rlk:room zbm
+=== data/rlk/function/room/zone_enter.mcfunction
+@@ -5,0 +6,2 @@
++# 챕터 보스 입구(data.cboss): 바로 싸우지 않고 문 오브젝트(oact 16, room/obj/k_cboss)가 선다
++execute if score @s zkind matches 9 if data entity @s data.cboss run return run function rlk:mboss/cb/enter
+=== data/rlk/function/room/zone_floor.mcfunction
+@@ -2 +2 @@
+-execute if data entity @s data{boss_id:"narukami"} run return 0
++execute if data entity @s data.boss_id run return 0
+=== data/rlk/function/room/zone_patch.mcfunction
+@@ -2 +2 @@
+-execute if data entity @s data{boss_id:"narukami"} run return 0
++execute if data entity @s data.boss_id run return 0
+=== data/rlk/function/run/end.mcfunction
+@@ -7,0 +8 @@
++function rlk:mboss/cb/run_reset
+=== data/rlk/function/run/start.mcfunction
+@@ -13,0 +14,2 @@
++# 챕터 보스: 강제 라우팅 · 자동 문 누르기 · 보스 맵별 준비 저장소(cprep) 초기화
++function rlk:mboss/cb/run_reset
+diff --git a/roguelike/data/rlk/function/load.mcfunction b/roguelike/data/rlk/function/load.mcfunction
+index 45cf0f8..887c9de 100644
+--- a/roguelike/data/rlk/function/load.mcfunction
++++ b/roguelike/data/rlk/function/load.mcfunction
+@@ -649,6 +649,8 @@ scoreboard players set #10 tmp 10
+ scoreboard objectives remove vTtl
+ 
+ # ===== 조절 지점 =====
++# rift (build_rift.py)
++scoreboard players set #riftPm room 30
+ # 로비 · 튜토리얼 · 설정 · 체험 방(lobby/): 항상 불러와 둠
+ forceload add 80 14 134 64
+ scoreboard players set #c2 lob 2
+@@ -1373,6 +1375,8 @@ function rlk:bossui/init
+ function rlk:boss/raiden/init
+ # 중간보스 틀(tools/build_mboss_core.py): 점수 · 보스바 · 레지스트리 · 경기장 확인, 진행 중 전투는 체력 유지
+ function rlk:mboss/init
++# rift (build_rift.py)
++function rlk:room/rift/init
+ # 화면 위 미니맵(tools/build_minimap.py)
+ function rlk:minimap/init
+ # 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)
+diff --git a/roguelike/data/rlk/function/room/clear.mcfunction b/roguelike/data/rlk/function/room/clear.mcfunction
+index da81a3d..b7d3cc2 100644
+--- a/roguelike/data/rlk/function/room/clear.mcfunction
++++ b/roguelike/data/rlk/function/room/clear.mcfunction
+@@ -3,6 +3,8 @@
+ function rlk:boss/raiden/cleanup
+ # 중간보스 전투 정리(경기장 엔티티 · 보스바 · 상태). 플레이어는 옮기지 않음
+ function rlk:mboss/cleanup
++# rift (build_rift.py)
++function rlk:room/rift/forget
+ execute as @e[tag=rlk_zone,scores={zst=1..}] run function rlk:room/zone_erase
+ execute as @e[tag=rlk_door,scores={dst=1..}] run function rlk:room/door_erase with entity @s data
+ kill @e[tag=rlk_room]
+diff --git a/roguelike/data/rlk/function/room/combat_clear.mcfunction b/roguelike/data/rlk/function/room/combat_clear.mcfunction
+index a828957..a85c730 100644
+--- a/roguelike/data/rlk/function/room/combat_clear.mcfunction
++++ b/roguelike/data/rlk/function/room/combat_clear.mcfunction
+@@ -6,6 +6,10 @@ execute as @e[tag=rlk_seal] run function rlk:room/seal_out
+ execute unless score #k1 snd matches 1 run function rlk:snd/f1
+ execute unless score #k2 snd matches 1 run function rlk:snd/f2
+ execute as @a[tag=player,limit=1] run function rlk:room/msg {t:"구역 정리",c:"#8FD46A"}
++# rift (build_rift.py)
++execute if entity @s[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/clear
++# rift (build_rift.py)
++execute if entity @s[tag=rlk_riftz] run function rlk:room/rift/open
+ # 챕터 보스 구역: 경기장 정리 → 귀환 → 처치했으면 다음 챕터 오브젝트, 취소면 문이 다시 나타남(mboss/cb/clear)
+ execute if score @s zkind matches 9 if data entity @s data.cboss run return run function rlk:mboss/cb/clear
+ execute if score @s zkind matches 9 unless score #rdTest rd matches 1 run function rlk:room/obj/k_chapter
+diff --git a/roguelike/data/rlk/function/room/mob_wave.mcfunction b/roguelike/data/rlk/function/room/mob_wave.mcfunction
+index 859ff50..b2c99d3 100644
+--- a/roguelike/data/rlk/function/room/mob_wave.mcfunction
++++ b/roguelike/data/rlk/function/room/mob_wave.mcfunction
+@@ -1,4 +1,6 @@
+ # 적 소환 (@s = 구역 표식, at @s). 수 = 구역 크기별 범위 + (챕터 - 1)
++# rift (build_rift.py)
++execute if entity @s[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/start_zone
+ execute if score @s zkind matches 9 run return run function rlk:room/boss_spawn
+ # 중간보스 구역: 몹 대신 원형 경기장의 중간보스(mboss/start, 실패하면 #spawnT 로 다시 시도)
+ execute if score @s zkind matches 15 run return run function rlk:mboss/start
+diff --git a/roguelike/data/rlk/function/room/obj/click.mcfunction b/roguelike/data/rlk/function/room/obj/click.mcfunction
+index 9f22910..2b754e0 100644
+--- a/roguelike/data/rlk/function/room/obj/click.mcfunction
++++ b/roguelike/data/rlk/function/room/obj/click.mcfunction
+@@ -25,4 +25,6 @@ execute if score @s oact matches 14 run return run function rlk:mboss/gate
+ execute if score @s oact matches 15 run return run function rlk:room/obj/do_mbox
+ # 챕터 보스 문(oact 16, 입구 구역 한가운데): 경기장 준비가 끝났으면 구역 전투 시작 → 경기장
+ execute if score @s oact matches 16 run return run function rlk:mboss/cb/gate
++# rift (build_rift.py)
++execute if score @s oact matches 17 run return run function rlk:room/rift/click
+ execute if score @s oact matches 8 run return run function rlk:run/next_chapter
+diff --git a/roguelike/data/rlk/function/room/tick.mcfunction b/roguelike/data/rlk/function/room/tick.mcfunction
+index a41e235..b3f9668 100644
+--- a/roguelike/data/rlk/function/room/tick.mcfunction
++++ b/roguelike/data/rlk/function/room/tick.mcfunction
+@@ -17,6 +17,8 @@ execute as @e[tag=rlk_xpspot] at @s if entity @e[tag=rlk_body,distance=..8] run
+ execute as @e[tag=rlk_xpsrc] at @s run function rlk:room/xp/tick
+ # 중간보스 아이템 상자(mboss/box): 떨어지는 연출 · 땅에 닿으면 오브젝트로 · 반짝임. 상자가 있을 때만(#mbBoxOn)
+ execute if score #mbBoxOn mb matches 1 run function rlk:mboss/box/all
++# rift (build_rift.py)
++execute if score #riftOn room matches 1 run function rlk:room/rift/tick
+ # 오브젝트 조준 표시 (주의: anchored eyes 로 시작점만 눈으로 옮기고 feet 으로 되돌려야 레이가 휘지 않음)
+ tag @e[tag=rlk_ohover] remove rlk_ohover
+ execute if entity @e[tag=rlk_obj,limit=1] as @a[tag=player,limit=1] at @s if entity @e[tag=rlk_obj,distance=..12] anchored eyes positioned ^ ^ ^0.01 anchored feet run function rlk:room/obj/aim
+diff --git a/roguelike/data/rlk/function/room/zone_build.mcfunction b/roguelike/data/rlk/function/room/zone_build.mcfunction
+index d489e44..0baab36 100644
+--- a/roguelike/data/rlk/function/room/zone_build.mcfunction
++++ b/roguelike/data/rlk/function/room/zone_build.mcfunction
+@@ -5,6 +5,8 @@ execute if data entity @s data.cboss run function rlk:room/cboss/build
+ execute if data entity @s data{boss_id:"narukami"} run function rlk:room/raiden/build
+ execute unless data entity @s data.boss_id run function rlk:room/zb_fn with storage rlk:room zbm
+ scoreboard players set @s zst 1
++# rift (build_rift.py)
++function rlk:room/rift/roll
+ # 이 구역에 붙은 문을 한 단계씩 진행(숨김→닫힘→열림)
+ scoreboard players operation #zb tmp = @s zid
+ execute as @e[tag=rlk_door] if score @s da = #zb tmp run function rlk:room/door_step
+diff --git a/roguelike/data/rlk/function/room/zone_enter.mcfunction b/roguelike/data/rlk/function/room/zone_enter.mcfunction
+index 8cf57d8..8cb520a 100644
+--- a/roguelike/data/rlk/function/room/zone_enter.mcfunction
++++ b/roguelike/data/rlk/function/room/zone_enter.mcfunction
+@@ -1,5 +1,7 @@
+ # 구역에 처음 들어옴 (@s = 구역 표식, at @s). 이때 비로소 적/보상이 나타난다
+ scoreboard players set @s zst 2
++# rift (build_rift.py)
++execute if entity @s[tag=rlk_riftz] at @s run function rlk:room/rift/show
+ function rlk:room/cells_kill
+ function rlk:room/wave_start
+ execute if score @s zkind matches 1 run return run function rlk:room/combat_start
+diff --git a/roguelike/data/rlk/function/room/zone_first.mcfunction b/roguelike/data/rlk/function/room/zone_first.mcfunction
+index 9edf81c..dac6df1 100644
+--- a/roguelike/data/rlk/function/room/zone_first.mcfunction
++++ b/roguelike/data/rlk/function/room/zone_first.mcfunction
+@@ -4,3 +4,5 @@ function rlk:room/cells_kill
+ function rlk:room/zone_mark
+ execute if score @s zkind matches 8 run function rlk:room/spot with storage rlk:room cur.spot
+ execute if score @s zkind matches 10 run function rlk:room/spot with storage rlk:room cur.spot
++# rift (build_rift.py)
++execute if entity @s[tag=rlk_riftz] at @s run function rlk:room/rift/show
+diff --git a/roguelike/data/rlk/function/run/start.mcfunction b/roguelike/data/rlk/function/run/start.mcfunction
+index aff3a8b..053a7fa 100644
+--- a/roguelike/data/rlk/function/run/start.mcfunction
++++ b/roguelike/data/rlk/function/run/start.mcfunction
+@@ -29,6 +29,8 @@ scoreboard players set #rfCount room 0
+ # 노드: 다음 맵의 노드 목록, 나무뿌리 기적(한 판에 한 번)
+ data modify storage rlk:room next set value []
+ scoreboard players set #mirUsed room 0
++# rift (build_rift.py)
++scoreboard players set #riftUsed room 0
+ data modify storage rlk:room seen set value []
+ # 이번 판에 만난 중간보스(같은 중간보스가 연달아 나오지 않게)
+ data modify storage rlk:mboss met set value []
+diff --git a/roguelike/data/rlk/function/uninstall.mcfunction b/roguelike/data/rlk/function/uninstall.mcfunction
+index e7e4099..2506fe2 100644
+--- a/roguelike/data/rlk/function/uninstall.mcfunction
++++ b/roguelike/data/rlk/function/uninstall.mcfunction
+@@ -2,6 +2,8 @@ function rlk:boss/raiden/uninstall
+ kill @e[tag=rlk_raiden]
+ # 중간보스: 전투 정리 · 보스바 · 점수 · 경기장 청크 고정 해제
+ function rlk:mboss/uninstall
++# rift (build_rift.py)
++function rlk:room/rift/uninstall
+ scoreboard objectives remove lcSeen
+ execute as @a[tag=player] run function rlk:char/motion/stop
+ # 시스템 제거: 임시 엔티티/UI 아이템/스코어보드 정리 후 틱 처리 정지 (사용: /function rlk:uninstall)

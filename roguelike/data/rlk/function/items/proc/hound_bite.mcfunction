@@ -3,7 +3,9 @@ execute unless score #k132 snd matches 1 run function rlk:snd/f140
 particle minecraft:sweep_attack ~ ~1 ~ 0.2 0.2 0.2 0 2
 particle minecraft:dust{color:[0.77f,0.55f,1.00f],scale:1.5f} ~ ~1 ~ 0.3 0.3 0.3 0 12
 particle minecraft:crit ~ ~1 ~ 0.3 0.3 0.3 0.4 10
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:35}
+# 피해 계수 = #houndCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_hound_whistle.coef int 1 run scoreboard players get #houndCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_hound_whistle
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 3

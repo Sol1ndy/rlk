@@ -16,8 +16,6 @@ data modify entity @e[tag=rlk_avnew,limit=1] Health set value 1024f
 item replace entity @e[tag=rlk_avnew,limit=1] weapon.mainhand from entity @s hotbar.0
 function rlk:view/av_unwrap
 execute if score #charN tmp matches 7..8 run item replace entity @e[tag=rlk_avnew,limit=1] weapon.mainhand with minecraft:air
-summon minecraft:item_display ~ ~ ~ {Tags:["rlk_view","rlk_camv"],teleport_duration:1}
-scoreboard players set #durNow view -1
 execute positioned ~ ~1.62 ~ positioned ^ ^ ^6 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_view","rlk_aim"]}
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_view","rlk_vmk"]}
 # 진짜 플레이어: 투명 · 중력 없음 · 몹과 같은 팀(몹이 진짜 플레이어를 노리지 않게)

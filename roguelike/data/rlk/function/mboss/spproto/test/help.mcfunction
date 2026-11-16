@@ -1,0 +1,6 @@
+function rlk:help/head {cmd:"/function rlk:mboss/test/pattern {id:…}",what:"시험용 균열 수호자 시험 번호"}
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/pattern {id:1}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/pattern {id:1}'}},{text:"  1",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"원판 (번개)",color:"white"}]
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/pattern {id:2}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/pattern {id:2}'}},{text:"  2",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"고리",color:"white"}]
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/pattern {id:3}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/pattern {id:3}'}},{text:"  3",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"음악 끄기",color:"white"}]
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/pattern {id:4}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/pattern {id:4}'}},{text:"  4",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"음악 1단계",color:"white"}]
+tellraw @s ["",{text:" lock {id:1~2}: 그 패턴만 반복 · {id:0} 해제",color:"gray"}]

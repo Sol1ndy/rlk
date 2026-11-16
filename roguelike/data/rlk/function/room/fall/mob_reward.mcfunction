@@ -2,5 +2,4 @@
 function rlk:combat/heal_orb_roll
 function rlk:combat/kill_xp
 function rlk:combat/gold_drop
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/aur_move
 execute if score #charN tmp matches 5 run function rlk:char/arlecchino/dir_death

@@ -1,4 +1,4 @@
-# @s = 까마귀 깃이 꽂힌 자리, at @s. 1.5초 뒤 반경 3.5칸에 공격력의 60퍼센트 번개 원소 피해 + 공격력 증가
+# @s = 까마귀 깃이 꽂힌 자리, at @s. 1.5초 뒤 반경 3.5칸에 공격력의 #tenguCoef 퍼센트 번개 원소 피해 + 공격력 증가(#tenguAtk 퍼센트, #tenguDur 틱)
 scoreboard players remove @s life 1
 particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:0.8f} ~ ~0.3 ~ 0.3 0.2 0.3 0 2
 execute if score @s life matches 1.. run return 0

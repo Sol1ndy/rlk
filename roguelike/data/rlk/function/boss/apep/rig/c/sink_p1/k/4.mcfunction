@@ -1,0 +1,16 @@
+data merge entity 524c4b4d-4150-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0f,1.86073f,2.00858f],left_rotation:[-0.02618f,0f,0f,0.99966f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0f,2.21866f,1.95978f],left_rotation:[-0.02618f,0f,0f,0.99966f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:9,transformation:{translation:[5.9f,0.6f,1.6f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:9,transformation:{translation:[-5.9f,0.6f,1.6f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:9,transformation:{translation:[3.4f,0.35f,3.1f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,interpolation_duration:9,transformation:{translation:[-3.4f,0.35f,3.1f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:9,transformation:{translation:[3.7f,0.35f,-2.7f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000026 {start_interpolation:0,interpolation_duration:9,transformation:{translation:[-3.7f,0.35f,-2.7f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002a {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0f,0.17352f,-5.8635f],left_rotation:[-0.00064f,-0.13207f,-0.00886f,0.9912f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002b {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0.31f,0.16924f,-7.00629f],left_rotation:[0.00172f,-0.1698f,-0.0003f,0.98548f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002c {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0.69f,0.17298f,-8.07629f],left_rotation:[-0.00163f,-0.22781f,0.0024f,0.9737f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:9,transformation:{translation:[1.19f,0.17064f,-9.08633f],left_rotation:[0.00083f,-0.12852f,-0.00124f,0.99171f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:9,transformation:{translation:[1.48f,0.17216f,-10.18638f],left_rotation:[-0.00027f,-0.05968f,0.00061f,0.99822f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/apep/rig/look/tint/p1_brown
+scoreboard players set @s apRigFy 3
+scoreboard players reset @s apRigQx

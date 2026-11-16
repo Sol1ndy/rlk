@@ -1,0 +1,2 @@
+execute if score #ph kn matches 5 run return run function rlk:boss/arlecchino/rig/play/walk2
+function rlk:boss/arlecchino/rig/play/walk

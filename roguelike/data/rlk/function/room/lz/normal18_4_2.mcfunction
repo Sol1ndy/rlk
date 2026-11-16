@@ -116,7 +116,6 @@ fill 49 201 -9 49 201 -7 minecraft:podzol
 fill 38 201 -8 38 201 -6 minecraft:podzol
 fill 31 201 -6 37 201 -6 minecraft:podzol
 fill 43 201 -6 47 201 -6 minecraft:podzol
-fill 28 201 -3 58 201 -2 minecraft:podzol
 fill 30 201 -39 30 201 -38 minecraft:dirt
 fill 30 202 -39 30 202 -38 minecraft:podzol
 fill 36 201 -39 36 201 -38 minecraft:dirt

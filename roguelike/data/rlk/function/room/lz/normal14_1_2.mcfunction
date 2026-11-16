@@ -27,13 +27,8 @@ fill 18 206 -1 18 207 -1 minecraft:moss_block
 fill 18 209 -1 19 209 -1 minecraft:moss_block
 fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
 fill 1 210 -19 18 210 -2 minecraft:air
-fill 5 201 -19 6 201 -18 minecraft:podzol
-fill 6 201 -17 18 201 -17 minecraft:podzol
-fill 7 201 -16 18 201 -16 minecraft:podzol
 fill 1 201 -4 3 201 -4 minecraft:podzol
 fill 3 201 -3 3 201 -2 minecraft:podzol
-fill 7 201 -19 18 201 -18 minecraft:dirt
-fill 7 202 -19 18 202 -18 minecraft:podzol
 fill 1 201 -3 2 201 -2 minecraft:dirt
 fill 1 202 -3 2 202 -2 minecraft:podzol
 fill 18 201 -4 18 205 -2 minecraft:mossy_cobblestone

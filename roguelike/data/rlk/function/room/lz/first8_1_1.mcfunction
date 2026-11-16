@@ -24,21 +24,13 @@ fill -13 208 -1 -8 210 -1 minecraft:tuff
 fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
 fill -19 210 -19 -2 210 -2 minecraft:air
 fill -18 201 -19 -18 201 -16 minecraft:tuff
-fill -15 201 -19 -14 201 -18 minecraft:tuff
-fill -14 201 -17 -14 201 -16 minecraft:tuff
-fill -13 201 -16 -2 201 -16 minecraft:tuff
 fill -17 201 -15 -17 201 -14 minecraft:tuff
-fill -12 201 -15 -2 201 -15 minecraft:tuff
 fill -16 201 -13 -15 201 -13 minecraft:tuff
 fill -15 201 -12 -15 201 -10 minecraft:tuff
 fill -16 201 -10 -16 201 -9 minecraft:tuff
 fill -19 201 -9 -17 201 -9 minecraft:tuff
 fill -19 201 -19 -19 201 -16 minecraft:cobbled_deepslate
 fill -19 202 -19 -19 202 -16 minecraft:tuff
-fill -13 201 -19 -13 201 -17 minecraft:cobbled_deepslate
-fill -13 202 -19 -13 202 -17 minecraft:tuff
-fill -12 201 -17 -2 201 -17 minecraft:cobbled_deepslate
-fill -12 202 -17 -2 202 -17 minecraft:tuff
 fill -18 201 -15 -18 201 -14 minecraft:cobbled_deepslate
 fill -18 202 -15 -18 202 -14 minecraft:tuff
 fill -17 201 -13 -17 201 -13 minecraft:cobbled_deepslate
@@ -47,8 +39,6 @@ fill -16 201 -12 -16 201 -11 minecraft:cobbled_deepslate
 fill -16 202 -12 -16 202 -11 minecraft:tuff
 fill -19 201 -11 -17 201 -10 minecraft:cobbled_deepslate
 fill -19 202 -11 -17 202 -10 minecraft:tuff
-fill -12 201 -19 -2 202 -18 minecraft:cobbled_deepslate
-fill -12 203 -19 -2 203 -18 minecraft:tuff
 fill -19 201 -15 -19 202 -12 minecraft:cobbled_deepslate
 fill -19 203 -15 -19 203 -12 minecraft:tuff
 fill -18 201 -13 -18 202 -12 minecraft:cobbled_deepslate
@@ -61,6 +51,6 @@ fill -8 201 -3 -5 206 -2 minecraft:stone
 fill -8 207 -3 -5 207 -2 minecraft:tuff
 execute positioned -19 201 -5 run function rlk:room/prop/m_arch_z4
 execute positioned -4 201 -3 run function rlk:room/prop/m_rail_x
-execute positioned -11 202 -16 run function rlk:room/prop/m_rail_z
+execute positioned -11 201 -16 run function rlk:room/prop/m_rail_z
 setblock -19 205 -11 minecraft:wall_torch[facing=east]
 setblock -19 203 -7 minecraft:wall_torch[facing=east]

@@ -1,0 +1,891 @@
+{
+ "schema": 1,
+ "id": "arlecchino",
+ "source": "stub",
+ "_doc": "D0 stub of tools/arlecchino_rig_manifest.json (S2 writes the real one with the same parts, clips, events, looks, anchors, calls; the real one adds transforms, budgets, sprites). Generated from tools/mboss_arlecchino/api.py.",
+ "height": 2.8,
+ "hip_y": 1.05,
+ "size": 1.4,
+ "uuid": "524c4b4d-4b4e-4100-8000-0000000000{:02x}",
+ "parts": [
+  {
+   "name": "head",
+   "nn": 0,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/head",
+    "p2": "rlk:mboss/arlecchino/p2/head"
+   }
+  },
+  {
+   "name": "body",
+   "nn": 1,
+   "parent": null,
+   "model": {
+    "p1": "rlk:player_motion/arle/body",
+    "p2": "rlk:mboss/arlecchino/p2/body"
+   }
+  },
+  {
+   "name": "right_arm",
+   "nn": 2,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_arm",
+    "p2": "rlk:mboss/arlecchino/p2/right_arm"
+   }
+  },
+  {
+   "name": "right_forearm",
+   "nn": 3,
+   "parent": "right_arm",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_forearm",
+    "p2": "rlk:mboss/arlecchino/p2/right_forearm"
+   }
+  },
+  {
+   "name": "left_arm",
+   "nn": 4,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_arm",
+    "p2": "rlk:mboss/arlecchino/p2/left_arm"
+   }
+  },
+  {
+   "name": "left_forearm",
+   "nn": 5,
+   "parent": "left_arm",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_forearm",
+    "p2": "rlk:mboss/arlecchino/p2/left_forearm"
+   }
+  },
+  {
+   "name": "right_leg",
+   "nn": 6,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_leg",
+    "p2": "rlk:mboss/arlecchino/p2/right_leg"
+   }
+  },
+  {
+   "name": "right_shin",
+   "nn": 7,
+   "parent": "right_leg",
+   "model": {
+    "p1": "rlk:player_motion/arle/right_shin",
+    "p2": "rlk:mboss/arlecchino/p2/right_shin"
+   }
+  },
+  {
+   "name": "left_leg",
+   "nn": 8,
+   "parent": "body",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_leg",
+    "p2": "rlk:mboss/arlecchino/p2/left_leg"
+   }
+  },
+  {
+   "name": "left_shin",
+   "nn": 9,
+   "parent": "left_leg",
+   "model": {
+    "p1": "rlk:player_motion/arle/left_shin",
+    "p2": "rlk:mboss/arlecchino/p2/left_shin"
+   }
+  },
+  {
+   "name": "scythe_r",
+   "nn": 10,
+   "parent": "right_forearm",
+   "model": {
+    "p1": "rlk:player_motion/weapons/scythe",
+    "p2": "rlk:player_motion/weapons/scythe"
+   }
+  },
+  {
+   "name": "scythe_l",
+   "nn": 11,
+   "parent": "left_forearm",
+   "model": {
+    "p1": "rlk:player_motion/weapons/scythe",
+    "p2": "rlk:player_motion/weapons/scythe"
+   }
+  },
+  {
+   "name": "leg_1a",
+   "nn": 12,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_1b",
+   "nn": 13,
+   "parent": "leg_1a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_2a",
+   "nn": 14,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_2b",
+   "nn": 15,
+   "parent": "leg_2a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_3a",
+   "nn": 16,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_3b",
+   "nn": 17,
+   "parent": "leg_3a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_4a",
+   "nn": 18,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_4b",
+   "nn": 19,
+   "parent": "leg_4a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_5a",
+   "nn": 20,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_5b",
+   "nn": 21,
+   "parent": "leg_5a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_6a",
+   "nn": 22,
+   "parent": "body",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "leg_6b",
+   "nn": 23,
+   "parent": "leg_6a",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "cup",
+   "nn": 24,
+   "parent": "right_forearm",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  },
+  {
+   "name": "saucer",
+   "nn": 25,
+   "parent": "left_forearm",
+   "model": {
+    "p1": null,
+    "p2": null
+   }
+  }
+ ],
+ "clips": {
+  "idle": {
+   "id": 0,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p1"
+  },
+  "walk": {
+   "id": 1,
+   "len": 24,
+   "loop": [
+    0,
+    24
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 12
+   },
+   "form": "p1"
+  },
+  "strafe_l": {
+   "id": 2,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p1"
+  },
+  "strafe_r": {
+   "id": 3,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p1"
+  },
+  "idle2": {
+   "id": 4,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p2"
+  },
+  "walk2": {
+   "id": 5,
+   "len": 24,
+   "loop": [
+    0,
+    24
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 12
+   },
+   "form": "p2"
+  },
+  "strafe2_l": {
+   "id": 6,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p2"
+  },
+  "strafe2_r": {
+   "id": 7,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {},
+   "form": "p2"
+  },
+  "backstep": {
+   "id": 8,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "land": 10
+   },
+   "form": null
+  },
+  "flinch": {
+   "id": 9,
+   "len": 6,
+   "loop": null,
+   "events": {},
+   "form": null
+  },
+  "brk": {
+   "id": 10,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "hit": 0
+   },
+   "form": null
+  },
+  "stun": {
+   "id": 11,
+   "len": 140,
+   "loop": [
+    20,
+    120
+   ],
+   "events": {
+    "kneel": 10,
+    "rise": 120
+   },
+   "form": "p1"
+  },
+  "stun2": {
+   "id": 12,
+   "len": 140,
+   "loop": [
+    20,
+    120
+   ],
+   "events": {
+    "kneel": 10,
+    "rise": 120
+   },
+   "form": "p2"
+  },
+  "intro": {
+   "id": 13,
+   "len": 150,
+   "loop": null,
+   "events": {
+    "sip": 14,
+    "lower": 22,
+    "embers": 34,
+    "flee": 35,
+    "reach": 44,
+    "vortex": 52,
+    "form": 60,
+    "blade": 70,
+    "hold": 72,
+    "title": 80,
+    "twirl": 92,
+    "ring": 98,
+    "twirl_end": 104,
+    "flip": 110,
+    "stance": 116,
+    "set": 120,
+    "beat": 126,
+    "music": 136,
+    "push": 140,
+    "end": 150
+   },
+   "form": "p1"
+  },
+  "a2": {
+   "id": 14,
+   "len": 46,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "h1": 14,
+    "h2": 24,
+    "end": 46
+   },
+   "form": "p1"
+  },
+  "a4": {
+   "id": 15,
+   "len": 100,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 24,
+    "h3": 44,
+    "h4": 64,
+    "end": 100
+   },
+   "form": "p1"
+  },
+  "a5": {
+   "id": 16,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 24,
+    "h3": 44,
+    "h4": 64,
+    "h5": 84,
+    "end": 124
+   },
+   "form": "p1"
+  },
+  "b1": {
+   "id": 17,
+   "len": 60,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "spin": 10,
+    "release": 28,
+    "catch": 52,
+    "end": 60
+   },
+   "form": "p1"
+  },
+  "b2": {
+   "id": 18,
+   "len": 130,
+   "loop": null,
+   "events": {
+    "spin": 10,
+    "rel1": 28,
+    "spin2": 40,
+    "rel2": 58,
+    "reach": 76,
+    "lock": 80,
+    "grab": 96,
+    "end": 130
+   },
+   "form": "p1"
+  },
+  "c1": {
+   "id": 19,
+   "len": 80,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "jump": 8,
+    "apex": 18,
+    "lock": 44,
+    "dive": 48,
+    "impact": 54,
+    "end": 80
+   },
+   "form": "p1"
+  },
+  "c2": {
+   "id": 20,
+   "len": 140,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "jump": 8,
+    "apex": 18,
+    "lock": 44,
+    "dive": 48,
+    "impact": 54,
+    "wing_open": 84,
+    "wing": 90,
+    "end": 140
+   },
+   "form": "p1"
+  },
+  "d1": {
+   "id": 21,
+   "len": 56,
+   "loop": null,
+   "events": {
+    "flare": 0,
+    "go": 26,
+    "hit": 30,
+    "end": 56
+   },
+   "form": "p1"
+  },
+  "d2": {
+   "id": 22,
+   "len": 76,
+   "loop": null,
+   "events": {
+    "flare": 0,
+    "go": 26,
+    "hit": 30,
+    "fhit": 46,
+    "end": 76
+   },
+   "form": "p1"
+  },
+  "e1": {
+   "id": 23,
+   "len": 112,
+   "loop": null,
+   "events": {
+    "rise": 0,
+    "zig1": 16,
+    "zig2": 26,
+    "zig3": 36,
+    "zig4": 46,
+    "zig5": 56,
+    "lock": 64,
+    "go": 70,
+    "sweep": 76,
+    "spin": 92,
+    "end": 112
+   },
+   "form": "p1"
+  },
+  "f1": {
+   "id": 24,
+   "len": 232,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "centre": 40,
+    "arms": 100,
+    "flood": 110,
+    "hit1": 160,
+    "wings": 166,
+    "hit2": 196,
+    "end": 232
+   },
+   "form": "p1"
+  },
+  "g1": {
+   "id": 25,
+   "len": 140,
+   "loop": null,
+   "events": {
+    "plant": 0,
+    "blades": 6,
+    "cross1": 34,
+    "relock": 40,
+    "cross2": 62,
+    "rim": 70,
+    "field": 104,
+    "end": 140
+   },
+   "form": "p1"
+  },
+  "h1": {
+   "id": 26,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "leap": 0,
+    "perch": 10,
+    "clones": 20,
+    "strike": 34,
+    "drop": 64,
+    "wing": 72,
+    "sweep": 84,
+    "end": 124
+   },
+   "form": "p1"
+  },
+  "e70": {
+   "id": 27,
+   "len": 110,
+   "loop": null,
+   "events": {
+    "glow": 0,
+    "rise": 20,
+    "pool": 40,
+    "brand": 70,
+    "wings": 74,
+    "land": 96,
+    "end": 110
+   },
+   "form": "p1"
+  },
+  "t_p2": {
+   "id": 28,
+   "len": 180,
+   "loop": null,
+   "events": {
+    "kneel": 0,
+    "pillar": 24,
+    "dark": 50,
+    "rise": 70,
+    "swap": 90,
+    "legs1": 110,
+    "legs2": 116,
+    "legs3": 122,
+    "scythes": 130,
+    "title": 140,
+    "launch": 150,
+    "end": 180
+   },
+   "form": "p1"
+  },
+  "q0_hover": {
+   "id": 29,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "form": "p2"
+  },
+  "q0_dive": {
+   "id": 30,
+   "len": 40,
+   "loop": null,
+   "events": {
+    "go": 0,
+    "impact": 20,
+    "blades": 28,
+    "end": 40
+   },
+   "form": "p2"
+  },
+  "q1": {
+   "id": 31,
+   "len": 124,
+   "loop": null,
+   "events": {
+    "h1": 14,
+    "h2": 30,
+    "h3": 46,
+    "h4": 66,
+    "h5": 82,
+    "h6": 100,
+    "end": 124
+   },
+   "form": "p2"
+  },
+  "q2": {
+   "id": 32,
+   "len": 70,
+   "loop": null,
+   "events": {
+    "windup": 0,
+    "release": 20,
+    "go": 34,
+    "slash": 42,
+    "end": 70
+   },
+   "form": "p2"
+  },
+  "q3": {
+   "id": 33,
+   "len": 36,
+   "loop": null,
+   "events": {
+    "whip": 0,
+    "spin": 14,
+    "end": 36
+   },
+   "form": "p2"
+  },
+  "q4_up": {
+   "id": 34,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "top": 20
+   },
+   "form": "p2"
+  },
+  "q4_shot": {
+   "id": 35,
+   "len": 50,
+   "loop": null,
+   "events": {
+    "aim": 0,
+    "lock": 20,
+    "fire": 26,
+    "end": 50
+   },
+   "form": "p2"
+  },
+  "q4_land": {
+   "id": 36,
+   "len": 16,
+   "loop": null,
+   "events": {
+    "land": 12
+   },
+   "form": "p2"
+  },
+  "q5a": {
+   "id": 37,
+   "len": 180,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "ring1": 60,
+    "hit1": 95,
+    "donut": 100,
+    "hit2": 121,
+    "ring3": 130,
+    "hit3": 158,
+    "end": 180
+   },
+   "form": "p2"
+  },
+  "q5b": {
+   "id": 38,
+   "len": 136,
+   "loop": null,
+   "events": {
+    "raise": 0,
+    "brand": 22,
+    "x": 26,
+    "mark": 50,
+    "s1": 56,
+    "s2": 59,
+    "s3": 62,
+    "s4": 65,
+    "s5": 68,
+    "s6": 71,
+    "s7": 74,
+    "s8": 77,
+    "s9": 80,
+    "final": 96,
+    "end": 136
+   },
+   "form": "p2"
+  },
+  "q6": {
+   "id": 39,
+   "len": 200,
+   "loop": null,
+   "events": {
+    "fly": 0,
+    "gone": 20,
+    "moon": 30,
+    "v1": 50,
+    "v2": 60,
+    "v3": 70,
+    "v4": 80,
+    "v5": 90,
+    "v6": 100,
+    "orbs": 110,
+    "toss": 125,
+    "lock": 140,
+    "dive": 160,
+    "impact": 168,
+    "end": 200
+   },
+   "form": "p2"
+  },
+  "death": {
+   "id": 40,
+   "len": 110,
+   "loop": null,
+   "events": {
+    "stop": 0,
+    "lower": 10,
+    "fade": 30,
+    "stand": 50,
+    "flames": 70,
+    "gone": 96,
+    "wisps": 100,
+    "end": 110
+   },
+   "form": "p2"
+  }
+ },
+ "looks": {
+  "form": [
+   "p1",
+   "p2"
+  ],
+  "wings": [
+   "off",
+   "open"
+  ],
+  "weapon_r": [
+   "hand",
+   "gone",
+   "world"
+  ],
+  "weapon_l": [
+   "hand",
+   "gone",
+   "world"
+  ],
+  "glow": [
+   "normal",
+   "crimson"
+  ],
+  "props": [
+   "none",
+   "tea"
+  ]
+ },
+ "arm_layout": {
+  "p1": "slim",
+  "p2": "classic"
+ },
+ "anchors": [
+  "hand_r",
+  "hand_l",
+  "blade_r",
+  "blade_l",
+  "palm_r",
+  "chest",
+  "spine"
+ ],
+ "calls": [
+  "init",
+  "spawn",
+  "spawn_hidden",
+  "tick",
+  "kill",
+  "uninstall",
+  "flash",
+  "state/normal",
+  "state/hidden",
+  "face/player",
+  "face/track",
+  "look/form/p1",
+  "look/form/p2",
+  "look/wings/off",
+  "look/wings/open",
+  "look/weapon_r/hand",
+  "look/weapon_r/gone",
+  "look/weapon_r/world",
+  "look/weapon_l/hand",
+  "look/weapon_l/gone",
+  "look/weapon_l/world",
+  "look/glow/normal",
+  "look/glow/crimson",
+  "look/props/none",
+  "look/props/tea",
+  "anchor/hand_r",
+  "anchor/hand_l",
+  "anchor/blade_r",
+  "anchor/blade_l",
+  "anchor/palm_r",
+  "anchor/chest",
+  "anchor/spine"
+ ],
+ "macro_calls": {
+  "face/set": [
+   "yaw"
+  ]
+ }
+}

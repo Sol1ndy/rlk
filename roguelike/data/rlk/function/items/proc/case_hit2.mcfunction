@@ -1,5 +1,6 @@
 execute unless score #k141 snd matches 1 run function rlk:snd/f149
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:80}
+execute store result storage rlk:tune m_lumidouce_case.coef int 1 run scoreboard players get #caseFireCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_lumidouce_case
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 7

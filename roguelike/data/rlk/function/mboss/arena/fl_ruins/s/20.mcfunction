@@ -1,0 +1,34 @@
+# GENERATED build slice 21/21 of fl_ruins (in minecraft:overworld, the box loaded).
+fill 712 250 -40 808 250 56 minecraft:air strict
+setblock 750 250 -6 minecraft:light[level=15] strict
+setblock 756 250 -6 minecraft:light[level=15] strict
+setblock 762 250 -6 minecraft:light[level=15] strict
+setblock 768 250 -6 minecraft:light[level=15] strict
+setblock 744 250 0 minecraft:light[level=15] strict
+setblock 750 250 0 minecraft:light[level=15] strict
+setblock 756 250 0 minecraft:light[level=15] strict
+setblock 762 250 0 minecraft:light[level=15] strict
+setblock 768 250 0 minecraft:light[level=15] strict
+setblock 774 250 0 minecraft:light[level=15] strict
+setblock 744 250 6 minecraft:light[level=15] strict
+setblock 750 250 6 minecraft:light[level=15] strict
+setblock 756 250 6 minecraft:light[level=15] strict
+setblock 762 250 6 minecraft:light[level=15] strict
+setblock 768 250 6 minecraft:light[level=15] strict
+setblock 774 250 6 minecraft:light[level=15] strict
+setblock 744 250 12 minecraft:light[level=15] strict
+setblock 750 250 12 minecraft:light[level=15] strict
+setblock 756 250 12 minecraft:light[level=15] strict
+setblock 762 250 12 minecraft:light[level=15] strict
+setblock 768 250 12 minecraft:light[level=15] strict
+setblock 774 250 12 minecraft:light[level=15] strict
+setblock 744 250 18 minecraft:light[level=15] strict
+setblock 750 250 18 minecraft:light[level=15] strict
+setblock 756 250 18 minecraft:light[level=15] strict
+setblock 762 250 18 minecraft:light[level=15] strict
+setblock 768 250 18 minecraft:light[level=15] strict
+setblock 774 250 18 minecraft:light[level=15] strict
+setblock 756 250 24 minecraft:light[level=15] strict
+setblock 762 250 24 minecraft:light[level=15] strict
+setblock 768 250 24 minecraft:light[level=15] strict
+function rlk:mboss/arena/fl_ruins/done with storage rlk:mboss arjob

@@ -1,0 +1,8 @@
+# D4 pattern tick 18
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4b1] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2104f,1.0488f,0.4951f],left_rotation:[-0.0664f,-0.2784f,0.9445f,0.1615f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+kill @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_10]
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_12] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_14] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_16] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_d4_17,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.2538f,1.0349f,0.5319f],left_rotation:[-0.1619f,0.1776f,-0.9592f,0.1491f],scale:[0.4297f,0.22f,1.5334f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_tr","rlk_mb_part","rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_p_d4","rlk_hr_trr","rlk_hr_trf","rlk_hr_tr_d4_18","rlk_hr_tr_i0"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:1,transformation:{translation:[0.2254f,1.0822f,0.4379f],left_rotation:[-0.0795f,0.1947f,-0.9539f,0.2141f],scale:[0f,0.22f,1.6739f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/hr_kit/sw_fan_0","minecraft:custom_model_data":{colors:[16771496]}}}}

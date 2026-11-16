@@ -6,13 +6,9 @@ execute if score @s energy > #burstCost100 tmp run scoreboard players operation 
 scoreboard players operation @s energyPt = @s energy
 scoreboard players operation @s energyPt /= #100 tmp
 execute unless items entity @s inventory.0 minecraft:player_head[minecraft:custom_data~{rlk_char:1b}] run function rlk:char/place_info
-execute if data storage rlk:chars cur.info.extra.lore[0] unless items entity @s inventory.2 minecraft:paper[minecraft:custom_data~{rlk_ext:1b}] run function rlk:char/place_info
+execute if data storage rlk:chars cur.info.extra.lore[0] unless items entity @s inventory.1 minecraft:paper[minecraft:custom_data~{rlk_pas:1b}] run function rlk:char/place_info
 execute if data storage rlk:chars cur.info.passive[0] unless items entity @s inventory.1 minecraft:paper[minecraft:custom_data~{rlk_pas:1b}] run function rlk:char/place_info
 execute if score #charN tmp matches 1 at @e[tag=rlk_body,limit=1] run function rlk:char/lumine/tick
-execute if score #charN tmp matches 2 at @e[tag=rlk_body,limit=1] run function rlk:char/yoimiya/tick
-# 활: 조준(차지) 상태 · 예약된 화살
-execute if score #wType tmp matches 2 at @e[tag=rlk_body,limit=1] run function rlk:char/bow/tick
-execute unless score #wType tmp matches 2 run scoreboard players set #bowChg tmp 0
 execute if score #charN tmp matches 3 at @e[tag=rlk_body,limit=1] run function rlk:char/skirk/tick
 execute unless score #charN tmp matches 3 run scoreboard players set #skMode tmp 0
 # 원소폭발 시전 동작

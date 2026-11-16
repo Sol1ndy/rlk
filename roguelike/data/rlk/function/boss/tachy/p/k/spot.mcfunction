@@ -1,0 +1,50 @@
+# K reappear spot (@s = body): 4.5 b from the player, the front arc first (a random side first), then the
+# sides, behind last; then 3.5 / 5.5 b; each must pass mv/ok; else the front spot walked inside (u/fit); else
+# her own spot. She faces the player.
+execute store result score #k_r tk run random value 0..1
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~0 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~30 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-30 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-30 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~30 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~60 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-60 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-60 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~60 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~120 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-120 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-120 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~120 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~180 0 positioned ^ ^ ^4.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~0 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~45 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-45 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-45 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~45 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~135 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-135 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-135 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~135 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~180 0 positioned ^ ^ ^3.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~0 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~45 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-45 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-45 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~45 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 0 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~-90 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute if score #k_r tk matches 1 at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~90 0 positioned ^ ^ ^5.5 if function rlk:mboss/mv/ok run return run function rlk:boss/tachy/p/k/put
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @e[tag=rlk_body,limit=1] rotated ~ 0 positioned ^ ^ ^4.5 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_tk_p","rlk_tk_p_k","rlk_tk_air","rlk_tk_kspot"]}
+scoreboard players set #k_n tk 0
+execute as @e[type=minecraft:marker,tag=rlk_tk_kspot,limit=1] if function rlk:boss/tachy/p/k/u/fit at @s run function rlk:boss/tachy/p/k/put_m
+kill @e[type=minecraft:marker,tag=rlk_tk_kspot]
+execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0

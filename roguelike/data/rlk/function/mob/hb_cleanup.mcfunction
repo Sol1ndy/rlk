@@ -15,3 +15,5 @@ kill @e[tag=rlk_frz_ice,tag=!rlk_frz_ok]
 tag @e[tag=rlk_frz_ice] remove rlk_frz_ok
 kill @e[tag=rlk_hb_er,tag=!rlk_hb_ok]
 tag @e[tag=rlk_hb_er] remove rlk_hb_ok
+kill @e[tag=rlk_hb_bal,tag=!rlk_hb_ok]
+tag @e[tag=rlk_hb_bal] remove rlk_hb_ok

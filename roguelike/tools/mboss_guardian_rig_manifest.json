@@ -1,0 +1,883 @@
+{
+  "parts": [
+    {
+      "part": "pelvis",
+      "uuid": "524c4b4d-4247-4400-8000-000000000001",
+      "model": "pelvis",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "skirt_f",
+      "uuid": "524c4b4d-4247-4400-8000-000000000002",
+      "model": "skirt_f",
+      "brightness": 13,
+      "scale": 1.35
+    },
+    {
+      "part": "skirt_o",
+      "uuid": "524c4b4d-4247-4400-8000-000000000003",
+      "model": "skirt_o",
+      "brightness": 13,
+      "scale": 1.35
+    },
+    {
+      "part": "tail",
+      "uuid": "524c4b4d-4247-4400-8000-000000000004",
+      "model": "tail",
+      "brightness": 13,
+      "scale": 1.5
+    },
+    {
+      "part": "leg_r",
+      "uuid": "524c4b4d-4247-4400-8000-000000000005",
+      "model": "leg_r",
+      "brightness": 13,
+      "scale": 1.2
+    },
+    {
+      "part": "leg_l",
+      "uuid": "524c4b4d-4247-4400-8000-000000000006",
+      "model": "leg_l",
+      "brightness": 13,
+      "scale": 1.2
+    },
+    {
+      "part": "torso",
+      "uuid": "524c4b4d-4247-4400-8000-000000000007",
+      "model": "torso",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "head",
+      "uuid": "524c4b4d-4247-4400-8000-000000000008",
+      "model": "head",
+      "brightness": 15,
+      "scale": 1.2
+    },
+    {
+      "part": "halo",
+      "uuid": "524c4b4d-4247-4400-8000-000000000009",
+      "model": "halo",
+      "brightness": 15,
+      "scale": 1
+    },
+    {
+      "part": "halo_glow",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000a",
+      "model": "halo_glow",
+      "brightness": 15,
+      "scale": 1
+    },
+    {
+      "part": "r_upper",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000b",
+      "model": "r_upper",
+      "brightness": 12,
+      "scale": 1
+    },
+    {
+      "part": "r_fore",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000c",
+      "model": "r_fore",
+      "brightness": 12,
+      "scale": 1
+    },
+    {
+      "part": "r_hand",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000d",
+      "model": "r_hand_fist",
+      "brightness": 12,
+      "scale": 1
+    },
+    {
+      "part": "l_upper",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000e",
+      "model": "l_upper",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "l_fore",
+      "uuid": "524c4b4d-4247-4400-8000-00000000000f",
+      "model": "l_fore",
+      "brightness": 15,
+      "scale": 1
+    },
+    {
+      "part": "l_hand",
+      "uuid": "524c4b4d-4247-4400-8000-000000000010",
+      "model": "l_hand_open",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "bracket",
+      "uuid": "524c4b4d-4247-4400-8000-000000000011",
+      "model": "bracket",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "shield",
+      "uuid": "524c4b4d-4247-4400-8000-000000000012",
+      "model": "shield",
+      "brightness": 14,
+      "scale": 1
+    },
+    {
+      "part": "shield_eye",
+      "uuid": "524c4b4d-4247-4400-8000-000000000013",
+      "model": "shield_eye",
+      "brightness": 15,
+      "scale": 1
+    },
+    {
+      "part": "wing_cov",
+      "uuid": "524c4b4d-4247-4400-8000-000000000014",
+      "model": "wing_cov",
+      "brightness": 13,
+      "scale": 2
+    },
+    {
+      "part": "wing_sec",
+      "uuid": "524c4b4d-4247-4400-8000-000000000015",
+      "model": "wing_sec",
+      "brightness": 13,
+      "scale": 2
+    },
+    {
+      "part": "wing_pri",
+      "uuid": "524c4b4d-4247-4400-8000-000000000016",
+      "model": "wing_pri",
+      "brightness": 13,
+      "scale": 2.2
+    },
+    {
+      "part": "spear",
+      "uuid": "524c4b4d-4247-4400-8000-000000000017",
+      "model": "spear",
+      "brightness": 15,
+      "scale": 2.2
+    },
+    {
+      "part": "spear_glow",
+      "uuid": "524c4b4d-4247-4400-8000-000000000018",
+      "model": "spear_glow_geo",
+      "brightness": 15,
+      "scale": 2.2
+    },
+    {
+      "part": "trail_1",
+      "uuid": "524c4b4d-4247-4400-8000-000000000019",
+      "model": "trail",
+      "brightness": 15,
+      "scale": 2.2
+    },
+    {
+      "part": "trail_2",
+      "uuid": "524c4b4d-4247-4400-8000-00000000001a",
+      "model": "trail",
+      "brightness": 15,
+      "scale": 2.2
+    },
+    {
+      "part": "cubes_a",
+      "uuid": "524c4b4d-4247-4400-8000-00000000001b",
+      "model": "cubes_a",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "cubes_b",
+      "uuid": "524c4b4d-4247-4400-8000-00000000001c",
+      "model": "cubes_b",
+      "brightness": 13,
+      "scale": 1
+    },
+    {
+      "part": "cubes_c",
+      "uuid": "524c4b4d-4247-4400-8000-00000000001d",
+      "model": "cubes_c",
+      "brightness": 13,
+      "scale": 1
+    }
+  ],
+  "clips": [
+    {
+      "id": 0,
+      "name": "idle",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 24,
+      "keys": 121,
+      "note": "hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; legs swing out of step; cubes drift"
+    },
+    {
+      "id": 1,
+      "name": "glide",
+      "len": 24,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 17,
+      "keys": 72,
+      "note": "moving pose (approach, guard drift, reposition): leaning into the travel, spear level toward the target, wing swept back"
+    },
+    {
+      "id": 2,
+      "name": "thrust",
+      "len": 79,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "glow": 3,
+        "glint": 14,
+        "hit1": 21,
+        "rise": 31,
+        "dive": 42,
+        "hit2": 46,
+        "land": 53,
+        "flourish": 60
+      },
+      "keyFiles": 77,
+      "keys": 1271,
+      "note": "body travel by the pattern code: lunge 2-3 b forward at 27-28; fly back 4-6 b at 38-54; dash 5-6 b at 57-58",
+      "authoredLen": 91,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          26,
+          19
+        ],
+        [
+          28,
+          21
+        ],
+        [
+          38,
+          31
+        ],
+        [
+          54,
+          42
+        ],
+        [
+          58,
+          46
+        ],
+        [
+          91,
+          79
+        ]
+      ]
+    },
+    {
+      "id": 3,
+      "name": "javelin",
+      "len": 67,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "spin": 0,
+        "vanish": 9,
+        "glyph": 10,
+        "beam": 20,
+        "rematerialise": 22,
+        "release": 26,
+        "launch": 27,
+        "return": 49,
+        "catch": 54
+      },
+      "keyFiles": 64,
+      "keys": 557,
+      "note": "the rig spear is hidden from 10 to 31 and from 36 to 63; the flying spear is a prop (rig/prop/spear) moved by the pattern code",
+      "authoredLen": 76,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          31,
+          22
+        ],
+        [
+          36,
+          27
+        ],
+        [
+          76,
+          67
+        ]
+      ]
+    },
+    {
+      "id": 4,
+      "name": "slam",
+      "len": 64,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "raise": 0,
+        "ring": 7,
+        "glint": 9,
+        "down": 16,
+        "impact": 20,
+        "pull": 42,
+        "twirl": 48
+      },
+      "keyFiles": 57,
+      "keys": 692,
+      "note": "disc r 5 centred 3.5 b in front; the spear stays planted (rig part) 26-48, so the body must not move then",
+      "authoredLen": 70,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          26,
+          20
+        ],
+        [
+          70,
+          64
+        ]
+      ]
+    },
+    {
+      "id": 5,
+      "name": "pull",
+      "len": 32,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "aura": 0,
+        "cage": 7,
+        "relocate": 24
+      },
+      "keyFiles": 29,
+      "keys": 232,
+      "note": "the corrupted claw casts (the left hand takes the shaft); the player is relocated at 32; follow with swing after 10-14 t (K15)",
+      "authoredLen": 40,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          22,
+          14
+        ],
+        [
+          32,
+          24
+        ],
+        [
+          40,
+          32
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "name": "swing",
+      "len": 46,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "windup": 0,
+        "swing1": 15,
+        "swing1_end": 19,
+        "swing2": 28,
+        "swing2_end": 34
+      },
+      "keyFiles": 43,
+      "keys": 719,
+      "note": "two full 360 degree spins with the spear level at waist height: forehand (left to right) 20-24, backhand 33-39 rising low-right to high-left",
+      "authoredLen": 51,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          17,
+          12
+        ],
+        [
+          39,
+          34
+        ],
+        [
+          51,
+          46
+        ]
+      ]
+    },
+    {
+      "id": 7,
+      "name": "flyslam",
+      "len": 91,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "raise": 0,
+        "glint": 5,
+        "beam": 12,
+        "takeoff": 14,
+        "ring": 16,
+        "gone": 18,
+        "dive": 29,
+        "impact": 31,
+        "spikes": 37,
+        "pull": 61,
+        "twirl": 69
+      },
+      "keyFiles": 78,
+      "keys": 769,
+      "note": "rises to +8 b at 19-23 and stays up; move the body under the locked ring during 23-39; dives at 39-41; the spear stays planted 41-71",
+      "authoredLen": 101,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          23,
+          18
+        ],
+        [
+          36,
+          26
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          101,
+          91
+        ]
+      ]
+    },
+    {
+      "id": 8,
+      "name": "guard_entry",
+      "len": 50,
+      "loop": false,
+      "next": "guard",
+      "events": {
+        "twirl": 0,
+        "discs": 16,
+        "ring": 35,
+        "settle": 44,
+        "guard": 50
+      },
+      "keyFiles": 49,
+      "keys": 437,
+      "note": "baton twirl in front (0-16), vertical spin discs to her right and front (16-35), ground ring (35-44), settle into the guard pose"
+    },
+    {
+      "id": 9,
+      "name": "guard",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 23,
+      "keys": 76,
+      "note": "guard mode hold (100 t in the pattern): spear diagonal up-right, wing raised and opened, slight bob"
+    },
+    {
+      "id": 10,
+      "name": "sweep",
+      "len": 39,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "windup": 0,
+        "active": 14,
+        "active_end": 19
+      },
+      "keyFiles": 36,
+      "keys": 372,
+      "note": "gold sweep: 19 t wind-up (spear cocked behind her right shoulder, tip toward her left), 180-210 degree front arc from her left to her right, active 19-24",
+      "authoredLen": 44,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          44,
+          39
+        ]
+      ]
+    },
+    {
+      "id": 11,
+      "name": "sweep_e",
+      "len": 45,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "enchant": 0,
+        "windup": 5,
+        "active": 14,
+        "active_end": 22
+      },
+      "keyFiles": 44,
+      "keys": 409,
+      "note": "enchanted sweep (call rig/spear/<element> first): enchant line 0-6, wind-up raised high to her left 7-19, active 19-27",
+      "authoredLen": 50,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          50,
+          45
+        ]
+      ]
+    },
+    {
+      "id": 12,
+      "name": "chaos_leap",
+      "len": 32,
+      "loop": false,
+      "next": "chaos_charge",
+      "events": {
+        "leap": 0,
+        "land": 32
+      },
+      "keyFiles": 27,
+      "keys": 683,
+      "note": "leap 0-9, arcing flight 9-31 (move the body to the arena centre meanwhile), landing 32"
+    },
+    {
+      "id": 13,
+      "name": "chaos_charge",
+      "len": 36,
+      "loop": false,
+      "next": "chaos_hover",
+      "events": {
+        "charge": 0,
+        "flare": 7,
+        "rise": 30,
+        "hover": 36
+      },
+      "keyFiles": 26,
+      "keys": 239,
+      "note": "charge on the centre with the spear level (30 t), then the rise to the chaos hover (feet 3 b up)"
+    },
+    {
+      "id": 14,
+      "name": "chaos_hover",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 24,
+      "keys": 79,
+      "note": "chaos hold (350 t timer): arms up, spear horizontal behind the shoulders, wing spread, slow bob"
+    },
+    {
+      "id": 15,
+      "name": "chaos_fail",
+      "len": 30,
+      "loop": false,
+      "next": null,
+      "events": {
+        "twist": 8,
+        "rise": 16,
+        "high": 19
+      },
+      "keyFiles": 24,
+      "keys": 287,
+      "note": "timeout (tick 0 = timer full): twist with the wing swept across the front (10-14), rise 0.5-0.7 BH (21-25) and hold; play chaos_land at tick 33 (lands at +55, between fail spear 1 at +49 and spear 2 at +80)",
+      "authoredLen": 40,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          30
+        ]
+      ]
+    },
+    {
+      "id": 16,
+      "name": "chaos_land",
+      "len": 26,
+      "loop": false,
+      "next": null,
+      "events": {
+        "land": 22
+      },
+      "keyFiles": 23,
+      "keys": 401,
+      "note": "fail: descends from the chaos height to stand on the floor at the centre, the spear still held across the shoulders (patterns.md §9.4); holds the stance. Then chaos_raise for a second fail spear, or idle / glide when the spears are done"
+    },
+    {
+      "id": 17,
+      "name": "chaos_fall",
+      "len": 20,
+      "loop": false,
+      "next": "groggy_a",
+      "events": {
+        "hang": 0,
+        "fall": 6,
+        "land": 18
+      },
+      "keyFiles": 18,
+      "keys": 423,
+      "note": "second star broken: hangs 6 t, falls about 1 BH and lands on the floor (no impact), then groggy"
+    },
+    {
+      "id": 18,
+      "name": "groggy_a",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 26,
+      "keys": 63,
+      "note": "pose A: slumped, the spear planted head-down at her right, wing drooped, halo blazing"
+    },
+    {
+      "id": 19,
+      "name": "groggy_b",
+      "len": 34,
+      "loop": false,
+      "next": "getup",
+      "events": {
+        "fold": 0,
+        "getup": 34
+      },
+      "keyFiles": 22,
+      "keys": 105,
+      "note": "pose B: head bowed, torso folded forward, the shield swung in front of her body"
+    },
+    {
+      "id": 20,
+      "name": "getup",
+      "len": 40,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "spread": 0,
+        "lift": 6,
+        "stance": 12
+      },
+      "keyFiles": 37,
+      "keys": 321,
+      "note": "get-up: the wing sweeps out to its widest, she lifts into the hover and takes the spear forward"
+    },
+    {
+      "id": 21,
+      "name": "entrance",
+      "len": 60,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "fall": 0,
+        "impact": 14,
+        "appear": 14,
+        "grab": 26,
+        "pull": 34
+      },
+      "keyFiles": 57,
+      "keys": 498,
+      "note": "the spear plunges from 7 b above to the floor at 14 (damage), she fades in beside it (14-24), grabs it at 26 and pulls it out (26-34)"
+    },
+    {
+      "id": 22,
+      "name": "death",
+      "len": 80,
+      "loop": false,
+      "next": null,
+      "events": {
+        "slump": 0,
+        "takeoff": 22,
+        "gone": 76
+      },
+      "keyFiles": 67,
+      "keys": 758,
+      "note": "death line, slump (0-20), then the fly-away: rises out of the arena and fades (22-76); call rig/kill after 80"
+    },
+    {
+      "id": 23,
+      "name": "pose_ref",
+      "len": 20,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 17,
+      "keys": 50,
+      "note": "the official render pose (hand at mid-shaft, spear crossing the body); for screenshots and the entrance end pose"
+    },
+    {
+      "id": 24,
+      "name": "chaos_raise",
+      "len": 24,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "raise": 0,
+        "overhead": 6
+      },
+      "keyFiles": 21,
+      "keys": 263,
+      "note": "fail spear 2: from the across-the-shoulders stance she raises the spear vertically overhead in the last 0.3 s before the drop (start 6 t before it), holds, then idle"
+    },
+    {
+      "id": 25,
+      "name": "backstep",
+      "len": 12,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "push": 2,
+        "peak": 6,
+        "land": 10
+      },
+      "keyFiles": 9,
+      "keys": 245,
+      "note": "P4 from melee range: a readable hop back to 6-7 b (move the anchor away over 11 t); the spear stays in its idle hold"
+    }
+  ],
+  "elements": {
+    "geo": {
+      "id": 0,
+      "eye": "painted",
+      "glow": "#f4d07c"
+    },
+    "pyro": {
+      "id": 1,
+      "eye": "#ff8a4c",
+      "glow": "#ff7a3c"
+    },
+    "hydro": {
+      "id": 2,
+      "eye": "#5cc8ff",
+      "glow": "#4cb8ff"
+    },
+    "electro": {
+      "id": 3,
+      "eye": "#e484fc",
+      "glow": "#d46cfc"
+    },
+    "cryo": {
+      "id": 4,
+      "eye": "#a2fefd",
+      "glow": "#8cf0ff"
+    },
+    "gold": {
+      "id": 5,
+      "eye": "#fce484",
+      "glow": "#fcd84c"
+    },
+    "red": {
+      "id": 6,
+      "eye": "#e03a3a",
+      "glow": "#e0303c"
+    }
+  },
+  "objectives": {
+    "gdRigC": "current clip id (anchor)",
+    "gdRigT": "tick within the clip (anchor; -1 = queued by play)",
+    "gdRigF": "hit flash countdown",
+    "gdRigEye": "eye look id",
+    "gdRigSp": "spear look id",
+    "gdRigY": "face/track scratch",
+    "gdRigGl": "glow look id (0 none, 1 gold)"
+  },
+  "textures": 69,
+  "screen": {
+    "font": "rlk:mboss_gd",
+    "frames": {
+      "vig0": "[{\"text\":\"\\ue500\\ue5f0\\ue501\\ue5f1\\ue502\\ue5f0\\ue503\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig1": "[{\"text\":\"\\ue504\\ue5f0\\ue505\\ue5f1\\ue506\\ue5f0\\ue507\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig2": "[{\"text\":\"\\ue508\\ue5f0\\ue509\\ue5f1\\ue50a\\ue5f0\\ue50b\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig3": "[{\"text\":\"\\ue50c\\ue5f0\\ue50d\\ue5f1\\ue50e\\ue5f0\\ue50f\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig4": "[{\"text\":\"\\ue510\\ue5f0\\ue511\\ue5f1\\ue512\\ue5f0\\ue513\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig5": "[{\"text\":\"\\ue514\\ue5f0\\ue515\\ue5f1\\ue516\\ue5f0\\ue517\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "field": "[{\"text\":\"\\ue518\\ue5f0\\ue519\\ue5f1\\ue51a\\ue5f0\\ue51b\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "diamond": "[{\"text\":\"\\ue51c\\ue5f0\\ue51d\\ue5f1\\ue51e\\ue5f0\\ue51f\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "flash": "[{\"text\":\"\\ue520\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]"
+    },
+    "vig": 6,
+    "codepoints": [
+      "\\ue500",
+      "\\ue520"
+    ],
+    "spaces": [
+      "\\ue5f0",
+      "\\ue5f1"
+    ],
+    "tile_px": [
+      256,
+      144
+    ],
+    "tile_units": [
+      128,
+      72
+    ],
+    "ref_units": 32
+  }
+}

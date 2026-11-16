@@ -1,0 +1,1246 @@
+{
+ "schema": 1,
+ "id": "scarlet",
+ "source": "stub",
+ "_doc": "D0 stub of tools/scarlet_rig_manifest.json (S2a writes the real one with the same parts, clips, events, looks, anchors and calls; the real one adds transforms, models, budgets, sprites). Generated from tools/mboss_scarlet/api.py --write-stub: do not edit.",
+ "height": 2.0,
+ "hat_top": 2.3,
+ "brim_d": 1.32,
+ "uuid": "524c4b4d-4852-4400-8000-0000000000{:02x}",
+ "parts": [
+  {
+   "name": "pelvis",
+   "nn": 0,
+   "parent": null,
+   "uuid": "524c4b4d-4852-4400-8000-000000000000",
+   "tag": "rlk_hr_pelvis"
+  },
+  {
+   "name": "torso",
+   "nn": 1,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000001",
+   "tag": "rlk_hr_torso"
+  },
+  {
+   "name": "head",
+   "nn": 2,
+   "parent": "torso",
+   "uuid": "524c4b4d-4852-4400-8000-000000000002",
+   "tag": "rlk_hr_head"
+  },
+  {
+   "name": "face",
+   "nn": 3,
+   "parent": "head",
+   "uuid": "524c4b4d-4852-4400-8000-000000000003",
+   "tag": "rlk_hr_face"
+  },
+  {
+   "name": "hair_tail_1",
+   "nn": 4,
+   "parent": "head",
+   "uuid": "524c4b4d-4852-4400-8000-000000000004",
+   "tag": "rlk_hr_hair_tail_1"
+  },
+  {
+   "name": "hair_tail_2",
+   "nn": 5,
+   "parent": "hair_tail_1",
+   "uuid": "524c4b4d-4852-4400-8000-000000000005",
+   "tag": "rlk_hr_hair_tail_2"
+  },
+  {
+   "name": "lock_r",
+   "nn": 6,
+   "parent": "head",
+   "uuid": "524c4b4d-4852-4400-8000-000000000006",
+   "tag": "rlk_hr_lock_r"
+  },
+  {
+   "name": "lock_l",
+   "nn": 7,
+   "parent": "head",
+   "uuid": "524c4b4d-4852-4400-8000-000000000007",
+   "tag": "rlk_hr_lock_l"
+  },
+  {
+   "name": "arm_r",
+   "nn": 8,
+   "parent": "torso",
+   "uuid": "524c4b4d-4852-4400-8000-000000000008",
+   "tag": "rlk_hr_arm_r"
+  },
+  {
+   "name": "forearm_r",
+   "nn": 9,
+   "parent": "arm_r",
+   "uuid": "524c4b4d-4852-4400-8000-000000000009",
+   "tag": "rlk_hr_forearm_r"
+  },
+  {
+   "name": "arm_l",
+   "nn": 10,
+   "parent": "torso",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000a",
+   "tag": "rlk_hr_arm_l"
+  },
+  {
+   "name": "forearm_l",
+   "nn": 11,
+   "parent": "arm_l",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000b",
+   "tag": "rlk_hr_forearm_l"
+  },
+  {
+   "name": "thigh_r",
+   "nn": 12,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000c",
+   "tag": "rlk_hr_thigh_r"
+  },
+  {
+   "name": "shin_r",
+   "nn": 13,
+   "parent": "thigh_r",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000d",
+   "tag": "rlk_hr_shin_r"
+  },
+  {
+   "name": "thigh_l",
+   "nn": 14,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000e",
+   "tag": "rlk_hr_thigh_l"
+  },
+  {
+   "name": "shin_l",
+   "nn": 15,
+   "parent": "thigh_l",
+   "uuid": "524c4b4d-4852-4400-8000-00000000000f",
+   "tag": "rlk_hr_shin_l"
+  },
+  {
+   "name": "skirt_fl",
+   "nn": 16,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000010",
+   "tag": "rlk_hr_skirt_fl"
+  },
+  {
+   "name": "skirt_fr",
+   "nn": 17,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000011",
+   "tag": "rlk_hr_skirt_fr"
+  },
+  {
+   "name": "skirt_bl",
+   "nn": 18,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000012",
+   "tag": "rlk_hr_skirt_bl"
+  },
+  {
+   "name": "skirt_br",
+   "nn": 19,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000013",
+   "tag": "rlk_hr_skirt_br"
+  },
+  {
+   "name": "sash_tails",
+   "nn": 20,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000014",
+   "tag": "rlk_hr_sash_tails"
+  },
+  {
+   "name": "hat",
+   "nn": 21,
+   "parent": "head",
+   "uuid": "524c4b4d-4852-4400-8000-000000000015",
+   "tag": "rlk_hr_hat"
+  },
+  {
+   "name": "hat_strings",
+   "nn": 22,
+   "parent": "hat",
+   "uuid": "524c4b4d-4852-4400-8000-000000000016",
+   "tag": "rlk_hr_hat_strings"
+  },
+  {
+   "name": "sword",
+   "nn": 23,
+   "parent": "forearm_l",
+   "uuid": "524c4b4d-4852-4400-8000-000000000017",
+   "tag": "rlk_hr_sword"
+  },
+  {
+   "name": "sword_glow",
+   "nn": 24,
+   "parent": "sword",
+   "uuid": "524c4b4d-4852-4400-8000-000000000018",
+   "tag": "rlk_hr_sword_glow"
+  },
+  {
+   "name": "scabbard",
+   "nn": 25,
+   "parent": "pelvis",
+   "uuid": "524c4b4d-4852-4400-8000-000000000019",
+   "tag": "rlk_hr_scabbard"
+  },
+  {
+   "name": "hilt_sheathed",
+   "nn": 26,
+   "parent": "scabbard",
+   "uuid": "524c4b4d-4852-4400-8000-00000000001a",
+   "tag": "rlk_hr_hilt_sheathed"
+  },
+  {
+   "name": "cup",
+   "nn": 27,
+   "parent": "forearm_r",
+   "uuid": "524c4b4d-4852-4400-8000-00000000001b",
+   "tag": "rlk_hr_cup"
+  },
+  {
+   "name": "bottle",
+   "nn": 28,
+   "parent": "forearm_l",
+   "uuid": "524c4b4d-4852-4400-8000-00000000001c",
+   "tag": "rlk_hr_bottle"
+  }
+ ],
+ "reparent": [
+  {
+   "part": "hat",
+   "look": "worn",
+   "parent": "head"
+  },
+  {
+   "part": "hat",
+   "look": "back",
+   "parent": "torso"
+  },
+  {
+   "part": "hat",
+   "look": "hand",
+   "parent": "forearm_r"
+  },
+  {
+   "part": "hat",
+   "look": "world",
+   "parent": null
+  },
+  {
+   "part": "scabbard",
+   "look": "hand",
+   "parent": "forearm_r"
+  },
+  {
+   "part": "scabbard",
+   "look": "hip",
+   "parent": "pelvis"
+  },
+  {
+   "part": "cup",
+   "look": "hand",
+   "parent": "forearm_r"
+  },
+  {
+   "part": "cup",
+   "look": "rock",
+   "parent": null
+  },
+  {
+   "part": "bottle",
+   "look": "hand",
+   "parent": "forearm_l"
+  },
+  {
+   "part": "bottle",
+   "look": "rock",
+   "parent": null
+  }
+ ],
+ "shadow": {
+  "nn": 64,
+  "uuid": "524c4b4d-4852-4400-8000-000000000040",
+  "radius": 0.6,
+  "tags": [
+   "rlk_room",
+   "rlk_mb_aux",
+   "rlk_hr_part",
+   "rlk_hr_shadow"
+  ]
+ },
+ "clips": {
+  "idle": {
+   "id": 0,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "owner": "S2a"
+  },
+  "idle2": {
+   "id": 1,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "owner": "S2a"
+  },
+  "walk": {
+   "id": 2,
+   "len": 24,
+   "loop": [
+    0,
+    24
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 12
+   },
+   "owner": "S2a"
+  },
+  "glide": {
+   "id": 3,
+   "len": 16,
+   "loop": [
+    0,
+    16
+   ],
+   "events": {},
+   "owner": "S2a"
+  },
+  "strafe_l": {
+   "id": 4,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 10
+   },
+   "owner": "S2a"
+  },
+  "strafe_r": {
+   "id": 5,
+   "len": 20,
+   "loop": [
+    0,
+    20
+   ],
+   "events": {
+    "step1": 0,
+    "step2": 10
+   },
+   "owner": "S2a"
+  },
+  "backstep": {
+   "id": 6,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "land": 10
+   },
+   "owner": "S2a"
+  },
+  "flinch": {
+   "id": 7,
+   "len": 6,
+   "loop": null,
+   "events": {},
+   "owner": "S2a"
+  },
+  "a1": {
+   "id": 8,
+   "len": 34,
+   "loop": null,
+   "events": {
+    "pivot": 0,
+    "glint": 6,
+    "lock": 7,
+    "fan": 10,
+    "hit": 14
+   },
+   "owner": "S2a"
+  },
+  "a2": {
+   "id": 9,
+   "len": 30,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "draw": 4,
+    "lock": 5,
+    "glow": 6,
+    "hit": 12
+   },
+   "owner": "S2a"
+  },
+  "a3": {
+   "id": 10,
+   "len": 96,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "lock1": 7,
+    "h1": 14,
+    "lock2": 23,
+    "h2": 30,
+    "lock3": 38,
+    "h3": 45,
+    "lock4": 50,
+    "h4": 57,
+    "lock5": 62,
+    "h5": 69
+   },
+   "owner": "S2a"
+  },
+  "a4": {
+   "id": 11,
+   "len": 60,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "leap": 2,
+    "apex": 6,
+    "glint": 7,
+    "lock": 12,
+    "flip": 13,
+    "dive": 16,
+    "hit": 20,
+    "crouch2": 22,
+    "slash": 25,
+    "lock2": 27,
+    "ring": 28,
+    "hit2": 34,
+    "land": 38
+   },
+   "owner": "S2a"
+  },
+  "a6": {
+   "id": 12,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "bubble": 0,
+    "gone": 2,
+    "appear": 4,
+    "settle": 10
+   },
+   "owner": "S2a"
+  },
+  "a9": {
+   "id": 13,
+   "len": 64,
+   "loop": null,
+   "events": {
+    "turn": 0,
+    "spin": 3,
+    "ring": 4,
+    "yellow": 8,
+    "star": 17,
+    "lock": 22,
+    "flash": 24,
+    "go": 26,
+    "cut": 28
+   },
+   "owner": "S2a"
+  },
+  "a10": {
+   "id": 14,
+   "len": 56,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "spring": 2,
+    "apex": 8,
+    "yellow": 10,
+    "lock": 14,
+    "dive": 20,
+    "hit": 22
+   },
+   "owner": "S2a"
+  },
+  "grog_in": {
+   "id": 15,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "hit": 0,
+    "buckle": 3,
+    "hat_off": 6,
+    "land": 10
+   },
+   "owner": "H1"
+  },
+  "d4": {
+   "id": 16,
+   "len": 80,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "lock1": 7,
+    "h1": 14,
+    "lock2": 27,
+    "h2": 34,
+    "lock3": 37,
+    "h3": 44,
+    "lock4": 47,
+    "h4": 54
+   },
+   "owner": "H1"
+  },
+  "tri": {
+   "id": 17,
+   "len": 84,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "lock0": 7,
+    "go": 12,
+    "h0": 14,
+    "lock1": 31,
+    "h1": 38,
+    "lock2": 41,
+    "h2": 48,
+    "lock3": 53,
+    "h3": 60
+   },
+   "owner": "H1"
+  },
+  "rings": {
+   "id": 18,
+   "len": 78,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "lock1": 7,
+    "r1": 14,
+    "lock2": 17,
+    "r2": 24,
+    "lock3": 27,
+    "r3": 34,
+    "lock4": 37,
+    "r4": 44,
+    "lock5": 47,
+    "r5": 54
+   },
+   "owner": "H1"
+  },
+  "ult": {
+   "id": 19,
+   "len": 86,
+   "loop": null,
+   "events": {
+    "yellow": 0,
+    "star1": 12,
+    "cut1": 24,
+    "web": 26,
+    "star2": 34,
+    "cut2": 46,
+    "settle": 56
+   },
+   "owner": "H1"
+  },
+  "hcut": {
+   "id": 20,
+   "len": 52,
+   "loop": null,
+   "events": {
+    "yellow": 2,
+    "sparkle": 8,
+    "lock": 19,
+    "go": 24,
+    "cut": 26
+   },
+   "owner": "H1"
+  },
+  "blue": {
+   "id": 21,
+   "len": 46,
+   "loop": null,
+   "events": {
+    "yellow": 0,
+    "blue": 4,
+    "lock": 15,
+    "go": 20,
+    "hit": 22
+   },
+   "owner": "H1"
+  },
+  "kcut": {
+   "id": 22,
+   "len": 50,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "yellow": 3,
+    "sparkle": 9,
+    "glow": 12,
+    "lock": 15,
+    "go": 20,
+    "cut": 22
+   },
+   "owner": "H1"
+  },
+  "mx": {
+   "id": 23,
+   "len": 60,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "star": 4,
+    "lock": 9,
+    "go": 14,
+    "x": 16,
+    "lock2": 21,
+    "dome": 28
+   },
+   "owner": "H1"
+  },
+  "nb": {
+   "id": 24,
+   "len": 66,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "leap": 2,
+    "apex": 8,
+    "lock1": 13,
+    "b1": 20,
+    "lock2": 23,
+    "b2": 30,
+    "lock3": 33,
+    "b3": 40,
+    "land": 46
+   },
+   "owner": "H1"
+  },
+  "q_grab": {
+   "id": 25,
+   "len": 40,
+   "loop": null,
+   "events": {
+    "glint": 0,
+    "ghost": 4,
+    "star": 8,
+    "lock": 13,
+    "go": 16,
+    "grab": 20
+   },
+   "owner": "H1"
+  },
+  "q_air": {
+   "id": 26,
+   "len": 96,
+   "loop": null,
+   "events": {
+    "throw": 0,
+    "rise": 2,
+    "apex": 10,
+    "lock1": 15,
+    "beam": 22,
+    "lock2": 31,
+    "dive": 34,
+    "hit": 38,
+    "land": 40,
+    "leap": 46,
+    "apex2": 52,
+    "star": 62,
+    "lock3": 67,
+    "pillar": 74,
+    "drop": 78,
+    "land2": 84
+   },
+   "owner": "H1"
+  },
+  "a7_tell": {
+   "id": 27,
+   "len": 16,
+   "loop": null,
+   "events": {
+    "back": 0,
+    "yellow": 2,
+    "retreat": 4,
+    "settle": 14
+   },
+   "owner": "S2a"
+  },
+  "a7_throw": {
+   "id": 28,
+   "len": 16,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "up": 4,
+    "crescent": 6,
+    "spin": 7,
+    "release": 12
+   },
+   "owner": "S2a"
+  },
+  "g_brim": {
+   "id": 29,
+   "len": 14,
+   "loop": [
+    6,
+    14
+   ],
+   "events": {
+    "raise": 0,
+    "hold": 6
+   },
+   "owner": "S2a"
+  },
+  "g_tell": {
+   "id": 30,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "lilac": 0,
+    "burst": 3,
+    "gone": 4
+   },
+   "owner": "S2a"
+  },
+  "g_reform": {
+   "id": 31,
+   "len": 10,
+   "loop": null,
+   "events": {
+    "appear": 0,
+    "solid": 4
+   },
+   "owner": "S2a"
+  },
+  "g_dash": {
+   "id": 32,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "appear": 0,
+    "go": 6,
+    "arrive": 10
+   },
+   "owner": "S2a"
+  },
+  "g_glide": {
+   "id": 33,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "appear": 0,
+    "go": 2,
+    "stop": 9
+   },
+   "owner": "S2a"
+  },
+  "g_drop": {
+   "id": 34,
+   "len": 14,
+   "loop": null,
+   "events": {
+    "flash": 0,
+    "gone": 2,
+    "appear": 7,
+    "land": 12
+   },
+   "owner": "S2a"
+  },
+  "g_run": {
+   "id": 35,
+   "len": 14,
+   "loop": null,
+   "events": {
+    "appear": 0,
+    "run": 2,
+    "lunge": 10
+   },
+   "owner": "S2a"
+  },
+  "g_ring": {
+   "id": 36,
+   "len": 14,
+   "loop": null,
+   "events": {
+    "arc": 0,
+    "hit": 3,
+    "spin": 4
+   },
+   "owner": "S2a"
+  },
+  "g_rise": {
+   "id": 37,
+   "len": 14,
+   "loop": null,
+   "events": {
+    "spin": 0,
+    "arms": 6,
+    "hit": 9
+   },
+   "owner": "S2a"
+  },
+  "g_leap": {
+   "id": 38,
+   "len": 18,
+   "loop": null,
+   "events": {
+    "coil": 0,
+    "raise": 5,
+    "hit": 9,
+    "tumble": 10,
+    "gone": 16
+   },
+   "owner": "S2a"
+  },
+  "g_sweep": {
+   "id": 39,
+   "len": 14,
+   "loop": null,
+   "events": {
+    "arm": 0,
+    "hit": 3,
+    "spring": 4
+   },
+   "owner": "S2a"
+  },
+  "g_x": {
+   "id": 40,
+   "len": 16,
+   "loop": null,
+   "events": {
+    "drop": 0,
+    "raise": 2,
+    "hit": 6,
+    "gone": 14
+   },
+   "owner": "S2a"
+  },
+  "g_wrap": {
+   "id": 41,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "land": 0,
+    "hit": 3
+   },
+   "owner": "S2a"
+  },
+  "g_dome": {
+   "id": 42,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "swirl": 0,
+    "hit": 3
+   },
+   "owner": "S2a"
+  },
+  "g_vert": {
+   "id": 43,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "crouch": 0,
+    "glow": 1,
+    "hit": 5,
+    "rise": 6,
+    "gone": 18
+   },
+   "owner": "S2a"
+  },
+  "g_dive": {
+   "id": 44,
+   "len": 22,
+   "loop": null,
+   "events": {
+    "appear": 0,
+    "dive": 15,
+    "hit": 18
+   },
+   "owner": "S2a"
+  },
+  "g_deflect": {
+   "id": 45,
+   "len": 12,
+   "loop": null,
+   "events": {
+    "stop": 0,
+    "fall": 2,
+    "lock": 10
+   },
+   "owner": "S2a"
+  },
+  "repel": {
+   "id": 46,
+   "len": 140,
+   "loop": null,
+   "events": {
+    "lock": 0,
+    "heave": 22,
+    "wide": 26,
+    "grab": 36,
+    "strike": 49,
+    "cut1": 56,
+    "cut2": 62,
+    "hook": 70,
+    "throw": 78,
+    "hat_off": 84,
+    "over": 88,
+    "land": 101,
+    "lie": 104,
+    "kick": 129,
+    "roll": 133,
+    "hat_on": 139
+   },
+   "owner": "H2"
+  },
+  "down": {
+   "id": 47,
+   "len": 40,
+   "loop": [
+    0,
+    40
+   ],
+   "events": {},
+   "owner": "S2a"
+  },
+  "kipup": {
+   "id": 48,
+   "len": 20,
+   "loop": null,
+   "events": {
+    "legs": 0,
+    "up": 8,
+    "crouch": 10,
+    "raise": 14
+   },
+   "owner": "S2a"
+  },
+  "lead60": {
+   "id": 49,
+   "len": 56,
+   "loop": null,
+   "events": {
+    "rise": 0,
+    "stand": 20,
+    "brim": 40
+   },
+   "owner": "H2"
+  },
+  "lead5": {
+   "id": 50,
+   "len": 116,
+   "loop": null,
+   "events": {
+    "stagger": 0,
+    "back": 8,
+    "refill": 60,
+    "glow": 84,
+    "brim": 100
+   },
+   "owner": "H2"
+  },
+  "lead_re": {
+   "id": 51,
+   "len": 60,
+   "loop": null,
+   "events": {
+    "refill": 10,
+    "brim": 44
+   },
+   "owner": "H2"
+  },
+  "intro": {
+   "id": 52,
+   "len": 1290,
+   "loop": null,
+   "events": {
+    "l1": 258,
+    "take_bottle": 326,
+    "pour": 352,
+    "l2": 340,
+    "bottle_down": 414,
+    "l3": 462,
+    "raise": 470,
+    "l4": 540,
+    "drink": 600,
+    "l5": 690,
+    "cup_down": 700,
+    "grip": 756,
+    "glint": 764,
+    "stand": 792,
+    "l6": 838,
+    "turn": 840,
+    "l7": 906,
+    "smile": 912,
+    "l8": 980,
+    "off_rock": 1040,
+    "l9": 1044,
+    "walk": 1052,
+    "l10": 1140,
+    "stop": 1148,
+    "tip": 1160,
+    "crouch": 1230,
+    "leap": 1234,
+    "land": 1258
+   },
+   "owner": "H2"
+  },
+  "intro_end": {
+   "id": 53,
+   "len": 150,
+   "loop": null,
+   "events": {
+    "l11": 4,
+    "brim": 40,
+    "smile": 60,
+    "draw": 66,
+    "stance": 90,
+    "music": 130
+   },
+   "owner": "H2"
+  },
+  "cs1": {
+   "id": 54,
+   "len": 720,
+   "loop": null,
+   "events": {
+    "lunge": 6,
+    "lock": 10,
+    "push": 30,
+    "leap": 34,
+    "land": 50,
+    "l13": 110,
+    "sheathe": 200,
+    "bottle": 216,
+    "l14": 232,
+    "hat_off": 240,
+    "hat_on": 258,
+    "smile": 280,
+    "raise": 300,
+    "offer": 404,
+    "drink": 458,
+    "props_off": 500,
+    "wipe": 506,
+    "l15": 578,
+    "iai": 610,
+    "l16": 618,
+    "draw": 642,
+    "slash": 650,
+    "recolour": 660,
+    "music": 676
+   },
+   "owner": "H2"
+  },
+  "ending": {
+   "id": 55,
+   "len": 1372,
+   "loop": null,
+   "events": {
+    "up": 6,
+    "hat_on": 20,
+    "raise": 28,
+    "lunge": 50,
+    "graze": 52,
+    "lock": 56,
+    "burst": 70,
+    "shove": 80,
+    "back": 116,
+    "run": 150,
+    "clash": 190,
+    "rise": 204,
+    "a1": 228,
+    "a2": 262,
+    "a3": 286,
+    "a4": 298,
+    "off": 304,
+    "fly": 314,
+    "land": 334,
+    "scab_up": 388,
+    "swing": 398,
+    "l17": 420,
+    "music": 420,
+    "sheathe": 426,
+    "sheathed": 452,
+    "l18": 486,
+    "l19": 628,
+    "head_down": 640,
+    "turn": 650,
+    "l20": 716,
+    "look_back": 760,
+    "hand": 800,
+    "l21": 910,
+    "gaze": 990,
+    "pivot": 1072,
+    "l22": 1082,
+    "walk": 1094,
+    "stop": 1154,
+    "gesture": 1160,
+    "brim": 1216,
+    "l23": 1230,
+    "eyes": 1240,
+    "pull": 1290,
+    "open": 1360
+   },
+   "owner": "H2"
+  },
+  "ev_give": {
+   "id": 56,
+   "len": 34,
+   "loop": null,
+   "events": {
+    "lift": 0,
+    "present": 12,
+    "toss": 30
+   },
+   "owner": "S2a"
+  },
+  "ev_toast": {
+   "id": 57,
+   "len": 34,
+   "loop": null,
+   "events": {
+    "look": 0,
+    "palm": 14,
+    "offer": 30
+   },
+   "owner": "S2a"
+  },
+  "ev_leave": {
+   "id": 58,
+   "len": 10,
+   "loop": null,
+   "events": {
+    "turn": 0,
+    "gone": 6
+   },
+   "owner": "S2a"
+  }
+ },
+ "looks": {
+  "form": [
+   "normal",
+   "ghost"
+  ],
+  "phase": [
+   "p1",
+   "p2"
+  ],
+  "hat": [
+   "worn",
+   "back",
+   "hand",
+   "world",
+   "gone"
+  ],
+  "sword": [
+   "hand",
+   "sheathed",
+   "gone"
+  ],
+  "blade": [
+   "off",
+   "lilac",
+   "pink",
+   "violet",
+   "gold",
+   "edge"
+  ],
+  "scabbard": [
+   "hand",
+   "hip",
+   "gone"
+  ],
+  "face": [
+   "calm",
+   "smile",
+   "closed"
+  ],
+  "props": [
+   "none"
+  ]
+ },
+ "hands": [
+  "open",
+  "grip",
+  "brim"
+ ],
+ "prop_states": [
+  "none",
+  "hand",
+  "rock"
+ ],
+ "anchors": [
+  "hand_l",
+  "hand_r",
+  "blade_tip",
+  "blade_mid",
+  "scabbard_mouth",
+  "hat_crown",
+  "head",
+  "chest"
+ ],
+ "calls": [
+  "init",
+  "spawn",
+  "spawn_hidden",
+  "tick",
+  "kill",
+  "uninstall",
+  "flash",
+  "state/normal",
+  "state/hidden",
+  "face/player",
+  "face/track",
+  "look/form/normal",
+  "look/form/ghost",
+  "look/phase/p1",
+  "look/phase/p2",
+  "look/hat/worn",
+  "look/hat/back",
+  "look/hat/hand",
+  "look/hat/world",
+  "look/hat/gone",
+  "look/sword/hand",
+  "look/sword/sheathed",
+  "look/sword/gone",
+  "look/blade/off",
+  "look/blade/lilac",
+  "look/blade/pink",
+  "look/blade/violet",
+  "look/blade/gold",
+  "look/blade/edge",
+  "look/scabbard/hand",
+  "look/scabbard/hip",
+  "look/scabbard/gone",
+  "look/face/calm",
+  "look/face/smile",
+  "look/face/closed",
+  "look/props/none",
+  "anchor/hand_l",
+  "anchor/hand_r",
+  "anchor/blade_tip",
+  "anchor/blade_mid",
+  "anchor/scabbard_mouth",
+  "anchor/hat_crown",
+  "anchor/head",
+  "anchor/chest"
+ ],
+ "macro_calls": {
+  "face/set": [
+   "yaw"
+  ]
+ }
+}

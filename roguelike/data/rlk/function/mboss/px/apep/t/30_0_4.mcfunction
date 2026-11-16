@@ -1,0 +1,5 @@
+execute if score #pxT mb matches 0 run return run function rlk:mboss/px/apep/k/30/0
+execute if score #pxT mb matches 1 run return run function rlk:mboss/px/apep/k/30/1
+execute if score #pxT mb matches 2 run return run function rlk:mboss/px/apep/k/30/2
+execute if score #pxT mb matches 3 run return run function rlk:mboss/px/apep/k/30/3
+execute if score #pxT mb matches 4 run return run function rlk:mboss/px/apep/k/30/4

@@ -1,0 +1,5 @@
+execute if score @s fgRigT matches 77 run return run function rlk:mboss/fieldgen/rig/c/entrance/k/77
+execute if score @s fgRigT matches 78 run return run function rlk:mboss/fieldgen/rig/c/entrance/k/78
+execute if score @s fgRigT matches 79 run return run function rlk:mboss/fieldgen/rig/c/entrance/k/79
+execute if score @s fgRigT matches 84 run return run function rlk:mboss/fieldgen/rig/c/entrance/k/84
+execute if score @s fgRigT matches 85 run return run function rlk:mboss/fieldgen/rig/c/entrance/k/85

@@ -1,0 +1,24 @@
+whole melee walk sword 11 ticks 4392 end dead lost %max/min 142.5 deaths 5 phases {'p1': 1080, 'm1': 405, 't1': 80, 'p2': 1273, 'm2': 345, 't2': 110, 'p3': 1099}
+whole melee walk sword 22 ticks 4331 end dead lost %max/min 158.0 deaths 5 phases {'p1': 1072, 'm1': 405, 't1': 80, 'p2': 1275, 'm2': 345, 't2': 110, 'p3': 1044}
+whole melee walk sword 33 ticks 4290 end dead lost %max/min 113.6 deaths 3 phases {'p1': 1101, 'm1': 405, 't1': 80, 'p2': 1209, 'm2': 345, 't2': 110, 'p3': 1040}
+whole melee dash sword 11 ticks 4450 end dead lost %max/min 20.0 deaths 0 phases {'p1': 1054, 'm1': 405, 't1': 80, 'p2': 1447, 'm2': 345, 't2': 110, 'p3': 1009}
+whole melee dash sword 22 ticks 4333 end dead lost %max/min 27.3 deaths 0 phases {'p1': 1121, 'm1': 405, 't1': 80, 'p2': 1238, 'm2': 345, 't2': 110, 'p3': 1034}
+whole melee dash sword 33 ticks 4471 end dead lost %max/min 19.9 deaths 0 phases {'p1': 1157, 'm1': 405, 't1': 80, 'p2': 1334, 'm2': 345, 't2': 110, 'p3': 1040}
+whole ranged walk bow 11 ticks 2256 end dead lost %max/min 42.4 deaths 0 phases {'p1': 504, 'm1': 428, 't1': 80, 'p2': 357, 'm2': 437, 't2': 110, 'p3': 340}
+whole ranged walk bow 22 ticks 2669 end dead lost %max/min 61.7 deaths 1 phases {'p1': 648, 'm1': 488, 't1': 80, 'p2': 380, 'm2': 345, 't2': 110, 'p3': 618}
+whole ranged walk bow 33 ticks 2377 end dead lost %max/min 81.2 deaths 1 phases {'p1': 783, 'm1': 444, 't1': 80, 'p2': 319, 'm2': 437, 't2': 110, 'p3': 204}
+whole stand none sword 11 ticks 12000 end limit lost %max/min 222.2 deaths 20 phases {'p1': 12000}
+whole stand none sword 22 ticks 12000 end limit lost %max/min 209.3 deaths 19 phases {'p1': 12000}
+whole stand none sword 33 ticks 12000 end limit lost %max/min 238.2 deaths 22 phases {'p1': 12000}
+p1 stand none sword 11 ticks 2400 end limit lost %max/min 233.1 deaths 4 phases {'p1': 2400}
+p1 stand none sword 22 ticks 2400 end limit lost %max/min 180.4 deaths 3 phases {'p1': 2400}
+p1 melee walk sword 11 ticks 2400 end limit lost %max/min 164.5 deaths 3 phases {'p1': 2400}
+p1 melee walk sword 22 ticks 2400 end limit lost %max/min 149.7 deaths 2 phases {'p1': 2400}
+p2 stand none sword 11 ticks 2400 end limit lost %max/min 262.8 deaths 5 phases {'p2': 2400}
+p2 stand none sword 22 ticks 2400 end limit lost %max/min 243.6 deaths 4 phases {'p2': 2400}
+p2 melee walk sword 11 ticks 2400 end limit lost %max/min 155.7 deaths 3 phases {'p2': 2400}
+p2 melee walk sword 22 ticks 2400 end limit lost %max/min 170.3 deaths 3 phases {'p2': 2400}
+p3 stand none sword 11 ticks 2400 end limit lost %max/min 229.4 deaths 4 phases {'p3': 2400}
+p3 stand none sword 22 ticks 2400 end limit lost %max/min 280.4 deaths 5 phases {'p3': 2400}
+p3 melee walk sword 11 ticks 2400 end limit lost %max/min 121.6 deaths 2 phases {'p3': 2400}
+p3 melee walk sword 22 ticks 2400 end limit lost %max/min 88.5 deaths 1 phases {'p3': 2400}

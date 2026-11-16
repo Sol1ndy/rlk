@@ -1,0 +1,8 @@
+# death tick 4
+execute if score #bfForm mb matches 1 at @s rotated as @s rotated ~ 0 positioned ^ ^2.1 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:25,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute if score #bfForm mb matches 1 at @s rotated as @s rotated ~ 0 positioned ^ ^2.1 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:95,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute if score #bfForm mb matches 1 at @s rotated as @s rotated ~ 0 positioned ^ ^2.1 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:160,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute if score #bfForm mb matches 2 at @s rotated as @s rotated ~ 0 positioned ^ ^3.2 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:25,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute if score #bfForm mb matches 2 at @s rotated as @s rotated ~ 0 positioned ^ ^3.2 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:95,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute if score #bfForm mb matches 2 at @s rotated as @s rotated ~ 0 positioned ^ ^3.2 ^ run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:160,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+playsound minecraft:block.amethyst_block.break hostile @a[tag=player] ~ ~ ~ 0.6 0.9 0.2

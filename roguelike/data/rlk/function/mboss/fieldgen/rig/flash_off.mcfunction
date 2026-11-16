@@ -1,0 +1,20 @@
+# End of the hit flash. @s = rig anchor.
+data merge entity 524c4b4d-4647-4400-8000-000000000001 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000003 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000004 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000006 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000008 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000009 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000000c {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000000d {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000000e {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000000f {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000010 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000011 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000012 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000013 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000014 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000015 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-000000000016 {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000001b {Glowing:0b}
+data merge entity 524c4b4d-4647-4400-8000-00000000001c {Glowing:0b}

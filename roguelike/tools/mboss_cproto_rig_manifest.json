@@ -1,0 +1,292 @@
+{
+ "schema": 1,
+ "boss": "cproto",
+ "source": "stub",
+ "runtime": {
+  "ns": "rlk:mboss/cproto/rig/",
+  "clip_obj": "mbS",
+  "tick_obj": "mbT"
+ },
+ "uuids": {
+  "block": "524c4b4d-4350-4400-8000-0000000000",
+  "ints": [
+   1380731725,
+   1129333760,
+   -2147483648
+  ],
+  "proxies": {
+   "core": 65,
+   "tail": 66
+  }
+ },
+ "proxies": {
+  "layout": [
+   {
+    "name": "core",
+    "part": "core",
+    "point": [
+     0,
+     0,
+     0
+    ],
+    "w": 2.0,
+    "top_margin": 0.4,
+    "tail_only": false,
+    "idx": 65,
+    "uuid": "524c4b4d-4350-4400-8000-000000000041",
+    "flash": "all"
+   },
+   {
+    "name": "tail",
+    "part": "tail",
+    "point": [
+     0,
+     0,
+     0
+    ],
+    "w": 1.2,
+    "top_margin": 0.3,
+    "tail_only": true,
+    "idx": 66,
+    "uuid": "524c4b4d-4350-4400-8000-000000000042",
+    "flash": "all"
+   }
+  ],
+  "rest": {
+   "core": [
+    0.0,
+    0.0,
+    2.4
+   ],
+   "tail": [
+    0.0,
+    -2.4,
+    1.2
+   ]
+  }
+ },
+ "states": {
+  "normal": {
+   "px": [
+    "core",
+    "tail"
+   ],
+   "vis": null,
+   "inv": false,
+   "capsules": [
+    "body",
+    "tailcap"
+   ]
+  },
+  "tail_only": {
+   "px": [
+    "tail"
+   ],
+   "vis": null,
+   "inv": false,
+   "capsules": []
+  },
+  "inv": {
+   "px": [],
+   "vis": null,
+   "inv": true,
+   "capsules": []
+  },
+  "dead": {
+   "px": [],
+   "vis": null,
+   "inv": true,
+   "capsules": []
+  }
+ },
+ "capsules": {
+  "body": {
+   "f0": -1.2,
+   "f1": 1.2,
+   "hw": 1.2
+  },
+  "tailcap": {
+   "f0": -3.2,
+   "f1": -1.6,
+   "hw": 0.6,
+   "px": "tail",
+   "top_max": 1.5
+  }
+ },
+ "flash_groups": {
+  "all": [
+   "core",
+   "tail"
+  ]
+ },
+ "clips": [
+  {
+   "id": 1,
+   "name": "idle",
+   "len": 40,
+   "loop": true,
+   "next": null,
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     },
+     "20": {
+      "core": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     },
+     "39": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": 2,
+   "name": "sweep",
+   "len": 24,
+   "loop": false,
+   "next": "idle",
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     },
+     "12": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       2.4,
+       -1.0,
+       1.4
+      ]
+     },
+     "23": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": 3,
+   "name": "sink",
+   "len": 20,
+   "loop": false,
+   "next": null,
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     },
+     "19": {
+      "core": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": 4,
+   "name": "rise",
+   "len": 20,
+   "loop": false,
+   "next": "idle",
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "core": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     },
+     "19": {
+      "core": [
+       0.0,
+       0.0,
+       2.4
+      ],
+      "tail": [
+       0.0,
+       -2.4,
+       1.2
+      ]
+     }
+    }
+   }
+  }
+ ]
+}

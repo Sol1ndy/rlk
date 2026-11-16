@@ -2,12 +2,9 @@
 $data modify storage rlk:chars cur set from storage rlk:chars registry.$(id)
 execute store result score #charN tmp run data get storage rlk:chars cur.n
 execute store result score #charElem tmp run data get storage rlk:chars cur.elem
-# 무기 종류: 1 근접 / 2 활 / 3 법구. 활의 조준 사격 계수(풀차지 전 / 풀차지)
+# 무기 종류: 1 근접 / 3 법구 (2 는 없앤 활)
 scoreboard players set #wType tmp 1
-execute if data storage rlk:chars cur{weaponType:"bow"} run scoreboard players set #wType tmp 2
 execute if data storage rlk:chars cur{weaponType:"catalyst"} run scoreboard players set #wType tmp 3
-execute store result score #bowAim tmp run data get storage rlk:chars cur.aim
-execute store result score #bowFull tmp run data get storage rlk:chars cur.full
 execute store result score #na1 tmp run data get storage rlk:chars cur.na1
 execute store result score #na2 tmp run data get storage rlk:chars cur.na2
 execute store result score #skillCdT tmp run data get storage rlk:chars cur.skill.cd

@@ -1,0 +1,34 @@
+--- rp/README.md
++++ rp/README.md
+@@ -38,11 +38,11 @@
+ | `…/cm/` | 잡몹 리그: 1챕터 `sw ar fm im sh cn`, 2챕터 `c2/{ns,slime,sp,dr,fx}` · `kr nj cc ci`, 3챕터 `c3/{fu,fp,em,sb,cw}` · `cs rv pc`; 팔레트 · 소품 `textures/cm/{c2,c2e,c3,c3e}` |
+ | `…/mboss/<id>/` · `…/mboss/<킷>/` | 보스 리그(`guardian` `butterfly` `fieldgen` `azhdaha` `apep` `apep_om`(아펩 생명체 · 심장 · 돔) `tachy` `arlecchino` `scarlet`(홍련: **몸은 플레이어 아바타와 같은 상자**(머리 8 × 8 × 8, 몸 8 × 12 × 4 를 상체 · 골반으로 나눔, 아바타와 같은 슬림 3픽셀 팔 · 4픽셀 다리, 스킨 1픽셀 = 1/16칸, 크기 1)에 **사용자의 마인크래프트 스킨** `textures/mboss/scarlet/skin.png`(64 × 64, 사용자가 준 파일 그대로)를 바닐라 배치로 입힘; 갓 · 갓끈 · 띠 꼬리 · 칼 · 칼집 · 잔 · 병은 우리 그림(S2c 색, 몸에 맞게 줄인 크기), 손 셋, 얼굴 겹침 `face_fx`, 단계 둘의 갓 매듭 / 띠, 칼 빛 넷, 모든 모델의 유령 쌍둥이 `<model>_g`, 아이템 `item_sword`))와 효과 킷(`bf_kit` `fg_kit` `az_kit` `ap_kit` `tk_kit` `kn_kit` `hr_kit`) |
+ | `…/raiden/` | 나루카미: 파트 모델은 `items/raiden/*.json` · `models/item/raiden/*.json` 바로 아래(그림 `textures/raiden/rig/`) · `fx/` 색 견본 · `fxg/` 번개 그림(둘 다 `textures/` 에만) · `arena/` 일심정토 배경 패널 · `judgment/` 만겁의 팔 · `clone/` 분신 · `prop/` 소품(만겁 보호막 돔 · 박수 손 · 추모의 꽃 · 씨앗 · 금강저 · 구슬 · 꽂힌 나기나타 등) · `fx_*` 효과 · `skin.png` |
+-| `…/player_motion/` | 플레이어 아바타(`arle` `skirk` `navia` 의 몸 파트)와 무기(`weapons/`) |
++| `…/player_motion/` | 플레이어 아바타(`arle` `skirk` `navia` 의 몸 파트)와 무기(`weapons/`); 홍련 컷신 배우(11-11 레인 H3: `lumine` `clorinde` `ronova` `nefer` 의 10파트 — 다른 셋은 아바타의 것을 그대로 씀 — 와 칼 하나 `weapons/cine_sword` = 아바타 리그의 `sword` 모델) |
+ | `…/navia_fx/` · `…/rift/` | 나비아 금빛 카드 · 방 균열 |
+ | `rlk/items/h/*` | 3인칭에서 손의 바닐라 무기를 감추는 감싸기(`view/av_unwrap` 가 되돌림) |
+ | `rlk/items/{claymore,dice,empty,map_button}.json`, `models/item/{claymore,dice}.json`, `textures/item/dice_1..6.png` | 대검 · 주사위 · 빈 모델 · 지도 버튼 |
+-| `rlk/textures/skin/*.png` | 캐릭터 스킨(`arlecchino clorinde navia nefer ronova skirk`; 요이미야 · 활 모델은 11-11 에 지움)과 몹 스킨(`mob_*`) |
++| `rlk/textures/skin/*.png` | 캐릭터 스킨(`arlecchino clorinde lumine navia nefer ronova skirk`; `lumine` 은 11-11 레인 H3 이 그녀의 프로필 텍스처에서 받아 `tools/player_motion/cine/skin/lumine.png` 에 둔 것을 배우 생성기가 복사; 배우의 스킨 넷 `rlk:skin/{lumine,clorinde,ronova,nefer}` 은 아틀라스 항목; 요이미야 · 활 모델은 11-11 에 지움)과 몹 스킨(`mob_*`) |
+ | `rlk/sounds.json` | `{}` |
+ 
+ 글꼴(글리프 뿌리 텍스트는 늘 비우고 꾸미지 않는다; 킷 글꼴은 끝에 `minecraft:default` 참조가 있어 글자가 기본 글꼴로 나온다):
+@@ -54,7 +54,7 @@
+ | `rlk:bossbar` | U+E400–E438 | 보스바 HP 막대 · 숫자 자리 · 흰 피해 자국 · 아랫줄 — `build_bossbar.py` |
+ | `rlk:mboss_gd` | U+E500–E5F1 | 파수꾼 P4 화면 — `build_mboss_guardian_rig.mjs`(`guardian_screen.mjs`) |
+ | `rlk:mboss_bf` · `_fg` · `_az` · `_ap` · `_tk` · `_kn` | U+E600 · E700 · E800 · E900 · EA00 · EB00 대 | 보스별 배지 · 계기 · 화면 번쩍임 — 각 효과 킷 |
+-| `rlk:mboss_hr` | U+EC10–EC16, EC1F, EC20–EC37 | 홍련의 전체 화면 덮개 여섯(검정 · 반전 · 분홍빛 흰색 · 붉은 기 · 자홍 · 흰색, 144 × 81) · 가장자리 비네트 `vig` U+EC16(가운데 투명; SR 아이템 화무십일홍) · −1 칸 띄우개 U+EC1F · 대사가 떠 있는 동안의 덮개 사라짐 단계 U+EC20–EC37(덮개마다 20 / 40 / 60 / 80 % 넷, `textures/font/mboss_hr/<덮개>_<1-4>.png`; F2 HR-30) — `build_mboss_hr_fx.py`(글리프 31개) |
++| `rlk:mboss_hr` | U+EC10–EC18, EC1F, EC20–EC3F | 홍련의 전체 화면 덮개 여덟(검정 · 반전 · 분홍빛 흰색 · 붉은 기 · 자홍 · 흰색, 144 × 81; 11-11: 금빛 `gold` U+EC17 = 튕겨내기 · 칼 맞댐의 섬광(레인 H2c), 깨진 유리 `web` U+EC18 = 공간 참(레인 H1c, 256 × 144)) · 가장자리 비네트 `vig` U+EC16(가운데 투명; SR 아이템 화무십일홍) · −1 칸 띄우개 U+EC1F · 대사가 떠 있는 동안의 덮개 사라짐 단계 U+EC20–EC3F(덮개마다 20 / 40 / 60 / 80 % 넷, `textures/font/mboss_hr/<덮개>_<1-4>.png`; F2 HR-30) — `build_mboss_hr_fx.py`(글리프 41개) |
+ | `rlk:bal` | U+ED00–ED22 | 균형치 마름모(노랑 · 빈 칸 · 흰 번쩍임 · 그로기 주황, 몹 머리 밑 줄과 보스바 줄; 11-11 전투 개편 B) — `build_balance.py` |
+ | `rlk:cb` | U+EE00–EE04, EE0F | 패링 · 닷지 효과(퍼펙트 패링 금빛 줄 · 작은 줄 · 퍼펙트 닷지 붉은 화면 · 별 · 패링 불가 경고 섬광, 칸 맞춤; 11-11 전투 개편 C) — `build_combat_fx.py` |
+ 
+@@ -82,7 +82,7 @@
+ 
+ | 생성기 | 리소스팩에 쓰는 곳 | 데이터팩 쪽 |
+ |---|---|---|
+-| `node build_player_rig.mjs --datapack . --resourcepack <RP>` (+ `weapon_paint.mjs` 등) | `models/item/player_motion/**` · `items/player_motion/**`, `textures/player_motion/weapons/*`, 아틀라스 `rlk:player_motion/*`(블록 별칭) · 스킨 항목 | `char/motion/**`(평타 시간표 `char/motion/combat/config/<캐릭터>/<클립>` 포함) |
++| `node build_player_rig.mjs --datapack . --resourcepack <RP>` (+ `weapon_paint.mjs` 등; 11-11 부터 홍련 컷신 배우 `build_player_cine.mjs` 도 부름) | `models/item/player_motion/**` · `items/player_motion/**`(배우의 `{lumine,clorinde,ronova,nefer}/*` · `weapons/cine_sword` 포함), `textures/player_motion/weapons/*`, `textures/skin/lumine.png`, 아틀라스 `rlk:player_motion/*`(블록 별칭) · 스킨 항목(배우의 `rlk:skin/{lumine,clorinde,ronova,nefer}`) | `char/motion/**`(평타 시간표 `char/motion/combat/config/<캐릭터>/<클립>` 포함), `char/cine/**`(배우) |
+ | `python3 build_navia_fx_cards.py --resourcepack <RP>` | `navia_fx/` | `fx/nv/**` |
+ | `node build_mobs.mjs --datapack . --resourcepack <RP>`(= `build_shield` · `build_casters_archer` · `build_cannon.mjs`) + `node build_swordsman.mjs`(같은 인자) | `models/item/cm/{sw,sh,fm,im,ar,cn}` · `items/cm/…`, 아틀라스 별칭 `rlk:cm/<몹>/*` | `cm/<몹>/` 포즈 |
+ | `node build_ch2_swarm_rigs.mjs --resourcepack <RP>` · `node build_ch2_elite_rigs.mjs --resourcepack <RP>` | `cm/c2/**`, `cm/{kr,nj,cc,ci}`, `textures/skin/mob_c2_*` · `mob_{kr,nj,cc}`, `textures/cm/c2*` | `tools/ch2_elite_poses.json`(→ `build_ch2_mobs.py`) |

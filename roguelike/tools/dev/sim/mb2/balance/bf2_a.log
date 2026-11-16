@@ -1,0 +1,25 @@
+2 melee walk s33 248.4
+2 melee walk s22 263.3
+2 stand none s33 267.7
+2 stand none s11 270.9
+2 melee walk s11 272.2
+2 stand none s22 273.1
+1 stand none s33 42.8
+1 stand none s11 45.0
+1 stand none s22 45.4
+1 melee walk s11 43.6
+1 melee walk s33 42.0
+1 melee walk s22 44.6
+2 ranged walk s22 97.9
+2 ranged walk s11 111.9
+2 ranged walk s33 95.1
+1 ranged walk s22 15.7
+1 ranged walk s11 16.9
+1 ranged walk s33 16.2
+policy       | BF HP/min GD HP/min  BF/GD | BF hits/min, DoT/min, deaths/min | GD hits/min
+stand none   |     251.9     217.1   1.16 | 18.22   41.7  1.78 |  9.56   (seeds 3/3)
+melee walk   |     219.7     158.3   1.39 | 14.44   23.3  1.33 |  7.22   (seeds 3/3)
+ranged walk  |     141.9     130.6   1.09 |  7.78    8.8  0.78 |  5.22   (seeds 3/3)
+  BF stand : H1 48.6  H2 45.9  B4 36.0  B5 22.0  B2 16.0  B5dot 15.0  B1 14.7  B3 11.7  TFcoc 11.4  B4dot 9.3  B1dot 9.0  -dot 6.2  H4 4.0  B3dot 1.7  B2dot 0.4
+  BF melee : H1 51.1  H2 46.7  B4 24.0  B5 22.0  B3 18.8  B1 16.0  B5dot 13.3  TFcoc 13.1  B1dot 7.0  H3 4.7  B3dot 3.0
+  BF ranged: B4 36.0  B5 22.0  H2 18.1  H1 14.6  B1 13.3  TFcoc 11.4  H3 9.3  B3 4.3  H4 4.0  B1dot 2.4  -dot 2.2  B4dot 1.8  B5dot 1.7  B3dot 0.7

@@ -1,19 +1,28 @@
-function rlk:boss/raiden/camera/release_all
-function rlk:boss/raiden/judgment_rig/cleanup
-scoreboard players set @s rdBlink 0
+# Phase 0 -> 1 (rage full while no pattern runs, or a test). Clears every pattern entity and visual, cancels a
+# blink, then transform_tick plays the 60 t transformation. Hits land (and can kill her) until the armour
+# beat 50 (tag rlk_rd_armoured: combat/apply returns in phase 1 from then on), as in phase 0.
+tag @s remove rlk_rd_armoured
+scoreboard players set @s rdGo 0
+scoreboard players set @s rdNext 0
 scoreboard players set @s rdWalk 0
-kill @e[tag=rlk_rd_hazard]
+scoreboard players set @s rdBlink 0
+kill @e[tag=rlk_rd_blink_dest]
+function rlk:boss/raiden/illusion/cleanup
+function rlk:boss/raiden/movement/cleanup
+kill @e[tag=rlk_rd_tmp]
+function rlk:boss/raiden/hazard/clear
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 scoreboard players set @s rdPhase 1
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
-scoreboard players set @s rdAnim 9
 scoreboard players add @s rdCycle 1
-execute at @e[tag=rlk_raiden_arena,limit=1] run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+tag @s remove rlk_rd_tm_rear
+scoreboard players set @s rdTmChain 0
+execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
-title @a[tag=player] times 8 55 16
-execute at @s run function rlk:boss/raiden/vfx/transform
-title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purple",bold:true}
-title @a[tag=player] subtitle {text:"번개 갑주를 파괴하면 잠시 무력화됩니다",color:"white"}
-playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
+function rlk:boss/raiden/line/eternal
+scoreboard players set #rdCapPat rd 0
+playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.8 0.6 0.3

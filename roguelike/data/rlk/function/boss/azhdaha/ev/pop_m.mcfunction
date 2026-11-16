@@ -1,0 +1,2 @@
+$summon minecraft:text_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_az_pop"],billboard:"center",text:[{text:"흡수 중 ",color:"#FFD27A"},{text:"($(raw))",color:"gray"}],background:0,see_through:1b,transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.4f,1.4f,1.4f]}}
+scoreboard players set @e[type=minecraft:text_display,tag=rlk_mb_az_pop] azT 16

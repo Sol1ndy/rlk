@@ -106,5 +106,5 @@ particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.7} ^3.4545 ^3.5850 ^2.27
 particle minecraft:dust{color:[1,0.48,0.26],scale:0.37} ^3.4545 ^3.6200 ^2.2650 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.12,0.004,0.012],scale:1.05} ^3.8000 ^3.7400 ^2.3000 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.7} ^3.8000 ^3.7750 ^2.2750 0 0 0 0 1 normal
-particle minecraft:flash ^-0.3000 ^1.6000 ^0.4000 0 0 0 0 1 normal
+particle minecraft:flash{color:[1.0,1.0,0.86,0.9]} ^-0.3000 ^1.6000 ^0.4000 0 0 0 0 1 normal
 particle minecraft:flame ^ ^1.1 ^2.3 1.1 0.6 0.8 0.04 12 normal

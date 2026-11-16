@@ -1,0 +1,27 @@
+# #ai_rc = rear samples among the last 6 (bits of #rear).
+scoreboard players set #ai_rc kn 0
+scoreboard players operation #t kn = #rear kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn
+scoreboard players operation #t2 kn = #t kn
+scoreboard players operation #t2 kn %= #c2 kn
+scoreboard players operation #ai_rc kn += #t2 kn
+scoreboard players operation #t kn /= #c2 kn

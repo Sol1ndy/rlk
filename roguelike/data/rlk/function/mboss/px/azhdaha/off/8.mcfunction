@@ -1,0 +1,3 @@
+# Proxy tail4 parked: 8 b under the floor, no rlk_mob.
+data modify storage rlk:mboss px.o.tail4_y set value -8d
+tag 524c4b4d-415a-4400-8000-000000000048 remove rlk_mob

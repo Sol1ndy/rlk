@@ -73,9 +73,7 @@ fill -39 210 0 -21 210 18 minecraft:air
 fill -20 210 0 -1 210 19 minecraft:polished_deepslate
 fill -20 210 1 -2 210 18 minecraft:air
 fill -37 201 -19 -37 201 -14 minecraft:podzol
-fill -34 201 -19 -34 201 -16 minecraft:podzol
 fill -45 201 -17 -44 201 -14 minecraft:podzol
-fill -33 201 -17 -22 201 -15 minecraft:podzol
 fill -46 201 -16 -46 201 -14 minecraft:podzol
 fill -43 201 -16 -43 201 -14 minecraft:podzol
 fill -47 201 -14 -47 201 -14 minecraft:podzol
@@ -120,14 +118,10 @@ fill -6 201 10 -6 201 12 minecraft:podzol
 fill -19 201 11 -16 201 11 minecraft:podzol
 fill -19 201 12 -19 201 12 minecraft:podzol
 fill -4 201 12 -2 201 12 minecraft:podzol
-fill -32 201 15 -2 201 16 minecraft:podzol
-fill -33 201 16 -33 201 18 minecraft:podzol
 fill -49 201 -13 -49 201 -13 minecraft:andesite
 fill -49 202 -13 -49 202 -13 minecraft:podzol
 fill -42 201 -19 -38 201 -17 minecraft:dirt
 fill -42 202 -19 -38 202 -17 minecraft:podzol
-fill -33 201 -19 -22 201 -18 minecraft:dirt
-fill -33 202 -19 -22 202 -18 minecraft:podzol
 fill -43 201 -17 -43 201 -17 minecraft:dirt
 fill -43 202 -17 -43 202 -17 minecraft:podzol
 fill -42 201 -16 -41 201 -15 minecraft:dirt
@@ -174,8 +168,6 @@ fill -19 201 10 -17 201 10 minecraft:dirt
 fill -19 202 10 -17 202 10 minecraft:podzol
 fill -4 201 10 -2 201 11 minecraft:dirt
 fill -4 202 10 -2 202 11 minecraft:podzol
-fill -32 201 17 -2 201 18 minecraft:dirt
-fill -32 202 17 -2 202 18 minecraft:podzol
 fill -49 201 -11 -49 201 -11 minecraft:stone
 fill -49 202 -11 -49 202 -11 minecraft:podzol
 fill -51 201 -15 -50 202 -13 minecraft:andesite
@@ -273,7 +265,7 @@ execute positioned -26 201 -11 run function rlk:room/prop/p_dandelion
 execute positioned -17 201 12 run function rlk:room/prop/p_wildflower
 execute positioned -39 203 -17 run function rlk:room/prop/p_grass
 execute positioned -57 201 -19 run function rlk:room/prop/p_litter
-execute positioned -12 202 16 run function rlk:room/prop/p_grass
+execute positioned -12 201 16 run function rlk:room/prop/p_grass
 execute positioned -43 202 -15 run function rlk:room/prop/p_wildflower
 execute positioned -41 203 -16 run function rlk:room/prop/p_dandelion
 execute positioned -25 202 10 run function rlk:room/prop/p_dandelion
@@ -281,9 +273,9 @@ execute positioned -50 201 -16 run function rlk:room/prop/p_grass
 execute positioned -36 201 0 run function rlk:room/prop/p_wildflower
 execute positioned -38 203 -16 run function rlk:room/prop/p_dandelion
 execute positioned -17 201 13 run function rlk:room/prop/p_wildflower
-execute positioned -22 203 -18 run function rlk:room/prop/p_wildflower
+execute positioned -22 201 -18 run function rlk:room/prop/p_wildflower
 execute positioned -34 201 -6 run function rlk:room/prop/p_wildflower
-execute positioned -24 203 18 run function rlk:room/prop/p_grass
+execute positioned -24 201 18 run function rlk:room/prop/p_grass
 execute positioned -39 203 -17 run function rlk:room/prop/p_grass
 setblock -50 209 -5 minecraft:short_grass keep
 setblock -49 209 -6 minecraft:short_grass keep

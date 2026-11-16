@@ -1,0 +1,9 @@
+# Clip entrance_p1 (id 0) tick 80: the proxy columns that moved.
+data modify storage rlk:mboss px.o.chest_x set value 0d
+data modify storage rlk:mboss px.o.chest_z set value 0.71d
+data modify storage rlk:mboss px.top.chest set value 6.04f
+data merge entity 524c4b4d-4150-4400-8000-000000000042 {height:6.04f}
+data modify storage rlk:mboss px.o.a_r_x set value -3.54d
+data modify storage rlk:mboss px.o.a_r_z set value 2.22d
+data modify storage rlk:mboss px.top.a_r set value 4.49f
+data merge entity 524c4b4d-4150-4400-8000-000000000049 {height:4.49f}

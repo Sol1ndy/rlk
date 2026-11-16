@@ -1,0 +1,8 @@
+# (@s = 플레이어, player/hotbar/place 에서 매 틱) F5 위쪽 시점(받침 rlk_vseat 가 있음)에서 핫바 0~2번(무기 · 스킬 · 폭발)을 다시 만들었으면
+# view/ride_tick 이 하던 마무리를 이 틱 안에서 같은 순서로 한다: 무기는 손 감싸기(view/hand_wrap), 셋 다 우클릭 감지 부품(consumable).
+# player/tick 끝(invEvt 0) 앞이라 이 변화의 인벤 이벤트는 자기 변화로 소비된다. 다음 틱 ride_tick 이 고치면 그 이벤트가 정렬 · 장비 스캔을
+# 두 번 돌렸다(전투 중 스킬 · 폭발 아이템이 초마다 다시 만들어져 후반 렉). ride_tick 의 같은 줄은 그대로 둔다(받침이 없던 틱의 안전망)
+execute if items entity @s hotbar.0 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.0 *[minecraft:consumable] if entity @e[tag=rlk_vseat,limit=1] run function rlk:view/hand_wrap
+execute if items entity @s hotbar.0 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.0 *[minecraft:consumable] if entity @e[tag=rlk_vseat,limit=1] run item modify entity @s hotbar.0 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}
+execute if items entity @s hotbar.1 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.1 *[minecraft:consumable] if entity @e[tag=rlk_vseat,limit=1] run item modify entity @s hotbar.1 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}
+execute if items entity @s hotbar.2 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.2 *[minecraft:consumable] if entity @e[tag=rlk_vseat,limit=1] run item modify entity @s hotbar.2 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}

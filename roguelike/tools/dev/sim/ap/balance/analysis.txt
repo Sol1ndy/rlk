@@ -1,0 +1,42 @@
+Guardian reference (gd, Lv4 vs L4, 3 seeds x 3 min): stand 159.6 / melee walk 119.8 / ranged walk 100.7 % max HP per min
+
+ok   | P1 stand none %max/min vs 0.9x Guardian                        | 132.2 = 0.83x (n 3)          | 0.72-1.08x (target 0.90x)
+ok   | P1 melee walk %max/min vs 0.9x Guardian                        | 127.7 = 1.07x (n 3)          | 0.72-1.08x (target 0.90x)
+ok   | P1 ranged walk %max/min vs 0.9x Guardian                       | 78.7 = 0.78x (n 3)           | 0.72-1.08x (target 0.90x)
+FAIL | P3 stand none %max/min vs 0.9x Guardian                        | 186.5 = 1.17x (n 3)          | 0.72-1.08x (target 0.90x)
+ok   | P3 melee walk %max/min vs 0.9x Guardian                        | 94.4 = 0.79x (n 3)           | 0.72-1.08x (target 0.90x)
+ok   | P3 ranged walk %max/min vs 0.9x Guardian                       | 92.8 = 0.92x (n 3)           | 0.72-1.08x (target 0.90x)
+FAIL | whole fight HP lost, melee walk sword (% max HP)               | 466.5 (n 3)                  | <= 2.5x Guardian whole fight = 334
+FAIL | whole fight HP lost, ranged walk bow (% max HP)                | 347.6 (n 3)                  | <= 2.5x Guardian whole fight = 252
+ok   | worst 40 t window, melee walk (% max HP)                       | 43.7 (n 12)                  | <= 45
+ok   | worst 40 t window, ranged walk (% max HP)                      | 43.7 (n 9)                   | <= 45
+ok   | all hits of one cast, stand agent (% max HP; Q2 blast excluded) | 45.1 (pattern 6)             | <= 60
+ok   | dash-only hits per 40 t (static)                               | pat_p1 / pat_p3 TABLE checks | <= 2, >= 6 t apart
+ok   | undodgeable share of damage, walkers (P1 + P3)                 | 5.7 %                        | <= 25 %
+ok   | perfect dasher P1 melee dash %max/min                          | 17.4 (n 3)                   | <= 0.3x Guardian walker = 35.9
+ok   | perfect dasher P1 ranged dash %max/min                         | 5.8 (n 3)                    | <= 0.3x Guardian walker = 35.9
+ok   | perfect dasher P3 melee dash %max/min                          | 3.7 (n 3)                    | <= 0.3x Guardian walker = 35.9
+ok   | perfect dasher P3 ranged dash %max/min                         | 3.7 (n 3)                    | <= 0.3x Guardian walker = 35.9
+FAIL | positional (P1): FRONT melee walker vs BACK melee walker       | front 88.9 back 101.4: 12.3 % less | >= 25 % less
+ok   | Q2 walk-to-nearest-dome agent: blast hits / max ticks per cast / deaths | 0 / 2 (mean 2.0) / 0 (18 casts, 9 seeds); HP lost per cast mean 3.7 / max 3.7 % max HP | 0 / <= 3 (the 2 pre-dome ticks + 1) / 0 over 9 seeds
+ok   | Q2 late agent (moves at dome 1 + 40 t): deaths                 | 0 (18 casts; ticks max 7, blast hits 0); HP lost per cast mean 7.6 / max 13.1 % max HP | 0
+ok   | Q2 early leaver (leaves at the blast, from full HP): deaths    | 0 (18 casts, blast hits 18); HP lost per cast mean 83.6 / max 83.6 % max HP | 0 (survives)
+ok   | human jump model (static)                                      | pat_p1 / pat_p3: jumpable => mbHzY1 <= 7 | every documented jump dodge succeeds
+ok   | P2 stage length (s), plan agent, item-less sword               | 100.4 (9/9 won)              | 85-120
+ok   | P2 stage length (s), plan agent, sword x1.75 (items)           | 56.3 (3/3 won)               | 50-75
+FAIL | P2 stage length (s), plan agent, bow x2.5 (strongest)          | 29.3 (3/3 won)               | >= 30
+ok   | P2 failures, plan agent, sword (1.00x sword DPS)               | 0 / 9                        | 0 / 9 (chars >= 0.6x)
+ok   | P2 failures, plan agent, bow (1.06x sword DPS)                 | 0 / 9                        | 0 / 9 (chars >= 0.6x)
+ok   | P2 failures, plan agent, catalyst (0.64x sword DPS)            | 0 / 9                        | 0 / 9 (chars >= 0.6x)
+ok   | P2 failures, "nearest target" agent, item-less sword           | 0 / 9 (len 141.3 s)          | <= 1 / 9
+ok   | P2 idle agent: the Heart at 0                                  | 42.3 s (n 3)                 | 30-45 s
+ok   | P2 HP loss per minute vs the P1 rate (melee walk sword)        | 15.1 vs 127.7                | <= 0.8x P1
+ok   | one 포식성 bite chain on a standing player (static, 9.2 grid)     | 24.3 % max HP                | <= 30 %
+ok   | full fight, item-less sword agent (min)                        | 5.95 (3/3 kills)             | <= 6.5
+ok   | apfair P2 vs p2sim_rev W7 (item-less sword 105 s)              | 100.4 s = -4.4 %             | within 15 %
+
+rows: 34, ok 29, FAIL 5, n/a 0
+p1 melee walk, HP lost by pattern id (share): 1: 1053 (34 %), 3: 293 (10 %), 4: 559 (18 %), 6: 1174 (38 %)
+p1 stand, HP lost by pattern id (share): 1: 1305 (41 %), 2: 1100 (34 %), 3: 114 (4 %), 4: 301 (9 %), 6: 369 (12 %)
+p3 melee walk, HP lost by pattern id (share): 31: 1036 (46 %), 32: 90 (4 %), 33: 470 (21 %), 35: 605 (27 %), 36: 75 (3 %)
+p3 stand, HP lost by pattern id (share): 31: 532 (12 %), 32: 1697 (38 %), 33: 943 (21 %), 34: 689 (15 %), 35: 462 (10 %), 36: 175 (4 %)

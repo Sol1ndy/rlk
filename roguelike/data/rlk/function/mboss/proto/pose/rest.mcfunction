@@ -1,0 +1,10 @@
+# Pose "rest" over $(d) ticks (macro {d:N}).
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_leg_l,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.4f,0f,0f,0.02f,0f,1.15f,0f,0f,0f,0f,0.4f,-0.2f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_leg_r,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.4f,0f,0f,-0.42f,0f,1.15f,0f,0f,0f,0f,0.4f,-0.2f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_torso,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.9f,0f,0f,-0.45f,0f,0.95f,0f,1.15f,0f,0f,0.5f,-0.25f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_head,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.62f,0f,0f,-0.31f,0f,0.62f,0f,2.1f,0f,0f,0.62f,-0.31f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_eye,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.44f,0f,0f,-0.22f,0f,0.08f,0f,2.46f,0f,0f,0.02f,0.31f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_arm_l,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.3192f,-0.0732f,0f,0.5236f,0.0221f,1.0372f,0.0445f,0.9294f,-0.0031f,-0.1458f,0.3169f,-0.0111f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_arm_r,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.3192f,0.0732f,0f,-0.8429f,-0.0217f,1.0163f,0.0774f,0.9558f,0.0054f,-0.2534f,0.3105f,0.0955f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_shaft,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.1796f,0.0126f,0f,-0.7744f,-0.0122f,0.1742f,0.4234f,0.9099f,0.003f,-0.0434f,1.698f,0.0141f,0f,0f,0f,1f]}
+$data merge entity @e[type=minecraft:block_display,tag=rlk_mbp_club,limit=1] {start_interpolation:0,interpolation_duration:$(d),transformation:[0.4589f,0.0321f,0f,-0.9238f,-0.0311f,0.4452f,0.1403f,1.171f,0.0078f,-0.111f,0.5628f,1.598f,0f,0f,0f,1f]}

@@ -35,17 +35,12 @@ fill 1 201 6 1 201 8 minecraft:podzol
 fill 5 201 6 5 201 11 minecraft:podzol
 fill 3 201 9 3 201 10 minecraft:podzol
 fill 4 201 10 4 201 11 minecraft:podzol
-fill 7 201 15 18 201 16 minecraft:podzol
-fill 6 201 16 6 201 18 minecraft:podzol
-fill 5 201 17 5 201 18 minecraft:podzol
 fill 5 201 5 5 201 5 minecraft:dirt
 fill 5 202 5 5 202 5 minecraft:podzol
 fill 3 201 6 4 201 8 minecraft:dirt
 fill 3 202 6 4 202 8 minecraft:podzol
 fill 4 201 9 4 201 9 minecraft:dirt
 fill 4 202 9 4 202 9 minecraft:podzol
-fill 7 201 17 18 201 18 minecraft:dirt
-fill 7 202 17 18 202 18 minecraft:podzol
 fill 3 201 4 4 207 5 minecraft:stone
 fill 3 208 4 4 208 5 minecraft:podzol
 execute positioned 17 201 8 run function rlk:room/prop/f_rock_a

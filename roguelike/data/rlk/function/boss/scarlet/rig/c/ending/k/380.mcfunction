@@ -1,0 +1,4 @@
+data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[-0.34375f,1.36367f,0.03052f],left_rotation:[0.28682f,0.29281f,-0.08786f,0.9079f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[-0.42562f,1.15866f,-0.08682f],left_rotation:[-0.24958f,0.29382f,0.0844f,0.91883f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[-0.24999f,0.92972f,0.18f],left_rotation:[-0.81441f,0.13818f,0.21535f,0.52083f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/rig/m/forearm_r/grip

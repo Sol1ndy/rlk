@@ -1,3 +1,19 @@
+execute as @e[tag=rlk_pc_anchor,tag=!rlk_cmsync,tag=!rlk_pc_dying] at @s run function rlk:cm/pc/rig/die
+execute as @e[tag=rlk_pc_anchor,tag=rlk_pc_dying] at @s run function rlk:cm/pc/rig/death_tick
+execute as @e[tag=rlk_rv_anchor,tag=!rlk_cmsync,tag=!rlk_rv_dying] at @s run function rlk:cm/rv/rig/die
+execute as @e[tag=rlk_rv_anchor,tag=rlk_rv_dying] at @s run function rlk:cm/rv/rig/death_tick
+execute as @e[tag=rlk_cs_anchor,tag=!rlk_cmsync,tag=!rlk_cs_dying] at @s run function rlk:cm/cs/rig/die
+execute as @e[tag=rlk_cs_anchor,tag=rlk_cs_dying] at @s run function rlk:cm/cs/rig/death_tick
+function rlk:cm/c3/clean
+execute as @e[tag=rlk_ci_anchor,tag=!rlk_cmsync,tag=!rlk_ci_dying] at @s run function rlk:cm/ci/rig/die
+execute as @e[tag=rlk_ci_anchor,tag=rlk_ci_dying] at @s run function rlk:cm/ci/rig/death_tick
+execute as @e[tag=rlk_cc_anchor,tag=!rlk_cmsync,tag=!rlk_cc_dying] at @s run function rlk:cm/cc/rig/die
+execute as @e[tag=rlk_cc_anchor,tag=rlk_cc_dying] at @s run function rlk:cm/cc/rig/death_tick
+execute as @e[tag=rlk_nj_anchor,tag=!rlk_cmsync,tag=!rlk_nj_dying] at @s run function rlk:cm/nj/rig/die
+execute as @e[tag=rlk_nj_anchor,tag=rlk_nj_dying] at @s run function rlk:cm/nj/rig/death_tick
+execute as @e[tag=rlk_kr_anchor,tag=!rlk_cmsync,tag=!rlk_kr_dying] at @s run function rlk:cm/kr/rig/die
+execute as @e[tag=rlk_kr_anchor,tag=rlk_kr_dying] at @s run function rlk:cm/kr/rig/death_tick
+function rlk:cm/c2/clean
 execute as @e[tag=rlk_sw_anchor,tag=!rlk_cmsync,tag=!rlk_sw_dying] at @s run function rlk:cm/sw/rig/die
 execute as @e[tag=rlk_sw_anchor,tag=rlk_sw_dying] at @s run function rlk:cm/sw/rig/death_tick
 execute as @e[tag=rlk_ar_anchor,tag=!rlk_cmsync,tag=!rlk_ar_dying] at @s run function rlk:cm/ar/rig/die

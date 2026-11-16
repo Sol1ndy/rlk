@@ -11,7 +11,7 @@ kill @e[tag=rlk_plkb]
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_plkb"]}
 execute at @e[tag=rlk_body,limit=1] rotated as @e[tag=rlk_plkb_source,limit=1] run tp @e[tag=rlk_plkb,limit=1] ~ ~ ~ ~ 0
 scoreboard players operation @e[tag=rlk_plkb,limit=1] pkbT = #cmKB tmp
-# 검격의 전진 예약은 밀려나는 동안 종료. 대쉬 값은 재사용하지 않는다.
+# 검격의 전진 예약은 밀려나는 동안 종료. 닷지 값은 재사용하지 않는다.
 scoreboard players set @s stepT 0
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:view/stop_h
 execute as @e[tag=rlk_plkb,limit=1] run function rlk:player/knockback/tick

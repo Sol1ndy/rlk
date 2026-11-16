@@ -21,15 +21,10 @@ fill -2 206 -1 -1 207 -1 minecraft:dark_prismarine
 fill -7 203 -1 -2 203 -1 minecraft:dark_prismarine
 fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
 fill -19 210 -19 -2 210 -2 minecraft:air
-fill -19 201 -15 -17 201 -15 minecraft:podzol
-fill -17 201 -14 -17 201 -6 minecraft:podzol
 fill -4 201 -7 -2 201 -7 minecraft:podzol
-fill -19 201 -6 -18 201 -5 minecraft:podzol
 fill -5 201 -6 -5 201 -6 minecraft:podzol
 fill -6 201 -5 -6 201 -5 minecraft:podzol
 fill -7 201 -4 -7 201 -2 minecraft:podzol
-fill -19 201 -14 -18 201 -7 minecraft:dirt
-fill -19 202 -14 -18 202 -7 minecraft:podzol
 fill -4 201 -6 -2 201 -6 minecraft:dirt
 fill -4 202 -6 -2 202 -6 minecraft:podzol
 fill -5 201 -5 -5 201 -5 minecraft:dirt
@@ -62,7 +57,7 @@ execute positioned -16 201 -4 run function rlk:room/prop/fo_lamp2
 execute positioned -3 201 -10 run function rlk:room/prop/fo_rock_s
 execute positioned -19 201 -16 run function rlk:room/prop/fo_flower
 execute positioned -6 201 -11 run function rlk:room/prop/fo_flower
-execute positioned -17 202 -14 run function rlk:room/prop/p_grass
+execute positioned -17 201 -14 run function rlk:room/prop/p_grass
 execute positioned -2 203 -6 run function rlk:room/prop/p_grass
 execute positioned -8 201 -8 run function rlk:room/prop/fo_flower
 execute positioned -13 201 -13 run function rlk:room/prop/fo_flower

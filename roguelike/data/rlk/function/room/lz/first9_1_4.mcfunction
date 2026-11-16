@@ -28,40 +28,26 @@ fill -18 202 19 -13 204 19 minecraft:andesite
 fill -20 210 0 -1 210 19 minecraft:polished_deepslate
 fill -19 210 1 -2 210 18 minecraft:air
 fill -7 201 1 -7 201 2 minecraft:podzol
-fill -19 201 2 -18 201 3 minecraft:podzol
 fill -8 201 2 -8 201 5 minecraft:podzol
-fill -17 201 3 -17 201 4 minecraft:podzol
-fill -16 201 4 -16 201 15 minecraft:podzol
 fill -7 201 5 -6 201 5 minecraft:podzol
-fill -15 201 6 -15 201 13 minecraft:podzol
 fill -5 201 6 -5 201 9 minecraft:podzol
 fill -4 201 9 -2 201 9 minecraft:podzol
-fill -19 201 15 -17 201 15 minecraft:podzol
-fill -19 201 16 -18 201 16 minecraft:podzol
 fill -6 201 1 -2 201 1 minecraft:dirt
 fill -6 202 1 -2 202 1 minecraft:podzol
 fill -6 201 2 -6 201 2 minecraft:dirt
 fill -6 202 2 -6 202 2 minecraft:podzol
-fill -19 201 4 -18 201 5 minecraft:dirt
-fill -19 202 4 -18 202 5 minecraft:podzol
-fill -17 201 5 -17 201 14 minecraft:dirt
-fill -17 202 5 -17 202 14 minecraft:podzol
 fill -5 201 5 -5 201 5 minecraft:dirt
 fill -5 202 5 -5 202 5 minecraft:podzol
 fill -4 201 6 -4 201 8 minecraft:dirt
 fill -4 202 6 -4 202 8 minecraft:podzol
 fill -3 201 7 -2 201 8 minecraft:dirt
 fill -3 202 7 -2 202 8 minecraft:podzol
-fill -19 201 14 -18 201 14 minecraft:dirt
-fill -19 202 14 -18 202 14 minecraft:podzol
 fill -5 201 2 -2 202 2 minecraft:dirt
 fill -5 203 2 -2 203 2 minecraft:podzol
 fill -5 201 3 -3 202 4 minecraft:dirt
 fill -5 203 3 -3 203 4 minecraft:podzol
 fill -4 201 5 -3 202 5 minecraft:dirt
 fill -4 203 5 -3 203 5 minecraft:podzol
-fill -19 201 6 -18 202 13 minecraft:dirt
-fill -19 203 6 -18 203 13 minecraft:podzol
 fill -3 201 6 -2 202 6 minecraft:dirt
 fill -3 203 6 -2 203 6 minecraft:podzol
 fill -7 201 3 -6 207 4 minecraft:stone_bricks
@@ -72,12 +58,12 @@ execute positioned -4 201 18 run function rlk:room/prop/i_flower
 execute positioned -5 204 3 run function rlk:room/prop/i_grass
 execute positioned -4 202 9 run function rlk:room/prop/i_flower
 execute positioned -10 201 14 run function rlk:room/prop/i_petal
-execute positioned -16 202 15 run function rlk:room/prop/i_grass
+execute positioned -16 201 15 run function rlk:room/prop/i_grass
 execute positioned -11 201 17 run function rlk:room/prop/i_grass
 execute positioned -11 201 8 run function rlk:room/prop/i_petal
-execute positioned -19 202 2 run function rlk:room/prop/i_grass
+execute positioned -19 201 2 run function rlk:room/prop/i_grass
 execute positioned -18 201 18 run function rlk:room/prop/i_grass
-execute positioned -15 202 9 run function rlk:room/prop/i_grass
+execute positioned -15 201 9 run function rlk:room/prop/i_grass
 setblock -6 209 3 minecraft:short_grass keep
 setblock -2 209 3 minecraft:short_grass keep
 setblock -2 209 4 minecraft:cherry_leaves[persistent=true] keep

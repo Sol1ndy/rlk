@@ -1,7 +1,9 @@
 particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:1.5f} ~ ~2.2 ~ 0.08 1.6 0.08 0 30
 particle minecraft:electric_spark ~ ~0.8 ~ 0.9 0.5 0.9 0.4 25
 execute unless score #k160 snd matches 1 run function rlk:snd/f169
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:50}
+# 피해 계수 = #orbCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_nightsoul_orb.coef int 1 run scoreboard players get #orbCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_nightsoul_orb
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 3

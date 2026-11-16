@@ -1,0 +1,12 @@
+# Tachy review (fb314e1)
+- TK-01 blocker: second 70% floor hit skipped M1/T1/P2 → fixed (35% step only after M1), test floor_double.
+- TK-02 blocker: damage ~3x target → DMG tiers halved (35/50/68/85%), nova 25%, HP 280→250. Melee walk 138%/min = 1.27x Guardian; standing ≤1.77x; worst 40t window 35%; TTK 214-220 s.
+- TK-03 major: double level-up (kill XP + reward) → kill XP 0 for specials with lvup; mboss_lib rejects.
+- TK-04 major: black chest discs → suit weave.
+- TK-05 major: copper dome behind head → folded shell, swings over on visor close.
+- TK-06 major: arc_fit flattened diagonals / W2 air cuts → swing-centre pivot, diagonals 28-40°, air cuts vertical.
+- TK-07 minor: "[중간보스]" label on special cancel → fixed.
+- TK-08 minor: nova 40% → 25%.
+- TK-09 minor (left): standing on dormant rift at clear pulls player in ~30 t later.
+- TK-10 minor (left): cancelled special prints two lines (same as mid-boss).
+- Not done: RP items.json source order varies with generator run order (same entries).

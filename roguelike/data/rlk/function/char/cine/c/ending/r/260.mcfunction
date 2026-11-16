@@ -1,0 +1,4 @@
+# ending: the segments running across tick 260, sent one tick after the snap.
+data merge entity 524c4b4d-4349-4e45-8000-000000000000 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.00819f,1.44152f,2.58797f],left_rotation:[0.00056f,0.02144f,-0.00221f,0.99977f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000004 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.3487f,1.31721f,2.53904f],left_rotation:[-0.43412f,-0.09355f,0.2332f,0.8651f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4349-4e45-8000-000000000005 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.42192f,1.20451f,2.74985f],left_rotation:[-0.86383f,-0.21781f,0.13244f,0.43453f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

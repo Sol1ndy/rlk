@@ -1,0 +1,6 @@
+execute on passengers if entity @s[tag=rlk_ap_om_stalk] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,-2f,0f],left_rotation:[0f,0f,0f,1f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_cap] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.18f,-0.06f],left_rotation:[0.08716f,0f,0f,0.99619f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_cap] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/nurt_cap_idle"
+execute on passengers if entity @s[tag=rlk_ap_om_cap_x] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.18f,-0.06f],left_rotation:[0.08052f,-0.38123f,-0.03335f,0.92036f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_cap_x] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/nurt_capx_idle"
+execute on passengers if entity @s[tag=rlk_ap_om_orb] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0.06f,0.4f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

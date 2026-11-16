@@ -1,0 +1,3 @@
+execute on passengers if entity @s[tag=rlk_ap_om_spire] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0.2f,0f],left_rotation:[0f,0f,0f,1f],scale:[1.855f,1.68f,1.855f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_spire_x] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0.2f,0f],left_rotation:[0f,-0.38268f,0f,0.92388f],scale:[1.855f,1.68f,1.855f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_orb] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,3.05f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}

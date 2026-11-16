@@ -1,0 +1,5 @@
+# flyslam clip tick 34
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5i_1,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:14,transformation:{translation:[-2.299f,2.522f,-2.326f],left_rotation:[0.26f,0.302f,-0.868f,0.296f],scale:[0.036f,0.036f,0.036f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5i_7,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:14,transformation:{translation:[-0.104f,1.946f,2.156f],left_rotation:[-0.7f,0.484f,0.516f,-0.095f],scale:[0.044f,0.044f,0.044f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5i_9,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:11,transformation:{translation:[2.119f,2.511f,2.74f],left_rotation:[0.219f,0.643f,-0.251f,0.689f],scale:[0.025f,0.025f,0.025f],right_rotation:[0f,0f,0f,1f]}}
+particle minecraft:dust_color_transition{from_color:[1f,0.92f,0.55f],to_color:[0.95f,0.55f,0.15f],scale:1.6} ~ ~0.8 ~ 1.222 0.6 1.222 0 14 force @a[tag=player]

@@ -21,9 +21,6 @@ fill -10 207 19 -9 209 19 minecraft:red_sandstone
 fill -4 205 19 -2 205 19 minecraft:orange_terracotta
 fill -20 210 0 -1 210 19 minecraft:polished_deepslate
 fill -19 210 1 -2 210 18 minecraft:air
-fill -19 201 5 -16 201 5 minecraft:red_sand
-fill -16 201 6 -16 201 14 minecraft:red_sand
-fill -19 201 14 -17 201 15 minecraft:red_sand
 fill -13 201 15 -7 201 15 minecraft:red_sand
 fill -13 201 16 -13 201 16 minecraft:red_sand
 fill -8 201 16 -7 201 16 minecraft:red_sand
@@ -31,8 +28,6 @@ fill -14 201 17 -14 201 18 minecraft:red_sand
 fill -9 201 17 -8 201 18 minecraft:red_sand
 fill -16 201 18 -15 201 18 minecraft:red_sand
 fill -10 201 18 -10 201 18 minecraft:red_sand
-fill -19 201 6 -17 201 13 minecraft:sandstone
-fill -19 202 6 -17 202 13 minecraft:red_sand
 fill -12 201 16 -9 201 16 minecraft:sandstone
 fill -12 202 16 -9 202 16 minecraft:red_sand
 fill -13 201 17 -10 201 17 minecraft:sandstone
@@ -47,7 +42,7 @@ execute positioned -9 201 9 run function rlk:room/prop/sd_bush
 execute positioned -7 201 12 run function rlk:room/prop/sd_bush
 execute positioned -5 201 11 run function rlk:room/prop/sd_bush
 execute positioned -16 201 17 run function rlk:room/prop/sd_bush
-execute positioned -16 202 11 run function rlk:room/prop/sd_bush
+execute positioned -16 201 11 run function rlk:room/prop/sd_bush
 execute positioned -3 201 13 run function rlk:room/prop/sd_dry
 execute positioned -2 201 16 run function rlk:room/prop/sd_bush
 execute positioned -6 201 2 run function rlk:room/prop/sd_dry

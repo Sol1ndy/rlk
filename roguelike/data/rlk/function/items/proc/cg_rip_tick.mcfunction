@@ -3,7 +3,7 @@ scoreboard players operation #t1 itv = #cgRipT itv
 scoreboard players operation #t1 itv %= #st4 tmp
 execute if score #t1 itv matches 0 run function rlk:items/proc/cg_rip_fx_pick
 scoreboard players operation #t1 itv = #cgRipT itv
-scoreboard players operation #t1 itv %= #st40 tmp
+scoreboard players operation #t1 itv %= #cgRipInt tmp
 execute if score #t1 itv matches 1 if entity @e[tag=rlk_mob,distance=..4,limit=1] run function rlk:items/proc/cg_rip_hit
 # 사이드바: 중력
 execute if score #cgG itv matches 1.. run scoreboard players operation 중력 stacks = #cgG itv

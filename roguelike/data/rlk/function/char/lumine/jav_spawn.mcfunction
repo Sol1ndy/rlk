@@ -6,6 +6,8 @@ scoreboard players add #jb tmp 1000
 scoreboard players operation #dmg tmp *= #jb tmp
 scoreboard players operation #dmg tmp /= #1000 tmp
 function rlk:items/hook/burst_dmg
+# 균형치: 원소폭발 표시는 투창이 맞을 때(jav_hit) 다시 세움
+scoreboard players set #burstDmg tmp 0
 scoreboard players operation @e[tag=rlk_javnew] jdmg = #dmg tmp
 scoreboard players operation @e[tag=rlk_javnew] jcrit = #crit tmp
 scoreboard players set @e[tag=rlk_javnew] life 0

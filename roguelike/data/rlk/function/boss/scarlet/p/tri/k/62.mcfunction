@@ -1,0 +1,7 @@
+# TRI pattern tick 62
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_trib3] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.6279f,0.9227f,-0.1905f],left_rotation:[-0.7641f,-0.3934f,-0.2499f,-0.446f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_58] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_60] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_61,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.5096f,1.068f,0.0427f],left_rotation:[0.1553f,0.5362f,-0.2514f,0.7906f],scale:[0.6892f,0.3f,1.8989f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_61,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3732f,1.1356f,0.0113f],left_rotation:[0.2038f,0.6669f,-0.2106f,0.685f],scale:[0.7166f,0.3f,1.9741f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_tri_61,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3187f,1.1439f,0.0187f],left_rotation:[0.2457f,0.7762f,-0.163f,0.5574f],scale:[0.7254f,0.3f,1.9981f],right_rotation:[0f,0f,0f,1f]}}

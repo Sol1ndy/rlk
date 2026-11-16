@@ -1,0 +1,3 @@
+# macro: item, model → 아이템 아이콘 (조준하면 카드와 함께 강조)
+$summon minecraft:item_display ~ ~ ~ {Tags:["rlk_pk","rlk_pk_d","rlk_pk_new"],Rotation:[180f,0f],brightness:{sky:15,block:15},item_display:"gui",glow_color_override:16768138,item:{id:"$(item)",count:1,components:{"minecraft:item_model":"$(model)"}},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.6f,0.6f,0.6f]}}
+execute if data storage rlk:io src.prof run data modify entity @e[tag=rlk_pk_new,type=minecraft:item_display,limit=1] item.components."minecraft:profile" set from storage rlk:io src.prof

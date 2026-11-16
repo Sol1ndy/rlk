@@ -6,6 +6,8 @@ execute if items entity @s container.* *[minecraft:custom_data~{rlk_ui:{role:"bl
 execute if items entity @s player.cursor *[minecraft:custom_data~{rlk_ui:{role:"blank"}}] run item replace entity @s player.cursor with air
 execute unless items entity @s hotbar.0 *[minecraft:custom_data~{rlk_ui:{role:"attack"}}] run function rlk:player/hotbar/fix_attack
 function rlk:char/hotbar
+# F5 위쪽 시점: 방금 다시 만든 아이템을 이 틱 안에서 마저 꾸밈(인벤 이벤트가 자기 변화로 소비되게)
+function rlk:player/hotbar/wrap
 
 # 예전 판의 채움칸(방벽)이 남아 있으면 지움
 execute if items entity @s container.* minecraft:barrier[minecraft:custom_data~{rlk_ui:{}}] run clear @s minecraft:barrier[minecraft:custom_data~{rlk_ui:{}}]

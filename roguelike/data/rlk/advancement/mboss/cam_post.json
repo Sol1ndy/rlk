@@ -1,0 +1,10 @@
+{
+ "criteria": {
+  "t": {
+   "trigger": "minecraft:tick"
+  }
+ },
+ "rewards": {
+  "function": "rlk:mboss/cam/post"
+ }
+}

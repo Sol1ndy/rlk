@@ -1,7 +1,9 @@
 particle minecraft:electric_spark ~ ~1 ~ 0.6 1.2 0.6 0.5 40
 particle minecraft:end_rod ~ ~2 ~ 0.1 1.5 0.1 0.02 12
 execute unless score #k183 snd matches 1 run function rlk:snd/f198
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:120}
+# 피해 계수 = #mechCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_mech_heart.coef int 1 run scoreboard players get #mechCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_mech_heart
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 3

@@ -23,17 +23,12 @@ fill -25 207 39 -22 208 39 minecraft:copper_ore
 fill -25 203 39 -22 205 39 minecraft:cobblestone
 fill -40 210 20 -21 210 39 minecraft:polished_deepslate
 fill -39 210 21 -22 210 38 minecraft:air
-fill -39 201 25 -37 201 25 minecraft:tuff
-fill -37 201 26 -37 201 34 minecraft:tuff
 fill -25 201 30 -24 201 31 minecraft:tuff
 fill -23 201 31 -22 201 32 minecraft:tuff
 fill -25 201 32 -25 201 34 minecraft:tuff
 fill -22 201 33 -22 201 33 minecraft:tuff
-fill -39 201 34 -38 201 35 minecraft:tuff
 fill -31 201 35 -26 201 35 minecraft:tuff
 fill -31 201 36 -30 201 36 minecraft:tuff
-fill -39 201 26 -38 201 33 minecraft:cobbled_deepslate
-fill -39 202 26 -38 202 33 minecraft:tuff
 fill -24 201 32 -24 201 38 minecraft:cobbled_deepslate
 fill -24 202 32 -24 202 38 minecraft:tuff
 fill -23 201 33 -23 201 38 minecraft:cobbled_deepslate
@@ -50,7 +45,7 @@ fill -31 201 37 -27 207 38 minecraft:stone
 fill -31 208 37 -27 208 38 minecraft:tuff
 execute positioned -36 201 26 run function rlk:room/prop/m_crate_b
 execute positioned -37 201 37 run function rlk:room/prop/m_crate_b
-execute positioned -37 202 25 run function rlk:room/prop/m_rail_x
+execute positioned -37 201 25 run function rlk:room/prop/m_rail_x
 execute positioned -33 201 21 run function rlk:room/prop/m_rail_x
 execute positioned -33 201 25 run function rlk:room/prop/m_pebble
 execute positioned -32 201 37 run function rlk:room/prop/m_rail_x

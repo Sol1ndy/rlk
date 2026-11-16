@@ -1,0 +1,13 @@
+# Circle r 0.5 (12 points); a point at angle t from forward needs #hzAng >= |t|.
+$execute if score #hzAng mb matches 180.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^-0.5 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 150.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.25 ^0.12 ^-0.433 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 120.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.433 ^0.12 ^-0.25 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 90.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.5 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 60.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.433 ^0.12 ^0.25 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 30.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.25 ^0.12 ^0.433 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 0.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^0.5 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 30.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0.25 ^0.12 ^0.433 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 60.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0.433 ^0.12 ^0.25 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 90.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0.5 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 120.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0.433 ^0.12 ^-0.25 0 0 0 0 1 force @a[tag=player]
+$execute if score #hzAng mb matches 150.. run particle minecraft:dust{color:$(col),scale:$(sc)} ^0.25 ^0.12 ^-0.433 0 0 0 0 1 force @a[tag=player]

@@ -1,0 +1,35 @@
+# knobs from /tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/hr/s5/tmp/snap_hr_s5/roguelike (F:items/tune/b10, sword_hwamu/def, F:load): #hwStkAtk 6, #hwStkDur 120, #hwCtrCoef 138, #hwCtrCdT 80, #hwLowCd 30, #hwSlCoef 500, #hwSlCdT 800, #hwSlCrit 20, #hwSlCritDur 200, #hwEvery 4, #hwStkMax 5, #hwCost 4, #hwFloor 50, #hwLowHp 60, #hwSlHp 50, #atkPct 25, #hrMoonAtk 27, #hrMoonCrit 10, #hwSlDelay 4
+# runs: 33 (scarlet p1 melee:dash:sword, scarlet p1 melee:walk:sword, scarlet p2 melee:dash:sword, scarlet p2 melee:walk:sword, scarlet whole melee:dash:sword, scarlet whole melee:walk:sword)
+# measured: basic hits 1.64/s (while she is hittable 2.00/s), counter events (hits taken + i-frame eats, her body hittable) 0.158/s (645 of 1645 at her invulnerable body left out), HP <= 60 % item-less 0.42 of the time, <= 50 % 0.32
+# dense rooms: 9 runs (ch1 L5, ch2 L11, ch3 L17), 10.7 mobs, 49 s, cleared 9/9; counter events 1.09/s; slash targets (mobs <= 20 b) 10.7 in the first 5 s, 5.3 over the room
+#   star 0: stacks 4.30, counters fired 0.083/s median, 0.133/s p90 of 207 boss 30-s windows, rooms mean 0.118/s p90 0.167/s (12 windows), p90 over rooms + boss fights 0.167/s (cap 0.19/s), with the item's cost HP <= 60 % 0.73, <= 50 % 0.64
+#   star 1: stacks 4.61, counters fired 0.097/s median, 0.167/s p90 of 207 boss 30-s windows, rooms mean 0.122/s p90 0.167/s (12 windows), p90 over rooms + boss fights 0.167/s (cap 0.21/s), with the item's cost HP <= 60 % 0.73, <= 50 % 0.64
+#   star 2: stacks 4.67, counters fired 0.106/s median, 0.167/s p90 of 207 boss 30-s windows, rooms mean 0.130/s p90 0.200/s (12 windows), p90 over rooms + boss fights 0.200/s (cap 0.23/s), with the item's cost HP <= 60 % 0.73, <= 50 % 0.64
+#   star 3: stacks 4.71, counters fired 0.115/s median, 0.167/s p90 of 207 boss 30-s windows, rooms mean 0.146/s p90 0.233/s (12 windows), p90 over rooms + boss fights 0.233/s (cap 0.25/s), with the item's cost HP <= 60 % 0.73, <= 50 % 0.64
+# K = 3.28 ATK-multiples/s (measured hits x 1.10 / 0.55)
+# K in the dense rooms = 4.08 (the room player's basic hits 2.04/s)
+
+== mid  (Lv15, items +50% ATK, crit 20 / 150)
+  화무십일홍 ☆☆☆  boss  24.0 %  (p90 counter  26.1 %, rooms at the counter cap x aoe 2  28.6 %; ev.py §7.4.7 guesses  22.8 %)  [stacks 4.30, counters 0.083/s, p90 0.167/s, HP<=60 0.73, <=50 0.64]
+  화무십일홍 ★☆☆  boss  34.1 %  (p90 counter  36.6 %, rooms at the counter cap x aoe 2  40.8 %; ev.py §7.4.7 guesses  31.4 %)  [stacks 4.61, counters 0.097/s, p90 0.167/s, HP<=60 0.73, <=50 0.64]   (event grant)
+  화무십일홍 ★★☆  boss  44.6 %  (p90 counter  49.1 %, rooms at the counter cap x aoe 2  54.3 %; ev.py §7.4.7 guesses  40.9 %)  [stacks 4.67, counters 0.106/s, p90 0.200/s, HP<=60 0.73, <=50 0.64]
+  화무십일홍 ★★★  boss  56.2 %  (p90 counter  63.3 %, rooms at the counter cap x aoe 2  69.8 %; ev.py §7.4.7 guesses  51.6 %)  [stacks 4.71, counters 0.115/s, p90 0.233/s, HP<=60 0.73, <=50 0.64]
+  refs: 불씨의 맹약  60.7 %   마검: 키리온  77.6 %   B1 월하대작 (final ATK +27 / crit +10)  32.8 % (+ move speed, no slot)
+  item ★★ net (slot 4 %, exposure 2 %):  36.1 % (slot 0-8 %: 30.4-41.8 %)
+  G1 ★★★ vs 불씨의 맹약: x0.972 (target within +-10 %): PASS
+  G2 ★★★ p90 aoe 1 63.3, p90 aoe 2 68.8, cap aoe 1 64.3, cap aoe 2 69.8 % vs 키리온 77.6 % (target: all <=; p90 0.233/s over rooms + boss fights); at the rooms' K 4.08: p90 aoe 1 59.5, p90 aoe 2 63.9, cap aoe 1 60.3, cap aoe 2 64.7 % vs 키리온 67.7 %: PASS
+  G3 B1 vs item ★★ net: x0.976 (target within +-5 %; B1 needs #hrMoonAtk 31 for x1.00): PASS
+
+== late (Lv30, items +100% ATK, crit 35 / 180)
+  화무십일홍 ☆☆☆  boss  20.8 %  (p90 counter  22.8 %, rooms at the counter cap x aoe 2  25.2 %; ev.py §7.4.7 guesses  19.7 %)  [stacks 4.30, counters 0.083/s, p90 0.167/s, HP<=60 0.73, <=50 0.64]
+  화무십일홍 ★☆☆  boss  29.6 %  (p90 counter  32.0 %, rooms at the counter cap x aoe 2  36.1 %; ev.py §7.4.7 guesses  27.3 %)  [stacks 4.61, counters 0.097/s, p90 0.167/s, HP<=60 0.73, <=50 0.64]   (event grant)
+  화무십일홍 ★★☆  boss  39.0 %  (p90 counter  43.3 %, rooms at the counter cap x aoe 2  48.3 %; ev.py §7.4.7 guesses  35.9 %)  [stacks 4.67, counters 0.106/s, p90 0.200/s, HP<=60 0.73, <=50 0.64]
+  화무십일홍 ★★★  boss  49.4 %  (p90 counter  56.2 %, rooms at the counter cap x aoe 2  62.4 %; ev.py §7.4.7 guesses  45.4 %)  [stacks 4.71, counters 0.115/s, p90 0.233/s, HP<=60 0.73, <=50 0.64]
+  refs: 불씨의 맹약  55.0 %   마검: 키리온  68.3 %   B1 월하대작 (final ATK +27 / crit +10)  34.9 % (+ move speed, no slot)
+  item ★★ net (slot 4 %, exposure 2 %):  30.8 % (slot 0-8 %: 25.3-36.2 %)
+  G1 ★★★ vs 불씨의 맹약: x0.964 (target within +-10 %): PASS
+  G2 ★★★ p90 aoe 1 56.2, p90 aoe 2 61.4, cap aoe 1 57.1, cap aoe 2 62.4 % vs 키리온 68.3 % (target: all <=; p90 0.233/s over rooms + boss fights); at the rooms' K 4.08: p90 aoe 1 52.5, p90 aoe 2 56.7, cap aoe 1 53.3, cap aoe 2 57.5 % vs 키리온 58.8 %: PASS
+  G3 B1 vs item ★★ net: x1.032 (target within +-5 %; B1 needs #hrMoonAtk 24 for x1.00): PASS
+
+# gates: mid G1 PASS, mid G2 PASS, mid G3 PASS, late G1 PASS, late G2 PASS, late G3 PASS
+# wrote hr_s5_reward_ev.json

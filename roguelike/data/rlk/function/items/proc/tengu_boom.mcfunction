@@ -1,4 +1,6 @@
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:60}
+# 반경 3.5칸에 공격력의 #tenguCoef 퍼센트 번개 원소 피해 (피해 계수는 강화 단계로 조정)
+execute store result storage rlk:tune m_tengu_feather.coef int 1 run scoreboard players get #tenguCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_tengu_feather
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 3

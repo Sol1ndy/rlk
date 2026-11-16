@@ -1,9 +1,13 @@
 execute if entity @s[tag=rlk_raiden,scores={rdDeath=1}] run return 0
+execute if entity @s[tag=rlk_mb_dying] run return 0
 # @s = 몹, at @s
 # 클릭 실드 유지: 몹으로 가는 클릭을 바닐라 타격 대신 실드가 받음(빨간 플래시는 실제 데미지 때만)
-execute unless score #bowChg tmp matches 1 run function rlk:mob/shield_ensure
-execute if score @s stunT matches 1.. run scoreboard players remove @s stunT 1
+function rlk:mob/shield_ensure
+# round V: 박자가 세계를 멈춘 틱(#btHold cb)에는 경직 · 균형치 · 원소 타이머가 흐르지 않는다
+execute if score @s stunT matches 1.. unless score #btHold cb matches 1 run scoreboard players remove @s stunT 1
 execute if score @s stunT matches 0 run function rlk:mob/unstun
+# 균형치: 회복 · 그로기 시간(레지스트리 보스는 전투가 멈추면 멈춤, 나루카미는 자기 틱에서)
+execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] unless score #btHold cb matches 1 run function rlk:bal/tick
 # 체력/최대체력 (스코어 mhpC / mhpM)
 execute unless score @s mhpM matches 1.. run function rlk:mob/hp_init
 # 바닐라 피해 감지(바닐라 체력은 1024 고정)
@@ -29,4 +33,4 @@ execute unless score #lvNow tmp matches 1.. run scoreboard players set #lvNow tm
 execute store result storage rlk:hb lv int 1 run scoreboard players get #lvNow tmp
 execute on passengers if entity @s[tag=rlk_hb_lv] unless score @s mlv = #lvNow tmp run function rlk:mob/hb_lv with storage rlk:hb
 # 원소 부착/반응 처리 (상태가 있을 때만)
-execute if score @s elAct matches 1.. run function rlk:element/tick
+execute if score @s elAct matches 1.. unless score #btHold cb matches 1 run function rlk:element/tick

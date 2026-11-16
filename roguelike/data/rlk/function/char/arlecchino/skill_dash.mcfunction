@@ -1,7 +1,10 @@
-# 대상 앞으로 (@s = 플레이어). 나타날 자리 표식 rlk_arto: 대상에서 몸 쪽으로 1.4칸(막혔으면 0.9칸)
+# 대상 앞으로 (@s = 플레이어). 나타날 자리 표식 rlk_arto: 대상에서 몸 쪽으로 1.4칸(막혔으면 0.9칸). round X(x_brief 판정 1): 대상이 보스의
+# 몸(rlk_mb_body)이면 1.6칸(막혔으면 2.1칸): 보스의 몸 1.6칸 안에는 나타나지 않는다
 kill @e[tag=rlk_arto]
-execute as @e[tag=rlk_artg,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^1.4 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
-execute unless entity @e[tag=rlk_arto,limit=1] as @e[tag=rlk_artg,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.9 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
+execute as @e[tag=rlk_artg,limit=1,tag=!rlk_mb_body] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^1.4 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
+execute unless entity @e[tag=rlk_arto,limit=1] as @e[tag=rlk_artg,limit=1,tag=!rlk_mb_body] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.9 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
+execute unless entity @e[tag=rlk_arto,limit=1] as @e[tag=rlk_artg,limit=1,tag=rlk_mb_body] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^1.6 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
+execute unless entity @e[tag=rlk_arto,limit=1] as @e[tag=rlk_artg,limit=1,tag=rlk_mb_body] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^2.1 if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass run summon minecraft:marker ~ ~ ~ {Tags:["rlk_arto"]}
 execute unless entity @e[tag=rlk_arto,limit=1] run return 0
 # 떠난 자리 · 나타난 자리 효과
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:large_smoke ~ ~1 ~ 0.3 0.6 0.3 0.02 15

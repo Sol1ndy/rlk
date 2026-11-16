@@ -2,4 +2,3 @@
 execute unless entity @e[tag=rlk_av,limit=1] run return 0
 execute at @s run tp @e[tag=rlk_av,limit=1] ~ ~ ~ ~ 0
 data modify entity @e[tag=rlk_av,limit=1] Motion set value [0.0d,0.0d,0.0d]
-execute at @s run tp @e[tag=rlk_camv,limit=1] ~ ~ ~

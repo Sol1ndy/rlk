@@ -1,0 +1,3 @@
+# Star crystal, 불 (#FF8A4C): the rig's 4-point crystal (two crossed faceted cards + a
+# white-hot core cross), upright, slowly turning, grows from 0 (star/vis_tick).
+summon minecraft:item_display ~ ~1.2 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_starv","rlk_mb_gd_svnew"],billboard:"fixed",item_display:"none",brightness:{sky:15,block:15},view_range:3f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,transformation:{translation:[0f,-0.8f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.2f,0.2f,0.2f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/guardian/star_1"}}}

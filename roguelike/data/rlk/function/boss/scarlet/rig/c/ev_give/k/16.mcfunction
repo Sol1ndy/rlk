@@ -1,0 +1,3 @@
+data merge entity 524c4b4d-4852-4400-8000-00000000000c {start_interpolation:0,interpolation_duration:7,transformation:{translation:[-0.125f,0.73539f,0f],left_rotation:[-0.2503f,-0.0578f,-0.01487f,0.96633f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000d {start_interpolation:0,interpolation_duration:7,transformation:{translation:[-0.14663f,0.40754f,0.18076f],left_rotation:[0.27688f,-0.05731f,0.01665f,0.95905f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:7,transformation:{translation:[0.14562f,0.4152f,0.19412f],left_rotation:[0.23127f,0.05709f,-0.01786f,0.97105f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

@@ -1,0 +1,12 @@
+# kick clock 8
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/p/kick_rise
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"^ ^2.5 ^1.0",rot:"~ 0",bb:"fixed",roll:80,spin:0,s0:4,s1:5.5,move:"0f,0f,0f",life:3,fade:1,col:15595994}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~-46 12.9",bb:"fixed",roll:-11,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~-29.9 34",bb:"fixed",roll:-11,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~-12.4 12",bb:"fixed",roll:-9,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~6.7 34.3",bb:"fixed",roll:0,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~24.3 23.6",bb:"fixed",roll:-9,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"blade",pos:"^ ^0.1 ^1.2",rot:"~48 25.7",bb:"fixed",roll:0,spin:0,s0:0.3,s1:1.3,move:"0f,0.25f,0f",life:6,fade:3,col:16777215}
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run particle minecraft:dust{color:[0.843f,0.973f,0.6f],scale:1.2} ^ ^2 ^1.2 0.6 1.4 0.3 0 14 force @a[tag=player]
+execute at @s rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 run particle minecraft:wax_off ^ ^1.5 ^1.2 0.4 1 0.3 0 6 force @a[tag=player]
+function rlk:mboss/butterfly/fx/snd/kick_impact

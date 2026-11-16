@@ -1,4 +1,4 @@
-# 대쉬 서브스텝 (@s = 플레이어, macro: dx/dz = 이번 서브스텝의 이동). x → z 순서로 축을 나눠 옮긴다
+# 닷지 서브스텝 (@s = 플레이어, macro: dx/dz = 이번 서브스텝의 이동). x → z 순서로 축을 나눠 옮긴다
 scoreboard players set #dstop tmp 0
 # x
 scoreboard players set #dblk tmp 0
@@ -14,5 +14,5 @@ $execute if score @s dashDZ matches ..-1 at @e[tag=rlk_body,limit=1] positioned 
 $execute if score #dblk tmp matches 0 at @e[tag=rlk_body,limit=1] run tp @e[tag=rlk_body,limit=1] ~ ~ ~$(dz)
 $execute if score #dblk tmp matches 1 at @e[tag=rlk_body,limit=1] run function rlk:player/dash_up_z {dz:$(dz)}
 scoreboard players operation #dstop tmp += #dblk tmp
-# 두 축이 다 막혔으면 대쉬 끝
+# 두 축이 다 막혔으면 닷지 끝
 execute if score #dstop tmp matches 2.. run scoreboard players set @s dashMoveT 0

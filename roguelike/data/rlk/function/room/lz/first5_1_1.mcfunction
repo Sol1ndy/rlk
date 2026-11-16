@@ -25,15 +25,11 @@ fill 7 210 19 9 210 19 minecraft:coal_ore
 fill 6 206 19 8 208 19 minecraft:copper_ore
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
-fill 6 201 1 7 201 2 minecraft:tuff
-fill 7 201 3 18 201 3 minecraft:tuff
 fill 7 201 15 13 201 15 minecraft:tuff
 fill 7 201 16 8 201 16 minecraft:tuff
 fill 14 201 16 18 201 16 minecraft:tuff
 fill 7 201 17 7 201 18 minecraft:tuff
 fill 8 201 18 8 201 18 minecraft:tuff
-fill 8 201 1 18 201 2 minecraft:cobbled_deepslate
-fill 8 202 1 18 202 2 minecraft:tuff
 fill 9 201 16 13 201 18 minecraft:cobbled_deepslate
 fill 9 202 16 13 202 18 minecraft:tuff
 fill 8 201 17 8 201 17 minecraft:cobbled_deepslate

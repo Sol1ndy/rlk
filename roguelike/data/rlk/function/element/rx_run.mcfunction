@@ -1,4 +1,6 @@
 # @s = 몹, at @s. 지난 타격에서 예약된 반응(rxQ) 발동. 광역 피해는 여기서(최상위에서) 처리해 연쇄 반응이 꼬이지 않게 함
+# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
+scoreboard players add #atkSeq tmp 1
 scoreboard players operation #q tmp = @s rxQ
 scoreboard players operation #qDmg tmp = @s rxDmg
 scoreboard players operation #qDmg3 tmp = @s rxDmg3

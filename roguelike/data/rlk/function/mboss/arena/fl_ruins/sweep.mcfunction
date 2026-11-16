@@ -1,0 +1,54 @@
+# {y0,y1} (absolute y): barriers -> air in 50 row spans inside walk - 0.5 of fl_ruins (never a
+# rectangle: blocks outside the disc are not touched). Only while the box is loaded.
+execute unless function rlk:mboss/ar/fl_ruins/loaded run return fail
+$fill 753 $(y0) -17 766 $(y1) -17 minecraft:air replace minecraft:barrier
+$fill 750 $(y0) -16 769 $(y1) -16 minecraft:air replace minecraft:barrier
+$fill 748 $(y0) -15 771 $(y1) -15 minecraft:air replace minecraft:barrier
+$fill 746 $(y0) -14 773 $(y1) -14 minecraft:air replace minecraft:barrier
+$fill 745 $(y0) -13 774 $(y1) -13 minecraft:air replace minecraft:barrier
+$fill 744 $(y0) -12 775 $(y1) -12 minecraft:air replace minecraft:barrier
+$fill 742 $(y0) -11 777 $(y1) -11 minecraft:air replace minecraft:barrier
+$fill 741 $(y0) -10 778 $(y1) -10 minecraft:air replace minecraft:barrier
+$fill 741 $(y0) -9 778 $(y1) -9 minecraft:air replace minecraft:barrier
+$fill 740 $(y0) -8 779 $(y1) -8 minecraft:air replace minecraft:barrier
+$fill 739 $(y0) -7 780 $(y1) -7 minecraft:air replace minecraft:barrier
+$fill 738 $(y0) -6 781 $(y1) -6 minecraft:air replace minecraft:barrier
+$fill 738 $(y0) -5 781 $(y1) -5 minecraft:air replace minecraft:barrier
+$fill 737 $(y0) -4 782 $(y1) -4 minecraft:air replace minecraft:barrier
+$fill 737 $(y0) -3 782 $(y1) -3 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) -2 783 $(y1) -2 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) -1 783 $(y1) -1 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) 0 783 $(y1) 0 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 1 784 $(y1) 1 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 2 784 $(y1) 2 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 3 784 $(y1) 3 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 4 784 $(y1) 4 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 5 784 $(y1) 5 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 6 784 $(y1) 6 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 7 784 $(y1) 7 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 8 784 $(y1) 8 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 9 784 $(y1) 9 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 10 784 $(y1) 10 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 11 784 $(y1) 11 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 12 784 $(y1) 12 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 13 784 $(y1) 13 minecraft:air replace minecraft:barrier
+$fill 735 $(y0) 14 784 $(y1) 14 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) 15 783 $(y1) 15 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) 16 783 $(y1) 16 minecraft:air replace minecraft:barrier
+$fill 736 $(y0) 17 783 $(y1) 17 minecraft:air replace minecraft:barrier
+$fill 737 $(y0) 18 782 $(y1) 18 minecraft:air replace minecraft:barrier
+$fill 737 $(y0) 19 782 $(y1) 19 minecraft:air replace minecraft:barrier
+$fill 738 $(y0) 20 781 $(y1) 20 minecraft:air replace minecraft:barrier
+$fill 738 $(y0) 21 781 $(y1) 21 minecraft:air replace minecraft:barrier
+$fill 739 $(y0) 22 780 $(y1) 22 minecraft:air replace minecraft:barrier
+$fill 740 $(y0) 23 779 $(y1) 23 minecraft:air replace minecraft:barrier
+$fill 741 $(y0) 24 778 $(y1) 24 minecraft:air replace minecraft:barrier
+$fill 741 $(y0) 25 778 $(y1) 25 minecraft:air replace minecraft:barrier
+$fill 742 $(y0) 26 777 $(y1) 26 minecraft:air replace minecraft:barrier
+$fill 744 $(y0) 27 775 $(y1) 27 minecraft:air replace minecraft:barrier
+$fill 745 $(y0) 28 774 $(y1) 28 minecraft:air replace minecraft:barrier
+$fill 746 $(y0) 29 773 $(y1) 29 minecraft:air replace minecraft:barrier
+$fill 748 $(y0) 30 771 $(y1) 30 minecraft:air replace minecraft:barrier
+$fill 750 $(y0) 31 769 $(y1) 31 minecraft:air replace minecraft:barrier
+$fill 753 $(y0) 32 766 $(y1) 32 minecraft:air replace minecraft:barrier
+return 1

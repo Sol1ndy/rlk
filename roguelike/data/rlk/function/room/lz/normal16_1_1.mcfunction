@@ -26,20 +26,10 @@ fill 15 205 19 17 207 19 minecraft:andesite
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
 fill 13 201 1 14 201 5 minecraft:tuff
-fill 1 201 4 4 201 5 minecraft:tuff
-fill 4 201 6 5 201 13 minecraft:tuff
 fill 15 201 6 18 201 6 minecraft:tuff
 fill 15 201 7 16 201 7 minecraft:tuff
-fill 1 201 14 4 201 14 minecraft:tuff
-fill 1 201 15 3 201 15 minecraft:tuff
-fill 7 201 15 18 201 16 minecraft:tuff
-fill 6 201 16 6 201 18 minecraft:tuff
 fill 15 201 1 18 201 5 minecraft:cobbled_deepslate
 fill 15 202 1 18 202 5 minecraft:tuff
-fill 1 201 6 3 201 13 minecraft:cobbled_deepslate
-fill 1 202 6 3 202 13 minecraft:tuff
-fill 7 201 17 18 201 18 minecraft:cobbled_deepslate
-fill 7 202 17 18 202 18 minecraft:tuff
 fill 12 201 3 12 207 3 minecraft:deepslate
 fill 12 208 3 12 208 3 minecraft:tuff
 fill 18 201 10 18 207 10 minecraft:deepslate
@@ -53,7 +43,7 @@ fill 17 208 7 18 208 9 minecraft:tuff
 fill 17 201 10 17 207 10 minecraft:stone
 fill 17 208 10 17 208 10 minecraft:tuff
 execute positioned 6 201 5 run function rlk:room/prop/m_post
-execute positioned 2 203 8 run function rlk:room/prop/m_rail_x
+execute positioned 2 201 8 run function rlk:room/prop/m_rail_x
 execute positioned 9 201 3 run function rlk:room/prop/m_rail_x
 setblock 17 205 1 minecraft:wall_torch[facing=south]
 setblock 14 205 18 minecraft:wall_torch[facing=north]

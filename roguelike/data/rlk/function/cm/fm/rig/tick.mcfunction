@@ -21,6 +21,7 @@ scoreboard players operation @s cmAX = #fmX tmp
 scoreboard players operation @s cmAZ = #fmZ tmp
 execute if score @s cmAH matches 1 as @e[tag=rlk_fm_this,tag=rlk_fm_part] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}
 execute if score @s frzT matches 1.. run return run function rlk:cm/fm/rig/frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/fm/rig/frozen
 scoreboard players add @s cmAF 1
 execute if score @s cmAF matches 48.. run scoreboard players set @s cmAF 0
 scoreboard players operation #fmFrame tmp = @s cmAF

@@ -6,19 +6,45 @@ execute unless data storage rlk:config {installed:1b} run return 0
 # ===== 'player' 태그 보유자만 시스템 적용. 2명 이상이면 전원 태그 제거 (인벤/아이템 저장소가 1인 기준) =====
 execute store result score #pcount tmp if entity @a[tag=player]
 execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이크] ","color":"red","bold":true},{"text":"'player' 태그는 한 명만 가질 수 있습니다. 전원 태그를 제거합니다.","color":"red"}]
+# 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 느려짐(1인칭 점프 수정자)을 먼저 푼다
+execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
+# 연출 카메라에 잡혀 있던 플레이어(mboss/cam/hold, 태그 rlk_mb_camh)도 이 길에서는 아래 줄이 돌지 않으므로 여기서 풀어 준다
+execute if score #pcount tmp matches 2.. as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
+# 전투 개편 C: 입력 앞 단계. 이번 틱의 모든 피격(아바타의 바닐라 피격 · 커스텀 몹 · 나루카미 · 중간보스)보다 먼저 F(패링)와
+# 우클릭(닷지)을 받고, 이번 틱의 gametime(#now cb)과 퍼펙트 닷지 창(#dgOpen cb)을 정한다(player/def/input)
+execute store result score #now cb run time query gametime
+# round V (lane VP): 퍼펙트 패링 · 퍼펙트 닷지의 박자(player/def/beat/*). 박자가 도는 동안(#btK cb)만 그 시계가 이번 틱을 정한다: 세계를 멈춘
+# 틱(#btHold cb 1)에는 아래의 적 쪽 줄들(몹의 타이머 · 커스텀 몹과 그 투사체 · 나루카미 · 근접 재판정: 각 줄의 `unless score #btHold cb
+# matches 1`)과 중간보스(mboss/main 의 첫 줄이 되돌아감: 그 틱마다의 요청 #mbLowG · #mbCam 도 지워지지 않아 저중력 · 연출 잠금이 이어진다),
+# 닷지 재사용 대기가 돌지 않는다.
+# #now cb = 전투 시계 = gametime − 지금까지 멈춘 틱(#btAdj cb): 창 · 잠금 · 재사용 대기는 멈추지 않은 세계의 틱 수로 센다
+execute if score #btK cb matches 1.. run function rlk:player/def/beat/clock
+scoreboard players operation #now cb -= #btAdj cb
+execute as @a[tag=player] at @s run function rlk:player/def/input
+execute store success score #dgOpen cb if score #now cb <= #dgEnd cb
+# 창이 끝난 다음 틱에 시작 자리 상자를 지운다(그 틱을 놓쳤어도 지울 때까지: player/def/box_end)
+execute if score #dgBox cb matches 1 if score #now cb >= #dgKill cb run function rlk:player/def/box_end
 
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
 execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
+# 평타 휘두르기 느려짐(swHold): 이번 틱의 이동(view/move, 1인칭 점프 속성)보다 먼저 atkCD 에서 다시 구한다
+execute as @a[tag=player] run function rlk:player/swing/tick
+# 중간보스 저중력(tools/build_mboss_core.py mboss/lowg_on|off): 모듈이 이번 전투 틱에 요청했으면(#mbLowG 1) 플레이어와 아바타에 붙이고,
+# 아니면 아직 달고 있는 쪽(태그 rlk_lowg)에서 뗀다. view/tick(아바타 점프)보다 먼저
+execute if score #mbLowG mb matches 1 as @a[tag=player] run function rlk:mboss/lowg_on
+execute unless score #mbLowG mb matches 1 if entity @e[tag=rlk_lowg,limit=1] run function rlk:mboss/lowg_off
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick
 function rlk:combat/text_tick
+# 화면 위 미니맵(리소스팩 글꼴, 보이지 않는 흰색 보스바 이름)
+function rlk:minimap/tick
 function rlk:ditem/tick
 function rlk:shop/tick
-# 화살(활 캐릭터)
+# 투사체(로노바의 구체 · 잔향; 틀은 char/bow/arrow_*)
 execute as @e[tag=rlk_arrow] at @s run function rlk:char/bow/arrow_tick
 
 # 몹 처리 (넉백저항·경직·체력바·상태이상)
@@ -35,13 +61,29 @@ execute unless entity @e[tag=rlk_mob,limit=1] if entity @e[tag=rlk_hb_bg,limit=1
 execute if entity @e[tag=rlk_mshield,limit=1] run function rlk:combat/mshield_tick
 
 # 커스텀 몹(cm): 두뇌 · 투사체 · 모습/부착물 정리
-execute if entity @e[tag=rlk_cmb,limit=1] run function rlk:cm/world
+# 퍼펙트 닷지 창이 열린 동안(#dgOpen cb 1)은 몸 자리를 닷지를 시작한 자리(rlk_dgo)로 두고 판정한다: 그 자리에 닿은 공격 = 퍼펙트 닷지
+execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_on
+execute if entity @e[tag=rlk_cmb,limit=1] unless score #btHold cb matches 1 run function rlk:cm/world
 execute unless entity @e[tag=rlk_cmb,limit=1] if entity @e[tag=rlk_cmglob,limit=1] run kill @e[tag=rlk_cmglob]
-execute if entity @e[tag=rlk_cmp,limit=1] run function rlk:cm/pj/world
+execute if entity @e[tag=rlk_cmp,limit=1] unless score #btHold cb matches 1 run function rlk:cm/pj/world
+execute if score #dgOpen cb matches 1 run function rlk:player/def/ghost_off
 execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
 # Narukami boss AI, telegraphs, combat objects and orphan cleanup.
-execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
+execute unless score #btHold cb matches 1 if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
 execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux,limit=1] run function rlk:boss/raiden/cleanup
+# 보스바는 서버 전체에 남으므로, 불러와진 나루카미가 없으면(런 종료·로비 복귀·청크 밖) 바로 숨긴다
+execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
+# 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
+execute if score #mbLive mb matches 1 run function rlk:mboss/main
+# 연출 카메라 잠금(FN-cam, tools/build_mboss_core.py mboss/cam/*): 보스 모듈이 이번 전투 틱에 요청했으면(#mbCam 1; mboss/main 이 틱마다 지우고
+# 모듈의 틱이 다시 켬) 플레이어를 관전 모드로 카메라 거치대(#mbCamId 1 = rlk_mb_cam1, 2 = rlk_mb_cam2)에 붙여 두고(관전 중 Shift 는 관전을
+# 풀므로 틱마다 다시 spectate), 요청이 멈추면(연출 끝 · 취소 · 멈춤 · 사망 · /reload · 정리) 잡혀 있던 플레이어(태그 rlk_mb_camh)를 바로 푼다:
+# 관전 해제 · 게임 모드 복구 · 아바타 자리 · 보스 쪽 시선 · 받침 다시 탑승. 잡혀 있는 동안 view/tick 은 쉰다(그 파일의 한 줄)
+execute if score #mbCam mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/cam/hold
+execute unless score #mbCam mb matches 1 as @a[tag=rlk_mb_camh] run function rlk:mboss/cam/release
+# 전투 개편 C: 퍼펙트 닷지 창 동안 보스의 위험 지대 · 투사체를 닷지를 시작한 자리에서 한 번 더 판정(mboss/near_all; 몸이 이미 빠져나간 퍼펙트 닷지)
+execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 unless score #btHold cb matches 1 run function rlk:mboss/near_all
+execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
 execute as @e[tag=rlk_gold] at @s run function rlk:combat/gold_tick
@@ -53,13 +95,21 @@ function rlk:element/tick_world
 # 원소 입자 / 캐릭터 소환물
 execute as @e[tag=rlk_epart] at @s run function rlk:char/particle_tick
 execute as @e[tag=rlk_jav] at @s run function rlk:char/lumine/jav_tick
+# 나비아 금빛 카드 효과(tools/build_navia_fx_cards.py): 수명·보간·정리
+function rlk:fx/nv/world
+# 전투 개편 C: 패링 · 닷지 · 경고 섬광 효과의 나이(player/def/fx/world)
+execute if entity @e[tag=rlk_cb_fx,limit=1] run function rlk:player/def/fx/world
+# round V: 박자가 도는 동안의 뒤쪽 일(마네킹 캐릭터의 대역 리그, 느린 화면의 디스플레이 보간 늘이기; player/def/beat/post)
+execute if score #btK cb matches 1.. run function rlk:player/def/beat/post
+# round W (통합): 박자 없이 도는 대역 리그(마네킹 캐릭터의 더블 닷지 옆돌기, char/motion/dash2 → lite/f)도 같은 자리에서 한 틱
+execute unless score #btK cb matches 1.. as @a[tag=player,limit=1] if score @s plActive matches 1 run function rlk:char/motion/lite/tick
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems
 
-# 눈앞 atkBlock/atkStrike 인터랙션 유지 + 클릭 폴링 (좌클릭=공격, 우클릭=대쉬)
+# 눈앞 atkBlock/atkStrike 인터랙션 유지 + 좌클릭 폴링(공격). 우클릭(닷지)은 맨 앞의 player/def/input 이 받는다
 execute as @a[tag=player] run function rlk:combat/atkblock_manage
-# 대쉬 방향용 이전 위치 저장(다음 틱 델타)
+# 닷지 방향용 이전 위치 저장(다음 틱 델타)
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPX run data get entity @e[tag=rlk_body,limit=1] Pos[0] 100
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPZ run data get entity @e[tag=rlk_body,limit=1] Pos[2] 100
 # 로비

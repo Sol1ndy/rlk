@@ -1,0 +1,647 @@
+[
+ {
+  "id": "B1-tofu-title-box",
+  "t_start": 90.033,
+  "t_end": 206.45,
+  "category": "broken-glyph",
+  "severity": "high",
+  "what": "A white hollow rectangle (missing-glyph box) is drawn by the title on every tier-3 AND tier-2 parry: 16 occurrences in the combat parts, always ONE box, same place, no correct glyph beside it and no gold streak anywhere on screen. It never appears on the three perfect dodges (their red wash overlay renders correctly). No other text shows tofu (boss bar, HUD line, damage numbers, warning banner, reaction labels all render).",
+  "evidence": [
+   "tofu_all16.jpg",
+   "tofu_crop_f5404_x3.jpg",
+   "tofu_crop_f9630_x3.jpg",
+   "tofu_crop_f12140_x3.jpg",
+   "attack_90s_parry_strip.jpg"
+  ],
+  "measured": {
+   "box_px": {
+    "x": [
+     943,
+     988
+    ],
+    "y": [
+     450,
+     521
+    ],
+    "w": 46,
+    "h": 72,
+    "outline_thickness": 9,
+    "centre": [
+     965.5,
+     485.5
+    ],
+    "screen_centre": [
+     960,
+     540
+    ]
+   },
+   "occurrences": [
+    {
+     "first_frame": 5402,
+     "t": 90.033,
+     "frames_visible": 14,
+     "parry_tier_guess": 3,
+     "context": "P1 parry, boss pip 12-row -1"
+    },
+    {
+     "first_frame": 5504,
+     "t": 91.733,
+     "frames_visible": 15,
+     "parry_tier_guess": 3,
+     "context": "P1 parry, pip -1"
+    },
+    {
+     "first_frame": 5845,
+     "t": 97.417,
+     "frames_visible": 10,
+     "parry_tier_guess": 2,
+     "context": "P1 A3 first cut"
+    },
+    {
+     "first_frame": 9411,
+     "t": 156.85,
+     "frames_visible": 14,
+     "parry_tier_guess": 3,
+     "context": "G1 cut 4, shield 5->4"
+    },
+    {
+     "first_frame": 9464,
+     "t": 157.733,
+     "frames_visible": 10,
+     "parry_tier_guess": 2,
+     "context": "G1 cut 5, \"-2\" damage number, no shield break"
+    },
+    {
+     "first_frame": 9555,
+     "t": 159.25,
+     "frames_visible": 9,
+     "parry_tier_guess": 2,
+     "context": "G1 cut 6, \"-2\", no shield break"
+    },
+    {
+     "first_frame": 9628,
+     "t": 160.467,
+     "frames_visible": 12,
+     "parry_tier_guess": 3,
+     "context": "G1 cut 7, shield 4->3"
+    },
+    {
+     "first_frame": 10512,
+     "t": 175.2,
+     "frames_visible": 7,
+     "parry_tier_guess": 2,
+     "context": "P2, \"-2\""
+    },
+    {
+     "first_frame": 10848,
+     "t": 180.8,
+     "frames_visible": 12,
+     "parry_tier_guess": 3,
+     "context": "P2 A3 first cut"
+    },
+    {
+     "first_frame": 11835,
+     "t": 197.25,
+     "frames_visible": 15,
+     "parry_tier_guess": 3,
+     "context": "G2 cut 1, shield 5->4"
+    },
+    {
+     "first_frame": 11877,
+     "t": 197.95,
+     "frames_visible": 8,
+     "parry_tier_guess": 2,
+     "context": "G2 cut 2, \"-2\", no break"
+    },
+    {
+     "first_frame": 11929,
+     "t": 198.817,
+     "frames_visible": 14,
+     "parry_tier_guess": 3,
+     "context": "G2 cut 3, 4->3"
+    },
+    {
+     "first_frame": 12138,
+     "t": 202.3,
+     "frames_visible": 15,
+     "parry_tier_guess": 3,
+     "context": "G2 cut 6, 3->2"
+    },
+    {
+     "first_frame": 12210,
+     "t": 203.5,
+     "frames_visible": 14,
+     "parry_tier_guess": 3,
+     "context": "G2 cut 7, 2->1"
+    },
+    {
+     "first_frame": 12326,
+     "t": 205.433,
+     "frames_visible": 6,
+     "parry_tier_guess": 2,
+     "context": "G2 cut 9, no break"
+    },
+    {
+     "first_frame": 12373,
+     "t": 206.217,
+     "frames_visible": 14,
+     "parry_tier_guess": 3,
+     "context": "G2 cut 10, 1->0"
+    }
+   ],
+   "tier3_count": 10,
+   "tier2_count": 6,
+   "on_dodges": 0,
+   "drawn_at_same_time": "yellow-white full-screen flash (frame mean +12..+27 for ~10 frames, the vanilla flash particle), gold star glyph at the avatar chest (~80 px, renders fine), crit / end_rod / spark particles, yellow arcs at the feet (tier 3), a 14x10 px view jolt for 2-3 frames (tier 3)"
+  },
+  "likely_cause": "(established by the coordinator) streak.png and streak_s.png are 512x288, over the client glyph-atlas limit, so U+EE00 / U+EE01 fall back to the missing glyph; wash (256x144) and star (128x128) render. Note (unverified): glint.png is 320x64, also wider than 256."
+ },
+ {
+  "id": "A1-tier2-looks-like-perfect",
+  "t_start": 157.733,
+  "t_end": 205.5,
+  "category": "parry-feedback",
+  "severity": "high",
+  "what": "A tier-2 parry (3-5 ticks early) looks the same as a perfect parry: same box, same yellow screen flash, same star, only shorter (6-10 frames instead of 12-15) and a small purple \"-2\". In gauntlet 1 the player saw four \"parry effects\" (156.85, 157.73, 159.25, 160.47) but only two shield segments broke (5 -> 3), and the gauntlet was lost (-246 at 163.35). In gauntlet 2, seven effects, five breaks.",
+  "evidence": [
+   "tofu_all16.jpg",
+   "gauntlet1_cut7_160s.jpg",
+   "hud_160s_x2.5.jpg"
+  ],
+  "measured": {
+   "G1_parry_effects": 4,
+   "G1_segments_broken": 2,
+   "G2_parry_effects": 7,
+   "G2_segments_broken": 5,
+   "tier2_frames": [
+    10,
+    10,
+    9,
+    7,
+    8,
+    6
+   ],
+   "tier3_frames": [
+    14,
+    15,
+    14,
+    12,
+    12,
+    15,
+    14,
+    15,
+    14,
+    14
+   ],
+   "gauge_px_width_per_segment": 90
+  },
+  "likely_cause": "tier 2 uses the same flash / star / title overlay family as tier 3 (smaller values only), and the shield gauge is a 7-px bar far from the action"
+ },
+ {
+  "id": "A2-no-hitstop-no-slowmo",
+  "t_start": 90.033,
+  "t_end": 206.3,
+  "category": "parry-feedback",
+  "severity": "high",
+  "what": "Perfect parry: no hit-stop, no slow motion, no avatar reaction that reads. The whole event is: the box, a 10-frame pale-yellow screen flash, an ~80 px star at the avatar chest for ~15 frames, sparks, and a 1.5-degree view jolt that is undone 2-3 frames later. Frame-to-frame motion continues normally through the parry. Nothing lights up on the scythe.",
+  "evidence": [
+   "attack_90s_parry_strip.jpg",
+   "attack_91-92s_strip.jpg",
+   "gauntlet1_cut7_160s.jpg",
+   "slash_boss_175s.jpg"
+  ],
+  "measured": {
+   "view_jolt_px": {
+    "f5402": [
+     -14,
+     10
+    ],
+    "f5504": [
+     -14,
+     10
+    ],
+    "f9411": [
+     -4,
+     7
+    ],
+    "f9628": [
+     -15,
+     10
+    ],
+    "f12138": "not detected"
+   },
+   "jolt_frames": "2-3",
+   "flash_frames": "~10",
+   "star_px": "~80",
+   "hitstop_frames": 0
+  },
+  "likely_cause": "by design the effect is only particles + a 1-tick view rotation (\"does not stop or slow the server\")"
+ },
+ {
+  "id": "A3-dodge-feedback",
+  "t_start": 108.017,
+  "t_end": 186.6,
+  "category": "dodge-feedback",
+  "severity": "medium",
+  "what": "Three perfect dodges (108.02, 185.52, 186.30). Shown: a red-orange screen wash for 19-21 frames, a 1-px red outline of the avatar at the start spot for ~24 frames, red dust. The avatar itself only leans / lies flat and slides about one block (at 186.3 the body is horizontal for ~14 frames; at 108.0 it drops out of the bottom of the frame for ~6 frames). No flip, no slow motion, no camera effect. On the crimson phase-2 field the red wash and red outline are close to the background colour.",
+  "evidence": [
+   "dodge_108s_strip.jpg",
+   "dodge_108s_avatar.jpg",
+   "dodge_185s_strip.jpg",
+   "dodge_186s_avatar.jpg",
+   "slash_boss_186s.jpg"
+  ],
+  "measured": {
+   "wash_frames": [
+    20,
+    19,
+    20
+   ],
+   "wash_red_excess_peak_P1": 55,
+   "wash_red_excess_peak_P2": [
+    47,
+    41
+   ],
+   "outline_thickness_px": 1,
+   "hitstop_frames": 0
+  },
+  "likely_cause": "dodge = the generic dash pose; the effect palette (red) matches the phase-2 field"
+ },
+ {
+  "id": "C1-windup-unreadable",
+  "t_start": 74,
+  "t_end": 190,
+  "category": "attack-readability",
+  "severity": "high",
+  "what": "Her wind-ups cannot be read from the play camera. She is 170-200 px tall at 4-5 blocks (about 50 px at 10+ blocks); the blade is a 2-3 px line 60-90 px long; her torso and arms are covered by her own 90x90 px red four-petal ornament and usually by the avatar head (120 px wide), which sits on the same line of sight. Between the cue and the hit the silhouette barely changes (the hat tilts). In the 18 fight attacks examined I could name a pose change before the cue in 4.",
+  "evidence": [
+   "glint_native_p1_p2_g1.jpg",
+   "attack_90s_parry_strip.jpg",
+   "attack_91-92s_strip.jpg",
+   "attack_97s_strip.jpg",
+   "attack_77s_dash_strip.jpg",
+   "glint_check_b2.jpg"
+  ],
+  "measured": {
+   "boss_height_px": {
+    "4-5_blocks": "170-200",
+    "10+_blocks": "~50"
+   },
+   "hat_width_px": 115,
+   "blade_px": "2-3 x 60-90",
+   "ornament_px": "90x90",
+   "avatar_head_px": 120
+  },
+  "likely_cause": "poses are sword-arm changes on a 2-block rig seen from behind the avatar; no large body displacement, no trail on the blade before the hit"
+ },
+ {
+  "id": "C2-glint-visibility",
+  "t_start": 74,
+  "t_end": 207,
+  "category": "attack-readability",
+  "severity": "high",
+  "what": "The white-gold blade glint is the only visual tell and it is unreliable. Phase 1: it sits on / above her white hat over pale grass, ~90-125 px, 16-20 frames, low contrast. Phase 2: good contrast against crimson (~110 px, 20 frames at 185.15) but covered by flames / black smoke / white blobs from the player attacks in 3 of 5 cues checked (168.49: 3-4 frames visible; 174.82: covered after ~6 frames; 180.44: boss fully covered; 181.98: not visible). Gauntlets: visible in 2 of 8 cuts checked (160.08: ~200 px, 12+ frames; 198.41: ~8 frames), not on screen in 154.33, 156.48, 160.93, 201.18, 203.98, 205.84.",
+  "evidence": [
+   "glint_60fps_4cues.jpg",
+   "glint_native_p1_p2_g1.jpg",
+   "gauntlet_glint_check.jpg",
+   "glint_check_b1.jpg",
+   "glint_check_b2.jpg"
+  ],
+  "measured": {
+   "P1_px": "90-125",
+   "P1_frames": "16-20",
+   "P2_px": 110,
+   "P2_frames": 20,
+   "gauntlet_px_when_visible": 200,
+   "gauntlet_visible": "2 of 8",
+   "P2_unobstructed": "2 of 5"
+  },
+  "likely_cause": "guess: the glint card is anchored at the blade / her arrival spot and ends up inside or behind her body, the avatar or particle sprites; in phase 1 its colour matches hat and field"
+ },
+ {
+  "id": "C3-audio-cue",
+  "t_start": 75.1,
+  "t_end": 206.6,
+  "category": "attack-readability",
+  "severity": "low",
+  "what": "The parry cue sound works and is consistent: 57 cues found (P1 23, G1 9, P2 14, G2 11 = one per cut). It starts 0.35-0.40 s (21-24 frames) before the hit in all 16 cases where the hit frame is known from a parry effect. It is the only tell that is always present.",
+  "evidence": [],
+  "measured": {
+   "lead_s": [
+    0.387,
+    0.387,
+    0.371,
+    0.37,
+    0.362,
+    0.354,
+    0.387,
+    0.379,
+    0.362,
+    0.354,
+    0.379,
+    0.404,
+    0.379,
+    0.362,
+    0.387,
+    0.379
+   ],
+   "mean_lead_s": 0.375,
+   "spectral_peaks_hz": [
+    656,
+    680,
+    2040,
+    4480
+   ],
+   "duration_s": "~0.1"
+  },
+  "likely_cause": "n/a (works as designed: 7 ticks)"
+ },
+ {
+  "id": "C4-leap-attacks-leave-the-screen",
+  "t_start": 81.6,
+  "t_end": 94.8,
+  "category": "attack-readability",
+  "severity": "high",
+  "what": "In the leap attacks she leaves the top of the screen and the tell is off-screen. 81.6-82.6 (no cue sound, so unparriable; my guess A10): purple figure rises 81.65-81.9, nothing on screen 81.95-82.40 (27 frames), no yellow flash anywhere in the frame, a thin purple beam 82.40-82.55 (9 frames), impact -22. 93.9-94.8 (cue at 94.38; my guess A4): she is off-screen ~30 frames, then falls through the camera, -22.",
+  "evidence": [
+   "unparriable_leap_82s.jpg",
+   "attack_94s_leap_strip.jpg",
+   "camera_clip_into_boss.jpg"
+  ],
+  "measured": {
+   "offscreen_frames": [
+    27,
+    30
+   ],
+   "beam_frames_before_impact": 9,
+   "yellow_px_delta_82.0-82.4": 0
+  },
+  "likely_cause": "the tell is drawn on her chest while she is 5-6 blocks above the avatar, outside the third-person view cone"
+ },
+ {
+  "id": "C5-chest-flash-small",
+  "t_start": 84.2,
+  "t_end": 85.15,
+  "category": "attack-readability",
+  "severity": "medium",
+  "what": "The only chest colour flash I could find: a light-blue orb (my guess BLUE) at 84.30-84.80, about 25-30 px, ~30 frames, half hidden by the avatar head; she then crosses the avatar in ~6 frames (85.05-85.15), -16. No yellow or purple chest flash was identifiable anywhere in the fight footage.",
+  "evidence": [
+   "unparriable_blue_84s.jpg"
+  ],
+  "measured": {
+   "orb_px": "25-30",
+   "orb_frames": 30,
+   "dash_frames": 6
+  },
+  "likely_cause": "flash card is small (sub-block) and on the body line that the avatar occludes"
+ },
+ {
+  "id": "S1-boss-slash-crescent-misaligned",
+  "t_start": 79.0,
+  "t_end": 186.8,
+  "category": "slash-effect-alignment",
+  "severity": "high",
+  "what": "Boss cuts: the lilac crescent does not follow her blade. In 7 of 8 cuts it is a tall near-vertical arc (chord 70-85 degrees from horizontal) standing 1.5-4 blocks to one side of her, 2.5-5 blocks tall, which then rises and curls over the top for 24-36 frames. Her blade in the same frames is a short sweep that ends roughly horizontal or 30-45 degrees, often on the other side. The crescent starts on the hit frame (0-4 frames late) but reaches full size 6-12 frames later and is still sweeping 0.4-0.6 s after the blade stopped. Worst: 79.03 (about 4 blocks away from her, 190x450 px, blade pointing the other way), 97.45 (vertical arc on her left, blade ends horizontal on her right, ~70-90 degrees), 92.53 (240x530 px arc 2.5-3 blocks to her right, taller than she is by 2.5x). 175.20 is the closest match (downward chop on her right, vertical arc on her right, <=30 degrees) but 2 blocks further out and moving up while the blade went down. Gauntlet 160.50: a horizontal pale streak comes in from the left edge at head height while the ghost stands on the right with the blade pointing down-right.",
+  "evidence": [
+   "slash_boss_79s.jpg",
+   "slash_boss_97s.jpg",
+   "slash_boss_92s.jpg",
+   "slash_boss_175s.jpg",
+   "slash_boss_186s.jpg",
+   "attack_90s_parry_strip.jpg",
+   "attack_91-92s_strip.jpg",
+   "gauntlet1_cut7_160s.jpg"
+  ],
+  "measured": {
+   "cuts": [
+    {
+     "t": 79.03,
+     "crescent_px": "190x450",
+     "offset_blocks": "~4 (left / behind)",
+     "plane": "vertical ~80deg",
+     "blade": "pointing up-right ~35deg on the other side",
+     "mismatch_deg": "45-60",
+     "start_late_frames": "0-2",
+     "visible_frames": "30+"
+    },
+    {
+     "t": 90.03,
+     "crescent_px": "100x160 growing",
+     "offset_blocks": "~1.6 up-left",
+     "plane": "vertical",
+     "blade": "hidden",
+     "mismatch_deg": "unknown",
+     "start_late_frames": "<=4",
+     "visible_frames": "12+ (strip ends)"
+    },
+    {
+     "t": 91.73,
+     "crescent_px": "155x340",
+     "offset_blocks": "~1.5 left",
+     "plane": "vertical",
+     "blade": "hidden behind avatar",
+     "mismatch_deg": "unknown",
+     "start_late_frames": "1-4",
+     "visible_frames": "24+"
+    },
+    {
+     "t": 92.53,
+     "crescent_px": "240x530",
+     "offset_blocks": "2.5-3 right",
+     "plane": "vertical, curls over the top",
+     "blade": "not visible",
+     "mismatch_deg": "unknown",
+     "start_late_frames": 0,
+     "visible_frames": "30+"
+    },
+    {
+     "t": 97.42,
+     "crescent_px": "190x225+",
+     "offset_blocks": "~2.5 left",
+     "plane": "vertical 70-80deg",
+     "blade": "raised, ends horizontal to her right",
+     "mismatch_deg": "70-90",
+     "start_late_frames": "0-1",
+     "visible_frames": "24+"
+    },
+    {
+     "t": 160.47,
+     "crescent_px": "500+ long streak",
+     "offset_blocks": "comes from the opposite side",
+     "plane": "horizontal",
+     "blade": "down-right ~30deg",
+     "mismatch_deg": "~30, opposite side",
+     "start_late_frames": 0,
+     "visible_frames": "15+"
+    },
+    {
+     "t": 175.2,
+     "crescent_px": "40x200 -> 280x560",
+     "offset_blocks": "~2 right",
+     "plane": "vertical",
+     "blade": "chop down on her right",
+     "mismatch_deg": "<=30",
+     "start_late_frames": 0,
+     "visible_frames": "24+"
+    },
+    {
+     "t": 186.32,
+     "crescent_px": "30x110 -> large",
+     "offset_blocks": "~2 right",
+     "plane": "vertical, curls over",
+     "blade": "thin, unclear",
+     "mismatch_deg": "unknown",
+     "start_late_frames": 0,
+     "visible_frames": "24+"
+    }
+   ]
+  },
+  "likely_cause": "the crescents are hand-placed kit cards (qi_vert / qi_arc with a fixed roll / yaw / \"b ahead\" per hit, stood across her aim for the viewer) spawned at the body anchor on the hit tick, with a 4-frame sweep + 6-tick fade; nothing ties them to the blade bone path of the clip"
+ },
+ {
+  "id": "S2-player-scythe-effects",
+  "t_start": 78.2,
+  "t_end": 178.5,
+  "category": "slash-effect-alignment",
+  "severity": "medium",
+  "what": "Player (scythe): normal swings have almost no slash effect (78.2-78.5, 109.0-110.4: only small white / red squares), and the scythe model jumps 60-90 degrees between ticks. Where a trail exists (166.5-167.4) it is a thin orange line and a ring of dark-red dots that follows the scythe head path (plane within about 20 degrees, my estimate) but hangs in the air 20+ frames after the blade has left. The skill at 177.65-177.95 and 178.2-178.45 draws a straight magenta line ~25 degrees from horizontal across the screen while the avatar is out of frame; I could not compare it with the blade.",
+  "evidence": [
+   "player_swing_78s.jpg",
+   "player_swings_109s.jpg",
+   "player_swing_166s.jpg",
+   "slash_player_167s.jpg",
+   "player_skill_177s.jpg"
+  ],
+  "measured": {
+   "trail_linger_frames": "20+",
+   "pose_jump_deg_per_tick": "60-90",
+   "skill_line_angle_deg": 25
+  },
+  "likely_cause": "guess: particle trail sampled at the scythe head each tick (so it lags and is dotted); skill lines are placed from the aim, not the weapon"
+ },
+ {
+  "id": "G1-gauntlet-readability",
+  "t_start": 152,
+  "t_end": 207,
+  "category": "gauntlet",
+  "severity": "high",
+  "what": "Gauntlets: the lilac ghost itself reads well against the crimson field, but the cuts are hard to follow. She arrives from off-screen or from behind the camera within 6-12 frames; the glint is missing in most cuts (see C2); in 198.65 she is not in frame at all 10 frames before the hit. The cue sound is the only dependable tell (0.37 s). Cut times found: G1 hits at about 153.83, 154.70, 155.50, 156.85, 157.74, 159.27, 160.45, 161.30, 162.10 (2 perfect, 2 tier-2); G2 at 197.25, 197.95, 198.82, 200.47, 201.55, 202.30, 203.50, 204.35, 205.43, 206.22, 206.92 (5 perfect, 2 tier-2).",
+  "evidence": [
+   "gauntlet_cuts_tells.jpg",
+   "gauntlet_glint_check.jpg",
+   "glint_check_b1.jpg",
+   "gauntlet1_cut7_160s.jpg"
+  ],
+  "measured": {
+   "G1_cuts": 9,
+   "G1_perfect": 2,
+   "G2_cuts": 11,
+   "G2_perfect": 5,
+   "arrival_frames": "6-12"
+  },
+  "likely_cause": "arrival points are chosen around the player without regard to the camera; the tell card is not kept in view"
+ },
+ {
+  "id": "G2-gauntlet1-finish",
+  "t_start": 162.45,
+  "t_end": 163.55,
+  "category": "gauntlet",
+  "severity": "medium",
+  "what": "End of gauntlet 1 (failed): the screen is empty for 45 frames (162.50-163.25), then a 12-px purple beam over the avatar for 6 frames, the plunge with -246 (half of 492 HP) at 163.35, and at 163.43-163.53 (~7 frames) a pale lilac-white flat shape with a straight edge covers the right ~55 % of the screen (x 900-1920, full height).",
+  "evidence": [
+   "gauntlet1_end_163s.jpg",
+   "gauntlet1_fail_163s.jpg",
+   "camera_clip_into_boss.jpg"
+  ],
+  "measured": {
+   "empty_frames": 45,
+   "beam_px": 12,
+   "beam_frames": 6,
+   "shape_frames": 7,
+   "shape_cover": "~55 % of the width"
+  },
+  "likely_cause": "guess: the plunge light-column card (or her hat) seen from inside while the knock-back shoves the camera through it"
+ },
+ {
+  "id": "K1-camera-clips-into-boss",
+  "t_start": 85.05,
+  "t_end": 172.2,
+  "category": "camera",
+  "severity": "medium",
+  "what": "Whenever she lands on or dashes through the player her model passes through / in front of the camera and hides the avatar: 85.10-85.15 (hat fills the bottom, ~6 frames), 94.70-94.80 (whole model fills the view, ~8 frames), 102.63-103.2 (her hat sits between camera and avatar for 36+ frames), 164.7-164.9, 172.0-172.2.",
+  "evidence": [
+   "camera_clip_into_boss.jpg",
+   "attack_94s_leap_strip.jpg",
+   "clutter_164s.jpg",
+   "attack_172s_strip.jpg"
+  ],
+  "measured": {
+   "frames": [
+    6,
+    8,
+    36
+   ]
+  },
+  "likely_cause": "landing / dash end points are on the player position, between the third-person camera and the avatar"
+ },
+ {
+  "id": "H1-clutter",
+  "t_start": 79,
+  "t_end": 183,
+  "category": "clutter",
+  "severity": "medium",
+  "what": "Player-side effects bury her head and blade: 30-60 ground flames, black smoke-like pixel clusters and large white pixel blobs after skills (111.2-113.4, 164.9-165.5, 175.0-175.2, 180.4-180.8: she is fully covered for 15+ frames during a cue). Big orange damage numbers with diamond ornaments (~200 px wide: \"104\", \"311\", \"218\") float exactly above her hat where the glint is, and purple \"-13\" numbers stay 45+ frames near the avatar head. A full-screen magenta tint for 23 and 21 frames at 87.58 and 165.58 (my guess: the player burst) hides everything.",
+  "evidence": [
+   "clutter_108-114s.jpg",
+   "clutter_164s.jpg",
+   "glint_check_b1.jpg",
+   "glint_check_b2.jpg",
+   "player_burst_tint_87s.jpg",
+   "attack_78-80s_strip.jpg"
+  ],
+  "measured": {
+   "tint_frames": [
+    23,
+    21
+   ],
+   "damage_number_px": 200,
+   "covered_frames": "15+"
+  },
+  "likely_cause": "vanilla particle sprites at default size around the target; numbers anchored at her head height"
+ },
+ {
+  "id": "H2-hud-sizes",
+  "t_start": 74,
+  "t_end": 207,
+  "category": "hud",
+  "severity": "medium",
+  "what": "Boss bar: HP bar 450x16 px, the gauge is a 450x7 px purple bar with no visible dividers (the \"5 segments\" cannot be counted, each is 90 px), the 12 balance diamonds are 10-11 px each at 18 px pitch. The gauntlet-2 warning is one line of white text 640x16 px at y 137-152 with no backing plate, shown from 193.10 to the end of the gauntlet; \"즉사\" is red on a dark red background. Player line at the bottom is ~9 px text; \"생명의 계약 29%\" is dim red on the crimson field.",
+  "evidence": [
+   "hud_160s_x2.5.jpg",
+   "gauntlet2_leadin_195s_full.jpg",
+   "gauntlet2_banner_crop_x2.jpg"
+  ],
+  "measured": {
+   "hp_bar_px": [
+    450,
+    16
+   ],
+   "gauge_px": [
+    450,
+    7
+   ],
+   "diamond_px": [
+    11,
+    10
+   ],
+   "diamond_pitch_px": 18,
+   "banner_px": [
+    640,
+    16
+   ],
+   "banner_first_s": 193.1
+  },
+  "likely_cause": "boss-bar font rows at GUI scale; the banner uses a boss-bar name line"
+ }
+]

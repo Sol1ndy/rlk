@@ -1,0 +1,1 @@
+$summon minecraft:mannequin ~ ~ ~ {Tags:["rlk_cb_fx","rlk_cb_ghost","rlk_pet","rlk_cb_new"],hide_description:1b,immovable:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,Glowing:1b,active_effects:[{id:"minecraft:invisibility",duration:-1,amplifier:0,show_particles:0b,ambient:1b}],profile:$(prof)}

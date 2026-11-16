@@ -1,6 +1,6 @@
 # 각인 매 틱 (@s = 플레이어)
 # 정보 아이템이 제자리에 없으면 다시 만든다
-execute unless items entity @s inventory.7 minecraft:amethyst_shard[minecraft:custom_data~{rlk_eng:1b}] unless score @s devMode matches 1 run function rlk:engravings/info_build
+execute unless items entity @s inventory.7 *[minecraft:custom_data~{rlk_eng:1b}] unless score @s devMode matches 1 run function rlk:engravings/info_build
 # 각인 아이템을 집어 옮겼으면 다시 놓는다(커서에 든 것 = 인벤토리 밖의 사본이 생김)
 execute unless score @s devMode matches 1 store result score #t1 eng run clear @s *[minecraft:custom_data~{rlk_engi:1b}] 0
 execute unless score @s devMode matches 1 unless score #t1 eng = @s engItems run function rlk:engravings/info_fix

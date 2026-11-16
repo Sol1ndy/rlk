@@ -69,10 +69,6 @@ fill 20 210 0 39 210 19 minecraft:polished_deepslate
 fill 21 210 0 38 210 18 minecraft:air
 fill 40 210 -20 59 210 -1 minecraft:polished_deepslate
 fill 40 210 -19 58 210 -2 minecraft:air
-fill 25 201 -19 26 201 -18 minecraft:podzol
-fill 26 201 -17 26 201 -16 minecraft:podzol
-fill 27 201 -16 58 201 -16 minecraft:podzol
-fill 28 201 -15 58 201 -15 minecraft:podzol
 fill 53 201 -12 58 201 -12 minecraft:podzol
 fill 53 201 -11 54 201 -9 minecraft:podzol
 fill 55 201 -9 58 201 -9 minecraft:podzol
@@ -87,10 +83,6 @@ fill 31 201 9 31 201 14 minecraft:podzol
 fill 27 201 12 30 201 12 minecraft:podzol
 fill 28 201 13 30 201 13 minecraft:podzol
 fill 24 201 17 26 201 17 minecraft:podzol
-fill 27 201 -19 27 201 -17 minecraft:dirt
-fill 27 202 -19 27 202 -17 minecraft:podzol
-fill 28 201 -17 58 201 -17 minecraft:dirt
-fill 28 202 -17 58 202 -17 minecraft:podzol
 fill 55 201 -11 58 201 -10 minecraft:dirt
 fill 55 202 -11 58 202 -10 minecraft:podzol
 fill 28 201 9 30 201 9 minecraft:dirt
@@ -103,8 +95,6 @@ fill 24 201 16 24 201 16 minecraft:stone
 fill 24 202 16 24 202 16 minecraft:podzol
 fill 26 201 16 26 201 16 minecraft:stone
 fill 26 202 16 26 202 16 minecraft:podzol
-fill 28 201 -19 58 202 -18 minecraft:dirt
-fill 28 203 -19 58 203 -18 minecraft:podzol
 fill 24 201 12 26 202 13 minecraft:mossy_cobblestone
 fill 24 203 12 26 203 13 minecraft:podzol
 fill 21 201 12 23 202 15 minecraft:stone

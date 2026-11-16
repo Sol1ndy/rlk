@@ -1,0 +1,21 @@
+# Internal: the hand set (apRigHands x apRigTint).
+execute if score @s apRigHands matches 0 if score @s apRigTint matches 0 run function rlk:boss/apep/rig/look/r/hands/p1_rest_0
+execute if score @s apRigHands matches 0 if score @s apRigTint matches 1 run function rlk:boss/apep/rig/look/r/hands/p1_rest_1
+execute if score @s apRigHands matches 0 if score @s apRigTint matches 2 run function rlk:boss/apep/rig/look/r/hands/p1_rest_2
+execute if score @s apRigHands matches 0 if score @s apRigTint matches 3 run function rlk:boss/apep/rig/look/r/hands/p1_rest_3
+execute if score @s apRigHands matches 0 if score @s apRigTint matches 4 run function rlk:boss/apep/rig/look/r/hands/p1_rest_4
+execute if score @s apRigHands matches 1 if score @s apRigTint matches 0 run function rlk:boss/apep/rig/look/r/hands/p1_lift_0
+execute if score @s apRigHands matches 1 if score @s apRigTint matches 1 run function rlk:boss/apep/rig/look/r/hands/p1_lift_1
+execute if score @s apRigHands matches 1 if score @s apRigTint matches 2 run function rlk:boss/apep/rig/look/r/hands/p1_lift_2
+execute if score @s apRigHands matches 1 if score @s apRigTint matches 3 run function rlk:boss/apep/rig/look/r/hands/p1_lift_3
+execute if score @s apRigHands matches 1 if score @s apRigTint matches 4 run function rlk:boss/apep/rig/look/r/hands/p1_lift_4
+execute if score @s apRigHands matches 2 if score @s apRigTint matches 0 run function rlk:boss/apep/rig/look/r/hands/p3_open_0
+execute if score @s apRigHands matches 2 if score @s apRigTint matches 1 run function rlk:boss/apep/rig/look/r/hands/p3_open_1
+execute if score @s apRigHands matches 2 if score @s apRigTint matches 2 run function rlk:boss/apep/rig/look/r/hands/p3_open_2
+execute if score @s apRigHands matches 2 if score @s apRigTint matches 3 run function rlk:boss/apep/rig/look/r/hands/p3_open_3
+execute if score @s apRigHands matches 2 if score @s apRigTint matches 4 run function rlk:boss/apep/rig/look/r/hands/p3_open_4
+execute if score @s apRigHands matches 3 if score @s apRigTint matches 0 run function rlk:boss/apep/rig/look/r/hands/p3_curl_0
+execute if score @s apRigHands matches 3 if score @s apRigTint matches 1 run function rlk:boss/apep/rig/look/r/hands/p3_curl_1
+execute if score @s apRigHands matches 3 if score @s apRigTint matches 2 run function rlk:boss/apep/rig/look/r/hands/p3_curl_2
+execute if score @s apRigHands matches 3 if score @s apRigTint matches 3 run function rlk:boss/apep/rig/look/r/hands/p3_curl_3
+execute if score @s apRigHands matches 3 if score @s apRigTint matches 4 run function rlk:boss/apep/rig/look/r/hands/p3_curl_4

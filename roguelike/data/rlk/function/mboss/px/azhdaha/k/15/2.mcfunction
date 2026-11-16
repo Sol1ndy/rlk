@@ -1,0 +1,33 @@
+# Clip charge_run (id 15) tick 2: the proxy columns that moved.
+data modify storage rlk:mboss px.o.tail1_x set value 0.029d
+data modify storage rlk:mboss px.o.tail1_z set value -5.939d
+data modify storage rlk:mboss px.top.tail1 set value 3.779f
+data merge entity 524c4b4d-415a-4400-8000-000000000045 {height:3.779f}
+data modify storage rlk:mboss px.o.tail2_x set value 0.171d
+data modify storage rlk:mboss px.o.tail2_z set value -10.04d
+data modify storage rlk:mboss px.top.tail2 set value 2.705f
+data merge entity 524c4b4d-415a-4400-8000-000000000046 {height:2.705f}
+data modify storage rlk:mboss px.o.tail3_x set value 0.159d
+data modify storage rlk:mboss px.o.tail3_z set value -13.572d
+data modify storage rlk:mboss px.top.tail3 set value 1.96f
+data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:1.96f}
+data modify storage rlk:mboss px.o.tail4_x set value -0.313d
+data modify storage rlk:mboss px.o.tail4_z set value -17.253d
+data modify storage rlk:mboss px.top.tail4 set value 2.784f
+data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:2.784f}
+data modify storage rlk:mboss px.o.paw_l_x set value 3.15d
+data modify storage rlk:mboss px.o.paw_l_z set value 3.233d
+data modify storage rlk:mboss px.top.paw_l set value 3.371f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.371f}
+data modify storage rlk:mboss px.o.paw_r_x set value -3.15d
+data modify storage rlk:mboss px.o.paw_r_z set value 2.735d
+data modify storage rlk:mboss px.top.paw_r set value 3.335f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.335f}
+data modify storage rlk:mboss px.o.foot_l_x set value 2.5d
+data modify storage rlk:mboss px.o.foot_l_z set value -2.85d
+data modify storage rlk:mboss px.top.foot_l set value 2.92f
+data merge entity 524c4b4d-415a-4400-8000-00000000004b {height:2.92f}
+data modify storage rlk:mboss px.o.foot_r_x set value -2.5d
+data modify storage rlk:mboss px.o.foot_r_z set value -1.85d
+data modify storage rlk:mboss px.top.foot_r set value 2.92f
+data merge entity 524c4b4d-415a-4400-8000-00000000004c {height:2.92f}

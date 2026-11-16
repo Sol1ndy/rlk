@@ -103,7 +103,6 @@ fill 49 201 -9 49 201 -7 minecraft:podzol
 fill 38 201 -8 38 201 -6 minecraft:podzol
 fill 31 201 -6 37 201 -6 minecraft:podzol
 fill 43 201 -6 47 201 -6 minecraft:podzol
-fill 28 201 -3 58 201 -2 minecraft:podzol
 fill 30 201 -39 30 201 -38 minecraft:dirt
 fill 30 202 -39 30 202 -38 minecraft:podzol
 fill 36 201 -39 36 201 -38 minecraft:dirt
@@ -241,7 +240,7 @@ execute positioned 36 201 -25 run function rlk:room/prop/i_petal
 execute positioned 58 201 -25 run function rlk:room/prop/i_petal
 execute positioned 30 201 -33 run function rlk:room/prop/i_grass
 execute positioned 43 204 -31 run function rlk:room/prop/i_petal
-execute positioned 38 202 -3 run function rlk:room/prop/i_petal
+execute positioned 38 201 -3 run function rlk:room/prop/i_petal
 execute positioned 41 201 -17 run function rlk:room/prop/i_petal
 execute positioned 32 202 -6 run function rlk:room/prop/i_petal
 execute positioned 28 201 -20 run function rlk:room/prop/i_petal

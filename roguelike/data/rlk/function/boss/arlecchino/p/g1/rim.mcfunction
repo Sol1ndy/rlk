@@ -1,0 +1,18 @@
+# G1 rim (@s = body): twelve blades erupt around the rim (r 24, 30 deg apart), the floor tint grows (34 t).
+kill @e[type=minecraft:item_display,tag=rlk_kn_blade,tag=rlk_kn_p_g1]
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 0 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 30 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 60 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 90 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 120 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 150 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 180 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 210 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 240 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 270 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 300 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated 330 0 positioned ^ ^ ^24 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_p","rlk_kn_p_g1","rlk_kn_blade","rlk_kn_new"],teleport_duration:1}
+execute as @e[type=minecraft:item_display,tag=rlk_kn_new] run function rlk:boss/arlecchino/fx/prop/blade
+tag @e[type=minecraft:item_display,tag=rlk_kn_new] remove rlk_kn_new
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] run function rlk:boss/arlecchino/fx/snd/rim
+execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] positioned ~ 201 ~ run function rlk:boss/arlecchino/fx/decal/rim_tint {r0:0,r:240,t:34}

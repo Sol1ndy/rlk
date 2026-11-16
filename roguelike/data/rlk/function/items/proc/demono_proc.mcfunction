@@ -1,6 +1,6 @@
-# @s = 플레이어, at @s. 데모노미콘 발동: 3개 마법 중 하나를 10초간 활성화
+# @s = 플레이어, at @s. 데모노미콘 발동: 3개 마법 중 하나를 #demonoDur 틱(기본 10초) 동안 활성화
 scoreboard players set @s bookPages 0
-scoreboard players set @s demonoBuff 200
+scoreboard players operation @s demonoBuff = #demonoDur tmp
 execute store result score @s demonoType run random value 1..3
 particle minecraft:witch ~ ~1 ~ 1 1.2 1 0.3 60
 particle minecraft:enchant ~ ~2 ~ 1 1 1 1 40

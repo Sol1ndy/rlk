@@ -27,16 +27,11 @@ fill -6 201 3 -6 201 5 minecraft:tuff
 fill -2 201 3 -2 201 12 minecraft:tuff
 fill -8 201 4 -8 201 5 minecraft:tuff
 fill -5 201 4 -3 201 11 minecraft:tuff
-fill -19 201 5 -17 201 5 minecraft:tuff
-fill -17 201 6 -17 201 15 minecraft:tuff
 fill -4 201 12 -3 201 12 minecraft:tuff
-fill -19 201 14 -18 201 16 minecraft:tuff
 fill -6 201 1 -2 201 2 minecraft:cobbled_deepslate
 fill -6 202 1 -2 202 2 minecraft:tuff
 fill -5 201 3 -3 201 3 minecraft:cobbled_deepslate
 fill -5 202 3 -3 202 3 minecraft:tuff
-fill -19 201 6 -18 201 13 minecraft:cobbled_deepslate
-fill -19 202 6 -18 202 13 minecraft:tuff
 execute positioned -17 201 18 run function rlk:room/prop/m_ore_b
 execute positioned -3 201 18 run function rlk:room/prop/m_rail_z
 execute positioned -10 201 9 run function rlk:room/prop/m_rail_z

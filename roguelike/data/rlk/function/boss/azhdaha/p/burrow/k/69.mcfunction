@@ -1,0 +1,3 @@
+# burrow #azPT 69
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p9r1,limit=1] run function rlk:boss/azhdaha/p/burrow/ring_hit
+kill @e[tag=rlk_mb_az_p9r1]

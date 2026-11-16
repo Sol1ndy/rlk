@@ -1,0 +1,488 @@
+[
+ {
+  "id": "T1-GHOST-1",
+  "t_start": 28.7,
+  "t_end": 72.5,
+  "category": "translucent_ghost",
+  "severity": "high",
+  "what": "A translucent brown zombie-shaped body (husk: block head, torso, two legs, arms at sides) hangs in the air above/beside her in most CS0 shots that frame her from nearby. 32.5 s: top right, about x1360-1590 y0-550 (230x550 px). 41.5 s: huge, x310-650 y0-720. 63.4-64.9 s (leap, camera looks up): fills about 60% of the frame as a brown hourglass. 70.5-72.5 s: two leg bars at top centre x930-1100 y0-215. Also 53.9-63.4 s as a column over her hat.",
+  "evidence": [
+   "ghosts_t1.jpg",
+   "ghost_crops2.jpg",
+   "rv/cs0_06.jpg",
+   "rv/cs0_07.jpg"
+  ],
+  "measured": {
+   "shots_with_it": [
+    "28.7-35.2",
+    "39.4-43.8",
+    "53.9-63.4",
+    "63.4-64.9",
+    "69.4-72.5"
+   ],
+   "max_screen_fraction": 0.6
+  },
+  "likely_cause": "guess: an Invisible husk (the framework body / hit proxy) parked above the rig; spectator mode draws invisible mobs translucent"
+ },
+ {
+  "id": "T1-GHOST-2",
+  "t_start": 124.5,
+  "t_end": 130.5,
+  "category": "translucent_ghost",
+  "severity": "medium",
+  "what": "A translucent vanilla armour stand (pole, cross-bar, base plate visible) floats high above her at the far end of the stage axis, about 40x105 px at x860-900 y20-125 in the S6-S8 shots; the same object is seen in t2 (10-12 s, 36-38 s).",
+  "evidence": [
+   "ghosts_mix.jpg",
+   "rv/cs1_01.jpg"
+  ],
+  "measured": {
+   "size_px": [
+    40,
+    105
+   ]
+  },
+  "likely_cause": "an Invisible (non-marker-size) armour stand rendered translucent to a spectator; guess: an anchor / stage helper"
+ },
+ {
+  "id": "T1-GHOST-3",
+  "t_start": 2.4,
+  "t_end": 3.3,
+  "category": "translucent_ghost",
+  "severity": "medium",
+  "what": "Arrival: two tall translucent grey slabs left and right of the actor (each about 150-250 px wide, full height) and a translucent armour-stand silhouette at the left, over a pale sky-blue fog instead of the night arena.",
+  "evidence": [
+   "t1_start.jpg",
+   "ghosts_mix.jpg"
+  ],
+  "measured": {
+   "duration_s": 0.9
+  },
+  "likely_cause": "guess: near-camera invisible entities (rift / seat / stands) + the blindness fade showing fog colour"
+ },
+ {
+  "id": "T1-GHOST-4",
+  "t_start": 138.5,
+  "t_end": 146.5,
+  "category": "translucent_ghost",
+  "severity": "medium",
+  "what": "CS1 close shots (S10/S11): a large translucent brown rectangle covers the top-left of the frame (about x0-540 y0-230 at 138.5 s) and a dark translucent hat-shaped blob sits over her head from 139 s; ending aerial shot 225.5 s: translucent yellow-brown trapezoid x480-1345 y0-320.",
+  "evidence": [
+   "ghosts_mix.jpg",
+   "rv/cs1_03.jpg",
+   "ghosts_t1.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "same invisible husk seen from close / from below (guess)"
+ },
+ {
+  "id": "T1-STUTTER-1",
+  "t_start": 7.4,
+  "t_end": 10.42,
+  "category": "camera_stutter",
+  "severity": "high",
+  "what": "I3 moon shot (scripted slow pan: look point slides 6 blocks over 59 ticks, eye fixed = pure rotation): the whole picture (top and bottom bands together) moves in bursts and rests. 6 bursts of 5-9 frames, about 13-16 px each, separated by rests of 17-28 frames; 42% of frames are exact repeats.",
+  "evidence": [
+   "plot_444.jpg"
+  ],
+  "measured": {
+   "net_px": -80,
+   "burst_frames": "5-9",
+   "burst_px": "13-16",
+   "rest_frames": "17-28",
+   "bursts": 6,
+   "kind": "rotation"
+  },
+  "likely_cause": "each burst is one 1.4-degree rotation quantum (entity rotation is sent as a byte, 360/256), glided by the client over ~3 ticks; the pan is ~0.14 deg/tick so a new quantum arrives only every ~9-12 ticks"
+ },
+ {
+  "id": "T1-STUTTER-2",
+  "t_start": 14.4,
+  "t_end": 17.9,
+  "category": "camera_stutter",
+  "severity": "high",
+  "what": "I5 profile (0.1-block dolly over 69 ticks): the frame is still, then nudges ~17 px sideways in 8 frames, three times in 3.5 s (rests of 54-56 frames).",
+  "evidence": [
+   "plot_864.jpg"
+  ],
+  "measured": {
+   "nudge_px": 17,
+   "nudge_frames": 8,
+   "rest_frames": "54-56",
+   "nudges": 3
+  },
+  "likely_cause": "one 1.4-degree rotation quantum per nudge (entity rotation is sent as a byte); cam.py predicts exactly this for pans under 0.4 deg/tick"
+ },
+ {
+  "id": "T1-STUTTER-3",
+  "t_start": 28.68,
+  "t_end": 35.2,
+  "category": "camera_stutter",
+  "severity": "medium",
+  "what": "I9 over-the-shoulder slow push: foreground creeps 1 px every 9-14 frames (73 px in 6.5 s) and there is one 12-16 px vertical nudge in 8 frames at 30.72 s.",
+  "evidence": [
+   "plot_1721.jpg"
+  ],
+  "measured": {
+   "creep": "1 px / 9-14 frames",
+   "nudge_px": "12-16",
+   "nudge_t": 30.72
+  },
+  "likely_cause": "slow position move + one rotation quantum"
+ },
+ {
+  "id": "T1-STUTTER-4",
+  "t_start": 53.88,
+  "t_end": 59.6,
+  "category": "camera_stutter",
+  "severity": "medium",
+  "what": "I15 walk-back shot: the ground under her jitters +-8-13 px at irregular 3-9-frame intervals while the distant background creeps 1 px per 11-17 frames.",
+  "evidence": [
+   "plot_3233.jpg",
+   "rv/cs0_05.jpg"
+  ],
+  "measured": {
+   "ground_jitter_px": "8-13",
+   "bg_creep": "1 px / 11-17 frames"
+  },
+  "likely_cause": "guess: the per-tick re-aim at her flips between neighbouring 1.4-degree rotation values"
+ },
+ {
+  "id": "T1-STUTTER-5",
+  "t_start": 69.4,
+  "t_end": 72.2,
+  "category": "camera_stutter",
+  "severity": "high",
+  "what": "I19 pull-back (1.7 blocks over 50 ticks): motion in bursts of 4-8 frames (8-14 px) with rests of 22-64 frames; plus a 16 px nudge at 71.8 s.",
+  "evidence": [
+   "plot_4164.jpg"
+  ],
+  "measured": {
+   "moving_frames_pct": 19,
+   "rest_frames": "22-64"
+  },
+  "likely_cause": "rotation quanta while the eye pulls back and the aim at her changes slowly (same as T1-STUTTER-1)"
+ },
+ {
+  "id": "T1-STUTTER-6",
+  "t_start": 268.05,
+  "t_end": 271.5,
+  "category": "camera_stutter",
+  "severity": "low",
+  "what": "Ending coda slow tilt: background rises 1 px every 6-12 frames for 3 s (34 px), single-pixel steps.",
+  "evidence": [
+   "plot_16083.jpg"
+  ],
+  "measured": {
+   "creep": "1 px / 6-12 frames"
+  },
+  "likely_cause": "slow move below the rotation resolution"
+ },
+ {
+  "id": "T1-MOVE-OK",
+  "t_start": 10.42,
+  "t_end": 231.35,
+  "category": "camera_stutter",
+  "severity": "low",
+  "what": "Position moves and fast turns are acceptable: I2 side track 4.9-7.4 s (3-block sideways move; sub-pixel creep, 20% of frames move by <=1 px, median gap 4 frames, no bursts), I4 tilt 12.9-14.4 s (+360 px, 6 px/frame median, one repeated frame every 3-15 frames), I16 leap follow 63.4-64.9 s (steps up to 27 px), ending tilt 224.65-226.45 s (+323 px), pan 230.15-231.35 s (84% of frames move, 6 px/frame). All other shots (37 of 55) are static.",
+  "evidence": [
+   "shots.txt",
+   "runall.txt"
+  ],
+  "measured": {
+   "static_shots": 37,
+   "shots_total": 55
+  },
+  "likely_cause": "-"
+ },
+ {
+  "id": "T1-CUT-1",
+  "t_start": 7.4,
+  "t_end": 283.3,
+  "category": "hard_cut",
+  "severity": "high",
+  "what": "Most hard cuts are not clean: the new shot arrives sliding, turning or zooming for 2-6 frames (33-100 ms). Verified: 7.40 s (pans 4 frames), 17.90 s (first 3 frames are inside her body: giant limbs fill the frame), 28.68 s (6 frames sliding past her head), 53.88 s (4 frames of empty field and moon before she is in frame), 119.00 s (4-frame zoom-in), 138.50 s (4 frames), 211.40 s, 275.03 s (2 frames far too close, then the real framing). 30 of 55 cuts show it; 9 are clean.",
+  "evidence": [
+   "cuts_a.jpg",
+   "cuts_b.jpg",
+   "mid_t1.jpg"
+  ],
+  "measured": {
+   "cuts_total": 55,
+   "cuts_with_settle": 30,
+   "settle_frames": "2-6"
+  },
+  "likely_cause": "the newly live stand is still being interpolated (position and/or head rotation over 3 client ticks) when the camera switches to it"
+ },
+ {
+  "id": "T1-FLICKER-0",
+  "t_start": 5,
+  "t_end": 289,
+  "category": "spectate_flicker",
+  "severity": "low",
+  "what": "No out-and-back view jump was found in t1 cutscenes at 60 fps (scan for a jump that returns within 6 frames: 0 hits besides the scripted 3-frame white flash at 145.70 s). What reads as flicker in t1 is the cut settle (T1-CUT-1). The flicker is reproduced 37 times in t2 (T2-CLICK).",
+  "evidence": [],
+  "measured": {
+   "hits": 0
+  },
+  "likely_cause": "the player did not click during t1 cutscenes (guess)"
+ },
+ {
+  "id": "T1-HUD-1",
+  "t_start": 1.9,
+  "t_end": 289,
+  "category": "hud",
+  "severity": "medium",
+  "what": "During every cutscene: the crosshair (+, ~10 px, screen centre) stays on; the scoreboard sidebar stays at the right edge (x1740-1920, y505-555: \"스택 / 붉은 죽음의 가면 1\", red); a loot toast \"사파이어 +1\" sits at the left edge y970-990 during 216.0-224.6 s; the boss bar stays up through the whole repel cutscene 208.0-214.4 s; the chat box of the test command is on screen 1.9-10 s. Hotbar and hearts are hidden correctly.",
+  "evidence": [
+   "hud_text.jpg",
+   "rv/rep_00.jpg",
+   "rv/end_00.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "spectator mode keeps the crosshair; sidebar, toast and boss bar are not suppressed"
+ },
+ {
+  "id": "T1-HUD-2",
+  "t_start": 73.9,
+  "t_end": 74.3,
+  "category": "hud",
+  "severity": "low",
+  "what": "At the hand-back the vanilla actionbar \"Press Left Shift to Dismount\" shows above the hotbar (also t2 23.9 s).",
+  "evidence": [
+   "hud_text.jpg",
+   "t2_fightstart.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "the player is re-seated on the third-person seat"
+ },
+ {
+  "id": "T1-TEXT-1",
+  "t_start": 14.8,
+  "t_end": 288.3,
+  "category": "dialogue",
+  "severity": "high",
+  "what": "Lines are small white text with a thin shadow and no backdrop, centred at y575-597 (just under the crosshair), glyph height about 18 px at 1080p, width up to ~870 px. In close shots they lie across her face/chest and over pale dry grass and are hard to read (e.g. 28.7-33.2 s, 54-63 s, 142.4-144 s under the petal). Lines are up 2.1-7.7 s each (CS0: 2.7, 3.1, 3.1, 4.5, 6.5 s, then 19.6 s of back-to-back lines; ending: 3.0, 3.5, 2.1, 7.7, 6.5, 6.7, 4.5 s). The skip hint is even smaller: about 215x13 px at x850-1065 y920-930, grey, no backdrop.",
+  "evidence": [
+   "hud_text.jpg",
+   "rv/cs0_05.jpg"
+  ],
+  "measured": {
+   "glyph_px": 18,
+   "y": [
+    575,
+    597
+   ],
+   "hint_px": [
+    215,
+    13
+   ]
+  },
+  "likely_cause": "lines drawn as a title subtitle at GUI scale 2"
+ },
+ {
+  "id": "T1-STAGE-1",
+  "t_start": 142.4,
+  "t_end": 146.3,
+  "category": "staging",
+  "severity": "high",
+  "what": "The big petal is a flat dark-red blob that hides her face for the whole line \"천지만물을 벤다는 건...\": 143.5 s about 690x640 px (x900-1590 y60-700), then 560x520 px in front of her torso at 144.5-146 s. The same prop passes the moon in CS0 (t2 12.5-13.4 s, about 90x110 px).",
+  "evidence": [
+   "rv/cs1_03.jpg",
+   "rv2/a_1.jpg"
+  ],
+  "measured": {
+   "size_px_143.5": [
+    690,
+    640
+   ]
+  },
+  "likely_cause": "petal_big is 1.5 blocks before the lens with a flat untextured look"
+ },
+ {
+  "id": "T1-STAGE-2",
+  "t_start": 17.9,
+  "t_end": 18.0,
+  "category": "staging",
+  "severity": "medium",
+  "what": "Cut into the bottle shot starts with the lens inside her body for 3 frames.",
+  "evidence": [
+   "cuts_a.jpg"
+  ],
+  "measured": {
+   "frames": 3
+  },
+  "likely_cause": "see T1-CUT-1"
+ },
+ {
+  "id": "T1-STAGE-3",
+  "t_start": 49.9,
+  "t_end": 50.9,
+  "category": "staging",
+  "severity": "low",
+  "what": "I14 \"the field\" is 1 s of empty ground with a line starting over it; after it the cut to her shows 4 frames of empty field first.",
+  "evidence": [
+   "rv/cs0_05.jpg",
+   "cuts_b.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "-"
+ },
+ {
+  "id": "T1-STAGE-4",
+  "t_start": 63.4,
+  "t_end": 64.9,
+  "category": "staging",
+  "severity": "medium",
+  "what": "Leap shot: besides the intended purple after-image, the frame is covered by the brown ghost and at 64.5 s she is a 40 px speck in an empty dome.",
+  "evidence": [
+   "mid_t1.jpg",
+   "ghosts_t1.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "see T1-GHOST-1"
+ },
+ {
+  "id": "T1-HAND-1",
+  "t_start": 72.2,
+  "t_end": 73.9,
+  "category": "hand_back",
+  "severity": "low",
+  "what": "CS0 hand-back: the camera arcs over and behind; the actor rises into frame from the bottom edge at 73.2-73.5 s; HUD and scythe pop in at 73.90 s. No snap. CS1 hand-back 146.3-146.6 s is hidden by the red flash; repel to ending 214.47-214.53 s by a 4-frame white flash; end 289.0-289.15 s black then lobby. All clean.",
+  "evidence": [
+   "hand_t1.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "-"
+ },
+ {
+  "id": "T1-START-1",
+  "t_start": 1.9,
+  "t_end": 4.9,
+  "category": "staging",
+  "severity": "medium",
+  "what": "In t1 the first shot (I1, ticks 0-60) is spent on the lobby exit: black until 2.4 s, pale fog and ghosts to 3.3 s; the viewer sees about 1.5 s of it.",
+  "evidence": [
+   "t1_start.jpg"
+  ],
+  "measured": {
+   "tick0_s": 1.9
+  },
+  "likely_cause": "cutscene clock starts before the arena is visible"
+ },
+ {
+  "id": "T2-FLY",
+  "t_start": 6.6,
+  "t_end": 7.97,
+  "category": "free_flight",
+  "severity": "high",
+  "what": "During I1 the view leaves the scripted shot: it rises and backs away for 0.8 s (6.60-7.40 s), then hovers 0.55 s above the arena rim; the actor shrinks from about 330 px to about 48 px tall (roughly 7x farther). It is never pulled back; the next hard cut at 7.97 s restores the script. No spectator menu or hotbar appears; only the test chat box and skip hint are on screen.",
+  "evidence": [
+   "rv2/fly_396.jpg",
+   "rv2/a_0.jpg"
+  ],
+  "measured": {
+   "duration_s": 1.37,
+   "distance_factor": 7
+  },
+  "likely_cause": "the view was not attached to the stand for 27 ticks; cause not visible in the video"
+ },
+ {
+  "id": "T2-SHAKE",
+  "t_start": 15.3,
+  "t_end": 16.25,
+  "category": "shift_shake",
+  "severity": "high",
+  "what": "Holding Shift (which is also the skip gesture) makes the view jump almost every frame for 0.95 s before the skip fires: path range 134 px horizontal, 260 px vertical; a step over 12 px on 21 of 57 frames, mostly on consecutive frames. Same again 41.2-46.7 s (5.5 s; S7: 277x136 px range, 73 steps over 12 px in 3.1 s, about 23 per second), 38.8-40.7 s over the top-down grass shot (223x133 px), 54.75-55.15 s (378x152 px) and 55.9-56.87 s before the second skip (75x159 px).",
+  "evidence": [
+   "rv2/shake_914.jpg",
+   "rv2/shake_2660.jpg",
+   "rv2/b_1.jpg"
+  ],
+  "measured": {
+   "amplitude_px": {
+    "15.3-16.25": [
+     134,
+     260
+    ],
+    "43.6-46.7": [
+     277,
+     136
+    ],
+    "54.75-55.15": [
+     378,
+     152
+    ]
+   },
+   "steps_per_s": 23
+  },
+  "likely_cause": "while Shift is held the player is not spectating; the datapack teleports them to the stand at 20 Hz and the client drifts (sinks, mouse-turns) between snaps"
+ },
+ {
+  "id": "T2-SKIP",
+  "t_start": 16.25,
+  "t_end": 24.73,
+  "category": "skip",
+  "severity": "high",
+  "what": "CS0 skip at 16.25 s: black for 1.1 s (16.25-17.35 s) with the line \"낭자 생각은 어떤가?\" already drawn over black from 16.6 s. Then 17.35-22.05 s the camera sits low on empty ground looking down the stage; she is a ~20 px figure at the far rock while a purple slash and particles play in the empty foreground at 19.6-20.0 s where she should stand. Cut at 22.08 s to behind the player, still nobody near; avatar rises into frame 23.2 s; HUD 23.90 s; she pops in right in front of the avatar at 24.57-24.73 s (0.7 s after control returns) and her first hit lands at 25.5 s.",
+  "evidence": [
+   "t2_postskip.jpg",
+   "rv2/a_2.jpg",
+   "rv2/a_3.jpg",
+   "t2_fightstart.jpg"
+  ],
+  "measured": {
+   "black_s": 1.1,
+   "empty_stage_s": 4.7,
+   "boss_appears_s": 24.6,
+   "hud_s": 23.9
+  },
+  "likely_cause": "the skip moves the clock and camera but her body is not moved to the end mark until the fight starts"
+ },
+ {
+  "id": "T2-CLICK",
+  "t_start": 9.87,
+  "t_end": 38.17,
+  "category": "spectate_flicker",
+  "severity": "high",
+  "what": "37 one-to-three-frame view jumps: 22 in 9.87-14.82 s and 15 in 36.03-38.17 s, spaced 9-11 frames apart (about 6 per second). Each shows a wide view from about the actor's place looking down the stage at her (her ~20 blocks away at 11.45 s, ~8 blocks at 14.0 s, ~10 blocks at 36.3 s), with line and hint still drawn, then the scripted shot returns.",
+  "evidence": [
+   "rv2/click_733.jpg",
+   "rv2/click_2176.jpg",
+   "t2_alt.jpg"
+  ],
+  "measured": {
+   "events": 37,
+   "frames_each": "1-3",
+   "interval_frames": "9-11"
+  },
+  "likely_cause": "guess: left click hands the camera to another entity/the player for one server tick before the hold re-spectates the stand"
+ },
+ {
+  "id": "T2-CS1SKIP",
+  "t_start": 56.87,
+  "t_end": 62.0,
+  "category": "skip",
+  "severity": "low",
+  "what": "CS1 skip at 56.87 s: black about 1 s, then the petal line and the slash still play (58-61 s) before the crimson arena; fight HUD at 65 s. No missing boss here.",
+  "evidence": [
+   "../ov_t2/s_03.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "by design the skip lands on the last beat"
+ },
+ {
+  "id": "T2-GHOST",
+  "t_start": 5.6,
+  "t_end": 22.0,
+  "category": "translucent_ghost",
+  "severity": "medium",
+  "what": "Same ghosts as t1: grey slabs and armour stand at arrival 5.6-6.2 s, brown husk legs at top centre 6.4-6.7 s and 20.6-21.8 s, a translucent patch right in front of the lens 17.4-22 s.",
+  "evidence": [
+   "rv2/a_0.jpg",
+   "rv2/a_3.jpg",
+   "ghosts_mix.jpg"
+  ],
+  "measured": {},
+  "likely_cause": "see T1-GHOST-1..3"
+ }
+]

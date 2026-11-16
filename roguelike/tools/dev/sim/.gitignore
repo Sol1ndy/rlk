@@ -1,0 +1,23 @@
+# outputs the suites, probes and renderers write next to themselves (never commit them)
+__pycache__/
+*.pyc
+out/
+tmp/
+renders/
+*.png
+*.jpg
+ar/s4/
+ar/s2/dbg/
+ar/review/bal/out/
+ar/review/bal/snap/
+az/tests_cm/baseline/lint.txt
+az/tests_cm/baseline/macro.txt
+preview/rp/
+# inputs recreated at the old scratchpad paths (README 1): worktree links, unpacked RPs, the user's footage / saved wiki pages
+ar/wt_*
+az/wt_cm
+ar/rp_*
+tk/rp
+ar/src
+*.mp4
+*.html

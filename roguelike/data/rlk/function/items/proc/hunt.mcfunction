@@ -2,6 +2,8 @@
 execute unless score @s msid = #huntId itv run scoreboard players set #huntN itv 0
 scoreboard players operation #huntId itv = @s msid
 scoreboard players operation #t1 itv = #huntN itv
+# #huntPer 는 0.1% 단위 (30 = 타격당 3%): 쌓인 수 × #huntPer ÷ 10 → %
 scoreboard players operation #t1 itv *= #huntPer tmp
+scoreboard players operation #t1 itv /= #10 tmp
 scoreboard players operation #eb eng += #t1 itv
 execute if score #huntN itv < #huntMax tmp run scoreboard players add #huntN itv 1

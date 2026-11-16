@@ -9,11 +9,12 @@ scoreboard players operation @s vAimT = #viewAimHold tmp
 scoreboard players operation @s burstCd = #burstCdT tmp
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 execute if score #charN tmp matches 1 run function rlk:char/lumine/burst
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/burst
 execute if score #charN tmp matches 4 run function rlk:char/clorinde/burst
 execute if score #charN tmp matches 5 if entity @e[tag=rlk_pm_basis,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] run function rlk:char/arlecchino/burst
 execute if score #charN tmp matches 5 unless entity @e[tag=rlk_pm_basis,limit=1] run function rlk:char/arlecchino/burst
-execute if score #charN tmp matches 6 run function rlk:char/navia/burst
+# 나비아: 시전 시작 방향(모션 기준점)으로 포격
+execute if score #charN tmp matches 6 if entity @e[tag=rlk_pm_basis,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] run function rlk:char/navia/burst
+execute if score #charN tmp matches 6 unless entity @e[tag=rlk_pm_basis,limit=1] run function rlk:char/navia/burst
 execute if score #charN tmp matches 7 run function rlk:char/ronova/burst
 execute if score #charN tmp matches 8 run function rlk:char/nefer/burst
 # 아이템: 원소폭발을 썼을 때

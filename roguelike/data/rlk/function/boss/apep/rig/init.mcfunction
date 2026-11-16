@@ -1,0 +1,22 @@
+# Rig objectives. Safe to call on every load.
+scoreboard objectives add apRigC dummy
+scoreboard objectives add apRigT dummy
+scoreboard objectives add apRigF dummy
+scoreboard objectives add apRigY dummy
+scoreboard objectives add apRigState dummy
+scoreboard objectives add apRigForm dummy
+scoreboard objectives add apRigStance dummy
+scoreboard objectives add apRigFace dummy
+scoreboard objectives add apRigCore dummy
+scoreboard objectives add apRigGlow dummy
+scoreboard objectives add apRigTint dummy
+scoreboard objectives add apRigBright dummy
+scoreboard objectives add apRigHands dummy
+scoreboard objectives add apRigPark dummy
+scoreboard objectives add apRigFl dummy
+scoreboard objectives add apRigFy dummy
+scoreboard objectives add apRigQ dummy
+scoreboard objectives add apRigQx dummy
+scoreboard objectives add apRigQy dummy
+scoreboard objectives add apRigQz dummy
+scoreboard objectives add apRigQw dummy

@@ -1,0 +1,9 @@
+# NB pattern tick 24
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nbb2] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5724f,2.0476f,0.0302f],left_rotation:[-0.685f,0.1261f,-0.3904f,0.602f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_18] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_2"
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_20] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/hr_kit/sw_fan_1"
+tag @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_22] remove rlk_hr_trr
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_23,tag=rlk_hr_tr_i0] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.353f,1.7245f,-0.0434f],left_rotation:[0.8756f,0.4743f,0.0627f,0.0671f],scale:[0.8074f,0.22f,1.8066f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_23,tag=rlk_hr_tr_i1] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3349f,1.7148f,0.0222f],left_rotation:[-0.8594f,-0.4415f,-0.2546f,0.0405f],scale:[0.8224f,0.22f,1.8404f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_23,tag=rlk_hr_tr_i2] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.3497f,1.7387f,-0.0096f],left_rotation:[-0.8005f,-0.3868f,-0.4339f,0.146f],scale:[0.8131f,0.22f,1.8193f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_nb_23,tag=rlk_hr_tr_i3] run data merge entity @s {start_interpolation:0,transformation:{translation:[0.4289f,1.8455f,-0.0667f],left_rotation:[-0.7018f,-0.3128f,-0.5916f,0.2442f],scale:[0.7812f,0.22f,1.7476f],right_rotation:[0f,0f,0f,1f]}}

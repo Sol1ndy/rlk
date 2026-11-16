@@ -1,0 +1,1 @@
+data merge entity @s {start_interpolation:0,interpolation_duration:4,transformation:{translation:[3.7875f,26.4738f,1.65f],left_rotation:[0.14862f,-0.05123f,-0.32182f,0.93366f],scale:[4.4f,1.2571f,4.4f],right_rotation:[0f,0f,0f,1f]}}
