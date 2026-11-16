@@ -1311,7 +1311,7 @@ function rlk:mboss/hurt_ev
 w('hurt', '''
 # Generic hit on the player. @s = the attacker (hazard marker, projectile, the body for a direct swing);
 # it is the knockback source. Inputs: #mbHitPct mb (coefficient %, 100 = registry atk), #cmEl tmp
-# (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw).
+# (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw, 2 away from the boss body).
 # Goes through cm/hit_pl2 -> player/take_damage: the parry / dodge judge (player/def/judge), defence, level scaling,
 # element, shields. Output: #dodged tmp 1 when the hit was avoided (i-frames, a perfect dodge, a perfect parry), #parT tmp
 # the parry tier, #pdg tmp 1 a perfect dodge. One-shot inputs set around the call (hz/hurt, pj/hit, or the module before a
@@ -1392,8 +1392,10 @@ tag @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] add rlk_hc_atk
 ''')
 w('kb_src', '''
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_plkb_source"]}
+execute if score #mbKBDir mb matches 2 unless entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run scoreboard players set #mbKBDir mb 0
 execute if score #mbKBDir mb matches 0 at @e[tag=rlk_body,limit=1] facing entity @s feet rotated ~180 0 run tp @e[tag=rlk_plkb_source,limit=1] ~ ~ ~ ~ 0
 execute if score #mbKBDir mb matches 1 at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_plkb_source,limit=1] ~ ~ ~ ~ 0
+execute if score #mbKBDir mb matches 2 at @e[tag=rlk_body,limit=1] facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet rotated ~180 0 run tp @e[tag=rlk_plkb_source,limit=1] ~ ~ ~ ~ 0
 ''')
 w('true_hit', '''
 # True damage to @s (any rlk_mob, normally the body) at @s: #mbTrue mb = damage, #mbTrueEl mb = colour
@@ -1791,10 +1793,11 @@ scoreboard players operation @s mbHzA = #hzAct mb
 scoreboard players operation @s mbHzE = #mbEl mb
 execute if score #hzEl mb matches 0.. run scoreboard players operation @s mbHzE = #hzEl mb
 scoreboard players operation @s mbHzB = #hzKB mb
-# Knockback direction: 0 away from the origin, 1 along the aim, -1 (default) = shape default (lines 1, else 0).
+# Knockback direction: 0 away from the origin, 1 along the aim, 2 away from the boss body (round X: a hazard centred on a locked
+# spot pushes a player who stepped in past it away from the boss, not into it), -1 (default) = shape default (lines 1, else 0).
 scoreboard players operation @s mbHzKD = #hzKBDir mb
-execute unless score @s mbHzKD matches 0..1 run scoreboard players set @s mbHzKD 0
-execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run scoreboard players set @s mbHzKD 1
+execute unless score @s mbHzKD matches 0..2 run scoreboard players set @s mbHzKD 0
+execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..2 run scoreboard players set @s mbHzKD 1
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
 scoreboard players operation @s mbHzG = #hzGrp mb

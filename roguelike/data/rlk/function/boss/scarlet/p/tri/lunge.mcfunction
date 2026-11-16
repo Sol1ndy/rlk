@@ -1,8 +1,9 @@
-# TRI lunge (@s = the body, tick 12): along the locked aim to 1.5 b before the player, at most 6 b (probe, mv/ok),
+# TRI lunge (@s = the body, tick 12): along the locked aim to 1.6 b before the player (round X: the body rule's
+# stop; core/guard holds it against the live avatar on the way), at most 6 b (probe, mv/ok),
 # in 2 t.
 function rlk:mboss/mv/dist
 scoreboard players operation #t hr = #mbDist mb
-scoreboard players remove #t hr 15
+scoreboard players remove #t hr 16
 scoreboard players operation #t hr /= #c5 hr
 execute if score #t hr matches ..-1 run scoreboard players set #t hr 0
 execute if score #t hr matches 13.. run scoreboard players set #t hr 12

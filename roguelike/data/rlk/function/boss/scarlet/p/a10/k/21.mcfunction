@@ -2,6 +2,7 @@
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:15}
 scoreboard players set #hzEl mb 3
 scoreboard players set #hzKB mb 3
+scoreboard players set #hzKBDir mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNoParry mb 1

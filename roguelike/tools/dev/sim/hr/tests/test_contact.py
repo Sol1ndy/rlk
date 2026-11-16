@@ -155,10 +155,17 @@ if AM is not None:
     ok(0 <= du <= .6 and dxz <= .5, f'mutual: KT.over her pelvis at its highest (t{top}) {du:.3f} b over the actor\'s right shoulder (0-0.6), {dxz:.3f} b off it (<= 0.5)')
     hd = min(seg(a['head'][t], h['pelvis'][t], h['head'][t]) for t in range(79, 97))
     ok(hd >= .30, f'mutual: the throw 79-96: the actor\'s head stays {hd:.3f} b off her torso axis (>= 0.30: no head through her body)')
-# ---- gap (round W) ---------------------------------------------------------------------------------------------------------------
-GAP_MIN = 1.5            # b between the torso axes (two 0.5-b torsos: >= 1 b of air between them; the 11-12 locks were 0.9-1.2)
-GAP_SPANS = [('K1', 'cs1', 10, 30), ('KR', 'repel', 6, 26), ('KE2', 'ending', 56, 80), ('KE5', 'ending', 190, 204), ('KA1', 'ending', 224, 232),
-             ('KA2', 'ending', 258, 266), ('KA3', 'ending', 282, 290), ('KA4', 'ending', 298, 304)]
+# ---- gap (round W; round X: every tick of every two-figure clip) ------------------------------------------------------------------
+# Round W checked the torsos only on the eight lock / clash spans (GAP_SPANS); the repel's R2-R6 went 0.04-0.7 b torso to torso
+# unchecked (x_brief cause 3). Round X (ruling 3): on every tick where both figures are on the stage, her torso axis (pelvis -> 0.8
+# of the way to her head) and the actor's (waist -> chest) >= CINE_GAP['min'] b apart, except the declared contact rows of
+# tools/mboss_scarlet/api.py CINE_GAP (the grab, the hilt strike, the pass-by, the hook, the throw, the kick): there >= the row's
+# floor (>= CINE_GAP['contact']: no body through the other even in contact).
+sys.path.insert(0, str(DP / 'tools'))
+from mboss_scarlet import api as HA  # noqa: E402
+GAP = HA.CINE_GAP
+GAP_MIN = GAP['min']
+PAIRS = [('intro', 'cs0', 0), ('intro_end', 'cs0', 1290), ('cs1', 'cs1', 0), ('repel', 'repel', 0), ('ending', 'ending', 0)]
 
 
 def _segd(a0, a1, b0, b1, n=12):
@@ -172,19 +179,37 @@ def _segd(a0, a1, b0, b1, n=12):
     return best
 
 
+def _row(seq, t):
+    return next((r for r in GAP['rows'] if r[0] == seq and r[1] <= t <= r[2]), None)
+
+
 if AM:
-    for cid, clip, t0, t1 in GAP_SPANS:
-        Hc, Ac = TR['clips'][clip], AM['clips'][clip]['tick']
-        if 'waist' not in Ac:
-            ok(False, f'gap: the actor manifest has no waist / chest columns (tools/build_player_cine.mjs)')
-            break
-        worst, at = 9.0, t0
-        for t in range(t0, t1 + 1):
+    ok(all(r[3] >= GAP['contact'] for r in GAP['rows']), f'gap: every declared contact row\'s floor >= {GAP["contact"]} b ({[r[3] for r in GAP["rows"]]})')
+    for hc, ac, off in PAIRS:
+        Hc, Ac = TR['clips'].get(hc), AM['clips'].get(ac, {}).get('tick')
+        if Hc is None or Ac is None or 'waist' not in Ac:
+            ok(False, f'gap: {hc} / {ac}: her track or the actor\'s waist / chest columns missing')
+            continue
+        seq = hc if hc != 'intro_end' else 'intro'
+        n_t = min(len(Hc['pelvis']), len(Ac['waist']) - off)
+        free, rows, ticks = (9.0, None), {}, 0
+        for t in range(n_t):
             hp, hh = Hc['pelvis'][t], Hc['head'][t]
-            d = _segd(hp, [hp[k] + (hh[k] - hp[k]) * 0.8 for k in range(3)], Ac['waist'][t], Ac['chest'][t])
-            if d < worst:
-                worst, at = d, t
-        ok(worst >= GAP_MIN, f'gap: {cid} ({clip} {t0}-{t1}) the torsos {worst:.2f} b apart at their nearest (t{at}; >= {GAP_MIN})')
+            if hp is None or hh is None:
+                continue
+            ta = t + off
+            d = _segd(hp, [hp[k] + (hh[k] - hp[k]) * 0.8 for k in range(3)], Ac['waist'][ta], Ac['chest'][ta])
+            ticks += 1
+            r = _row(seq, ta)
+            if r is None:
+                if d < free[0]:
+                    free = (d, ta)
+            else:
+                rows[r] = min(rows.get(r, (9.0, None)), (d, ta))
+        ok(free[0] >= GAP_MIN, f'gap: {hc} ({ticks} ticks) outside the declared contact rows the torsos >= {GAP_MIN} b apart '
+           f'(nearest {free[0]:.3f} b at t{free[1]})')
+        for r, (d, ta) in sorted(rows.items(), key=lambda x: x[0][1]):
+            ok(d >= r[3], f'gap: {hc} contact row {r[1]}-{r[2]} ({r[4]}): the torsos >= {r[3]} b apart (nearest {d:.3f} b at t{ta})')
 
 
 print(f'test_contact: {n - len(fails)} / {n} ok' + ('' if not fails else f', {len(fails)} FAILED'))

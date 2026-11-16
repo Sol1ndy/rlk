@@ -16,8 +16,9 @@ The gauge is api.GAUGE_FP (#gau hr, 0-50 = tenths of a segment). Outside the gau
 - shield/judge (@s any): #gres hr = 1 (the gauge is 0: the deflect; the core starts seq/repel in this tick and the repel's
   first frames are the gold deflect) or 2 (fail: the gauntlet's own branch follows); the gauge is 0 after either outcome.
 - ult/fail60 (position = the impact point): mboss/pl_dot api.FAIL60_PM per mille of the player's max HP, Electro,
-  #mbDotLethal 0 (never kills), the push ring mboss_lib.push_ring(*api.FAIL60_PUSH) there in the same tick, the impact
-  effects (kit dive_impact {r:30} + light_column) and the fail_impact sound.
+  #mbDotLethal 0 (never kills), the impact effects (kit dive_impact {r:30} + light_column) and the fail_impact sound;
+  ult/fail60_push (position = HER landing point; round X): the push ring mboss_lib.push_ring(*api.FAIL60_PUSH) there in the
+  same tick (the gauntlet's fail calls both: the player goes straight away from where she lands).
 - ult/fatal (@s = the player; F:boss/raiden/hazard/fatal's model): nothing while the player is reviving (rnDie >= 1);
   else player/hurt_do with all current HP (Electro), curHealth 0, player/die: it bypasses mboss/hurt, so i-frames, parries
   and every shield are ignored; Ronova's one revive still applies; a death in a test ends in mboss/test/defeat.
@@ -67,9 +68,9 @@ def build(W):
     w('ult/fail60', [
         f'# The 60 % fail hit (ULT60_LETHAL false; position = the impact point, the dive on the player): {api.FAIL60_PM} per mille',
         '# of the player\'s max HP through mboss/pl_dot (no dodge, no parry, no position check: the failed judge is the hit;',
-        '# #mbDotLethal 0: it never kills), the push ring in the same tick (pl_dot has no knockback), the impact effects and sound.']
+        '# #mbDotLethal 0: it never kills), the impact effects and sound. The push (pl_dot has no knockback) is ult/fail60_push, at her',
+        '# landing point (round X).']
       + L.pl_dot(api.FAIL60_PM, api.ELEC, 0)
-      + [L.push_ring(*api.FAIL60_PUSH)]
       + S.fx('dive_impact', [part(S.DUST['lilac'], 1.2, 0.1, 1.2, 0, 30)], pos='positioned ~ ~0.1 ~', r=30)
       # round V (v_brief §3 VB 4; review v G2: the kit's 9 b light column - two crossed quads over a block wide on the player's own
       # spot - filled over half the screen for 7 frames when the push carried the lens through it): a thin column instead (a
@@ -78,6 +79,12 @@ def build(W):
                                                                   FAIL_COL_RGB, (FAIL_COL_TAG,), tpd=0),
          f'execute positioned ~ ~0.1 ~ rotated 0 -90 run tp {B.SEL.format(B.TAG_NEW)} ~ ~ ~ ~ ~', f'tag {B.SEL.format(B.TAG_NEW)} remove {B.TAG_NEW}']
       + S.snd('fail_impact', pos='positioned ~ ~ ~'))
+    w('ult/fail60_push', [
+        f'# Round X (x_brief ruling 1, cause 6; position = her landing point, the same tick as ult/fail60): a player within',
+        f'# {api.L.num(api.FAIL60_PUSH[0])} b goes straight away from it to {api.L.num(api.FAIL60_PUSH[2])} b in {api.FAIL60_PUSH[1]} t (the framework\'s push ring:',
+        '# collision-checked, never into a live hazard). It was centred on the player: a player at the centre goes toward the arena',
+        '# start, through her when they faced it.',
+        L.push_ring(*api.FAIL60_PUSH)])
     w('ult/fatal', [
         '# The 5 % instant death (ULT5_LETHAL true; @s = the player; F:boss/raiden/hazard/fatal\'s model): skipped while the player',
         '# revives; else all current HP as the hit (the number, Electro), curHealth 0, player/die. It bypasses mboss/hurt (i-frames,',

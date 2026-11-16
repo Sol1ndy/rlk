@@ -129,9 +129,14 @@ def finish(pb, key):
 # written (finish -> trail_of); the builders only name the moves her body carries the blade on (rib) and the struck lines (wave).
 DASH_SHORT = 2.0     # b: a dash-through stops this far before the locked spot (v_brief §3 VB 4: never within 1.2 b of the
 #                      player: the F5 lens ended up inside her; the blade and the hazard still reach through the spot)
-LAND_SHORT = 1.4     # b: a dive lands this far from the locked spot on her side (the blade comes down on the spot)
+LAND_SHORT = 1.6     # b: a dive lands this far from the locked spot on her side (the blade comes down on the spot; round X: 1.4 -> the body rule's stop)
 WAVE_Y = 1.0         # b over the floor: a struck line's wave (the blade's height in the dash)
 CAM_BACK, CAM_R, CAM_STEP = 4.0, 1.3, 1.8    # b: the camera line behind the player's eyes; her body's clearance from it; the step out
+BODY_STOP = api.BODY['stop']   # round X: no stop point of hers nearer the avatar's feet (core/cam_ok's body clause, core/guard)
+# round X (x_brief ruling 1): a hazard centred on the locked spot (her dash's disc, a dive's disc, kcut's lines, nb's bands, the
+# pillar, the gauntlet cuts) knocks the player back along the line from HER to them (the framework's #hzKBDir 2, mboss/kb_src),
+# not away from the spot: a player who stepped in past the spot was knocked into her
+KB_FROM_HER = 2
 _RT = set()
 
 
@@ -146,8 +151,14 @@ def sw_runtime(W):
         W.w('core/cam_ok', [
             f'# 1 when the executing floor point keeps her out of the player\'s camera line: her body (the point + 1 b) farther than',
             f'# {num(CAM_R)} b from the player\'s eyes and from every point 0.5 .. {num(CAM_BACK)} b behind them along their view.',
+            f'# Round X (x_brief ruling 1): and off the player\'s BODY - the point at least {num(BODY_STOP)} b from the avatar\'s feet (0.05 b of',
+            '# slack: a stop chosen at it passes). The eyes are the seat rider\'s, high over the avatar: the line alone passed with her on it.',
+            f'execute if entity @e[tag=rlk_body,distance=..{num(BODY_STOP - 0.05)}] run return fail',
             f'summon minecraft:marker ~ ~1 ~ {{Tags:["rlk_hr_camp","rlk_room","rlk_mb_aux"]}}', sset('#sw_c', 0)]
-            + [f'execute at {S.PL} anchored eyes positioned ^ ^ ^-{num(k)} if entity @e[type=minecraft:marker,tag=rlk_hr_camp,'
+            # (round X: `anchored eyes` takes the EXECUTOR's eye height - vanilla EntityAnchorArgument.Anchor.apply reads the source
+            # entity, not the `at` one: run as the player, else her own 1.74 b went on top of the seat rider's feet, ~4 b over the
+            # avatar's feet and 1.6 b over the real camera line)
+            + [f'execute as {S.PL} at @s anchored eyes positioned ^ ^ ^-{num(k)} if entity @e[type=minecraft:marker,tag=rlk_hr_camp,'
                f'distance=..{num(CAM_R)}] run {sset("#sw_c", 1)}' for k in pts]
             + ['kill @e[type=minecraft:marker,tag=rlk_hr_camp]', f'execute if score #sw_c {OBJ} matches 1 run return fail', 'return 1'])
         W.w('core/cam_clear', [
@@ -504,7 +515,7 @@ def build_a9(W):
     rib(pb, go, cut, 0)
     wave(pb, cut, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.note_hit(0, cut, tell_from=0, grp=g)
-    pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=KB_FROM_HER)
     pb.at(cut, S.snd('a9_cut'))
     cam_clear(pb, cut + 1)
     tail(pb, cut, end)
@@ -555,7 +566,7 @@ def build_a10(W):
     trail(pb, (dive, dive + 1))
     pb.motions.append((dive, hit, 'dive'))
     # the yellow flash (in the air, on her chest: api.FLASH_AT) comes with the hit row
-    pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=KB_FROM_HER)
     pb.at(hit, S.fx('burst_radial', [part(S.DUST['lilac'], 1.4, 0.2, 1.4, 0, 36), part('minecraft:end_rod', 0.2, 1.5, 0.2, 0.05, 10)],
                     pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~', r=35), S.snd('a10_impact', pos=f'at {S.LOCK_M}'))
     cam_clear(pb, hit + 1)
@@ -604,11 +615,12 @@ def build_tri(W):
     pb.track(1, lock0 - 1, TRK['deg'])
     pb.advance(1, go - 1, glide_v, reach)
     W.w(f'p/{key}/lunge', [
-        f'# TRI lunge (@s = the body, tick {go}): along the locked aim to 1.5 b before the player, at most {num(dmax)} b (probe, mv/ok),',
+        f'# TRI lunge (@s = the body, tick {go}): along the locked aim to {num(BODY_STOP)} b before the player (round X: the body rule\'s',
+        f'# stop; core/guard holds it against the live avatar on the way), at most {num(dmax)} b (probe, mv/ok),',
         f'# in {h0 - go} t.',
         'function rlk:mboss/mv/dist',
         f'scoreboard players operation #t {OBJ} = #mbDist mb',
-        f'scoreboard players remove #t {OBJ} 15',
+        f'scoreboard players remove #t {OBJ} {int(round(BODY_STOP * 10))}',
         f'scoreboard players operation #t {OBJ} /= #c5 {OBJ}',
         f'execute if score #t {OBJ} matches ..-1 run {sset("#t", 0)}',
         f'execute if score #t {OBJ} matches {int(dmax * 2) + 1}.. run {sset("#t", int(dmax * 2))}',
@@ -739,7 +751,7 @@ def build_hcut(W):
     wave(pb, cut, f'{ds} positioned ~ {num(CY + WAVE_Y, 2)} ~', 0, store=f'#{key}_n')
     pb.at(go, S.snd('g_dash'), S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(api.DASH_LEN[key] * 10)))
     pb.note_hit(0, cut, tell_from=0, grp=g)
-    pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=KB_FROM_HER)
     pb.at(cut, S.snd('a9_cut'))
     cam_clear(pb, cut + 1)
     tail(pb, cut, end)
@@ -795,7 +807,7 @@ def build_kcut(W):
     ln = api.HITS[key][1][3][0]
     for i, yaw in enumerate(api.KCUT_YAW):
         at = f'at {S.LOCK_M} rotated as {DS_M} rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)} positioned ~ {CY} ~'
-        pb.hit(i + 1, tell_from=0, grp=g, pos=at)
+        pb.hit(i + 1, tell_from=0, grp=g, pos=at, kbdir=KB_FROM_HER)
         # round W: the three crossing lines flash ON the cut (round V drew them from the lock on: a path ahead)
         wave(pb, cut, f'at {S.LOCK_M} rotated as {DS_M} rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)} positioned ~ {num(CY + WAVE_Y, 2)} ~',
              0, length=ln)

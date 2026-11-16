@@ -1,6 +1,7 @@
 # NB pattern tick 19
 scoreboard players set #hzEl mb 3
 scoreboard players set #hzKB mb 0
+scoreboard players set #hzKBDir mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNoParry mb 0

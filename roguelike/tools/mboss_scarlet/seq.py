@@ -205,6 +205,7 @@ THROW_H = 6                                 # (HF-B) the throw's root apex, tent
 LOCK_F = 2.25                               # CS1: the lunge to the lock at K1 (f 0.95)
 R8_T = 118                                  # the repel's cut to the kick
 REPEL_F = 1.95                              # the repel: she lands 1.3 b beyond KR (f 0.65), pulled in to 1.1 for the grab (30-36)
+REPEL_F0 = 1.4                              # round X: her place at tick 0 (1 b up; was 1.0: the torsos 1.4 b apart at 2-3)
 EX_F, EX_IN, EX_OFF = 4.75, 4.35, 5.3       # the ending's exchange: her mark (the actor at 2.5), the step in for the overhead, pushed off
 FLY_H = 10                                  # the spring back to her landing mark: apex 1.0 b (tenths; was 4 b: the "thrusters")
 _SF = round(math.dist(api.CS0_P0[::2], api.SEAT_POS[::2]), 2)
@@ -212,7 +213,7 @@ HER = {
     'intro': [_row(0, 840, (0, 0, _SF), y0=0), _row(840, 880, (0, 0, _SF), y0=0, y1=180), _row(880, 1052, (0, 0, _SF)),
               _row(1052, 1148, (0, 0, _SF), (0, 0, 13.5)), _row(1234, 1258, (0, 0, 13.5), (0, 0, 6.5), 4.5), _row(1258, 1440, (0, 0, 6.5))],
     'cs1': [_row(0, 6, (0, 0, 9)), _row(6, 10, (0, 0, 9), (0, 0, LOCK_F)), _row(34, 50, (0, 0, LOCK_F), (0, 0, 9), 1.2), _row(50, 720, (0, 0, 9))],
-    'repel': [_row(0, 6, (0, 1, 1), (0, 0, REPEL_F)), _row(30, 36, (0, 0, REPEL_F), (0, 0, 1.1)), _row(56, 64, (0, 0, 1.1), (0, 0, 1.2)),
+    'repel': [_row(0, 6, (0, 1, REPEL_F0), (0, 0, REPEL_F)), _row(30, 36, (0, 0, REPEL_F), (0, 0, 1.1)), _row(56, 64, (0, 0, 1.1), (0, 0, 1.2)),
               _row(78, 101, (0, 0, 1.2), (0, 0, 3), THROW_H / 10), _row(129, 135, (0, 0, 3), (0, 0, 8)), _row(135, 140, (0, 0, 8), (0, 0, 9))],
     # (round W: the bodies a swordfighter's distance apart in the locks; the exchange on the ground instead of the aerial duel)
     'ending': [_row(0, 6, (0, 0, 4.8)), _row(6, 22, (0, 0, 4.8), (0, 0, 5.2)), _row(50, 54, (0, 0, 5.2), (0, 0, 3.5)),
@@ -1209,7 +1210,9 @@ def build_repel(W):
     # R2 / R3: further round to the actor's right than the design's ST(1.9, 1.5, -0.4): from there the actor, stepping in to
     # f 0.5, stands before her (shot sheet); here the seized wrist and the hilt on her hat are between the two heads
     tr.cut(26, B, ST(2.2, 1.5, 0.1), ST(0, 1.4, 0.8), 'R2 grab / R3 hat strike', ('her', 'actor'))
-    tr.cut(52, A, ST(-2.2, 1.2, 2.4), ST(0, 1.2, 0.8), 'R4 two cuts', ('her', 'actor'))
+    # R4 (round X: the actor hops back to f -0.7 and cuts from a sword's reach, then passes her right side 1 b off): from the
+    # actor's left, wide, both figures side-on (from ST(-2.2, 1.2, 2.4) the pass-by filled the lens)
+    tr.cut(52, A, ST(-3.6, 1.5, 1.6), ST(0, 1.2, 0.4), 'R4 two cuts', ('her', 'actor'))
     # R5: three-quarter from the actor's right (the design's head-on ST(0, 1.6, 3.6) has the actor's head before hers: she
     # stands behind it; from here her head and the hooked arm over the right shoulder are beside the actor's)
     tr.cut(68, B, ST(2.1, 1.6, 2.7), ST(0, 1.3, 1.5), 'R5 back to back', ('her', 'actor'))
@@ -1223,9 +1226,9 @@ def build_repel(W):
     TRACKS['repel'] = tr
     STAGED['repel'] = [(6, 'ST', REPEL_F, 'the lock'), (36, 'ST', 1.1, 'the grab'), (68, 'ST', 1.2, 'back to back'),
                        (101, 'ST', 3.0, 'on her back'), (135, 'ST', 8.0, 'kicked away (60 %)'), (140, 'ST', HER_F, 'the hand-back (60 %)')]
-    # ---- R0: she drops onto the raised blade: 1 b above ST(0, 0, 1.0) at tick 0, down to f 1.3 by 6; the gold wash, the gold
+    # ---- R0: she drops onto the raised blade: 1 b above ST(0, 0, REPEL_F0) at tick 0, down to f REPEL_F by 6; the gold wash, the gold
     # star and the light column at KR, the deflect
-    drop = mv.add('drop', [cand(floor_pt(1.0), 'tp @s ~ ~1 ~')], 'R0 her place at tick 0: 1 b above ST(0, 0, 1.0), the dive\'s end')
+    drop = mv.add('drop', [cand(floor_pt(REPEL_F0), 'tp @s ~ ~1 ~')], f'R0 her place at tick 0: 1 b above ST(0, 0, {REPEL_F0}), the dive\'s end')
     land = mv.add('land', [cand(floor_pt(d), glide(6)) for d in (REPEL_F, REPEL_F + 0.5)], f'R0 down onto the blade: f {REPEL_F} by tick 6')
     s.at(0, gold(0, 4, 3), snd('deflect')).st(0, KR, K.p('clash_gold')).st(0, KR, K.p('light_column'))
     # ---- R1: the blade lock (sparks every 3 t, the blade ticks 8 / 16); R2: her sword wrist seized 36, f 1.1 (30-36)

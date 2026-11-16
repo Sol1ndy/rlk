@@ -1,6 +1,6 @@
 # Generic hit on the player. @s = the attacker (hazard marker, projectile, the body for a direct swing);
 # it is the knockback source. Inputs: #mbHitPct mb (coefficient %, 100 = registry atk), #cmEl tmp
-# (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw).
+# (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw, 2 away from the boss body).
 # Goes through cm/hit_pl2 -> player/take_damage: the parry / dodge judge (player/def/judge), defence, level scaling,
 # element, shields. Output: #dodged tmp 1 when the hit was avoided (i-frames, a perfect dodge, a perfect parry), #parT tmp
 # the parry tier, #pdg tmp 1 a perfect dodge. One-shot inputs set around the call (hz/hurt, pj/hit, or the module before a

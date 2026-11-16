@@ -70,10 +70,13 @@ POSTS = [l for l in TICK if 'player/def/beat/post' in l or ('lite/tick' in l and
 
 # ============================================================================================================ dodgecam
 CAM_D = 4.0                     # the vanilla F5 camera distance behind the eyes (the seat's camera_distance, client_facts §1)
-EYE = 1.62
+EYE = 2.36                      # round X (x_brief ruling 4): the camera rider's eyes over the avatar's feet (the default seat; the
+#                                 player entity of these worlds is the avatar: its `eye` data is this, hers is the rider's feet + her
+#                                 husk's 1.74 - vanilla `anchored eyes` reads the executor's eye height); round W used 1.62
+RIDER_EYE, HER_EYE = 1.62 * 0.0625, 1.74
 IN_R, IN_H = 0.6, 2.1           # her body as the camera sees it: the near plane inside this cylinder fills the picture
 LINE_R = 1.3                    # lane WB's camera-line clearance (core/cam_ok)
-SEP_MIN = 0.6                   # her body and the player's never closer (feet to feet, horizontal)
+SEP_MIN = 1.4 - 1e-3            # her body and the player's never closer (feet to feet, horizontal; round X: the body rule, was 0.6)
 DC_STUB = tuple(f for f in V.STUB_FX if f != 'rlk:player/dash_dir') + V.STUB_AV + (
     'rlk:char/motion/dash_b', 'rlk:char/motion/dash2', 'rlk:char/motion/dash_l', 'rlk:items/hook/on_dash_move',
     'rlk:player/dodge/snd_step', 'rlk:player/dodge/snd_flip', 'rlk:player/dash_fail', 'rlk:player/dodge/crouch',
@@ -131,6 +134,8 @@ def dc_world(key, ph, dist):
     H.heal(s)
     H.facing_setup(s, dist)
     pl.tags.add('rlk_body')                                 # the player is the body (dash / dash_go / the move run at it)
+    pl.data['eye'] = EYE                                     # round X: the seat rider's eyes (see EYE)
+    H.body_of(s).data['eye'] = EYE - RIDER_EYE + HER_EYE
     pid = ('e', pl.id)
     for o in ('rdCam', 'pmMoveLock', 'pmActive', 'skDash', 'dashMoveT', 'dashCool', 'dashUpN'):
         s.setsc(pid, o, 0)

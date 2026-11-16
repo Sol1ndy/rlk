@@ -2,6 +2,7 @@
 # she draws her own unparriable flashes (yellow / purple / blue): the framework's glint is off for the whole fight
 # (#mbNpOwn mb 1; the cleanup hook clears it).
 scoreboard players set #mbNpOwn mb 1
+tag @s add rlk_bodyr
 function rlk:boss/scarlet/init
 function rlk:boss/scarlet/core/vars
 function rlk:boss/scarlet/core/floors

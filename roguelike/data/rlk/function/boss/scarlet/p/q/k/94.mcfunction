@@ -1,6 +1,7 @@
 # Q pattern tick 94
 execute if score #q_hit hr matches 1 run scoreboard players set #hzEl mb 3
 execute if score #q_hit hr matches 1 run scoreboard players set #hzKB mb 3
+execute if score #q_hit hr matches 1 run scoreboard players set #hzKBDir mb 2
 execute if score #q_hit hr matches 1 run scoreboard players set #hzSfx mb 0
 execute if score #q_hit hr matches 1 run scoreboard players set #hzQuiet mb 1
 execute if score #q_hit hr matches 1 run scoreboard players set #hzNoParry mb 1

@@ -11,6 +11,7 @@ execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast m
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzEl mb 3
 scoreboard players set #hzKB mb 3
+scoreboard players set #hzKBDir mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNoParry mb 1

@@ -1,5 +1,5 @@
 # A10 pattern tick 20
-function rlk:boss/scarlet/core/near {d:1.4,t:2}
+function rlk:boss/scarlet/core/near {d:1.6,t:2}
 execute at @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] positioned ~ 203 ~ run function rlk:boss/scarlet/fx/p/claw_streaks {r:15}
 execute at @s run function rlk:boss/scarlet/fx/snd/a10_dive
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:15}

@@ -2024,8 +2024,8 @@
     "hat_on": 139
    },
    "owner": "H2",
-   "key_files": 123,
-   "keys": 1655,
+   "key_files": 121,
+   "keys": 1647,
    "keys_per_tick": 11.7,
    "source": "v 215.6-222.6 (ref/hr_repel_5fps.jpg, gauntlet_repel.jpg; hr_design §3.4): the deflected dive, the lock, the seized wrist, the hilt on the hat, two cuts, back to back, the shoulder throw, the kick, up again",
    "note": "",
@@ -2536,7 +2536,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 46293336
+  "version": 138152829
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -25817,10 +25817,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 64,
-  "key_files": 3478,
-  "keys": 29008,
-  "rig_functions": 4241,
-  "rig_bytes": 8873148,
+  "key_files": 3476,
+  "keys": 29000,
+  "rig_functions": 4239,
+  "rig_bytes": 8870856,
   "cull_overhang_ticks": 0
  },
  "sprites": {

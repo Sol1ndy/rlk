@@ -59,6 +59,7 @@ FIRST_PERSON, AVATAR = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=rlk_b
 DUST = S.DUST
 GAUNT = api.GAUNTLETS
 TABLE, EVENTS, MOVES, CUES, FLASHES, PPW = {}, {}, {}, {}, {}, {}
+P1F_KB = 2                           # round X: = p1.KB_FROM_HER (the framework's #hzKBDir 2: knocked back from her)
 
 
 def num(v, nd=3):
@@ -118,9 +119,11 @@ SPOTS = {
             ('face', 0, RE['D4']['dist']), ('face', RE['D4']['bearing'], 8.0), ('face', -RE['D4']['bearing'], 8.0)],
            RE['D4']['dist'], f"D4 far reappear: {num(RE['D4']['dist'])} b at {RE['D4']['bearing']:+d} (the player's front-left); "
            f"else {-RE['D4']['bearing']:+d} / 0 / +-{abs(RE['D4']['bearing'])} at 8 b"),
-    # round V (v_brief §3 VB 4): never on the player's own spot (the F5 lens ended up inside her): 1.3 b before them
-    'over': ([('face', 0, 1.3), ('face', 90, 1.3), ('face', -90, 1.3)], 1.5,
-             '1.3 b in front of the player (the A8.3 leap adds the height)'),
+    # round V (v_brief §3 VB 4): never on the player's own spot (the F5 lens ended up inside her): 1.3 b before them; round X
+    # (x_brief ruling 2): beside the player, not over their head (1.3 b ahead and 2.5 b up was 0.03 b off the avatar's axis for a
+    # player who walked in): 2.0 b at +60 (their front right), else -60 / +90 / -90
+    'over': ([('face', 60, 2.0), ('face', -60, 2.0), ('face', 90, 2.0), ('face', -90, 2.0)], 2.0,
+             '2.0 b beside the player at +60 (the A8.3 leap adds the height)'),
     'dv': ([('face', 0, 4.5), ('face', 30, 4.5), ('face', -30, 4.5), ('face', 0, 3.0)], 3.0,
            'the A8.9 dive\'s reappearance: 4.5 b in front of the player (the caller adds DIVE_UP): in the F5 view, the whole wind-up'),
     'land': ([('face', 0, 2.0), ('face', 90, 2.0), ('face', -90, 2.0)], 2.0,
@@ -181,11 +184,12 @@ def cut_files(W):
     w('g/cut/make', [
         '# {s,t,dmg,kb,n} (api.cut; @s = the pattern\'s executor = the body): a ghost cut (PLAN §5.3) = a quiet Electro disc hazard',
         f'# of radius CUT_R {num(api.CUT_R, 1)} b at the player\'s feet on the floor, striking t ticks later (at pattern tick s), active 2 t,',
-        '# dmg % of the base hit, knockback kb along her -> the player (kbdir 1, the marker\'s yaw); no outline, flash or decal;',
+        '# dmg % of the base hit, knockback kb from her to the player at the strike (round X: kbdir 2, mboss/kb_src; was the marker\'s',
+        '# yaw at the lock); no outline, flash or decal;',
         '# parryable (#hzNoParry 0): a perfect parry of it takes one gauge segment (shield/tick).',
         '# g/cut/tag stamps it (objective hr = s, rlk_hr_cut, the pattern tags, rlk_hr_cnt when it counts: n 1).',
         f'$scoreboard players set #g_s {OBJ} $(s)', f'$scoreboard players set #g_n {OBJ} $(n)']
-      + L.hz_opts(quiet=1, sfx=0, el=api.ELEC, act=2, kbdir=1, noparry=0)
+      + L.hz_opts(quiet=1, sfx=0, el=api.ELEC, act=2, kbdir=P1F_KB, noparry=0)
       + ['$scoreboard players set #hzKB mb $(kb)',
          f'$execute at {PLAYER} positioned ~ {CY} ~ facing entity @s feet rotated ~180 0 run function rlk:mboss/hz/disc '
          f'{{r:{r},tell:$(t),dmg:$(dmg)}}',
@@ -237,6 +241,18 @@ def g_files(W):
     cut_files(W)
     spot_files(W)
     body_files(W)
+    st_files(W)
+
+
+def st_files(W):
+    """Round X: the station files g/st/<name> (station_lines at ST_UP) and the live check g/st/ok (st_recheck)."""
+    for name in ST_NAMES:
+        up = ST_UP.get(name, 0.0)
+        W.w(f'g/st/{name}', [f'# The station of a gauntlet cut at spot {name}' + (f' + {num(up, 1)} b up' if up else '') +
+                             ' (@s = the body): the marker rlk_hr_gst there, facing the player.'] + station_lines(name, up))
+    W.w('g/st/ok', ['# Round X (x_brief ruling 2): 1 while the station marker\'s floor point passes core/cam_ok against the live player (the',
+                    f'# body clause: {num(api.BODY["stop"], 1)} b off the avatar; the camera line); fail when it is gone or does not.',
+                    f'execute at {ST_M} positioned ~ {CY} ~ if function {NS}core/cam_ok run return 1', 'return fail'])
 
 
 # ================================================================================================= the pattern builder
@@ -369,15 +385,29 @@ AT_ST = f'at {ST_M} rotated as {ST_M}'
 STATION_LEAD = 10
 
 
-def station(name, up=0.0):
+def station_lines(name, up=0.0):
     """The station marker at spot `name` (+ up), facing the player (@s = the body)."""
     return [f'kill @e[type=minecraft:marker,tag={ST_T}]', spot(name),
             f'execute as {SPOT_M} at @s{up_pos(up)} facing entity {PLAYER} feet rotated ~ 0 run tp @s ~ ~ ~ ~ 0',
             f'tag {SPOT_M} add {ST_T}', f'tag {ST_M} remove {SPOT_T}']
 
 
-def glide_st(t):
-    return [f'execute positioned as {ST_M} run function rlk:mboss/mv/glide {{t:{int(t)}}}']
+def station(name, up=0.0):
+    """The station of a cut (g/st/<name>: station_lines at the height ST_UP of that spot)."""
+    assert ST_UP.get(name, 0.0) == up, (name, up)
+    return [fn(f'g/st/{name}')]
+
+
+def st_recheck(name):
+    """Round X (x_brief ruling 2): the station is checked against the live player when her move to it starts (g/st/ok: its floor
+    point passes core/cam_ok - the body clause, api.BODY['stop'] b off the avatar, and the camera line); else it is chosen again
+    from the spot's candidates, relative to where the player is and looks now (the next candidate). core/guard keeps the glide
+    off the avatar on every tick after."""
+    return f'execute unless function {NS}g/st/ok run {fn(f"g/st/{name}")}'
+
+
+def glide_st(t, name, check=True):
+    return ([st_recheck(name)] if check else []) + [f'execute positioned as {ST_M} run function rlk:mboss/mv/glide {{t:{int(t)}}}']
 
 
 def face_st():
@@ -391,6 +421,8 @@ CONTACT = {'A8.1': 'g_ring', 'A8.2': 'g_rise', 'A8.3': 'g_leap_cut', 'A8.4': 'g_
 # the spot a move cuts from (the station; g/spot/<name>) and its height
 ST_SPOT = {'A8.3': ('over', 2.5)}
 APPROACH_END = {'D1': 'side', 'D2': 'd2e', 'D3': 'side', 'D4': 'side'}
+ST_UP = {name: up for name, up in ST_SPOT.values()}               # the height of each station spot (g/st/<name>)
+ST_NAMES = sorted({'side'} | set(APPROACH_END.values()) | set(ST_UP))
 APPROACH = ('D1', 'D2', 'D3', 'D4')
 TRAIL = {'D1': 125, 'D2': 65, 'D4': 105}          # ghost_trail len (tenths): the nominal dash / glide / run lengths
 HANG_UP, HANG_T = 3.0, 3                          # A8.4: she springs straight up and hangs (PLAN §4.5)
@@ -474,7 +506,7 @@ class Walk:
     def restation(self, s):
         """A chain cut: at its lock (s - LOCK_LEAD) she shifts to the station beside the locked spot and faces the player."""
         lk = s - api.LOCK_LEAD
-        self.gb.at(lk, face_st(), glide_st(RESTATION_T))
+        self.gb.at(lk, st_recheck(self.st_name[s]), face_st(), glide_st(RESTATION_T, self.st_name[s], check=False))
         self.gb.moves.append((lk, lk + RESTATION_T, 'station'))
 
     # ------------------------------------------------------------------ steps
@@ -497,7 +529,7 @@ class Walk:
         g.snd(t, 'g_appear', src=('g_dash', 'appear'))
         g.at(go, FACE)
         g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], at_body(0.95), src=('g_dash', 'go'), len=TRAIL['D1'])
-        g.at(go, glide_st(arr - go))
+        g.at(go, glide_st(arr - go, APPROACH_END['D1']))
         g.at(arr, face_st())
         g.moves.append((go, arr, 'dash side'))
         self.rib(go, arr)
@@ -512,7 +544,7 @@ class Walk:
         g.snd(t, 'g_appear', src=('g_glide', 'appear'))
         g.at(go, FACE)
         g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.2, 0.3, 0, 10)], at_body(0.45), src=('g_glide', 'go'), len=TRAIL['D2'])
-        g.at(go, glide_st(stop - go))
+        g.at(go, glide_st(stop - go, APPROACH_END['D2']))
         g.at(stop, face_st())
         g.moves.append((go, stop, 'glide d2e'))
         self.rib(go, stop)
@@ -528,7 +560,7 @@ class Walk:
         g.fx(gone, 'ghost_burst', puff_fb(c='white'), at_body(1.1), src=('g_drop', 'gone'))
         g.at(app, tp_spot('d3', RE['D3']['up']))
         g.moves.append((app, app, 'reappear d3 (up)'))
-        g.at(app, glide_st(land - app))
+        g.at(app, glide_st(land - app, APPROACH_END['D3']))
         g.at(land, face_st())
         g.moves.append((app, land, 'drop side'))
         self.rib(app, land)
@@ -542,7 +574,7 @@ class Walk:
         g.fx(t, 'ghost_burst', puff_fb(), at_body(0.8), src=('g_run', 'appear'))
         g.at(run, FACE)
         g.fx(run, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.3, 0.3, 0, 10)], at_body(0.8), src=('g_run', 'run'), len=TRAIL['D4'])
-        g.at(run, glide_st(lunge - run))
+        g.at(run, glide_st(lunge - run, APPROACH_END['D4']))
         g.at(lunge, face_st())
         g.moves.append((run, lunge, 'run side'))
         self.rib(run, lunge)
@@ -558,14 +590,14 @@ class Walk:
             lk, lp = s - api.LOCK_LEAD, s - LEAP_T       # the lock (she takes the station's yaw), the leap (coil + 3 -> the hit, 6 t)
             g.at(lk, face_st())
             g.snd(lp, 'g_leap', src=('plan', 'A8.3 breeze.jump at 3'))
-            g.at(lp, f'execute positioned as {ST_M} run function rlk:mboss/mv/leap {{t:{LEAP_T},h:{LEAP_H}}}')
-            g.moves.append((lp, s, 'leap over (2.5 b up)'))
+            g.at(lp, st_recheck(self.st_name[s]), f'execute positioned as {ST_M} run function rlk:mboss/mv/leap {{t:{LEAP_T},h:{LEAP_H}}}')
+            g.moves.append((lp, s, 'leap beside the player (2.5 b up)'))
             self.rib(lp, s, seg=2)
             self.ends_vanished(t, clip, 'gone')
         elif step == 'A8.5':
             lk = s - api.LOCK_LEAD
             g.at(lk, face_st())
-            g.at(t + E('g_x', 'drop'), glide_st(DROP_T))
+            g.at(t + E('g_x', 'drop'), glide_st(DROP_T, self.st_name[s]))
             g.moves.append((t, t + DROP_T, 'drop side'))
             self.ends_vanished(t, clip, 'gone')
         elif self.prev_step(t) not in APPROACH:
@@ -655,9 +687,14 @@ class Walk:
             g.ev(jt, 'fail', 'fatal', 'JUDGE_T')
         else:
             fail = [f'# {key.upper()} fail (#gres 2 at T + {jt}; not lethal: ULT{60 if key == "a8" else 5}_LETHAL {lethal}; @s = the body): the dive lands on the',
-                    f'# player: ult/fail60 at the player\'s floor spot ({api.FAIL60_PM} per mille, never kills, the push ring there blows them',
-                    f'# ~{num(api.FAIL60_PUSH[0] + 0.5, 1)} b off it); she lands on the impact point (from 1 b above it in {LAND_T} t), g_reform.',
-                    f'execute at {PLAYER} positioned ~ {CY} ~ run {api.shield("fail60")}', api.play('g_reform'), FACE] + glide_spot('land', LAND_T)
+                    f'# player: ult/fail60 at the player\'s floor spot ({api.FAIL60_PM} per mille, never kills); round X (x_brief cause 6): her',
+                    f'# landing point first (g/spot/land, 2 b from the player), the push ring centred THERE (ult/fail60_push: straight away',
+                    f'# from her to {num(api.FAIL60_PUSH[2], 1)} b; it was centred on the player and sent them toward the arena start, through her when',
+                    f'# they faced it); she lands there (from 1 b above it in {LAND_T} t), g_reform.',
+                    spot('land'),
+                    f'execute at {PLAYER} positioned ~ {CY} ~ run {api.shield("fail60")}',
+                    f'execute at {SPOT_M} run {fn("ult/fail60_push")}', api.play('g_reform'), FACE,
+                    f'execute positioned as {SPOT_M} run function rlk:mboss/mv/glide {{t:{int(LAND_T)}}}', KILL_SPOT]
             g.ev(jt, 'fail', 'fail60', 'JUDGE_T')
             from . import shield as SH
             col = B.SEL.format(SH.FAIL_COL_TAG)
@@ -672,7 +709,7 @@ class Walk:
         g, key = self.gb, self.key
         # the stations (round V): per strike s the tick its station is fixed: an approach's start for the cut the approach
         # leads into, else STATION_LEAD before the strike (never before the tick after the strike before it)
-        self.st_tick = {}
+        self.st_tick, self.st_name = {}, {}
         moves = [(t, step, clip) for t, step, clip, _c in self.rows if step in CONTACT]
         self.cut_clip = {t + E(clip, 'hit'): (clip, t) for t, step, clip in moves}      # strike -> the move that delivers it
         prev_s = None
@@ -686,6 +723,7 @@ class Walk:
                 q = max((prev_s or 0) + 1, s - STATION_LEAD)
                 name, up = ST_SPOT.get(step, ('side', 0.0))
             self.st_tick[s] = q
+            self.st_name[s] = name
             g.at(q, station(name, up))
             g.ev(q, 'station', name, (step, s))
             prev_s = s
@@ -853,7 +891,7 @@ def build_nb(W):
         pb.at(lk, P1F.lock_fn(pb, key), FACE_LOCK)
         yaw = api.NB_YAW[i]
         org = f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ^ ^ ^-{num(ln / 2)}'
-        pb.hit(i, tell_from=0 if i == 0 else prev, pos=f'{org} positioned ~ {CY} ~')
+        pb.hit(i, tell_from=0 if i == 0 else prev, pos=f'{org} positioned ~ {CY} ~', kbdir=P1F.KB_FROM_HER)
         # round W: the blade's trail (P1F.trail_of); round V's standing line through the locked spot from the lock on is gone
         pb.at(t, S.fx('qi_beam', [part(DUST['lilac'], 0.5, 0.3, 4.0, 0, 40), part(DUST['white'], 0.3, 0.2, 3.0, 0, 12)],
                       pos=f'at {S.LOCK_M} rotated as @s rotated ~{yaw} 0 positioned ~ ~0.6 ~', len=int(ln * 10)), S.snd('g_sweep'))
@@ -965,7 +1003,7 @@ def build_q(W):
     pb.at(lock3, gh([P1F.lock_fn(pb, key), FACE_LOCK]),
           gh(S.fx('sky_mark', [part(DUST['white'], 0.02, 6.0, 0.02, 0, 40), part(DUST['magenta'], 0.9, 0.02, 0.02, 0, 12)],
                   pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')))
-    pb.hit(3, tell_from=hit, t=pillar, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
+    pb.hit(3, tell_from=hit, t=pillar, cond=HIT, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', kbdir=P1F.KB_FROM_HER)
     pb.at(pillar, gh(S.fx('sky_pillar', [part(DUST['white'], 0.5, 6.0, 0.5, 0, 80), part(DUST['magenta'], 0.8, 0.3, 0.8, 0, 20)],
                           pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~', r=24)), gh(S.snd('sky_pillar', pos=f'at {S.LOCK_M}')))
     pb.at(drop, gh([f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land2 - drop}}}']))

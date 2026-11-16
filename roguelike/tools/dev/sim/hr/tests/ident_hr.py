@@ -246,6 +246,13 @@ ALLOW[LANE_WI] = [F + r'combat/(?:apply|text_normal_side(?:_n)?|text_crit_side)\
 # multiplier lives in view/move (listed here too: test_cam D1 reads only the round V / W groups) and load
 LANE_W1116 = 'round W follow-up (11-16): no F5 chat hint, the out-of-combat sprint'
 ALLOW[LANE_W1116] = [F + r'view/(?:seat_new|move)\.mcfunction']
+# Round X, lane XB (11-16, wip/x-body; tools/dev/plan/combat/xb_progress.md): the body rule of 홍련's fight on the player's side (the
+# walk, the dodge set, 클로린드's nudge, 아를레키노's E stop short of her / a boss body) and the framework's knockback mode 2 (away
+# from the boss body: mboss/kb_src, hz/init, hurt's comment; build_mboss_core.py)
+LANE_XB = 'round X lane XB (11-16): the body rule on the player\'s side, the knockback away from the boss body'
+ALLOW[LANE_XB] = [F + r'view/(?:move|body_rule|body_sqrt)\.mcfunction',
+                  F + r'player/(?:dash_move_tick|step_move_tick|step_body|body_next|dodge/body)\.mcfunction',
+                  F + r'char/arlecchino/skill_dash\.mcfunction', F + r'mboss/(?:kb_src|hurt|hz/init)\.mcfunction']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
               LANE_WP,                              # lane WP: the dash clips / 나비아's dash fx + audio, beat/d/a14, a21

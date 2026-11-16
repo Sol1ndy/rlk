@@ -65,10 +65,10 @@ export const ROOTS = {
     R(1052, 1148, [0, 0, 20.73], [0, 0, 13.5]), R(1234, 1258, [0, 0, 13.5], [0, 0, 6.5], 4.5), R(1258, 1440, [0, 0, 6.5])],
   // CS1 (§3.2): f 9.0; the lunge 6-10 to 1.5; the leap back 34-50 (apex 1.2) to 9.0
   cs1: [R(0, 6, [0, 0, 9]), R(6, 10, [0, 0, 9], [0, 0, 2.25]), R(34, 50, [0, 0, 2.25], [0, 0, 9], 1.2), R(50, 720, [0, 0, 9])],
-  // the repel (§3.4): 1 b above ST(0, 0, 1.0), down to f 1.3 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-64); thrown 78-101 over
+  // the repel (§3.4): 1 b above ST(0, 0, 1.4) (round X: was 1.0 - the torsos 1.4 b apart at 2-3), down to f 1.95 by 6; yanked in to 1.1 (30-36); staggers to 1.2 (56-64); thrown 78-101 over
   // the actor's shoulder (HF-B: a low arc, apex THROW_H; her pelvis rides its own path over the shoulder) to 3.0; kicked 129:
   // slides to 8.0 by 135, on to 9.0 by 140 (at 5 % the sequence ends at 129: the ending)
-  repel: [R(0, 6, [0, 1, 1], [0, 0, 1.95]), R(30, 36, [0, 0, 1.95], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], THROW_H),
+  repel: [R(0, 6, [0, 1, 1.4], [0, 0, 1.95]), R(30, 36, [0, 0, 1.95], [0, 0, 1.1]), R(56, 64, [0, 0, 1.1], [0, 0, 1.2]), R(78, 101, [0, 0, 1.2], [0, 0, 3], THROW_H),
     R(129, 135, [0, 0, 3], [0, 0, 8]), R(135, 140, [0, 0, 8], [0, 0, 9])],
   // the ending (§3.5; ST, from E8 = 338 on ST2 with her landing mark 9.0 b ahead; = lane H2's seq.py moves): placed on her back at
   // 4.8 at tick 0 (under the seam's white); up to 5.2 (6-22); the lunge to 3.5 (50-54: at the graze tick 52 she is half way, 4.35);

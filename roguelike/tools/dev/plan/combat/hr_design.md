@@ -495,6 +495,13 @@ contact, the actor's hilt 0.55 b before it (`tools/player_motion/cine/clips.mjs`
 (test_contact `gap`; the 11-12 locks were 0.9-1.2 b, chest to chest). The aerial duel (E6 204-314) is gone: the exchange
 KA1-KA4 is on the ground, 2.25 b apart, in close shots between face and abdomen with sparks at every contact; she springs back
 to her mark low (apex 1 b, 314-334), seen at the landing.
+Round X (lane XB, `x_brief.md` ruling 3): the bodies are apart on EVERY tick of every two-figure clip, not only in the locks:
+her torso axis and the actor's >= 1.5 b, except the declared contact rows of `api.CINE_GAP` (the grab 33-48, the hilt strike
+49-51, the pass-by 62-66 at >= 0.9 b, the hook 67-78, the throw 79-100, the kick 118-129), which keep >= 0.25 b (no body through
+the other even in contact). The repel's R2-R6 were 0.04-0.7 b torso to torso: now she starts 1 b above f 1.4 (was 1.0), the
+actor hops back to f -0.7 after the hilt strike and cuts from a sword's reach (56 / 62), passes her right side 1 b off (r -1.0),
+steps back to f 1.5 after the throw (98-102) and in again for the kick (116-122); the throw's fit keeps its torso 0.3 b off hers
+(79-80 were 0.04 b). The R4 camera is wide on the actor's left (ST(-3.6, 1.5, 1.6) -> ST(0, 1.2, 0.4)).
 `test_contact.py` (HI, after H2 and H3 land): at each row's ticks the distance from the point to her blade's centre line
 (from her rig manifest's `hand_l` / `blade_tip` anchors) and to the actor's (from H3's manifest) is within tolerance.
 
@@ -916,3 +923,31 @@ As built: `wi_progress.md`, `tools/dev/sim/hr/tests/test_wi.py` (beside `test_vi
 - **§6.4 on the final tree** (`hrfair2.py`, all 175 runs, log `tools/dev/sim/hr/review/bal/wi_final.log`): every row passes except
   **T1 on seed 33: 0.97** (1.02 / 1.03 / 0.97, pooled 1.01) — as at the 11-12 release (`DMG['T2']` 42, the lead's reading of HB's
   per-seed caveat); no balance value was changed. T6 σ0 / σ1 cleared 100 %, T7 0 / 0 / 0, T13 53 / 53.
+
+## 13. Round X (11-16, lane XB) — the body rule (`x_brief.md` rulings 1-5; `xb_progress.md`)
+The user (11-16): the bodies still bump into each other in her fight. Binding where it differs from the above:
+- **The rule**: her body and the player's avatar (`@e[tag=rlk_body]`) never closer than `api.BODY['rule']` 1.4 b centre to centre on
+  the floor plane (horizontal, at any height) while she is fought (P1, P2, G1, G2); no fight contact is declared (Q's grab keeps it).
+- **Her side, one shared helper** (`body.py` -> `core/body` at the end of every fight tick): `core/guard` tests the step `mv/tick`
+  takes next tick against the live avatar and stops her on her path 1.6 b off it (the glide's ticks left go to the stop point and
+  to the glide's end height; a leap keeps its arc, only its end moves out). Every stop choice passes `core/cam_ok`'s new body clause
+  (>= 1.6 b from the avatar's feet). `core/cam_ok`'s line clause now runs as the player: `anchored eyes` takes the executor's eye
+  height (vanilla `EntityAnchorArgument.Anchor.apply`), and run as her it put her 1.74 b on the seat rider's feet (~4 b over the
+  avatar's feet). The hits on the locked spot knock back from her (`#hzKBDir 2`, `mboss/kb_src`): A9 / HCUT discs, A10, KCUT's
+  lines, NB's bands, Q's pillar, the gauntlet cuts. The G1 fail's push ring is centred on her landing point (`ult/fail60_push`).
+  TRI's lunge stops 1.6 b short. Hit ticks, damage, shapes, weights and the locked spots are unchanged.
+- **The soft separation** (`core/sep`): inside 1.4 b the avatar goes straight away from her, <= 0.25 b a tick in 0.05-b steps checked
+  like a knockback step and inside the arena; within 1.75 b its Motion keeps no pull that would carry it inside the rule after the
+  tick's physics. Not while the player is dead / reviving / in the map / held by a camera, never on a beat's held tick.
+- **The player's side** (her body carries `rlk_bodyr`): the walk (`view/body_rule`, also on held ticks) and every dodge move
+  (`player/dodge/body`: twist, lunge-step, back-step, cartwheel) stop at 1.4 b from her (from where her glide puts her this tick:
+  `player/body_next`); a move away is never stopped. 클로린드's lunge (`player/step_body`) and 아를레키노's E (`char/arlecchino/skill_dash`)
+  stop 1.6 b from any boss body.
+- **Gauntlet stations**: `g/st/<name>` re-checked when the move to them starts (`g/st/ok`: cam_ok against the live player; else the
+  spot again from its candidates); `d2e` 2.0 b; A8.3's `over` is beside the player (2.0 b at +60 / -60 / +90 / -90). The cut ticks
+  are unchanged (`test_metro` 33 / 33, `chainparry` 624 / 624).
+- **The repel**: §4.3 (round X paragraph).
+- **Tests**: `test_body.py` (fight: every pattern of both phases and both gauntlets with walking / W-holding / sprinting / lunging /
+  standing-dodging players at 3 / 6 / 10 b, the camera rider at seat height 2.11 / 2.36 / 2.85, the game's tick order; sep; moves;
+  cam), `test_contact` `gap` over every tick of every two-figure clip.
+

@@ -363,6 +363,28 @@ class ScSim(HrSim):
     def snbt(s):
         return HrSim.snbt(re.sub(r'\[\s*[IBL]\s*;', '[', s))
 
+    # --- round X (lane XB): an entity's Motion (vanilla: every entity has one) - fgsim keeps what `store result entity ...
+    # Motion[i]` writes in self.motion; `data get entity <e> Motion[i] <scale>` reads it (0 when never written) and `data modify
+    # entity <e> Motion[i] set value <v>d` / `Motion set value [..]` writes it (her separation core/sep_motion, view/body_rule)
+    def data_get(self, toks, ctx):
+        if toks[0] == 'entity' and toks[2].startswith('Motion['):
+            es = self.select(toks[1], ctx) if toks[1] != '@s' else [ctx.ex]
+            if not es or es[0] is None:
+                raise KeyError(toks[1])
+            scale = float(toks[3]) if len(toks) > 3 else 1.0
+            return math.floor(self.motion.get(es[0].id, [0.0, 0.0, 0.0])[int(toks[2][7])] * scale)
+        return super().data_get(toks, ctx)
+
+    def _motion_set(self, t, ctx):
+        es = self.select(t[3], ctx) if t[3] != '@s' else ([ctx.ex] if ctx.ex else [])
+        for e in es:
+            m = self.motion.setdefault(e.id, [0.0, 0.0, 0.0])
+            if t[4] == 'Motion':
+                m[:] = [float(x.rstrip('dD')) for x in t[7].strip('[]').split(',')]
+            else:
+                m[int(t[4][7])] = float(t[7].rstrip('dD'))
+        return 1 if es else 0
+
     # --- the sneak predicate
     def _sneak(self, e):
         return bool(e is not None and e.data.get('sneak'))
@@ -412,6 +434,9 @@ class ScSim(HrSim):
         return super().execute(t, ctx)
 
     def cmd(self, t, ctx):
+        if t[0] == 'data' and len(t) > 7 and t[1] == 'modify' and t[2] == 'entity' and t[4].startswith('Motion') and t[5] == 'set':
+            self.ncmd += 1
+            return self._motion_set(t, ctx)
         self.ncmd += 1
         if self._kit_depth:
             self.nkit += 1

@@ -1,13 +1,14 @@
 # {s,t,dmg,kb,n} (api.cut; @s = the pattern's executor = the body): a ghost cut (PLAN §5.3) = a quiet Electro disc hazard
 # of radius CUT_R 3.2 b at the player's feet on the floor, striking t ticks later (at pattern tick s), active 2 t,
-# dmg % of the base hit, knockback kb along her -> the player (kbdir 1, the marker's yaw); no outline, flash or decal;
+# dmg % of the base hit, knockback kb from her to the player at the strike (round X: kbdir 2, mboss/kb_src; was the marker's
+# yaw at the lock); no outline, flash or decal;
 # parryable (#hzNoParry 0): a perfect parry of it takes one gauge segment (shield/tick).
 # g/cut/tag stamps it (objective hr = s, rlk_hr_cut, the pattern tags, rlk_hr_cnt when it counts: n 1).
 $scoreboard players set #g_s hr $(s)
 $scoreboard players set #g_n hr $(n)
 scoreboard players set #hzAct mb 2
 scoreboard players set #hzEl mb 3
-scoreboard players set #hzKBDir mb 1
+scoreboard players set #hzKBDir mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNoParry mb 0

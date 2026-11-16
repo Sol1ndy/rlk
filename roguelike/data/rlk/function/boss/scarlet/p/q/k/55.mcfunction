@@ -1,5 +1,5 @@
 # Q pattern tick 55
-execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/core/near {d:1.4,t:4}
+execute if score #q_hit hr matches 1 run function rlk:boss/scarlet/core/near {d:1.6,t:4}
 execute if score #q_hit hr matches 1 at @s run function rlk:boss/scarlet/fx/snd/g_dive
 execute if score #q_hit hr matches 1 at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:30}
 execute if score #q_hit hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_tr_q1b21] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.0265f,1.7395f,0.4203f],left_rotation:[-0.4426f,-0.4426f,0.5515f,-0.5515f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}

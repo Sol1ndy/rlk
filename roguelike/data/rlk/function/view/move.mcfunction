@@ -88,5 +88,7 @@ scoreboard players operation #mx view *= #sp view
 scoreboard players operation #mx view /= #1000 tmp
 scoreboard players operation #mz view *= #sp view
 scoreboard players operation #mz view /= #1000 tmp
+# round X (x_brief 판정 1): 몸의 규칙을 지키는 몸(rlk_bodyr: 홍련)이 2.2칸 안이면, 걷기는 그 몸 1.4칸 안으로 들어가지 않는다(view/body_rule)
+execute if entity @e[tag=rlk_bodyr,limit=1] as @e[tag=rlk_av,limit=1] at @s if entity @e[tag=rlk_bodyr,distance=..2.2] run function rlk:view/body_rule
 execute store result entity @e[tag=rlk_av,limit=1] Motion[0] double 0.0001 run scoreboard players get #mx view
 execute store result entity @e[tag=rlk_av,limit=1] Motion[2] double 0.0001 run scoreboard players get #mz view

@@ -3,6 +3,9 @@
 function rlk:player/dodge/speed
 # 옆돌기는 적의 몸 속에서 끝나지 않는다(그 앞에서 멈춤, player/dodge/clear)
 execute if score #dgMv cb matches 2 run function rlk:player/dodge/clear
+# round X: 모든 동작이 몸의 규칙을 지키는 몸(rlk_bodyr: 홍련) 1.4칸 앞에서 멈춘다(player/dodge/body)
+execute if entity @e[tag=rlk_bodyr,limit=1] unless score #dgSp tmp matches 0 at @e[tag=rlk_body,limit=1] if entity @e[tag=rlk_bodyr,distance=..3] run function rlk:player/dodge/body
+execute if entity @e[tag=rlk_bodyr,tag=rlk_mb_mv,limit=1] unless score #dgSp tmp matches 0 at @e[tag=rlk_body,limit=1] unless entity @e[tag=rlk_bodyr,distance=..3] if entity @e[tag=rlk_bodyr,distance=..12] run function rlk:player/dodge/body
 scoreboard players operation #subx tmp = @s dashDX
 scoreboard players operation #subx tmp *= #dgSp tmp
 scoreboard players operation #subx tmp /= #1000 tmp

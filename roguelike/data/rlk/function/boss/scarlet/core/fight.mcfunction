@@ -5,5 +5,9 @@ function rlk:boss/scarlet/core/look
 execute if score #mbFloorHit mb matches 1 run function rlk:boss/scarlet/core/floor_hit
 execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run function rlk:boss/scarlet/core/floor_hit
 function rlk:boss/scarlet/core/state
+execute if score #ph hr matches 1 at @s run function rlk:boss/scarlet/core/body
+execute if score #ph hr matches 4 at @s run function rlk:boss/scarlet/core/body
+execute if score #ph hr matches 7 at @s run function rlk:boss/scarlet/core/body
+execute if score #ph hr matches 9 at @s run function rlk:boss/scarlet/core/body
 function rlk:boss/scarlet/core/amb
 execute if score #mbSt mb matches 1 run function rlk:boss/scarlet/core/inv

@@ -148,10 +148,11 @@ for c in ('lead60', 'lead5', 'lead_re'):
     ok(TR['clips'].get(c, {}).get('staged') is False, f'tracks: {c} is not staged (the fight is open there)')
 R = lambda c, t: TR['clips'][c]['root'][t]
 # (round W, lane WC: the locks a swordfighter's distance apart - cs1 2.25, the repel 1.95, the ending's lunge 3.5 and run 4.75 -
-# and the exchange on the ground instead of the aerial duel: 204-304 at 4.75, the step in to 4.35 for the overhead)
+# and the exchange on the ground instead of the aerial duel: 204-304 at 4.75, the step in to 4.35 for the overhead; round X:
+# the repel starts 1 b above f 1.4, was 1.0)
 for c, t, want in [('intro', 0, [0, 0, 20.73, 0]), ('intro', 880, [0, 0, 20.73, 180]), ('intro', 1148, [0, 0, 13.5, 180]), ('intro', 1258, [0, 0, 6.5, 180]), ('intro_end', 150, [0, 0, 6.5, 180]),
                    ('cs1', 0, [0, 0, 9, 180]), ('cs1', 10, [0, 0, 2.25, 180]), ('cs1', 30, [0, 0, 2.25, 180]), ('cs1', 50, [0, 0, 9, 180]), ('cs1', 720, [0, 0, 9, 180]),
-                   ('repel', 0, [0, 1, 1, 180]), ('repel', 6, [0, 0, 1.95, 180]), ('repel', 36, [0, 0, 1.1, 180]), ('repel', 68, [0, 0, 1.2, 180]), ('repel', 101, [0, 0, 3, 180]),
+                   ('repel', 0, [0, 1, 1.4, 180]), ('repel', 6, [0, 0, 1.95, 180]), ('repel', 36, [0, 0, 1.1, 180]), ('repel', 68, [0, 0, 1.2, 180]), ('repel', 101, [0, 0, 3, 180]),
                    ('repel', 64, [0, 0, 1.2, 180]), ('repel', 129, [0, 0, 3, 180]), ('repel', 140, [0, 0, 9, 180]), ('ending', 0, [0, 0, 4.8, 180]), ('ending', 22, [0, 0, 5.2, 180]),
                    ('ending', 52, [0, 0, 4.35, 180]), ('ending', 54, [0, 0, 3.5, 180]),
                    ('ending', 56, [0, 0, 3.5, 180]), ('ending', 86, [0, 0, 6.6, 180]), ('ending', 190, [0, 0, 4.75, 180]), ('ending', 216, [0, 0, 4.75, 180]), ('ending', 228, [0, 0, 4.75, 180]),

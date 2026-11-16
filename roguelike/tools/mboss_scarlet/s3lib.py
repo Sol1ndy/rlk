@@ -56,7 +56,11 @@ AT_OF = {'a8': 60, 'a13': 5}                   # repel {at} of each gauntlet's c
 # api.EV_FP: the reward hook reads them after cleanup); the generator checks every '#name hr' S3 writes is listed here.
 # I1 (request s3-5): the S3 extras live in the contract now (api.CORE_FP, same order; api.CORE_CONSTS).
 CONSTS = api.CORE_CONSTS
-FP_EXTRA = ('#ai_uc', '#sw_n', '#sw_x', '#sw_y', '#sw_z', '#sw_u', '#sw_c')    # round W: the ribbon's length (core/sw/rib1), core/cam_ok's flag                    # HA-09: the gauge close (ai/ult_close) ran once
+# HA-09: the gauge close (ai/ult_close) ran once; round W: the ribbon's length (core/sw/rib1), core/cam_ok's flag; round X
+# (body.py): the body rule's guard / separation
+FP_EXTRA = ('#ai_uc', '#sw_n', '#sw_x', '#sw_y', '#sw_z', '#sw_u', '#sw_c',
+            '#bx_px', '#bx_pz', '#bx_t', '#bx_nx', '#bx_nz', '#bx_dx', '#bx_dz', '#bx_qx', '#bx_qz', '#bx_a', '#bx_b', '#bx_u',
+            '#bx_h', '#bx_k', '#bx_n', '#bx_d', '#bx_r', '#bx_ux', '#bx_uz', '#bx_p', '#bx_mx', '#bx_mz', '#bx_in', '#bx_al')
 FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1 + api.P2)   # the patterns' own scores (#<key>_<x>)
 FP = tuple(api.CORE_FP) + tuple(FP_EXTRA)
 assert len(FP) == len(set(FP)), 'duplicate fake player'

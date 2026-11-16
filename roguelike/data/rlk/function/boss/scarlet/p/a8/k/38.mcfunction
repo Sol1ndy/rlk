@@ -2,6 +2,7 @@
 function rlk:boss/scarlet/g/cut/lock {s:45}
 execute at @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] positioned ^-0.115 ^3.012 ^0.188 run function rlk:boss/scarlet/fx/p/glint {c:2}
 execute at @s run function rlk:boss/scarlet/fx/snd/parry_cue
+execute unless function rlk:boss/scarlet/g/st/ok run function rlk:boss/scarlet/g/st/side
 execute rotated as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run tp @s ~ ~ ~ ~ 0
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:3}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b20] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.2097f,1.0664f,-0.0859f],left_rotation:[-0.3696f,-0.8924f,0.2391f,0.099f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}

@@ -1,6 +1,7 @@
 # A13 pattern tick 139.
 function rlk:mboss/mv/face
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~0.8 ~ run function rlk:boss/scarlet/fx/p/ghost_trail {len:105}
+execute unless function rlk:boss/scarlet/g/st/ok run function rlk:boss/scarlet/g/st/side
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:8}
 execute at @s run function rlk:boss/scarlet/fx/snd/g_step
 function rlk:boss/scarlet/g/cut/aim {s:151}

@@ -236,6 +236,15 @@ MOVE_R = SAFE - 0.5       # 22.5: every end point (landing, dash end, blink, rea
 assert MOVE_R == 22.5
 FALLBACK_R = 21.0         # the guaranteed last reappear / landing point: on the player -> C line, <= 21 b from C
 TRACK = {'deg': 10, 'step': 0.3, 'min': 2.4}   # chains: re-aim <= 10 deg/t + a 0.3 b step before each hit (stop at 2.4 b)
+# round X (lane XB; tools/dev/plan/combat/x_brief.md rulings 1-2): the body rule of her fight. Her body and the player's avatar
+# (@e[tag=rlk_body]) are never closer than 'rule' b centre to centre on the floor plane (horizontal, at any height) while she is
+# fought (P1, P2, the gauntlets; never in a locked sequence or on a beat's held tick): every arrival of hers is checked against the
+# live avatar when it starts (core/cam_ok's body clause) and on every glide tick (core/guard: she stops 'stop' b off along her
+# path), the soft separation (core/sep) moves the avatar out radially by at most 'push' b a tick (collision- and arena-checked,
+# never through her) and holds its walk at the rule from 'near' b in (the avatar's Motion); the player's side keeps it too
+# (BODY_TAG on her body: view/body_rule, player/dodge/body). No fight contact is exempt (Q's grab stops at 'stop' as well).
+BODY = {'rule': 1.4, 'stop': 1.6, 'push': 0.25, 'near': 1.75}
+BODY_TAG = 'rlk_bodyr'
 DASH_LEN = {'a9': 12.0, 'a6': 12.0, 'cs1_lunge': 20.0,   # max dash / glide lengths (b): A9 iai dash, A6 back-blink
             'hcut': 16.0, 'blue': 9.0, 'kcut': 10.0, 'tri': 6.0, 'q': 14.0}   # hr_design §2.2
 DASH_BEYOND = {'a9': 3.0, 'hcut': 3.0, 'blue': 2.0, 'kcut': 3.0}   # the dash ends this far beyond the locked spot
@@ -396,7 +405,8 @@ REAPPEAR = {
     # round V (v_brief §3 VB 4: arrivals in front of the avatar): the station of the chain cuts 2.2 b at +35 (the player's front
     # right; was 1.5 b at +90, beside them: her blade swung through the lens)
     'D1': {'dist': 14.0, 'bearing': -40, 'fallback': (40, 0, 90, -90), 'fallback_dist': 10.0, 'end': (2.2, 35)},
-    'D2': {'dist': 8.0, 'bearing': 55, 'end': (1.6, 45)},
+    # round X (x_brief ruling 2): the D2 glide's stop 2.0 b from the player (1.6 b was the body rule's edge for a player who walked)
+    'D2': {'dist': 8.0, 'bearing': 55, 'end': (2.0, 45)},
     'D3': {'dist': 2.5, 'up': 3.0, 'bearing': 60},
     'D4': {'dist': 12.0, 'bearing': -55},
     'A8.9': {'up': 3.0},                             # round V: 3 b over a spot 4.5 b before the player (was 6 b over them: out of view;
@@ -410,7 +420,10 @@ P2_RECOVER, GROGGY_RECOVER = 20, 12   # P2's first decision after the repel {at:
 COUNTER_PM = {60: (15, 15, 15), 5: (15, 15, 'kill')}
 COUNTER_EV = ('strike', 'land', 'kick')           # repel 49 / 101 / 129 (hr_design §3.4)
 FAIL60_PM = 500           # A8 fail (ULT60_LETHAL false): pl_dot 500 per mille, #mbDotLethal 0 (cannot kill) + a push
-FAIL60_PUSH = (2.5, 3)    # mboss_lib.push_ring(2.5, 3) at the impact point, the same tick
+# round X (x_brief ruling 1, cause 6): the push ring is centred on HER landing point (g/spot/land, 2 b from the player), not on the
+# player's spot (that one sent them 3 b toward the arena start - through her when they faced it): whoever is within 4 b of it
+# goes straight away from it to 5 b (~3 b), in 3 t, the same tick (ult/fail60_push)
+FAIL60_PUSH = (4.0, 3, 5.0)    # mboss_lib.push_ring(r, kb, to) at her landing point
 FAIL60_REFORM_T, FAIL60_P2_T = 220, 240           # g_reform 220-230 (she lands 2 b from the player), P2 decision at 240
 FAIL5_T = {'reappear': 224, 'black': 239, 'slash': 242}   # the instant-death staging (ovl black 239-242, pinkwhite +
 #                                                           scarlet_line + ult/fatal at 242)
@@ -536,6 +549,18 @@ CONTACT = {                                             # id: (sequence, (tick f
 }
 CONTACT['KT1'] = ('repel', (88, 88), (0.28, 1.4, 2.0), 'her pelvis over the actor\'s right shoulder')   # HF-B (HB-01): the low throw
 CONTACT_TOL = {'blade': 0.08, 'body': 0.12}             # b: blades; hands and feet
+# round X (lane XB; x_brief ruling 3): the bodies of every two-figure clip (her clip against the actor's on the same sequence clock:
+# intro / intro_end on cs0, cs1, repel, ending; test_contact.py `gap`, from tools/dev/sim/hr/cine/her_tracks.json and the actor's
+# manifest): her torso axis (pelvis -> 0.8 of the way to her head) and the actor's (waist -> chest) at least CINE_GAP['min'] b apart
+# on EVERY tick, except the declared contact rows (sequence, from, to, floor, what): there at least their floor (>= 'contact' b:
+# no body through the other even in contact). Round W checked only the eight lock spans; the repel's R2-R6 were 0.04-0.7 b.
+CINE_GAP = {'min': 1.5, 'contact': 0.25, 'rows': (
+    ('repel', 33, 48, 0.25, 'KW: yanked in by her seized sword wrist, held'),
+    ('repel', 49, 51, 0.25, 'KH: the hilt on her hat, the landing before the hop back'),
+    ('repel', 62, 66, 0.9, 'the level cut 62 carrying the actor round her right side, 1 b off'),
+    ('repel', 67, 78, 0.25, 'KS: behind her, back to back, the hook over the shoulder'),
+    ('repel', 79, 100, 0.25, 'KT: the throw over the shoulder, her fall'),
+    ('repel', 118, 129, 0.25, 'KK: the step in, the leg drawn back, the kick'))}
 ACTOR_CLIPS = {'cs0': 1440, 'cs1': 720, 'repel': 140, 'ending': 1372, 'coda': 120}   # H3: tools/player_motion/cine/<id>.json
 ACTOR_LIMIT = {'fwd': 2.5, 'back': 1.5, 'side': 1.5, 'cs0_back': 6.0, 'air': 7.0}   # the actor's displacement from the stage origin
 ACTOR_MANIFEST = _TOOLS / 'player_motion/cine/manifest.json'                      # H3 writes it

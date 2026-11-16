@@ -5,6 +5,7 @@ execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positione
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
 function rlk:mboss/mv/face
 execute at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/rig/follow_now
+execute unless function rlk:boss/scarlet/g/st/ok run function rlk:boss/scarlet/g/st/side
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gst,limit=1] run function rlk:mboss/mv/glide {t:5}
 function rlk:boss/scarlet/g/cut/aim {s:163}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_tr_a8b154] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.5287f,1.2557f,-0.3927f],left_rotation:[-0.7697f,0.539f,-0.1962f,0.2802f],scale:[0.26f,0.26f,1.6f],right_rotation:[0f,0f,0f,1f]}}

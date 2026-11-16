@@ -136,9 +136,15 @@ function throwFit(c, left, seg, pelvis, {reach = .55, clear = .44, vars = ['hr',
     const g = get(x), s = shoulders(g), e = (S, T) => { const d = Math.hypot(...sub(S, T)); return Math.max(0, d - reach) ** 2 + Math.max(0, .26 - d) ** 2; };
     const H = headAt(g), hd = segPt(H, seg[0], seg[1]), sh = Math.hypot(s.R[0] - pelvis[0], s.R[2] - pelvis[2]);
     const side = 20 * Math.max(0, H[0] - (pelvis[0] - .35)) ** 2;     // the head ducks to the left of her (stage -r of her body)
-    const jump = prev ? 2 * ((x.hr - prev.hr) ** 2 + (x.hf - prev.hf) ** 2) + 4e-4 * ((x.ty - prev.ty) ** 2 + (x.tr - prev.tr) ** 2) : 0;
-    return 60 * (e(s.R, c.hR) + (left ? e(s.L, left) : 0)) + 40 * Math.max(0, clear - hd) ** 2 + 4 * Math.max(0, sh - .3) ** 2 + 3 * (x.hr ** 2 + x.hf ** 2)
-      + 6e-5 * (x.ty ** 2 + 2 * x.tr ** 2) + jump + side;
+    // (round X: no interpenetration in the contact rows, test_contact `gap` >= 0.25 b: the torso's axis - the pelvis and 0.4 b up
+    // the torso from it - stays 0.3 b off hers; the fit had slid the hips 0.35 b back into her pelvis at 79-80 to reach the holds)
+    const Qb = qmul(quat(g.rot), quat(g.tor)), Wa = add(add(A(g.root), [0, HIP_Y, 0]), rot(quat([0, g.rot[1], 0]), A(g.hip)));
+    const Ca = add(Wa, rot(Qb, [0, .4, 0]));
+    const wd = Math.min(...[0, .25, .5, .75, 1].map(u => segPt(A(mix(Wa, Ca, u)), seg[0], seg[1])));
+    const body = 600 * Math.max(0, .3 - wd) ** 2;
+    const jump = prev ? 30 * ((x.hr - prev.hr) ** 2 + (x.hf - prev.hf) ** 2) + 4e-4 * ((x.ty - prev.ty) ** 2 + (x.tr - prev.tr) ** 2) : 0;
+    return 60 * (e(s.R, c.hR) + (left ? e(s.L, left) : 0)) + 100 * Math.max(0, clear - hd) ** 2 + 4 * Math.max(0, sh - .3) ** 2 + 3 * (x.hr ** 2 + x.hf ** 2)
+      + 6e-5 * (x.ty ** 2 + 2 * x.tr ** 2) + jump + side + body;
   };
   let x = prev ? {...prev} : {hr: 0, hf: 0, ty: 0, tp: 0, tr: 0}, best = cost(x);
   for (let step = 1; step > .01; step /= 2) {
@@ -336,11 +342,13 @@ function cs1(tr) {
 // ============================================================================================================================
 // repel: 140 t (§3.4). The high guard at KR 0-4 (two hands, the knees bent); holds 4-22; heaves up 22-26; beats her blade
 // aside 26-30; steps in (f +0.5) 30-36, the left hand seizes her sword wrist at KW 36 and holds it high 36-48; the hilt
-// strike on her hat at KH 49 (a short hop: the crown is 2.2 b up); the rising cut 56, the level cut 62 that carries past
-// her right side (f 1.8, through r -0.55) 62-68; back to her 68, the right arm hooks her sword arm over the right shoulder
-// 70-76 (KS on the shoulder); bends and throws 78-96, straightens 96-102; looks down at her, the blade pointed at her 104-118;
-// the right leg back 120-128, the kick at KK 129; back-flip to the mark 132-138, lands, the idle at 140. `{at:5}` shows
-// ticks 0-129 only (the ending's tick 0 is the kick's pose).
+// strike on her hat at KH 49 (a short hop: the crown is 2.2 b up); round X (x_brief ruling 3: a swordfighter's distance outside
+// the grab / hilt / hook / throw / kick): lands and hops back out of her to f -0.7 50-52, the rising cut 56 and the level cut 62
+// from a sword's reach, the level cut carrying it round her right side 1 b off (r -1.0) 62-66, behind her 67-68 (f 1.8); the
+// right arm hooks her sword arm over the right shoulder 70-76 (KS on the shoulder); bends and throws 78-96, straightens 96-102,
+// stepping back to f 1.5 98-102; looks down at her, the blade pointed at her 104-116; steps in again 116-122, the right leg back
+// 120-128, the kick at KK 129; back-flip to the mark 132-138, lands, the idle at 140. `{at:5}` shows ticks 0-129 only (the
+// ending's tick 0 is the kick's pose).
 function repel(tr) {
   const hiltR = add(K.KR, [.35, -.2, -.2]), gR = {...blade(hiltR, sub(K.KR, hiltR), [0, 1, .3]), ...ELBOWS_OUT};
   const st0 = stance(O, [.27, .14], [-.25, -.2], {drop: .1});
@@ -380,22 +388,35 @@ function repel(tr) {
   tr.at(49, {aL: [110, 0, 64, 30]}, 'l');
   tr.at(51, {wL: 0}, 'l');
   tr.at(55, {aL: ARM.balL}, 'io');
-  // 49-52 lands, the blade dropping to the low left for the rising cut
-  const lowL = blade(add(A1, [-.1, .94, .42]), [-.62, -.4, .68], [0, 1, 0]);
-  tr.at(52, {hip: [0, -.1, .1], tor: [-12, -24, 0], rot: [0, 0, 0], head: [4, 20, 0], lfR: 0, lfL: 0, hR: lowL.hR, bd: lowL.bd, bn: lowL.bn}, 'o');
-  // 52-56 the rising cut, lower left to upper right; 56-62 the blade comes round level; 62-68 the level cut carries past her
-  const highR = blade(add(A1, [.42, 1.56, .42]), [.5, .82, .28], [0, 1, 0]);
-  sweep(tr, 52, 56, lowL, highR, {ease: 'io', via: norm([-.1, .25, .96])});
+  // 49-53 lands and hops back out of her (round X: the torsos 0.4 b apart at the strike, >= 1.5 b from 52), the blade coming down
+  // with the body and to the low left for the rising cut (53-56)
+  const AB = [0, 0, -.7];
+  tr.mv(50, 52, {root: AB}, 'io');
+  step(tr, 'R', 50, 52, [.3, -.74], .08);
+  step(tr, 'L', 50, 52, [-.16, -.48], .08);
+  // (the hand stays high as the body goes back, the point turned down past her: the strike's pommel-down blade never sweeps through
+  // the floor, the head or the arm's 120-degree limit on its way to the low left)
+  tr.at(51, {hR: [.22, 1.62, .32], bd: norm([.3, -.45, .84]), bn: [1, 0, 0]}, 'io');
+  const lowL = blade(add(AB, [-.1, .94, .42]), [-.62, -.4, .68], [0, 1, 0]);
+  tr.at(53, {hip: [0, -.1, .1], tor: [-12, -24, 0], rot: [0, 0, 0], head: [4, 20, 0], lfR: 0, lfL: 0, hR: lowL.hR, bd: lowL.bd, bn: lowL.bn}, 'o');
+  // 53-56 the rising cut from a sword's reach, lower left to upper right; 56-62 the blade comes round level; 62-68 the level cut
+  // carries it round her
+  const highR = blade(add(AB, [.42, 1.56, .42]), [.5, .82, .28], [0, 1, 0]);
+  sweep(tr, 53, 56, lowL, highR, {ease: 'io', via: norm([-.1, .25, .96])});
   tr.at(56, {hip: [.02, -.03, .12], tor: [-4, 18, 0], head: [2, -14, 0]}, 'o');
-  const lvl0 = blade(add(A1, [.4, 1.12, .0]), [.95, .02, -.3], [0, 0, 1]);
+  const lvl0 = blade(add(AB, [.4, 1.12, .0]), [.95, .02, -.3], [0, 0, 1]);
   sweep(tr, 56, 61, highR, lvl0, {ease: 'io', n: [0, 1, 0]});
   tr.at(61, {hip: [.02, -.1, .02], tor: [-8, 30, 0], head: [2, -26, 0]}, 'io');
+  // round X: round her right side 1 b off her (r -1.0 at her f; was r -0.5: 0.3 b torso to torso), behind her at 67-68
   const A2 = [0, 0, 1.8], lvl1 = blade(add(A2, [.36, 1.1, .2]), [.6, 0, -.8], [0, 0, -1]);
-  const lvlm = blade([-.2, 1.1, 1.3], [.86, 0, .5], [0, 0, 1]);
+  const P64 = [-.85, 0, .45], lvlm = blade(add(P64, [.4, 1.1, .35]), [.86, 0, .5], [0, 0, 1]);
   tr.hold(61, 'root', 'fR', 'fL', 'rot');
-  tr.at(64, {root: [-.5, 0, 1.0]}, 'i'); tr.at(66, {root: [-.42, 0, 1.5]}, 'l'); tr.at(68, {root: A2}, 'o');
+  tr.at(62, {root: [-.15, 0, -.45]}, 'i'); tr.at(64, {root: P64}, 'l'); tr.at(66, {root: [-1.0, 0, 1.35]}, 'l');
+  tr.at(67, {root: [-.55, 0, 1.75]}, 'l'); tr.at(68, {root: A2}, 'o');
+  const lvl66 = blade(add([-1.0, 0, 1.35], [.38, 1.1, .15]), [.75, 0, -.66], [0, 0, 1]);
   sweep(tr, 61, 64, lvl0, lvlm, {ease: 'l', n: [0, 1, 0]});
-  sweep(tr, 64, 68, lvlm, lvl1, {ease: 'l', n: [0, 1, 0]});
+  sweep(tr, 64, 66, lvlm, lvl66, {ease: 'l', n: [0, 1, 0]});
+  sweep(tr, 66, 68, lvl66, lvl1, {ease: 'l', n: [0, 1, 0]});
   tr.hold(61, 'lfR', 'lfL', 'lR', 'lL', 'kR', 'kL');
   tr.at(62, {lfR: 1, lfL: 1, lR: [-20, 0, -4, 30], lL: [36, 0, 4, 40], hip: [0, .0, .04]}, 'l');
   tr.at(63, {hip: [0, .04, .05]}, 'l');
@@ -424,10 +445,10 @@ function repel(tr) {
   // the right shoulder) designed at the key ticks, fitted at every tick 79-96 (her forearm moves tick by tick): the right fist
   // reaches its hold, the left hand its hold 86-91 (both fitted 0.52 b from the shoulder: the IK's reach with a margin), the head
   // stays 0.44 b off her body
-  const BEND = [[78, [0, -.14, -.02], [10, 4, 0], [-6, 24, 0]], [79, [0, -.15, -.06], [0, 2, -6], [-12, 0, -8]], [82, [0, -.18, -.14], [-32, 2, -16], [-30, 0, -20]],
+  const BEND = [[78, [0, -.14, -.02], [10, 4, 0], [-6, 24, 0]], [79, [0, -.15, -.02], [0, 2, -6], [-12, 0, -8]], [80, [0, -.16, .06], [-10, 2, -10], [-20, 0, -14]], [82, [0, -.18, -.14], [-32, 2, -16], [-30, 0, -20]],
     [84, [0, -.2, -.16], [-42, 2, -18], [-32, 0, -22]], [86, [0, -.21, -.18], [-48, 2, -18], [-30, 0, -22]], [90, [0, -.22, -.2], [-56, 2, -16], [-28, 0, -22]],
     [92, [0, -.21, -.19], [-56, 2, -14], [-24, 0, -20]], [94, [0, -.19, -.16], [-48, 2, -10], [-14, 0, -12]], [96, [0, -.16, -.12], [-42, 0, -8], [-4, 0, -4]]];
-  let xPrev = null;
+  let xPrev = {hr: 0, hf: 0, ty: 0, tp: 0, tr: 0};       // (round X: the first tick pays for leaving the hook's pose too)
   for (let t = 79; t <= 96; t++) {
     const g = arm.hand_l[t], d = norm(sub(arm.elbow_l[t], g));                // from her grip toward her elbow
     const holdL = add(g, mulv(d, .05)), holdR = add(add(g, mulv(d, .22)), [0, .05, 0]), wb = EZ.io(Math.min(1, (t - 78) / 4));
@@ -448,8 +469,18 @@ function repel(tr) {
 
 
   tr.at(102, {hip: [0, -.02, .02], tor: [-10, 0, 0], head: [16, 0, 0], hR: add(A2, [.4, .9, .2]), bd: norm([.2, -.5, .84]), bn: [0, .86, .51], pR: REST.pR}, 'io');
-  // 104-118 stands over her, the point at her
-  tr.mv(104, 112, {hR: over.hR, bd: over.bd, bn: over.bn, tor: [-14, 6, 0], head: [26, -4, 0], hip: [0, -.03, .04]}, 'io');
+  // round X: steps back off her as she falls (98-102: f 1.5; at 1.8 the torsos were 1.3 b apart for 26 t), the point at her
+  // 104-116; steps in again 116-122 for the kick
+  const A3 = [0, 0, 1.5];
+  tr.hold(98, 'root', 'fR', 'fL');
+  tr.mv(98, 102, {root: A3}, 'io');
+  step(tr, 'R', 98, 101, [.16, 1.64], .06);
+  step(tr, 'L', 99, 102, [-.2, 1.46], .06);
+  // 104-116 stands over her, the point at her
+  tr.mv(104, 112, {hR: add(over.hR, sub(A3, A2)), bd: over.bd, bn: over.bn, tor: [-14, 6, 0], head: [26, -4, 0], hip: [0, -.03, .04]}, 'io');
+  tr.hold(116, 'root', 'fL');
+  tr.mv(116, 122, {root: A2}, 'io');
+  step(tr, 'L', 116, 120, [-.2, 1.76], .06);
   // 120-128 the right leg goes back; 129 the kick lands on her flank
   tr.hold(120, 'hip', 'tor', 'head', 'fR', 'hR', 'bd', 'aL', 'kR');
   tr.at(126, {fR: [.2, .3, 1.36], kR: [.3, 0, 1], hip: [-.05, -.03, .04], tor: [-6, 10, 0], head: [22, -8, 0], hR: add(A2, [.5, 1.0, .0]), bd: norm([.5, -.2, .84]), aL: [30, 0, 30, 40]}, 'io', {fR: [0, .1, 0]});
@@ -657,9 +688,9 @@ export const CLIPS = [
   mk('cs1', 720, cs1, {grip: 'right hand; two hands 6-34', two: [[10, 30]], slides: [[30, 44], [664, 676], [694, 704]], sync: [566], steps: [68, 76, 82, 657, 663, 671, 711, 716],
     beats: 'ready 0-6; guard up 6-10; the cut on the blade at K1 at 10; lock 10-30, pushing 24-30; the shove 30-34; slides back 34-44; recovers, steps forward 60-82; sword lowered by 84; half guard 350-370, held; hit 650-653; stagger 652-664 (f -0.5); on the right knee, the sword planted 664-694; up 694-716; idle 720',
     her: [[0, [0, 0, 9]], [6, [0, 0, 9]], [10, [0, 0, 2.25]], [34, [0, 0, 2.25]], [50, [0, 0, 9]]]}),
-  mk('repel', 140, repel, {keep: [129], grip: 'two hands 0-30; left hand free 30-140 (on her wrist 36-48; the throw: the right fist with the sword hooked over her sword forearm 78-96, the left hand round her wrist 86-91)', two: [[0, 26]], slides: [[61, 68], [129, 139]], steps: [34, 38, 52, 68, 72, 132, 138],
-    beats: 'high guard at KR 0-4; holds 4-22; heaves 22-26; beats her blade aside 26-30; steps in 30-36; left hand on her wrist at KW 36-48; hilt strike at KH 49; rising cut 56; level cut 62, past her right side 62-68 (r -0.5); back to her 68; hooks her arm over the right shoulder 70-76; the throw 78-96: the right fist over her sword forearm 78-96, the left hand round her wrist 86-91 (reaching 79-85, letting go 92-97), the hips back under her, the back bent, the head ducked left: she goes over the right shoulder, low (her pelvis 0.35 b over it at 88); lets go 96, straightens 96-102; the point at her 104-118; leg back 120-128; kick at KK 129; back-flip 132-138; idle 140',
-    her: [[0, [0, 1, 1.0]], [6, [0, 0, 1.3]], [52, [0, 0, 1.1]], [68, [0, 0, 1.2]], [78, [0, 0, 1.2]], [88, [0.28, 1.4, 2.0]], [101, [0, 0, 3.0]], [129, [0, 0, 3.0]], [135, [0, 0, 8]], [140, [0, 0, 9]]]}),
+  mk('repel', 140, repel, {keep: [129], grip: 'two hands 0-30; left hand free 30-140 (on her wrist 36-48; the throw: the right fist with the sword hooked over her sword forearm 78-96, the left hand round her wrist 86-91)', two: [[0, 26]], slides: [[61, 68], [129, 139]], steps: [34, 38, 52, 68, 72, 101, 102, 120, 132, 138],
+    beats: 'high guard at KR 0-4; holds 4-22; heaves 22-26; beats her blade aside 26-30; steps in 30-36; left hand on her wrist at KW 36-48; hilt strike at KH 49; lands and hops back to f -0.7 50-52 (round X); rising cut 56; level cut 62, round her right side 62-67 (r -1.0); behind her 68; hooks her arm over the right shoulder 70-76; the throw 78-96: the right fist over her sword forearm 78-96, the left hand round her wrist 86-91 (reaching 79-85, letting go 92-97), the hips back under her, the back bent, the head ducked left: she goes over the right shoulder, low (her pelvis 0.35 b over it at 88); lets go 96, straightens 96-102 stepping back to f 1.5 98-102 (round X); the point at her 104-116; steps in 116-122; leg back 120-128; kick at KK 129; back-flip 132-138; idle 140',
+    her: [[0, [0, 1, 1.4]], [6, [0, 0, 1.95]], [52, [0, 0, 1.1]], [68, [0, 0, 1.2]], [78, [0, 0, 1.2]], [88, [0.28, 1.4, 2.0]], [101, [0, 0, 3.0]], [129, [0, 0, 3.0]], [135, [0, 0, 8]], [140, [0, 0, 9]]]}),
   mk('ending', 1372, ending, {start: KICK, after: ['repel', 129], grounded: [[330, 1372]],
     grip: 'right hand; two hands 56-80, 190-204, 298-304; left hand free 556-616', two: [[56, 80], [190, 204], [298, 304]],
     slides: [[50, 56], [80, 104], [117, 124], [304, 330]], steps: [8, 12, 16, 54, 123, 172, 180, 187, 189, 330, 343, 348, 386, 392],

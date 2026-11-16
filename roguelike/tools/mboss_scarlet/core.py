@@ -25,6 +25,7 @@ from . import api
 from . import s3lib as S
 from .s3lib import sset, fn, part, placed
 from . import blade as B
+from . import body as BR
 
 L, K = api.L, api.K
 OBJ = api.OBJ
@@ -154,7 +155,8 @@ def build(W, ctx):
     w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props;',
                      '# she draws her own unparriable flashes (yellow / purple / blue): the framework\'s glint is off for the whole fight',
                      '# (#mbNpOwn mb 1; the cleanup hook clears it).',
-                     f'scoreboard players set {api.NP_OWN[0]} {api.NP_OWN[1]} 1', fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
+                     # round X (body.py): her body keeps the body rule on the player's side too (view/body_rule, player/dodge/body)
+                     f'scoreboard players set {api.NP_OWN[0]} {api.NP_OWN[1]} 1', f'tag @s add {api.BODY_TAG}', fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
                      fn('core/deco'), 'data modify storage rlk:mboss sub set value []'])
     w('core/looks', ['# The rig looks the module owns (form, phase, blade, state) for the current phase (@s = body; reload, tests).',
                      api.rig('look/form/normal'),
@@ -218,7 +220,9 @@ def build(W, ctx):
         fn('core/look'),
         f'execute if score #mbFloorHit mb matches 1 run {fn("core/floor_hit")}',
         f'execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run {fn("core/floor_hit")}',
-        fn('core/state')]
+        fn('core/state'),
+        # round X (x_brief rulings 1-2, body.py): the body rule after every move of this fight tick (P1 / P2 / the gauntlets)
+        ] + [f'execute if score #ph {OBJ} matches {PH[k]} at @s run {fn("core/body")}' for k in ('p1', 'a8', 'p2', 'a13')]
       + ([fn('core/amb')] if amb1 and amb2 else [])
       + [f'execute if score #mbSt mb matches 1 run {fn("core/inv")}'])
     if amb1 and amb2:
@@ -782,6 +786,7 @@ def look_files(W):
 # ================================================================================================== helpers
 def helper_files(W):
     w = W.w
+    BR.runtime(W)                        # round X: core/body, core/guard*, core/sep*, core/isqrt (body.py)
     w('core/stop_move', ['# The body stops gliding (@s = body).', 'execute if entity @s[tag=rlk_mb_mv] run function rlk:mboss/mv/stop'])
     w('core/ground', ['# Back on the floor at once if airborne (a cancelled leap; @s = body): the spot below when mv/ok, else C.',
                       fn('core/stop_move'),
@@ -1280,6 +1285,7 @@ def stand_in_gauntlets(W, ctx):
                  fn('shield/judge'), *warn(0), f'execute if score #gres {OBJ} matches 1 run {sset("#done", 1)}']
         if g == 'a8':
             judge += [f'execute if score #gres {OBJ} matches 2 at {S.PLAYER} run {fn("ult/fail60")}',
+                      f'execute if score #gres {OBJ} matches 2 at @s run {fn("ult/fail60_push")}',
                       f'execute if score #gres {OBJ} matches 2 run {api.play("g_reform")}']
         else:
             judge += [f'execute if score #gres {OBJ} matches 2 as {S.PL} run {fn("ult/fatal")}']

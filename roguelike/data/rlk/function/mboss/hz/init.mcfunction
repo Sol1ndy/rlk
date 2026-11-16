@@ -6,10 +6,11 @@ scoreboard players operation @s mbHzA = #hzAct mb
 scoreboard players operation @s mbHzE = #mbEl mb
 execute if score #hzEl mb matches 0.. run scoreboard players operation @s mbHzE = #hzEl mb
 scoreboard players operation @s mbHzB = #hzKB mb
-# Knockback direction: 0 away from the origin, 1 along the aim, -1 (default) = shape default (lines 1, else 0).
+# Knockback direction: 0 away from the origin, 1 along the aim, 2 away from the boss body (round X: a hazard centred on a locked
+# spot pushes a player who stepped in past it away from the boss, not into it), -1 (default) = shape default (lines 1, else 0).
 scoreboard players operation @s mbHzKD = #hzKBDir mb
-execute unless score @s mbHzKD matches 0..1 run scoreboard players set @s mbHzKD 0
-execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run scoreboard players set @s mbHzKD 1
+execute unless score @s mbHzKD matches 0..2 run scoreboard players set @s mbHzKD 0
+execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..2 run scoreboard players set @s mbHzKD 1
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
 scoreboard players operation @s mbHzG = #hzGrp mb
