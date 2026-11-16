@@ -67,11 +67,16 @@ scoreboard players operation #inz view = #mz view
 # 달리기 시야 효과. 휘두르는 동안에도 그대로 두어 휘두를 때마다 시야가 출렁이지 않게 한다
 scoreboard players set #sprNow view 0
 execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players set #sprNow view 1
-# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3, 휘두르는 동안은 달리기 배율 없음)
+# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3, 전투 밖 달리기 ×3, 휘두르는 동안은 달리기 배율 없음)
 scoreboard players operation #sp view = #viewWalk tmp
 scoreboard players operation #sp view *= @s moveSpeed
 scoreboard players operation #sp view /= #100 tmp
-execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
+# 달리기 배율: 전투 중 #viewSprint(130 = ×1.3), 전투 밖 #viewSprintOoc(300 = 걷기의 ×3, 사용자 11-16). 전투 중 = 방 전투(#active room 1 ·
+# #combat room = 구역 번호; 나루카미 · 중간 · 챕터 · 특수 보스도 이 흐름) 또는 보스 엔진(#mbLive mb 1) — lvup/pick_sub 와 같은 판정
+scoreboard players operation #spM view = #viewSprintOoc tmp
+execute if score #active room matches 1 if score #combat room matches 1.. run scoreboard players operation #spM view = #viewSprint tmp
+execute if score #mbLive mb matches 1 run scoreboard players operation #spM view = #viewSprint tmp
+execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #spM view
 execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view *= #skDashSpd tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view /= #100 tmp

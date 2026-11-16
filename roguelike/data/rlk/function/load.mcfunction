@@ -907,6 +907,7 @@ scoreboard players set #rfMax tmp 2
 # 시점 시스템(숄더뷰): 걷는 속도(칸/틱 × 10000, 이동 속도 100% 기준) / 달리기 배율(%)
 scoreboard players set #viewWalk tmp 2159
 scoreboard players set #viewSprint tmp 130
+scoreboard players set #viewSprintOoc tmp 300
 # 평타를 휘두르는 동안(swHold) 걷는 속도(%, 달리기 배율 없음). 숄더뷰 · F5 시점의 아바타(view/move). 1인칭은 걷기를 늦추지 않고
 # 점프만 막는다(이동 속도 속성을 낮추면 바닐라가 화면을 확대함, player/swing/tick)
 scoreboard players set #swSlow tmp 50
