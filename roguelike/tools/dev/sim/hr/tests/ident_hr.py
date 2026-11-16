@@ -242,6 +242,10 @@ ALLOW['round V integration (11-12): the developer fallback mob is a zombie'] = [
 LANE_WI = 'round W integration (11-12): her damage numbers beside her, the dodge cut by a lock, the stand-in rig without a beat'
 ALLOW[LANE_WI] = [F + r'combat/(?:apply|text_normal_side(?:_n)?|text_crit_side)\.mcfunction', F + r'player/(?:tick|dodge/cut)\.mcfunction',
                   F + r'tick\.mcfunction']
+# round W follow-up (11-16, the user): the F5 seat no longer prints its chat hint (view/seat_new); the out-of-combat sprint
+# multiplier lives in view/move (listed here too: test_cam D1 reads only the round V / W groups) and load
+LANE_W1116 = 'round W follow-up (11-16): no F5 chat hint, the out-of-combat sprint'
+ALLOW[LANE_W1116] = [F + r'view/(?:seat_new|move)\.mcfunction']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_VP,                              # lane VP: fx/g/t_streak, t_streak_s, t_wash, fx/t_arc, fx/t_jolt
               LANE_WP,                              # lane WP: the dash clips / 나비아's dash fx + audio, beat/d/a14, a21
