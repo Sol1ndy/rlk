@@ -17,7 +17,7 @@ lane: byte-identical to `rp_rel4`); `<S>` = the scratchpad of `x_brief.md`. Cont
 - [x] the repel re-staged (R0 start, R4, R6's fit, R7, the R4 camera), `test_contact` gap over every tick of every two-figure clip,
       shot sheets looked at
 - [x] docs (README 홍련 / 2 / 3 / 0-8 / 0-9, hr_design §4.3 + §13)
-- [ ] gates on the final tree, balance, push (see "Gates")
+- [x] gates on the final tree, balance (full hrfair), push (see "Gates")
 
 ## What was wrong / what is built (x_brief causes 1-7, rulings 1-5)
 - **Her stops** were chosen from where the player WAS (the lock 7 t before the hit; the stations 10-14 t before the cut) and nothing
@@ -61,10 +61,10 @@ each hit; stand = no walk, the dodge + the cartwheel.
 | a2 P1 | 1.07 / 5 | 1.41 / 0 | 0.07 / 15 | 1.41 / 0 | 0.06 / 20 | 1.41 / 0 | 0.09 / 8 | 1.41 / 0 | 2.80 / 0 | 2.80 / 0 |
 | a3 P1 | 1.26 / 14 | 1.46 / 0 | 0.01 / 202 | 1.41 / 0 | 0.03 / 210 | 1.41 / 0 | 0.01 / 143 | 1.41 / 0 | 2.13 / 0 | 2.13 / 0 |
 | a3s P1 | 1.26 / 5 | 1.46 / 0 | 0.01 / 85 | 1.41 / 0 | 0.03 / 93 | 1.41 / 0 | 0.01 / 62 | 1.41 / 0 | 2.20 / 0 | 2.20 / 0 |
-| a4 P1 | 1.16 / 20 | 1.41 / 0 | 0.02 / 113 | 1.41 / 0 | 0.00 / 119 | 1.41 / 0 | 0.02 / 46 | 1.41 / 0 | 1.20 / 3 | 2.70 / 0 |
+| a4 P1 | 1.16 / 20 | 1.41 / 0 | 0.02 / 113 | 1.41 / 0 | 0.00 / 119 | 1.41 / 0 | 0.02 / 46 | 1.41 / 0 | 1.20 / 3 | 1.60 / 0 |
 | a6 P1 | 6.78 / 0 | 6.78 / 0 | 6.78 / 0 | 6.78 / 0 | 6.72 / 0 | 6.72 / 0 | 6.78 / 0 | 6.78 / 0 | 7.00 / 0 | 7.00 / 0 |
 | a9 P1 | 0.23 / 29 | 1.41 / 0 | 0.02 / 65 | 1.41 / 0 | 0.02 / 73 | 1.41 / 0 | 0.02 / 31 | 1.41 / 0 | 1.80 / 0 | 1.80 / 0 |
-| a10 P1 | 0.60 / 26 | 1.41 / 0 | 0.00 / 57 | 1.41 / 0 | 0.01 / 60 | 1.41 / 0 | 0.00 / 26 | 1.41 / 0 | 1.20 / 3 | 2.70 / 0 |
+| a10 P1 | 0.60 / 26 | 1.41 / 0 | 0.00 / 57 | 1.41 / 0 | 0.01 / 60 | 1.41 / 0 | 0.00 / 26 | 1.41 / 0 | 1.20 / 3 | 1.60 / 0 |
 | d4 P1 | 1.26 / 5 | 1.46 / 0 | 0.01 / 154 | 1.41 / 0 | 0.01 / 162 | 1.41 / 0 | 0.01 / 101 | 1.41 / 0 | 1.99 / 0 | 1.99 / 0 |
 | tri P1 | 0.48 / 14 | 1.41 / 0 | 0.00 / 177 | 1.41 / 0 | 0.04 / 179 | 1.41 / 0 | 0.02 / 144 | 1.41 / 0 | 1.30 / 4 | 1.50 / 0 |
 | rings P1 | 1.26 / 5 | 1.46 / 0 | 0.01 / 122 | 1.41 / 0 | 0.01 / 132 | 1.41 / 0 | 0.01 / 50 | 1.41 / 0 | 2.20 / 0 | 2.20 / 0 |
@@ -132,7 +132,41 @@ No other boss's output differs (ident_hr; `git diff origin/wip/x --stat` outside
 None (`diff -rq rp_rel4 rp_xb`: identical; atlas 13 109 184 px).
 
 ## Gates
-(the final round: below once run; the checkpoint commit had test_body 331, test_vi 208, test_wi 215, test_seq ALL, test_cam ALL, test_cine 172, test_contact 106, test_actor 157, pat_p1 559, pat_p2 70, pat_ghost 65, test_scarlet 48, test_flow 40, test_blade 347, test_metro 33, test_bal_hr 79, ident_hr pass, test_rig 162, test_kit 15 361, test_cb 402, chainparry 624 / 624, gen_check_hr 28 / 28, loadcheck xb1 0 failures + Done, check 0, rplint 0, atlas 13.109 M)
+The final tree (5e05a3053's sources; suites from a fresh copy of `tools/dev/sim` outside the tree, `<S>/xb/out/g3_*.log`):
+| gate | result |
+|---|---|
+| regeneration (README 0-4 order) twice | rounds 4 and 5: the same `git status` (294 paths before the commit) and tree hash `c9613e6b23ec0dba`, pack hash `3573a6e76c0b1d70` both rounds; the pack equals `rp_rel4` byte for byte |
+| `check_mboss_pack.py` | 0 problems (4 mid-boss, 4 chapter, 3 special modules, 7 arenas) |
+| loadcheck `xb1` (26.3 server) | 0 function load failures, `Loaded 1871 advancements`, `Done (0.791s)!` |
+| `rplint.py rp_xb` / `atlas_px.py` | 0 problems / 13 109 184 px (13.109 M) |
+| test_body | 331 / 331 (cam 3, moves 10, sep 7, fight 310 runs + the total: 23 797 ticks, 0 below 1.4 b, closest 1.408 b, 0 knocked toward her); eye 2.11 / 2.85 (walk, lunge, hold; 186 runs each): 187 / 187 both, 0 below the rule |
+| test_wi / test_vi | 215 / 215 (dodgecam at seat height and the rule: the camera inside her 0 of 8 274 ticks, her body in the camera line 0 ticks (round W: 138), the player's own move nearer than the rule 0, knocked across her 0) / 208 / 208 |
+| test_seq / test_cam / test_cine / test_contact / test_actor / test_rig | ALL / ALL / 172 / 106 (gap: outside the contact rows >= 1.525 b; the rows 0.465 / 0.432 / 0.901 / 0.354 / 0.328 / 1.073 b) / 157 / 162 |
+| pat_p1 / pat_p2 / pat_ghost / test_scarlet / test_flow | 559 / 70 / 65 / 48 (P1 545, P2 550 commands per tick; were 505 / 524, budget 830) / 40 (the whole fight 402, was 381) |
+| test_blade / test_kit / test_metro / test_bal_hr | 347 / 15 361 / 33 / 79 |
+| cb: test_cb / chainparry | 402 / 624 of 624 perfect (G1 9 / 9, G2 11 / 11), 0 refused, 0 exceptions |
+| ident_hr / gen_check_hr | passes (group LANE_XB) / 28 of 28 |
+
+**Balance** (hrfair 2.0, all 175 runs, seeds 11 / 22 / 33; `<S>/xb/out/hrfair_full.log`) against the round W final tree
+(`tools/dev/sim/hr/review/bal/wi_final.log`, = `origin/wip/x` for the fight): no balance value was changed.
+| row | band (hr_design §6.4) | before (11 / 22 / 33) | after (11 / 22 / 33) |
+|---|---|---|---|
+| T1 P1 walker / 타키 | 1.00-1.15 | 1.02 / 1.03 / **0.97** (pooled 1.01) | 1.02 / 1.03 / **0.97** (pooled 1.01): the same seed-33 miss as the release |
+| T1b / T1c | <= 0.60 / <= 5 | 0.50 / 0.58 / 0.59; 0 | the same |
+| T2 P2 walker / 타키 | <= 1.25 | 1.06 / 1.05 / 1.02 | 1.06 / 1.02 / 1.02 |
+| T3 standing / the Guardian | <= 1.8 | 1.47 / 1.50 / 1.51 | the same |
+| T4 / T5 / T5b | <= 40 / 45 / 55 % | 19.0 / 40.3 / 49.3 | the same |
+| T6 s0; s1 | >= 95; >= 95, cleared >= 90 % | 100; 85.0-91.2 raw, 100 in window, 100 % cleared | the same |
+| T7 sloppy; masher; dodger | <= 35; 0; 0 | 0; 0; 0 | the same |
+| T8 / T13 | <= 1 / 100 %, 0 | 1 / 53 of 53, 0 | the same |
+| T9 walker kill Lv5 / 10 / 15 (pooled) | 150-185 s | 159 / 170 / 169 | 160 / 170 / 169 |
+| T9b parrier s1.5 kill | 125-170 s | 164 / 164 / 167 | 164 / 164 / 160 |
+| T10 groggies / min | 0.8-1.6; <= 0.4 | 1.50 / 1.33 / 1.50; 0 | 1.50 / 1.33 / 1.33; 0 |
+| T11 U / min | 0.8-1.5; 0.6-1.0 | 1.33; 0.67 | the same |
+| T12 dodger s1 | >= 95 % in window | 100 (raw 92.2 / 90.4 / 78.2) | 100 (raw 87.7 / 92.2 / 78.6) |
+| W35 | <= 35 % | 35 35 34 35 / 35 35 35 32 | the same |
+The quick run (seed 11) on both trees (`hrfair_q_base.log` / `hrfair_q.log`) differs only in T9 walker Lv15 167 -> 170 s and P2's
+mixed / dodger N-hit counts.
 
 ## Only a person in the game can check
 README 0-9 「홍련 — 게임에서 확인할 것」, the 11-16 round X block X①-X⑩.
